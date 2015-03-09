@@ -23,6 +23,13 @@ namespace mtp { namespace usb
 		}
 	}
 
+	ConfigurationPtr DeviceDescriptor::GetConfiguration(int conf)
+	{
+		libusb_config_descriptor *desc;
+		USB_CALL(libusb_get_config_descriptor(_dev, conf, &desc));
+		return std::make_shared<Configuration>(desc);
+	}
+
 	DevicePtr DeviceDescriptor::Open()
 	{
 		libusb_device_handle *handle;

@@ -7,6 +7,15 @@
 
 namespace mtp { namespace usb
 {
+	class Configuration
+	{
+		libusb_config_descriptor *_config;
+
+	public:
+		Configuration(libusb_config_descriptor *config) : _config(config) { }
+		~Configuration() { libusb_free_config_descriptor(_config); }
+	};
+	DECLARE_PTR(Configuration);
 
 	class DeviceDescriptor
 	{
@@ -18,7 +27,18 @@ namespace mtp { namespace usb
 		DeviceDescriptor(libusb_device *dev);
 		~DeviceDescriptor();
 
+		u16 GetVendorId() const
+		{ return _descriptor.idVendor; }
+
+		u16 GetProductId() const
+		{ return _descriptor.idProduct; }
+
 		DevicePtr Open();
+
+		int GetConfigurationsCount() const
+		{ return _descriptor.bNumConfigurations; }
+
+		ConfigurationPtr GetConfiguration(int conf);
 	};
 	DECLARE_PTR(DeviceDescriptor);
 
