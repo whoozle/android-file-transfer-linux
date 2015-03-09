@@ -5,7 +5,7 @@
 
 #include <libusb.h>
 
-#define USB_CALL(...) do { int r = (__VA_ARGS__); if (r != 0) throw Exception(r) ; } while(false)
+#define USB_CALL(...) do { int r = (__VA_ARGS__); if (r != 0) throw mtp::usb::Exception(r) ; } while(false)
 
 #endif
 
