@@ -12,7 +12,7 @@ namespace mtp { namespace usb
 		libusb_device **devs;
 		int count = libusb_get_device_list(_ctx, &devs);
 		if (count < 0)
-			throw Exception(count);
+			throw Exception("libusb_get_device_list", count);
 
 		_devices.reserve(count);
 		for(int i = 0; i < count; ++i)

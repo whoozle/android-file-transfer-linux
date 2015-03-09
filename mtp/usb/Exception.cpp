@@ -3,10 +3,8 @@
 
 namespace mtp { namespace usb
 {
-	Exception::Exception(int returnCode) throw() : std::runtime_error(GetErrorMessage(returnCode))
-	{
-
-	}
+	Exception::Exception(const std::string &what, int returnCode) throw() : std::runtime_error(what + ": " + GetErrorMessage(returnCode))
+	{ }
 
 	std::string Exception::GetErrorMessage(int returnCode)
 	{
