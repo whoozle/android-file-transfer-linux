@@ -69,7 +69,7 @@ int main(int argc, char **argv)
 	device->SetConfiguration(configuration->GetIndex());
 	int epn = interface->GetEndpointsCount();
 
-	usb::EndpointPtr out;
+	usb::EndpointPtr out, in, interrupt;
 	printf("endpoints: %d\n", epn);
 	for(int i = 0; i < epn; ++i)
 	{
@@ -78,11 +78,28 @@ int main(int argc, char **argv)
 		//check for bulk here
 		if (ep->GetDirection() == usb::EndpointDirection::Out)
 		{
-			printf("OUT\n");
-			out = ep;
-			break;
+			if (ep->GetType() == usb::EndpointType::Bulk)
+			{
+				printf("OUT\n");
+				out = ep;
+			}
+		}
+		else
+		{
+			if (ep->GetType() == usb::EndpointType::Bulk)
+			{
+				printf("IN\n");
+				in = ep;
+			}
+			else
+			{
+				printf("INTERRUPT\n");
+				interrupt = ep;
+			}
 		}
 	}
+	if (!in || !out || !interrupt)
+		throw std::runtime_error("invalid endpoint");
 
 	printf("claiming interface %d...\n", interface->GetIndex());
 	USB_CALL(libusb_claim_interface(device->GetHandle(), interface->GetIndex()));

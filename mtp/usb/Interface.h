@@ -5,9 +5,17 @@
 
 namespace mtp { namespace usb
 {
-	enum struct EndpointDirection {
+	enum struct EndpointType
+	{
+		Control = 0, Isochronous = 1, Bulk = 2, Interrupt = 3
+	};
+
+	enum struct EndpointDirection
+	{
 		In, Out
 	};
+
+
 	class Endpoint
 	{
 		const libusb_endpoint_descriptor & _endpoint;
@@ -25,6 +33,11 @@ namespace mtp { namespace usb
 				return EndpointDirection::In;
 			else
 				return EndpointDirection::Out;
+		}
+
+		EndpointType GetType() const
+		{
+			return EndpointType(_endpoint.bmAttributes & 3);
 		}
 	};
 	DECLARE_PTR(Endpoint);
