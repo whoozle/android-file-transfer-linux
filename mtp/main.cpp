@@ -5,6 +5,7 @@
 #include <mtp/usb/Context.h>
 #include <mtp/usb/call.h>
 #include <mtp/ptp/OperationRequest.h>
+#include <mtp/ptp/Container.h>
 
 static void callback(struct libusb_transfer *transfer)
 {
@@ -89,13 +90,17 @@ int main(int argc, char **argv)
 	//USB_CALL(libusb_set_interface_alt_setting(device->GetHandle(), mtp_interface, 0));
 
 	OperationRequest req(OperationCode::GetDeviceInfo);
+	Container container(req);
+#if 0
 	libusb_transfer *transfer = libusb_alloc_transfer(0);
-	printf("data size: %u\n", (unsigned)req.Data.size());
-	libusb_fill_bulk_transfer(transfer, device->GetHandle(), out->GetAddress(),
-			req.Data.data(), req.Data.size(), &callback, 0, 3000);
+	printf("data size: %u\n", (unsigned)container.Data.size());
+	libusb_fill_bulk_transfer(transfer, device->GetHandle(), out->GetAddress(), container.Data.data(), container.Data.size(), &callback, 0, 3000);
 	USB_CALL(libusb_submit_transfer(transfer));
-	printf("submitted\n");
-
-	while(true);
+#endif
+	int r = 0;
+	printf("sending %u bytes\n", (unsigned)container.Data.size());
+	USB_CALL(libusb_bulk_transfer(device->GetHandle(), out->GetAddress(),
+			container.Data.data(), container.Data.size(), &r, 3000));
+	printf("submitted %d\n", r);
 	return 0;
 }

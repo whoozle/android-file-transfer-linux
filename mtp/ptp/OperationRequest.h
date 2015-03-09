@@ -2,6 +2,8 @@
 #define	OPERATIONREQUEST_H
 
 #include <mtp/types.h>
+#include <mtp/ptp/Packet.h>
+#include <mtp/ptp/Container.h>
 
 namespace mtp
 {
@@ -10,26 +12,9 @@ namespace mtp
 		GetDeviceInfo = 0x1001
 	};
 
-	struct OperationRequest
+	struct OperationRequest : Packet
 	{
-		std::vector<u8>		Data;
-
-		void Write(u8 byte)
-		{
-			Data.push_back(byte);
-		}
-
-		void Write(u16 word)
-		{
-			Write((u8)word);
-			Write((u8)(word >> 8));
-		}
-
-		void Write(u32 dword)
-		{
-			Write((u16)dword);
-			Write((u16)(dword >> 16));
-		}
+		static const ContainerType Type = ContainerType::Data;
 
 		OperationRequest(OperationCode opcode, u32 session = 0, u32 transaction = 0, u32 par1 = 0, u32 par2 = 0, u32 par3 = 0, u32 par4 = 0, u32 par5 = 0)
 		{
