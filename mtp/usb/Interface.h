@@ -5,6 +5,17 @@
 
 namespace mtp { namespace usb
 {
+	class Endpoint
+	{
+		const libusb_endpoint_descriptor & _endpoint;
+
+	public:
+		Endpoint(const libusb_endpoint_descriptor & endpoint) : _endpoint(endpoint) { }
+
+		u8 GetAddress() const
+		{ return _endpoint.bEndpointAddress; }
+	};
+	DECLARE_PTR(Endpoint);
 
 	class Interface
 	{
@@ -15,6 +26,9 @@ namespace mtp { namespace usb
 
 		int GetNameIndex() const
 		{ return _interface.iInterface; }
+
+		EndpointPtr GetEndpoint(int idx) const
+		{ return std::make_shared<Endpoint>(_interface.endpoint[idx]); }
 
 		int GetEndpointsCount() const
 		{ return _interface.bNumEndpoints; }

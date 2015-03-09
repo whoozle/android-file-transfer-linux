@@ -26,7 +26,9 @@ int main(int argc, char **argv)
 
 	int mtp_configuration = -1;
 	int mtp_interface = -1;
-	mtp::usb::InterfacePtr interface;
+
+	mtp::usb::ConfigurationPtr		configuration;
+	mtp::usb::InterfacePtr			interface;
 
 	for(int i = 0; i < confs; ++i)
 	{
@@ -35,25 +37,35 @@ int main(int argc, char **argv)
 		printf("interfaces: %d\n", interfaces);
 		for(int j = 0; j < interfaces; ++j)
 		{
-			interface = conf->GetInterface(j, 0);
-			int name_idx = interface->GetNameIndex();
+			mtp::usb::InterfacePtr iface = conf->GetInterface(j, 0);
+			printf("%d:%d %u\n", i, j, iface->GetEndpointsCount());
+			int name_idx = iface->GetNameIndex();
 			if (!name_idx)
 				continue;
 			std::string name = device->GetString(name_idx);
 			if (name == "MTP")
 			{
+				configuration = conf;
+				interface = iface;
 				mtp_configuration = i;
 				mtp_interface = j;
+				i = confs;
 				break;
 			}
 		}
 	}
 
-	if (mtp_interface < 0 || mtp_configuration < 0)
+	if (!interface || mtp_interface < 0 || mtp_configuration < 0)
 		throw std::runtime_error("no mtp interface found");
 
 	device->SetConfiguration(mtp_configuration);
-	interface->GetEndpointsCount();
+	int epn = interface->GetEndpointsCount();
+	printf("endpoints: %d\n", epn);
+	for(int i = 0; i < epn; ++i)
+	{
+		mtp::usb::EndpointPtr ep = interface->GetEndpoint(i);
+		printf("endpoint: %d: %02x\n", i, ep->GetAddress());
+	}
 
 	mtp::OperationRequest req(mtp::OperationCode::GetDeviceInfo);
 
