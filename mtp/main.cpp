@@ -94,6 +94,7 @@ int main(int argc, char **argv)
 	libusb_fill_bulk_transfer(transfer, device->GetHandle(), out->GetAddress(),
 			req.Data.data(), req.Data.size(), &callback, 0, 3000);
 	USB_CALL(libusb_submit_transfer(transfer));
+	printf("submitted\n");
 
 	while(true);
 	return 0;
