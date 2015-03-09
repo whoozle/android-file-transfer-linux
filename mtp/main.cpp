@@ -3,13 +3,20 @@
 #include <stdexcept>
 
 #include <mtp/usb/Context.h>
+#include <mtp/usb/call.h>
 #include <mtp/ptp/OperationRequest.h>
+
+static void callback(struct libusb_transfer *transfer)
+{
+	printf("CALLBACK!!!\n");
+}
 
 int main(int argc, char **argv)
 {
-	mtp::usb::Context ctx;
-	mtp::usb::DeviceDescriptorPtr desc;
-	for (mtp::usb::DeviceDescriptorPtr dd : ctx.GetDevices())
+	using namespace mtp;
+	usb::Context ctx;
+	usb::DeviceDescriptorPtr desc;
+	for (usb::DeviceDescriptorPtr dd : ctx.GetDevices())
 	{
 		if (dd->GetVendorId() == 0x18d1)
 		{
@@ -20,24 +27,24 @@ int main(int argc, char **argv)
 	if (!desc)
 		throw std::runtime_error("no mtp device found");
 
-	mtp::usb::DevicePtr device = desc->Open();
+	usb::DevicePtr device = desc->Open();
 	int confs = desc->GetConfigurationsCount();
 	printf("configurations: %d\n", confs);
 
 	int mtp_configuration = -1;
 	int mtp_interface = -1;
 
-	mtp::usb::ConfigurationPtr		configuration;
-	mtp::usb::InterfacePtr			interface;
+	usb::ConfigurationPtr		configuration;
+	usb::InterfacePtr			interface;
 
 	for(int i = 0; i < confs; ++i)
 	{
-		mtp::usb::ConfigurationPtr conf = desc->GetConfiguration(i);
+		usb::ConfigurationPtr conf = desc->GetConfiguration(i);
 		int interfaces = conf->GetInterfaceCount();
 		printf("interfaces: %d\n", interfaces);
 		for(int j = 0; j < interfaces; ++j)
 		{
-			mtp::usb::InterfacePtr iface = conf->GetInterface(j, 0);
+			usb::InterfacePtr iface = conf->GetInterface(j, 0);
 			printf("%d:%d %u\n", i, j, iface->GetEndpointsCount());
 			int name_idx = iface->GetNameIndex();
 			if (!name_idx)
@@ -60,14 +67,35 @@ int main(int argc, char **argv)
 
 	device->SetConfiguration(mtp_configuration);
 	int epn = interface->GetEndpointsCount();
+
+	usb::EndpointPtr out;
 	printf("endpoints: %d\n", epn);
 	for(int i = 0; i < epn; ++i)
 	{
-		mtp::usb::EndpointPtr ep = interface->GetEndpoint(i);
+		usb::EndpointPtr ep = interface->GetEndpoint(i);
 		printf("endpoint: %d: %02x\n", i, ep->GetAddress());
+		//check for bulk here
+		if (ep->GetDirection() == usb::EndpointDirection::Out)
+		{
+			printf("OUT\n");
+			out = ep;
+			break;
+		}
 	}
 
-	mtp::OperationRequest req(mtp::OperationCode::GetDeviceInfo);
+	int r = libusb_kernel_driver_active(device->GetHandle(), interface->GetIndex());
+	printf("kernel driver active %d\n", r);
+	printf("claiming interface %d...\n", interface->GetIndex());
+	USB_CALL(libusb_claim_interface(device->GetHandle(), interface->GetIndex()));
+	printf("claimed interface\n");
 
+	OperationRequest req(OperationCode::GetDeviceInfo);
+	libusb_transfer *transfer = libusb_alloc_transfer(0);
+	printf("data size: %u\n", (unsigned)req.Data.size());
+	libusb_fill_bulk_transfer(transfer, device->GetHandle(), out->GetAddress(),
+			req.Data.data(), req.Data.size(), &callback, 0, 3000);
+	USB_CALL(libusb_submit_transfer(transfer));
+
+	while(true);
 	return 0;
 }
