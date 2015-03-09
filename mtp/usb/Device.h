@@ -6,7 +6,7 @@
 
 namespace mtp { namespace usb
 {
-	class Device
+	class Device : Noncopyable
 	{
 	private:
 		libusb_device_handle *_handle;

@@ -9,7 +9,7 @@
 namespace mtp { namespace usb
 {
 
-	class Context
+	class Context : Noncopyable
 	{
 	private:
 		libusb_context *		_ctx;

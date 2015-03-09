@@ -8,7 +8,7 @@
 
 namespace mtp { namespace usb
 {
-	class Configuration
+	class Configuration : Noncopyable
 	{
 		libusb_config_descriptor *_config;
 
