@@ -5,6 +5,6 @@
 #include <mtp/usb/Context.h>
 
 int main() {
-	mtp::Context ctx;
+	mtp::usb::Context ctx;
 	return 0;
 }

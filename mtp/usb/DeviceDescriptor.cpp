@@ -1,13 +1,13 @@
 #include <mtp/usb/DeviceDescriptor.h>
 #include <mtp/usb/call.h>
 
-namespace mtp
+namespace mtp { namespace usb
 {
 	DeviceDescriptor::DeviceDescriptor(libusb_device *dev): _dev(dev)
 	{
 		USB_CALL(libusb_get_device_descriptor(_dev, &_descriptor));
-		printf("%04x:%04x\n", device_desc.idVendor, device_desc.idProduct);
-		for(unsigned config = 0; config < device_desc.bNumConfigurations; ++config)
+		printf("%04x:%04x\n", _descriptor.idVendor, _descriptor.idProduct);
+		for(unsigned config = 0; config < _descriptor.bNumConfigurations; ++config)
 		{
 			libusb_config_descriptor *desc;
 			USB_CALL(libusb_get_config_descriptor(_dev, config, &desc));
@@ -33,4 +33,4 @@ namespace mtp
 	DeviceDescriptor::~DeviceDescriptor()
 	{ libusb_unref_device(_dev); }
 
-}
+}}

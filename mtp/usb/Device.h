@@ -4,7 +4,7 @@
 #include <mtp/types.h>
 #include <libusb.h>
 
-namespace mtp
+namespace mtp { namespace usb
 {
 	class Device
 	{
@@ -16,7 +16,7 @@ namespace mtp
 		~Device();
 	};
 	DECLARE_PTR(Device);
-}
+}}
 
 #endif	/* DEVICE_H */
 

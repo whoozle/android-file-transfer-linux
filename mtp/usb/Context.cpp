@@ -2,7 +2,7 @@
 #include <mtp/usb/call.h>
 #include <stdio.h>
 
-namespace mtp
+namespace mtp { namespace usb
 {
 
 	Context::Context()
@@ -29,4 +29,4 @@ namespace mtp
 		libusb_exit(_ctx);
 	}
 
-}
+}}

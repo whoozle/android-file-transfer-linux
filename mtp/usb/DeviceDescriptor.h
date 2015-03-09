@@ -5,7 +5,7 @@
 #include <mtp/types.h>
 #include <mtp/usb/Device.h>
 
-namespace mtp
+namespace mtp { namespace usb
 {
 
 	class DeviceDescriptor
@@ -22,7 +22,7 @@ namespace mtp
 	};
 	DECLARE_PTR(DeviceDescriptor);
 
-}
+}}
 
 #endif
 

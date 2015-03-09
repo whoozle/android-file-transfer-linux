@@ -6,7 +6,7 @@
 #include <mtp/usb/DeviceDescriptor.h>
 #include <vector>
 
-namespace mtp
+namespace mtp { namespace usb
 {
 
 	class Context
@@ -21,7 +21,7 @@ namespace mtp
 	};
 	DECLARE_PTR(Context);
 
-}
+}}
 
 #endif
 

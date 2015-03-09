@@ -3,7 +3,7 @@
 
 #include <stdexcept>
 
-namespace mtp
+namespace mtp { namespace usb
 {
 	class Exception : public std::runtime_error
 	{
@@ -11,6 +11,6 @@ namespace mtp
 		Exception(int retCode) throw();
 		static std::string GetErrorMessage(int retCode);
 	};
-}
+}}
 
 #endif
