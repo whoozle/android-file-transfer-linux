@@ -8,7 +8,7 @@ namespace mtp { namespace usb
 	Context::Context()
 	{
 		USB_CALL(libusb_init(&_ctx));
-		libusb_set_debug(_ctx, 3);
+		libusb_set_debug(_ctx, 4);
 		libusb_device **devs;
 		int count = libusb_get_device_list(_ctx, &devs);
 		if (count < 0)

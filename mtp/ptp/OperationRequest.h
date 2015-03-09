@@ -14,7 +14,7 @@ namespace mtp
 
 	struct OperationRequest : Packet
 	{
-		static const ContainerType Type = ContainerType::Data;
+		static const ContainerType Type = ContainerType::Command;
 
 		OperationRequest(OperationCode opcode, u32 session = 0, u32 transaction = 0, u32 par1 = 0, u32 par2 = 0, u32 par3 = 0, u32 par4 = 0, u32 par5 = 0)
 		{

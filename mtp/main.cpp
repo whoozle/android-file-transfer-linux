@@ -108,16 +108,18 @@ int main(int argc, char **argv)
 
 	OperationRequest req(OperationCode::GetDeviceInfo);
 	Container container(req);
-#if 0
-	libusb_transfer *transfer = libusb_alloc_transfer(0);
+
+	std::vector<u8> data;
+	data.resize(4096);
+	libusb_transfer *transfer_in = libusb_alloc_transfer(0);
+	libusb_fill_bulk_transfer(transfer_in, device->GetHandle(), in->GetAddress(), data.data(), data.size(), &callback, 0, 3000);
+	USB_CALL(libusb_submit_transfer(transfer_in));
+
+	libusb_transfer *transfer_out = libusb_alloc_transfer(0);
 	printf("data size: %u\n", (unsigned)container.Data.size());
-	libusb_fill_bulk_transfer(transfer, device->GetHandle(), out->GetAddress(), container.Data.data(), container.Data.size(), &callback, 0, 3000);
-	USB_CALL(libusb_submit_transfer(transfer));
-#endif
-	int r = 0;
-	printf("sending %u bytes\n", (unsigned)container.Data.size());
-	USB_CALL(libusb_bulk_transfer(device->GetHandle(), out->GetAddress(),
-			container.Data.data(), container.Data.size(), &r, 3000));
-	printf("submitted %d\n", r);
+	libusb_fill_bulk_transfer(transfer_out, device->GetHandle(), out->GetAddress(), container.Data.data(), container.Data.size(), &callback, 0, 3000);
+	USB_CALL(libusb_submit_transfer(transfer_out));
+
+	while(true);
 	return 0;
 }
