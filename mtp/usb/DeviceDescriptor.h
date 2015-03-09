@@ -4,6 +4,7 @@
 #include <libusb.h>
 #include <mtp/types.h>
 #include <mtp/usb/Device.h>
+#include <mtp/usb/Interface.h>
 
 namespace mtp { namespace usb
 {
@@ -14,6 +15,11 @@ namespace mtp { namespace usb
 	public:
 		Configuration(libusb_config_descriptor *config) : _config(config) { }
 		~Configuration() { libusb_free_config_descriptor(_config); }
+		int GetInterfaceCount() const
+		{ return _config->bNumInterfaces; }
+
+		InterfacePtr GetInterface(int idx) const
+		{ return std::make_shared<Interface>(_config->interface[idx]); }
 	};
 	DECLARE_PTR(Configuration);
 

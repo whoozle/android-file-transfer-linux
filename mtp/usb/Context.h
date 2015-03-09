@@ -13,11 +13,19 @@ namespace mtp { namespace usb
 	{
 	private:
 		libusb_context *		_ctx;
-		std::vector<DeviceDescriptorPtr>	_devices;
+
+	public:
+		typedef std::vector<DeviceDescriptorPtr> Devices;
+
+	private:
+		Devices					_devices;
 
 	public:
 		Context();
 		~Context();
+
+		const Devices & GetDevices() const
+		{ return _devices; }
 	};
 	DECLARE_PTR(Context);
 
