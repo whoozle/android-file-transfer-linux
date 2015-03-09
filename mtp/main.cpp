@@ -3,6 +3,7 @@
 #include <stdexcept>
 
 #include <mtp/usb/Context.h>
+#include <mtp/ptp/OperationRequest.h>
 
 int main(int argc, char **argv)
 {
@@ -25,6 +26,8 @@ int main(int argc, char **argv)
 
 	int mtp_configuration = -1;
 	int mtp_interface = -1;
+	mtp::usb::InterfacePtr interface;
+
 	for(int i = 0; i < confs; ++i)
 	{
 		mtp::usb::ConfigurationPtr conf = desc->GetConfiguration(i);
@@ -32,7 +35,7 @@ int main(int argc, char **argv)
 		printf("interfaces: %d\n", interfaces);
 		for(int j = 0; j < interfaces; ++j)
 		{
-			mtp::usb::InterfacePtr interface = conf->GetInterface(j, 0);
+			interface = conf->GetInterface(j, 0);
 			int name_idx = interface->GetNameIndex();
 			if (!name_idx)
 				continue;
@@ -50,6 +53,9 @@ int main(int argc, char **argv)
 		throw std::runtime_error("no mtp interface found");
 
 	device->SetConfiguration(mtp_configuration);
+	interface->GetEndpointsCount();
+
+	mtp::OperationRequest req(mtp::OperationCode::GetDeviceInfo);
 
 	return 0;
 }
