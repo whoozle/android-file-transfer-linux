@@ -13,6 +13,9 @@ namespace mtp { namespace usb
 	public:
 		Interface(const libusb_interface_descriptor &interface): _interface(interface) { }
 
+		int GetNameIndex() const
+		{ return _interface.iInterface; }
+
 		int GetEndpointsCount() const
 		{ return _interface.bNumEndpoints; }
 	};

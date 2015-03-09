@@ -14,6 +14,10 @@ namespace mtp { namespace usb
 	public:
 		Device(libusb_device_handle * handle);
 		~Device();
+
+		void SetConfiguration(int idx);
+
+		std::string GetString(int idx) const;
 	};
 	DECLARE_PTR(Device);
 }}

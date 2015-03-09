@@ -18,8 +18,13 @@ int main(int argc, char **argv)
 	}
 	if (!desc)
 		throw std::runtime_error("no mtp device found");
+
+	mtp::usb::DevicePtr device = desc->Open();
 	int confs = desc->GetConfigurationsCount();
 	printf("configurations: %d\n", confs);
+
+	int mtp_configuration = -1;
+	int mtp_interface = -1;
 	for(int i = 0; i < confs; ++i)
 	{
 		mtp::usb::ConfigurationPtr conf = desc->GetConfiguration(i);
@@ -28,8 +33,23 @@ int main(int argc, char **argv)
 		for(int j = 0; j < interfaces; ++j)
 		{
 			mtp::usb::InterfacePtr interface = conf->GetInterface(j, 0);
-			printf("endpoints: %d\n", interface->GetEndpointsCount());
+			int name_idx = interface->GetNameIndex();
+			if (!name_idx)
+				continue;
+			std::string name = device->GetString(name_idx);
+			if (name == "MTP")
+			{
+				mtp_configuration = i;
+				mtp_interface = j;
+				break;
+			}
 		}
 	}
+
+	if (mtp_interface < 0 || mtp_configuration < 0)
+		throw std::runtime_error("no mtp interface found");
+
+	device->SetConfiguration(mtp_configuration);
+
 	return 0;
 }
