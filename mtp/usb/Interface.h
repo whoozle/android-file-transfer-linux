@@ -36,6 +36,9 @@ namespace mtp { namespace usb
 	public:
 		Interface(const libusb_interface_descriptor &interface): _interface(interface) { }
 
+		u8 GetIndex() const
+		{ return _interface.bInterfaceNumber; }
+
 		int GetNameIndex() const
 		{ return _interface.iInterface; }
 
