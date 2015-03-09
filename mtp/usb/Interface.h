@@ -8,11 +8,13 @@ namespace mtp { namespace usb
 
 	class Interface
 	{
-		const libusb_interface &_interface;
+		const libusb_interface_descriptor &_interface;
 
 	public:
-		Interface(const libusb_interface &interface): _interface(interface) { }
+		Interface(const libusb_interface_descriptor &interface): _interface(interface) { }
 
+		int GetEndpointsCount() const
+		{ return _interface.bNumEndpoints; }
 	};
 	DECLARE_PTR(Interface);
 

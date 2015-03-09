@@ -18,8 +18,10 @@ namespace mtp { namespace usb
 		int GetInterfaceCount() const
 		{ return _config->bNumInterfaces; }
 
-		InterfacePtr GetInterface(int idx) const
-		{ return std::make_shared<Interface>(_config->interface[idx]); }
+		int GetInterfaceAltSettingsCount(int idx) const
+		{ return _config->interface[idx].num_altsetting; }
+		InterfacePtr GetInterface(int idx, int settings) const
+		{ return std::make_shared<Interface>(_config->interface[idx].altsetting[settings]); }
 	};
 	DECLARE_PTR(Configuration);
 
