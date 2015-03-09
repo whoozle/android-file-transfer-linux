@@ -15,11 +15,16 @@ namespace mtp { namespace usb
 	public:
 		Configuration(libusb_config_descriptor *config) : _config(config) { }
 		~Configuration() { libusb_free_config_descriptor(_config); }
+
+		int GetIndex() const
+		{ return _config->bConfigurationValue; }
+
 		int GetInterfaceCount() const
 		{ return _config->bNumInterfaces; }
 
 		int GetInterfaceAltSettingsCount(int idx) const
 		{ return _config->interface[idx].num_altsetting; }
+
 		InterfacePtr GetInterface(int idx, int settings) const
 		{ return std::make_shared<Interface>(_config->interface[idx].altsetting[settings]); }
 	};

@@ -45,7 +45,7 @@ int main(int argc, char **argv)
 		for(int j = 0; j < interfaces; ++j)
 		{
 			usb::InterfacePtr iface = conf->GetInterface(j, 0);
-			printf("%d:%d %u\n", i, j, iface->GetEndpointsCount());
+			printf("%d:%d index %u, eps %u\n", i, j, iface->GetIndex(), iface->GetEndpointsCount());
 			int name_idx = iface->GetNameIndex();
 			if (!name_idx)
 				continue;
@@ -65,7 +65,7 @@ int main(int argc, char **argv)
 	if (!interface || mtp_interface < 0 || mtp_configuration < 0)
 		throw std::runtime_error("no mtp interface found");
 
-	device->SetConfiguration(mtp_configuration);
+	device->SetConfiguration(configuration->GetIndex());
 	int epn = interface->GetEndpointsCount();
 
 	usb::EndpointPtr out;
@@ -83,11 +83,10 @@ int main(int argc, char **argv)
 		}
 	}
 
-	int r = libusb_kernel_driver_active(device->GetHandle(), interface->GetIndex());
-	printf("kernel driver active %d\n", r);
 	printf("claiming interface %d...\n", interface->GetIndex());
 	USB_CALL(libusb_claim_interface(device->GetHandle(), interface->GetIndex()));
 	printf("claimed interface\n");
+	//USB_CALL(libusb_set_interface_alt_setting(device->GetHandle(), mtp_interface, 0));
 
 	OperationRequest req(OperationCode::GetDeviceInfo);
 	libusb_transfer *transfer = libusb_alloc_transfer(0);
