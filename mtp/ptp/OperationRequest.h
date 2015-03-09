@@ -21,14 +21,14 @@ namespace mtp
 
 		void Write(u16 word)
 		{
-			Data.push_back((u8)word);
-			Data.push_back((u8)(word >> 8));
+			Write((u8)word);
+			Write((u8)(word >> 8));
 		}
 
 		void Write(u32 dword)
 		{
-			Data.push_back((u16)dword);
-			Data.push_back((u16)(dword >> 16));
+			Write((u16)dword);
+			Write((u16)(dword >> 16));
 		}
 
 		OperationRequest(OperationCode opcode, u32 session = 0, u32 transaction = 0, u32 par1 = 0, u32 par2 = 0, u32 par3 = 0, u32 par4 = 0, u32 par5 = 0)
