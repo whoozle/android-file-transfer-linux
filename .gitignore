@@ -1,0 +1,5 @@
+*.ninja*
+cmake_*
+CMake*
+nbproject
+mtp-test
