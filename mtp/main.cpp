@@ -9,7 +9,10 @@
 
 static void callback(struct libusb_transfer *transfer)
 {
-	printf("CALLBACK!!!\n");
+	printf("CALLBACK, status: %d\n", transfer->status);
+	for(int i = 0; i < transfer->actual_length; ++i)
+		printf("%02x ", transfer->buffer[i]);
+	printf("\n");
 }
 
 int main(int argc, char **argv)
@@ -101,25 +104,61 @@ int main(int argc, char **argv)
 	if (!in || !out || !interrupt)
 		throw std::runtime_error("invalid endpoint");
 
+	//USB_CALL(libusb_reset_device(device->GetHandle()));
+
 	printf("claiming interface %d...\n", interface->GetIndex());
 	USB_CALL(libusb_claim_interface(device->GetHandle(), interface->GetIndex()));
 	printf("claimed interface\n");
-	//USB_CALL(libusb_set_interface_alt_setting(device->GetHandle(), mtp_interface, 0));
+	USB_CALL(libusb_set_interface_alt_setting(device->GetHandle(), mtp_interface, 0));
 
-	OperationRequest req(OperationCode::GetDeviceInfo);
+	//OperationRequest req(OperationCode::OpenSession, 0, 1);
+	OperationRequest req(OperationCode::GetDeviceInfo, 0, 1);
 	Container container(req);
 
-	std::vector<u8> data;
-	data.resize(4096);
+	/*
+	for(size_t i = 0; i < container.Data.size(); ++i)
+		printf("%02x ", container.Data[i]);
+	printf("\n");
+	*/
+
+	libusb_clear_halt(device->GetHandle(), out->GetAddress());
+	libusb_clear_halt(device->GetHandle(), in->GetAddress());
+
+	std::vector<u8> data(in->GetMaxPacketSize());
+	//std::vector<u8> data(64);
+#if 0
+	libusb_transfer *transfer_out = libusb_alloc_transfer(0);
+	//transfer_out->flags |= LIBUSB_TRANSFER_ADD_ZERO_PACKET | LIBUSB_TRANSFER_SHORT_NOT_OK;
+	printf("data size: %u\n", (unsigned)container.Data.size());
+	libusb_fill_bulk_transfer(transfer_out, device->GetHandle(), out->GetAddress(), container.Data.data(), container.Data.size(), &callback, 0, 3000);
+	USB_CALL(libusb_submit_transfer(transfer_out));
+	{
+		ctx.Wait();
+		printf("WAIT COMPLETED\n");
+	}
+
+	//libusb_free_transfer(transfer_out);
 	libusb_transfer *transfer_in = libusb_alloc_transfer(0);
 	libusb_fill_bulk_transfer(transfer_in, device->GetHandle(), in->GetAddress(), data.data(), data.size(), &callback, 0, 3000);
 	USB_CALL(libusb_submit_transfer(transfer_in));
 
-	libusb_transfer *transfer_out = libusb_alloc_transfer(0);
-	printf("data size: %u\n", (unsigned)container.Data.size());
-	libusb_fill_bulk_transfer(transfer_out, device->GetHandle(), out->GetAddress(), container.Data.data(), container.Data.size(), &callback, 0, 3000);
-	USB_CALL(libusb_submit_transfer(transfer_out));
 
-	while(true);
+	{
+		ctx.Wait();
+		printf("WAIT COMPLETED\n");
+	}
+
+#else
+	printf("bulk transfer start, endpoint: %02x\n", out->GetAddress());
+	int tr = 0;
+	int r = libusb_bulk_transfer(device->GetHandle(), out->GetAddress(), container.Data.data(), container.Data.size(), &tr, 1000);
+	printf("bulk transfer end %d %d\n", r, tr);
+	tr = data.size();
+	r = libusb_bulk_transfer(device->GetHandle(), in->GetAddress(), data.data(), data.size(), &tr, 3000);
+	//r = libusb_interrupt_transfer(device->GetHandle(), interrupt->GetAddress(), data.data(), data.size(), &tr, 2000);
+	printf("bulk transfer end %d %d\n", r, tr);
+#endif
+	libusb_release_interface(device->GetHandle(), interface->GetIndex());
+
 	return 0;
 }
