@@ -26,6 +26,9 @@ namespace mtp { namespace usb
 		u8 GetAddress() const
 		{ return _endpoint.bEndpointAddress; }
 
+		int GetMaxPacketSize() const
+		{ return _endpoint.wMaxPacketSize; }
+
 		EndpointDirection GetDirection() const
 		{
 			u8 dir = GetAddress() & LIBUSB_ENDPOINT_DIR_MASK;
