@@ -25,4 +25,10 @@ namespace mtp { namespace usb
 		libusb_exit(_ctx);
 	}
 
+	void Context::Wait()
+	{
+		USB_CALL(libusb_handle_events(_ctx));
+	}
+
+
 }}

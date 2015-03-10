@@ -24,6 +24,8 @@ namespace mtp { namespace usb
 		Context();
 		~Context();
 
+		void Wait();
+
 		const Devices & GetDevices() const
 		{ return _devices; }
 	};
