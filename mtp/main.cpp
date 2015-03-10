@@ -69,7 +69,7 @@ int main(int argc, char **argv)
 	if (!interface || mtp_interface < 0 || mtp_configuration < 0)
 		throw std::runtime_error("no mtp interface found");
 
-	device->SetConfiguration(configuration->GetIndex());
+	//device->SetConfiguration(configuration->GetIndex());
 	int epn = interface->GetEndpointsCount();
 
 	usb::EndpointPtr out, in, interrupt;
@@ -107,12 +107,12 @@ int main(int argc, char **argv)
 	//USB_CALL(libusb_reset_device(device->GetHandle()));
 
 	printf("claiming interface %d...\n", interface->GetIndex());
-	USB_CALL(libusb_claim_interface(device->GetHandle(), interface->GetIndex()));
+	//USB_CALL(libusb_claim_interface(device->GetHandle(), interface->GetIndex()));
 	printf("claimed interface\n");
-	USB_CALL(libusb_set_interface_alt_setting(device->GetHandle(), mtp_interface, 0));
+	//USB_CALL(libusb_set_interface_alt_setting(device->GetHandle(), mtp_interface, 0));
 
 	//OperationRequest req(OperationCode::OpenSession, 0, 1);
-	OperationRequest req(OperationCode::GetDeviceInfo, 0, 1);
+	OperationRequest req(OperationCode::GetDeviceInfo, 0, 0);
 	Container container(req);
 
 	/*
