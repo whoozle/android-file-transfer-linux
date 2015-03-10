@@ -9,7 +9,8 @@ namespace mtp
 {
 	enum class OperationCode : u16
 	{
-		GetDeviceInfo = 0x1001
+		GetDeviceInfo	= 0x1001,
+		OpenSession		= 0x1002
 	};
 
 	struct OperationRequest : Packet
