@@ -8,6 +8,7 @@
 #include <mtp/ptp/OperationRequest.h>
 #include <mtp/ptp/Container.h>
 #include <mtp/ptp/Messages.h>
+#include <mtp/ptp/Protocol.h>
 
 int main(int argc, char **argv)
 {
@@ -76,17 +77,11 @@ int main(int argc, char **argv)
 	OperationRequest req(OperationCode::GetDeviceInfo, 0, 0);
 	Container container(req);
 
-	pipe->Write(container.Data);
-	ByteArray data = pipe->Read();
+	Protocol proto(pipe);
+	proto.Write(container.Data);
+	ByteArray data = proto.Read();
 
-	for(size_t i = 0; i < data.size(); ++i)
-	{
-		u8 byte = data[i];
-		printf("%02x ", byte);
-	}
-	printf("\n");
-
-	Stream stream(data, 12);
+	Stream stream(data);
 	GetDeviceInfo gdi;
 	gdi.Read(stream);
 	printf("%s\n", gdi.VendorExtensionDesc.c_str());

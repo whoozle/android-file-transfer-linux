@@ -17,6 +17,8 @@ set(SOURCES
 	mtp/usb/DeviceDescriptor.cpp
 	mtp/usb/Exception.cpp
 
+	mtp/ptp/Protocol.cpp
+
 	mtp/main.cpp
 )
 

@@ -81,6 +81,9 @@ namespace mtp
 		u8 ReadByte()
 		{ return _data.at(_offset++); }
 
+		const ByteArray & GetData() const
+		{ return _data; }
+
 		template<typename T>
 		Stream& operator >> (T &ref)
 		{
