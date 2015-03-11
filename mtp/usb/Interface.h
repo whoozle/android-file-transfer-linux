@@ -45,12 +45,16 @@ namespace mtp { namespace usb
 	};
 	DECLARE_PTR(Endpoint);
 
+	class Configuration;
+	DECLARE_PTR(Configuration);
+
 	class Interface
 	{
-		const libusb_interface_descriptor &_interface;
+		ConfigurationPtr					_config;
+		const libusb_interface_descriptor &	_interface;
 
 	public:
-		Interface(const libusb_interface_descriptor &interface): _interface(interface) { }
+		Interface(ConfigurationPtr config, const libusb_interface_descriptor &interface): _config(config), _interface(interface) { }
 
 		int GetIndex() const
 		{ return _interface.bInterfaceNumber; }

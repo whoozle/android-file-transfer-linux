@@ -48,7 +48,7 @@ int main(int argc, char **argv)
 		printf("interfaces: %d\n", interfaces);
 		for(int j = 0; j < interfaces; ++j)
 		{
-			usb::InterfacePtr iface = conf->GetInterface(j, 0);
+			usb::InterfacePtr iface = conf->GetInterface(conf, j, 0);
 			printf("%d:%d index %u, eps %u\n", i, j, iface->GetIndex(), iface->GetEndpointsCount());
 			int name_idx = iface->GetNameIndex();
 			if (!name_idx)
