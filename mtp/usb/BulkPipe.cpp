@@ -11,7 +11,7 @@ namespace mtp { namespace usb
 		libusb_clear_halt(device->GetHandle(), interrupt->GetAddress());
 	}
 
-	ByteArray && BulkPipe::Read(int timeout)
+	ByteArray BulkPipe::Read(int timeout)
 	{
 		ByteArray data(_in->GetMaxPacketSize());
 		int tr = 0;

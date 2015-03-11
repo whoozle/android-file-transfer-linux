@@ -64,7 +64,7 @@ namespace mtp
 				{
 					ElementType el;
 					s >> el;
-					printf("read %04x", el);
+					printf("read %04x\n", el);
 					ref.push_back(el);
 				}
 			}
