@@ -9,8 +9,9 @@ namespace mtp
 {
 	typedef std::vector<u8> ByteArray;
 
-	inline void HexDump(const ByteArray &data)
+	inline void HexDump(const std::string &prefix, const ByteArray &data)
 	{
+		printf("%s: ", prefix.c_str());
 		for(size_t i = 0; i < data.size(); ++i)
 		{
 			u8 byte = data[i];

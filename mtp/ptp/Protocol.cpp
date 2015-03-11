@@ -6,6 +6,7 @@ namespace mtp
 {
 	void Protocol::Write(const ByteArray &data)
 	{
+		HexDump("send", data);
 		_pipe->Write(data);
 	}
 
@@ -15,7 +16,7 @@ namespace mtp
 		while(true)
 		{
 			ByteArray data = _pipe->Read();
-			HexDump(data);
+			HexDump("recv", data);
 			ContainerType type;
 			ByteArray payload;
 			Container::Read(data, type, payload);
