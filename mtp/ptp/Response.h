@@ -14,6 +14,7 @@ namespace mtp
 		IncompleteTransfer			= 0x2007,
 		InvalidStorageID			= 0x2008,
 		InvalidObjectHandle			= 0x2009,
+		SessionAlreadyOpen			= 0x201e
 #if 0
 		0x200A DeviceProp Not Supported
 		0x200B Invalid ObjectFormatCode
