@@ -76,30 +76,16 @@ int main(int argc, char **argv)
 	OperationRequest req(OperationCode::GetDeviceInfo, 0, 0);
 	Container container(req);
 
-	/*
-	for(size_t i = 0; i < container.Data.size(); ++i)
-		printf("%02x ", container.Data[i]);
-	printf("\n");
-	*/
+	pipe->Write(container.Data);
+	ByteArray data = pipe->Read();
 
-#if 0
-	std::vector<u8> data(in->GetMaxPacketSize());
-	//std::vector<u8> data(64);
-
-	printf("bulk transfer start, endpoint: %02x\n", out->GetAddress());
-	int tr = 0;
-	int r = libusb_bulk_transfer(device->GetHandle(), out->GetAddress(), container.Data.data(), container.Data.size(), &tr, 1000);
-	printf("bulk transfer end %d %d\n", r, tr);
-	tr = data.size();
-	r = libusb_bulk_transfer(device->GetHandle(), in->GetAddress(), data.data(), data.size(), &tr, 3000);
-	//r = libusb_interrupt_transfer(device->GetHandle(), interrupt->GetAddress(), data.data(), data.size(), &tr, 2000);
-	printf("bulk transfer end %d %d\n", r, tr);
 	for(size_t i = 0; i < data.size(); ++i)
 	{
 		u8 byte = data[i];
 		printf("%02x ", byte);
 	}
 	printf("\n");
+
 	Stream stream(data, 12);
 	GetDeviceInfo gdi;
 	gdi.Read(stream);
@@ -112,8 +98,8 @@ int main(int argc, char **argv)
 	{
 		printf("%04x\n", (unsigned)code);
 	}
-#endif
-	libusb_release_interface(device->GetHandle(), interface->GetIndex());
+
+	//libusb_release_interface(device->GetHandle(), interface->GetIndex());
 
 	return 0;
 }

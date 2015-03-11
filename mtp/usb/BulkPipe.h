@@ -20,7 +20,7 @@ namespace mtp { namespace usb
 		BulkPipe(DevicePtr device, InterfacePtr interface, EndpointPtr in, EndpointPtr out, EndpointPtr interrupt);
 
 		ByteArray && Read(int timeout = 3000);
-		int Write(const ByteArray &data, int timeout = 3000);
+		void Write(const ByteArray &data, int timeout = 3000);
 
 		static BulkPipePtr Create(usb::DevicePtr device, usb::InterfacePtr owner);
 	};
