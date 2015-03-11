@@ -11,6 +11,7 @@ add_definitions(-Wall -fstrict-aliasing -Wno-variadic-macros -pthread -std=c++1y
 include_directories(. ${CMAKE_SOURCE_DIR} ${LIBUSB_INCLUDE_DIRS})
 
 set(SOURCES
+	mtp/usb/BulkPipe.cpp
 	mtp/usb/Context.cpp
 	mtp/usb/Device.cpp
 	mtp/usb/DeviceDescriptor.cpp
