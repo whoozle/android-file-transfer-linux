@@ -19,6 +19,7 @@ namespace mtp { namespace usb
 	public:
 		BulkPipe(DevicePtr device, InterfacePtr interface, EndpointPtr in, EndpointPtr out, EndpointPtr interrupt);
 
+		ByteArray ReadInterrupt();
 		ByteArray Read(int timeout = 3000);
 		void Write(const ByteArray &data, int timeout = 3000);
 

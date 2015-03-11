@@ -11,6 +11,16 @@ namespace mtp { namespace usb
 		//libusb_clear_halt(device->GetHandle(), interrupt->GetAddress());
 	}
 
+	ByteArray BulkPipe::ReadInterrupt()
+	{
+		ByteArray data(_interrupt->GetMaxPacketSize());
+		int tr = 0;
+		int r = libusb_interrupt_transfer(_device->GetHandle(), _interrupt->GetAddress(), data.data(), data.size(), &tr, 1);
+		printf("INTERRUPT %d %d\n", r, tr);
+		data.resize(tr);
+		return std::move(data);
+	}
+
 	ByteArray BulkPipe::Read(int timeout)
 	{
 		ByteArray data(_in->GetMaxPacketSize());

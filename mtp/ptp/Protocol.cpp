@@ -12,6 +12,7 @@ namespace mtp
 
 	ByteArray Protocol::Read()
 	{
+		_pipe->ReadInterrupt();
 		ByteArray result;
 		while(true)
 		{
