@@ -40,6 +40,52 @@ namespace mtp
 			stream >> SerialNumber;
 		}
 	};
+
+	struct GetObjectHandles
+	{
+		std::vector<u32> ObjectHandles;
+
+		void Read(Stream &stream)
+		{
+			stream >> ObjectHandles;
+		}
+	};
+
+	struct GetStorageIDs
+	{
+		std::vector<u32> StorageIDs;
+
+		void Read(Stream &stream)
+		{
+			stream >> StorageIDs;
+		}
+	};
+
+	struct GetStorageInfo
+	{
+		u16			StorageType;
+		u16			FilesystemType;
+		u16			AccessCapability;
+		u64			MaxCapacity;
+		u64			FreeSpaceInBytes;
+		u32			FreeSpaceInImages;
+		std::string	StorageDescription;
+		std::string	VolumeLabel;
+
+
+		void Read(Stream &stream)
+		{
+			stream >> StorageType;
+			stream >> FilesystemType;
+			stream >> AccessCapability;
+			stream >> MaxCapacity;
+			stream >> FreeSpaceInBytes;
+			stream >> FreeSpaceInImages;
+			stream >> StorageDescription;
+			stream >> VolumeLabel;
+		}
+	};
+
 }
 
 

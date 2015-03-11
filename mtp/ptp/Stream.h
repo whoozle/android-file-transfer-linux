@@ -38,16 +38,39 @@ namespace mtp
 		};
 
 		template<typename Stream>
+		struct Reader<Stream, u64>
+		{ static void Read(Stream &s, u64 &ref)
+			{
+				u32 l, h;
+				Reader<Stream, u32>::Read(s, l);
+				Reader<Stream, u32>::Read(s, h);
+				ref = ((u64)h << 32) | l;
+			}
+		};
+
+		template<typename Stream>
 		struct Reader<Stream, std::string>
-		{ static void Read(Stream &s, std::string &ref)
+		{ static void Read(Stream &s, std::string &str)
 			{
 				u8 len = s.ReadByte();
-				ref.clear();
+				str.clear();
 				while(len--)
 				{
 					u16 ch;
 					Reader<Stream, u16>::Read(s, ch);
-					ref += ((char)(ch & 0xff));
+					if (ch <= 0x7f)
+						str += (char)ch;
+					else if (ch <= 0x7ff)
+					{
+						str += (char) ((ch >> 6) | 0xc0);
+						str += (char) ((ch & 0x3f) | 0x80);
+				    }
+					else if (ch <= 0xffff)
+					{
+						str += (char)((ch >> 12) | 0xe0);
+						str += (char)(((ch & 0x0fc0) >> 6) | 0x80);
+						str += (char)( (ch & 0x003f) | 0x80);
+					}
 				}
 			}
 		};

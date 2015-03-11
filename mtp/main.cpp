@@ -104,12 +104,47 @@ int main(int argc, char **argv)
 		HexDump("payload", data);
 	}
 
+	u32 storageId;
+	{
+		OperationRequest req(OperationCode::GetStorageIDs, 1, 0xffffffffu);
+		Container container(req);
+		proto.Write(container.Data);
+		ByteArray data = proto.Read();
+		Stream stream(data, 8); //operation code + session id
+
+		GetStorageIDs gsi;
+		gsi.Read(stream);
+		for(u32 storage : gsi.StorageIDs)
+		{
+			printf("storage %08x\n", storage);
+			storageId = storage;
+		}
+	}
+
+	{
+		OperationRequest req(OperationCode::GetStorageInfo, 1, storageId);
+		Container container(req);
+		proto.Write(container.Data);
+		ByteArray data = proto.Read();
+		Stream stream(data, 8); //operation code + session id
+		HexDump("GetStorageInfo", data);
+		GetStorageInfo gsi;
+		gsi.Read(stream);
+		printf("storage: %s %s %lld %lld\n", gsi.StorageDescription.c_str(), gsi.VolumeLabel.c_str(), gsi.FreeSpaceInBytes, gsi.MaxCapacity);
+	}
 	{
 		OperationRequest req(OperationCode::GetObjectHandles, 1, 0xffffffffu);
 		Container container(req);
 		proto.Write(container.Data);
 		ByteArray data = proto.Read();
-		HexDump("payload", data);
+		Stream stream(data, 8); //operation code + session id
+
+		GetObjectHandles goh;
+		goh.Read(stream);
+		for(u32 object : goh.ObjectHandles)
+		{
+			printf("object %08x\n", object);
+		}
 	}
 
 	//libusb_release_interface(device->GetHandle(), interface->GetIndex());
