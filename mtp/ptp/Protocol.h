@@ -16,7 +16,7 @@ namespace mtp
 		ByteArray Read();
 
 	private:
-
+		ByteArray ReadMessage();
 	};
 }
 
