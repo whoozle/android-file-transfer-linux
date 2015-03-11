@@ -5,7 +5,6 @@
 
 namespace mtp
 {
-
 	struct GetDeviceInfo
 	{
 		u16					StandardVersion;

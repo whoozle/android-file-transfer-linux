@@ -80,8 +80,9 @@ int main(int argc, char **argv)
 	Protocol proto(pipe);
 	proto.Write(container.Data);
 	ByteArray data = proto.Read();
+	HexDump("payload", data);
 
-	Stream stream(data);
+	Stream stream(data, 6); //operation code + session id
 	GetDeviceInfo gdi;
 	gdi.Read(stream);
 	printf("%s\n", gdi.VendorExtensionDesc.c_str());
