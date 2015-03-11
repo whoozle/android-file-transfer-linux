@@ -2,6 +2,7 @@
 #define	INTERFACE_H
 
 #include <mtp/types.h>
+#include <libusb.h>
 
 namespace mtp { namespace usb
 {
