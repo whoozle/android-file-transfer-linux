@@ -1,4 +1,5 @@
-#include "BulkPipe.h"
+#include <mtp/usb/BulkPipe.h>
+#include <mtp/usb/call.h>
 
 namespace mtp { namespace usb
 {
@@ -8,6 +9,22 @@ namespace mtp { namespace usb
 		libusb_clear_halt(device->GetHandle(), in->GetAddress());
 		libusb_clear_halt(device->GetHandle(), out->GetAddress());
 		libusb_clear_halt(device->GetHandle(), interrupt->GetAddress());
+	}
+
+	ByteArray && BulkPipe::Read(int timeout)
+	{
+		ByteArray data(_in->GetMaxPacketSize());
+		int tr = 0;
+		USB_CALL(libusb_bulk_transfer(_device->GetHandle(), _in->GetAddress(), data.data(), data.size(), &tr, timeout));
+		data.resize(tr);
+		return std::move(data);
+	}
+
+	int BulkPipe::Write(const ByteArray &data, int timeout)
+	{
+		int tr = 0;
+		USB_CALL(libusb_bulk_transfer(_device->GetHandle(), _out->GetAddress(), const_cast<u8 *>(data.data()), data.size(), &tr, timeout));
+		return tr;
 	}
 
 	BulkPipePtr BulkPipe::Create(usb::DevicePtr device, usb::InterfacePtr interface)

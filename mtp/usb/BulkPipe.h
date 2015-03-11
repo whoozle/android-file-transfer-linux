@@ -3,6 +3,7 @@
 
 #include <mtp/usb/Device.h>
 #include <mtp/usb/Interface.h>
+#include <mtp/ByteArray.h>
 
 namespace mtp { namespace usb
 {
@@ -17,6 +18,9 @@ namespace mtp { namespace usb
 
 	public:
 		BulkPipe(DevicePtr device, InterfacePtr interface, EndpointPtr in, EndpointPtr out, EndpointPtr interrupt);
+
+		ByteArray && Read(int timeout = 3000);
+		int Write(const ByteArray &data, int timeout = 3000);
 
 		static BulkPipePtr Create(usb::DevicePtr device, usb::InterfacePtr owner);
 	};

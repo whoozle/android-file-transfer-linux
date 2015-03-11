@@ -2,7 +2,7 @@
 #define	STREAM_H
 
 #include <mtp/types.h>
-#include <vector>
+#include <mtp/ByteArray.h>
 
 namespace mtp
 {
@@ -70,8 +70,6 @@ namespace mtp
 			}
 		};
 	}
-
-	typedef std::vector<u8> ByteArray;
 
 	class Stream
 	{
