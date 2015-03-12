@@ -8,17 +8,38 @@ namespace mtp
 {
 	msg::ObjectHandles Session::GetObjectHandles(u32 storageId)
 	{
+		OperationRequest req(OperationCode::GetObjectHandles, 1, 0xffffffffu);
+		Container container(req);
+		_packeter.Write(container.Data);
+		ByteArray data = _packeter.Read();
+		Stream stream(data, 8); //operation code + session id
+
 		msg::ObjectHandles goh;
+		goh.Read(stream);
 		return std::move(goh);
 	}
 	msg::StorageIDs Session::GetStorageIDs()
 	{
+		OperationRequest req(OperationCode::GetStorageIDs, 1, 0xffffffffu);
+		Container container(req);
+		_packeter.Write(container.Data);
+		ByteArray data = _packeter.Read();
+		Stream stream(data, 8); //operation code + session id
+
 		msg::StorageIDs gsi;
+		gsi.Read(stream);
 		return std::move(gsi);
 	}
+
 	msg::StorageInfo Session::GetStorageInfo(u32 storageId, u32 formatCode)
 	{
+		OperationRequest req(OperationCode::GetStorageInfo, 1, storageId);
+		Container container(req);
+		_packeter.Write(container.Data);
+		ByteArray data = _packeter.Read();
+		Stream stream(data, 8); //operation code + session id
 		msg::StorageInfo gsi;
+		gsi.Read(stream);
 		return std::move(gsi);
 	}
 

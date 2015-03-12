@@ -88,50 +88,6 @@ int main(int argc, char **argv)
 	SessionPtr session = mtp.OpenSession(1);
 	msg::ObjectHandles handles = session->GetObjectHandles();
 
-#if 0
-	u32 storageId;
-	{
-		OperationRequest req(OperationCode::GetStorageIDs, 1, 0xffffffffu);
-		Container container(req);
-		device.Write(container.Data);
-		ByteArray data = device.Read();
-		Stream stream(data, 8); //operation code + session id
-
-		GetStorageIDs gsi;
-		gsi.Read(stream);
-		for(u32 storage : gsi.StorageIDs)
-		{
-			printf("storage %08x\n", storage);
-			storageId = storage;
-		}
-	}
-
-	{
-		OperationRequest req(OperationCode::GetStorageInfo, 1, storageId);
-		Container container(req);
-		device.Write(container.Data);
-		ByteArray data = device.Read();
-		Stream stream(data, 8); //operation code + session id
-		HexDump("GetStorageInfo", data);
-		GetStorageInfo gsi;
-		gsi.Read(stream);
-		printf("storage: %s %s %lld %lld\n", gsi.StorageDescription.c_str(), gsi.VolumeLabel.c_str(), gsi.FreeSpaceInBytes, gsi.MaxCapacity);
-	}
-	{
-		OperationRequest req(OperationCode::GetObjectHandles, 1, 0xffffffffu);
-		Container container(req);
-		device.Write(container.Data);
-		ByteArray data = device.Read();
-		Stream stream(data, 8); //operation code + session id
-
-		GetObjectHandles goh;
-		goh.Read(stream);
-		for(u32 object : goh.ObjectHandles)
-		{
-			printf("object %08x\n", object);
-		}
-	}
-#endif
 	//libusb_release_interface(device->GetHandle(), interface->GetIndex());
 
 	return 0;
