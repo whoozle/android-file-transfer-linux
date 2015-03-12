@@ -8,7 +8,7 @@ namespace mtp
 {
 	msg::ObjectHandles Session::GetObjectHandles(u32 storageId)
 	{
-		OperationRequest req(OperationCode::GetObjectHandles, 1, 0xffffffffu);
+		OperationRequest req(OperationCode::GetObjectHandles, _sessionId, storageId);
 		Container container(req);
 		_packeter.Write(container.Data);
 		ByteArray data = _packeter.Read();
@@ -20,7 +20,7 @@ namespace mtp
 	}
 	msg::StorageIDs Session::GetStorageIDs()
 	{
-		OperationRequest req(OperationCode::GetStorageIDs, 1, 0xffffffffu);
+		OperationRequest req(OperationCode::GetStorageIDs, _sessionId, 0xffffffffu);
 		Container container(req);
 		_packeter.Write(container.Data);
 		ByteArray data = _packeter.Read();
@@ -33,7 +33,7 @@ namespace mtp
 
 	msg::StorageInfo Session::GetStorageInfo(u32 storageId, u32 formatCode)
 	{
-		OperationRequest req(OperationCode::GetStorageInfo, 1, storageId);
+		OperationRequest req(OperationCode::GetStorageInfo, _sessionId, storageId, formatCode);
 		Container container(req);
 		_packeter.Write(container.Data);
 		ByteArray data = _packeter.Read();
@@ -45,7 +45,13 @@ namespace mtp
 
 	msg::ObjectInfo Session::GetObjectInfo(u32 objectId)
 	{
+		OperationRequest req(OperationCode::GetObjectInfo, _sessionId, objectId);
+		Container container(req);
+		_packeter.Write(container.Data);
+		ByteArray data = _packeter.Read();
+		Stream stream(data, 8); //operation code + session id
 		msg::ObjectInfo goi;
+		goi.Read(stream);
 		return std::move(goi);
 	}
 

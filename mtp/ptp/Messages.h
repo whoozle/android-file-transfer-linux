@@ -107,6 +107,29 @@ namespace mtp { namespace msg
 		std::string	CaptureDate;
 		std::string	ModificationDate;
 		std::string	Keywords;
+
+		void Read(Stream &stream)
+		{
+			stream >> StorageId;
+			stream >> ObjectFormat;
+			stream >> ProtectinStatus;
+			stream >> ObjectCompressedSize;
+			stream >> ThumbFormat;
+			stream >> ThumbCompressedSize;
+			stream >> ThumbPixWidth;
+			stream >> ThumbPixHeight;
+			stream >> ImagePixWidth;
+			stream >> ImagePixHeight;
+			stream >> ImageBitDepth;
+			stream >> ParentObject;
+			stream >> AssociationType;
+			stream >> AssociationDesc;
+			stream >> SequenceNumber;
+			stream >> Filename;
+			stream >> CaptureDate;
+			stream >> ModificationDate;
+			stream >> Keywords;
+		}
 	};
 
 }}
