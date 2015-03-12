@@ -6,9 +6,9 @@
 
 namespace mtp
 {
-	msg::ObjectHandles Session::GetObjectHandles(u32 storageId)
+	msg::ObjectHandles Session::GetObjectHandles(u32 storageId, u32 objectFormat)
 	{
-		OperationRequest req(OperationCode::GetObjectHandles, _sessionId, storageId);
+		OperationRequest req(OperationCode::GetObjectHandles, _sessionId, storageId, objectFormat);
 		Container container(req);
 		_packeter.Write(container.Data);
 		ByteArray data = _packeter.Read();

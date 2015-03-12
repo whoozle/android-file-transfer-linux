@@ -33,7 +33,7 @@ namespace mtp
 
 		Session(usb::BulkPipePtr pipe, u32 sessionId): _packeter(pipe), _sessionId(sessionId) { }
 
-		msg::ObjectHandles GetObjectHandles(u32 storageId = Any);
+		msg::ObjectHandles GetObjectHandles(u32 storageId = Any, u32 objectFormat = 0);
 		msg::StorageIDs GetStorageIDs();
 		msg::StorageInfo GetStorageInfo(u32 storageId = Any, u32 formatCode = 0);
 		msg::ObjectInfo GetObjectInfo(u32 objectId);
