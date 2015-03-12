@@ -90,7 +90,7 @@ namespace mtp { namespace msg
 	{
 		u32			StorageId;
 		u16			ObjectFormat;
-		u16			ProtectinStatus;
+		u16			ProtectionStatus;
 		u32			ObjectCompressedSize;
 		u16			ThumbFormat;
 		u32			ThumbCompressedSize;
@@ -112,7 +112,7 @@ namespace mtp { namespace msg
 		{
 			stream >> StorageId;
 			stream >> ObjectFormat;
-			stream >> ProtectinStatus;
+			stream >> ProtectionStatus;
 			stream >> ObjectCompressedSize;
 			stream >> ThumbFormat;
 			stream >> ThumbCompressedSize;
