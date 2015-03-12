@@ -21,7 +21,7 @@ namespace mtp { namespace usb
 		Devices					_devices;
 
 	public:
-		Context();
+		Context(int debugLevel = 3);
 		~Context();
 
 		void Wait();
