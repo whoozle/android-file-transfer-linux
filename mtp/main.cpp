@@ -88,6 +88,11 @@ int main(int argc, char **argv)
 	SessionPtr session = mtp.OpenSession(1);
 	msg::ObjectHandles handles = session->GetObjectHandles();
 
+	for(u32 objectId : handles.ObjectHandles)
+	{
+		msg::ObjectInfo info = session->GetObjectInfo(objectId);
+		printf("%04x %s %ux%u, parent: %08x\n", info.ObjectFormat, info.Filename.c_str(), info.ImagePixWidth, info.ImagePixHeight, info.ParentObject);
+	}
 	//libusb_release_interface(device->GetHandle(), interface->GetIndex());
 
 	return 0;
