@@ -14,15 +14,16 @@ namespace mtp
 		IncompleteTransfer			= 0x2007,
 		InvalidStorageID			= 0x2008,
 		InvalidObjectHandle			= 0x2009,
+		DevicePropNotSupported		= 0x200a,
+		InvalidObjectFormatCode		= 0x200b,
+		StoreFull					= 0x200c,
+		ObjectWriteProtected		= 0x200d,
+		StoreReadOnly				= 0x200e,
+		AccessDenied				= 0x200f,
+		NoThumbnailPresent			= 0x2010,
+
 		SessionAlreadyOpen			= 0x201e
 #if 0
-		0x200A DeviceProp Not Supported
-		0x200B Invalid ObjectFormatCode
-		0x200C Store Full
-		0x200D Object WriteProtected
-		0x200E Store Read-Only
-		0x200F Access Denied
-		0x2010 No Thumbnail Present
 		0x2011 SelfTest Failed
 		0x2012 Partial Deletion
 		0x2013 Store Not Available

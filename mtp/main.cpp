@@ -5,10 +5,9 @@
 #include <mtp/usb/BulkPipe.h>
 #include <mtp/usb/Context.h>
 #include <mtp/usb/call.h>
-#include <mtp/ptp/OperationRequest.h>
 #include <mtp/ptp/Container.h>
 #include <mtp/ptp/Messages.h>
-#include <mtp/ptp/Protocol.h>
+#include <mtp/ptp/Device.h>
 
 int main(int argc, char **argv)
 {
@@ -73,43 +72,29 @@ int main(int argc, char **argv)
 	printf("claimed interface\n");
 	//USB_CALL(libusb_set_interface_alt_setting(device->GetHandle(), mtp_interface, 0));
 
-	Protocol proto(pipe);
+	Device mtp(pipe);
 
+	msg::DeviceInfo gdi = mtp.GetDeviceInfo();
+	printf("%s\n", gdi.VendorExtensionDesc.c_str());
+	printf("%s\n", gdi.Manufactorer.c_str());
+	printf("%s\n", gdi.Model.c_str());
+	printf("%s\n", gdi.DeviceVersion.c_str());
+	printf("%s\n", gdi.SerialNumber.c_str());
+	for(u16 code : gdi.OperationsSupported)
 	{
-		OperationRequest req(OperationCode::GetDeviceInfo, 0, 0);
-		Container container(req);
-		proto.Write(container.Data);
-		ByteArray data = proto.Read();
-		HexDump("payload", data);
-
-		Stream stream(data, 8); //operation code + session id
-		GetDeviceInfo gdi;
-		gdi.Read(stream);
-		printf("%s\n", gdi.VendorExtensionDesc.c_str());
-		printf("%s\n", gdi.Manufactorer.c_str());
-		printf("%s\n", gdi.Model.c_str());
-		printf("%s\n", gdi.DeviceVersion.c_str());
-		printf("%s\n", gdi.SerialNumber.c_str());
-		for(u16 code : gdi.OperationsSupported)
-		{
-			printf("supported op code: %04x\n", (unsigned)code);
-		}
+		printf("supported op code: %04x\n", (unsigned)code);
 	}
 
-	{
-		OperationRequest req(OperationCode::OpenSession, 0, 1);
-		Container container(req);
-		proto.Write(container.Data);
-		ByteArray data = proto.Read();
-		HexDump("payload", data);
-	}
+	SessionPtr session = mtp.OpenSession(1);
+	msg::ObjectHandles handles = session->GetObjectHandles();
 
+#if 0
 	u32 storageId;
 	{
 		OperationRequest req(OperationCode::GetStorageIDs, 1, 0xffffffffu);
 		Container container(req);
-		proto.Write(container.Data);
-		ByteArray data = proto.Read();
+		device.Write(container.Data);
+		ByteArray data = device.Read();
 		Stream stream(data, 8); //operation code + session id
 
 		GetStorageIDs gsi;
@@ -124,8 +109,8 @@ int main(int argc, char **argv)
 	{
 		OperationRequest req(OperationCode::GetStorageInfo, 1, storageId);
 		Container container(req);
-		proto.Write(container.Data);
-		ByteArray data = proto.Read();
+		device.Write(container.Data);
+		ByteArray data = device.Read();
 		Stream stream(data, 8); //operation code + session id
 		HexDump("GetStorageInfo", data);
 		GetStorageInfo gsi;
@@ -135,8 +120,8 @@ int main(int argc, char **argv)
 	{
 		OperationRequest req(OperationCode::GetObjectHandles, 1, 0xffffffffu);
 		Container container(req);
-		proto.Write(container.Data);
-		ByteArray data = proto.Read();
+		device.Write(container.Data);
+		ByteArray data = device.Read();
 		Stream stream(data, 8); //operation code + session id
 
 		GetObjectHandles goh;
@@ -146,7 +131,7 @@ int main(int argc, char **argv)
 			printf("object %08x\n", object);
 		}
 	}
-
+#endif
 	//libusb_release_interface(device->GetHandle(), interface->GetIndex());
 
 	return 0;

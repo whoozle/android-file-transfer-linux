@@ -3,9 +3,9 @@
 
 #include <mtp/ptp/Stream.h>
 
-namespace mtp
+namespace mtp { namespace msg
 {
-	struct GetDeviceInfo
+	struct DeviceInfo
 	{
 		u16					StandardVersion;
 		u32					VendorExtensionId;
@@ -41,7 +41,7 @@ namespace mtp
 		}
 	};
 
-	struct GetObjectHandles
+	struct ObjectHandles
 	{
 		std::vector<u32> ObjectHandles;
 
@@ -51,7 +51,7 @@ namespace mtp
 		}
 	};
 
-	struct GetStorageIDs
+	struct StorageIDs
 	{
 		std::vector<u32> StorageIDs;
 
@@ -61,7 +61,7 @@ namespace mtp
 		}
 	};
 
-	struct GetStorageInfo
+	struct StorageInfo
 	{
 		u16			StorageType;
 		u16			FilesystemType;
@@ -86,7 +86,30 @@ namespace mtp
 		}
 	};
 
-}
+	struct ObjectInfo
+	{
+		u32			StorageId;
+		u16			ObjectFormat;
+		u16			ProtectinStatus;
+		u32			ObjectCompressedSize;
+		u16			ThumbFormat;
+		u32			ThumbCompressedSize;
+		u32			ThumbPixWidth;
+		u32			ThumbPixHeight;
+		u32			ImagePixWidth;
+		u32			ImagePixHeight;
+		u32			ImageBitDepth;
+		u32			ParentObject;
+		u16			AssociationType;
+		u32			AssociationDesc;
+		u32			SequenceNumber;
+		std::string	Filename;
+		std::string	CaptureDate;
+		std::string	ModificationDate;
+		std::string	Keywords;
+	};
+
+}}
 
 
 #endif	/* MESSAGES_H */
