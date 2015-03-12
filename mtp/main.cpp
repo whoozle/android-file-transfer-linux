@@ -90,8 +90,16 @@ int main(int argc, char **argv)
 
 	for(u32 objectId : handles.ObjectHandles)
 	{
-		msg::ObjectInfo info = session->GetObjectInfo(objectId);
-		printf("%04x %s %ux%u, parent: %08x\n", info.ObjectFormat, info.Filename.c_str(), info.ImagePixWidth, info.ImagePixHeight, info.ParentObject);
+		try
+		{
+			printf("GET OBJECT ID INFO 0x%08x\n", objectId);
+			msg::ObjectInfo info = session->GetObjectInfo(objectId);
+			printf("%04x %s %ux%u, parent: 0x%08x\n", info.ObjectFormat, info.Filename.c_str(), info.ImagePixWidth, info.ImagePixHeight, info.ParentObject);
+		}
+		catch(const std::exception &ex)
+		{
+			printf("error: %s\n", ex.what());
+		}
 	}
 	//libusb_release_interface(device->GetHandle(), interface->GetIndex());
 
