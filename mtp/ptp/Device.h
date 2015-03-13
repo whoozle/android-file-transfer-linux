@@ -27,15 +27,19 @@ namespace mtp
 	{
 		PipePacketer	_packeter;
 		u32				_sessionId;
+		u32				_transactionId;
 
 	public:
-		static const u32 Any = 0xffffffffu;
+		static const u32 AllStorages = 0xffffffffu;
+		static const u32 Root = 0xffffffffu;
+		static const u32 Device = 0;
+		static const u32 AllFormats = 0;
 
-		Session(usb::BulkPipePtr pipe, u32 sessionId): _packeter(pipe), _sessionId(sessionId) { }
+		Session(usb::BulkPipePtr pipe, u32 sessionId): _packeter(pipe), _sessionId(sessionId), _transactionId(1) { }
 
-		msg::ObjectHandles GetObjectHandles(u32 storageId = Any, u32 objectFormat = 0);
+		msg::ObjectHandles GetObjectHandles(u32 storageId = AllStorages, u32 objectFormat = AllFormats, u32 parent = Device);
 		msg::StorageIDs GetStorageIDs();
-		msg::StorageInfo GetStorageInfo(u32 storageId = Any, u32 formatCode = 0);
+		msg::StorageInfo GetStorageInfo(u32 storageId);
 		msg::ObjectInfo GetObjectInfo(u32 objectId);
 	};
 	DECLARE_PTR(Session);

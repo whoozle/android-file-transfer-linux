@@ -6,9 +6,9 @@
 
 namespace mtp
 {
-	msg::ObjectHandles Session::GetObjectHandles(u32 storageId, u32 objectFormat)
+	msg::ObjectHandles Session::GetObjectHandles(u32 storageId, u32 objectFormat, u32 parent)
 	{
-		OperationRequest req(OperationCode::GetObjectHandles, _sessionId, storageId, objectFormat);
+		OperationRequest req(OperationCode::GetObjectHandles, _transactionId++, storageId, objectFormat, parent);
 		Container container(req);
 		_packeter.Write(container.Data);
 		ByteArray data = _packeter.Read();
@@ -20,7 +20,7 @@ namespace mtp
 	}
 	msg::StorageIDs Session::GetStorageIDs()
 	{
-		OperationRequest req(OperationCode::GetStorageIDs, _sessionId, 0xffffffffu);
+		OperationRequest req(OperationCode::GetStorageIDs, _transactionId++, 0xffffffffu);
 		Container container(req);
 		_packeter.Write(container.Data);
 		ByteArray data = _packeter.Read();
@@ -31,9 +31,9 @@ namespace mtp
 		return std::move(gsi);
 	}
 
-	msg::StorageInfo Session::GetStorageInfo(u32 storageId, u32 formatCode)
+	msg::StorageInfo Session::GetStorageInfo(u32 storageId)
 	{
-		OperationRequest req(OperationCode::GetStorageInfo, _sessionId, storageId, formatCode);
+		OperationRequest req(OperationCode::GetStorageInfo, _transactionId++, storageId);
 		Container container(req);
 		_packeter.Write(container.Data);
 		ByteArray data = _packeter.Read();
@@ -45,7 +45,7 @@ namespace mtp
 
 	msg::ObjectInfo Session::GetObjectInfo(u32 objectId)
 	{
-		OperationRequest req(OperationCode::GetObjectInfo, _sessionId, objectId);
+		OperationRequest req(OperationCode::GetObjectInfo, _transactionId++, objectId);
 		Container container(req);
 		_packeter.Write(container.Data);
 		ByteArray data = _packeter.Read();
@@ -57,7 +57,7 @@ namespace mtp
 
 	msg::DeviceInfo Device::GetDeviceInfo()
 	{
-		OperationRequest req(OperationCode::GetDeviceInfo, 0, 0);
+		OperationRequest req(OperationCode::GetDeviceInfo);
 		Container container(req);
 		_packeter.Write(container.Data);
 		ByteArray data = _packeter.Read();
@@ -71,7 +71,7 @@ namespace mtp
 
 	SessionPtr Device::OpenSession(u32 sessionId)
 	{
-		OperationRequest req(OperationCode::OpenSession, 0, 1);
+		OperationRequest req(OperationCode::OpenSession, 0, sessionId);
 		Container container(req);
 		_packeter.Write(container.Data);
 		ByteArray data = _packeter.Read();
