@@ -45,8 +45,8 @@ namespace mtp { namespace usb
 		u16 GetProductId() const
 		{ return _descriptor.idProduct; }
 
-		DevicePtr Open();
-		DevicePtr TryOpen();
+		DevicePtr Open(ContextPtr context);
+		DevicePtr TryOpen(ContextPtr context);
 
 		int GetConfigurationsCount() const
 		{ return _descriptor.bNumConfigurations; }

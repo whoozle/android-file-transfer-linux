@@ -151,7 +151,7 @@ namespace mtp
 
 		for (usb::DeviceDescriptorPtr desc : ctx->GetDevices())
 		{
-			device = desc->TryOpen();
+			device = desc->TryOpen(ctx);
 			if (!device)
 				continue;
 			int confs = desc->GetConfigurationsCount();

@@ -15,18 +15,18 @@ namespace mtp { namespace usb
 		return std::make_shared<Configuration>(desc);
 	}
 
-	DevicePtr DeviceDescriptor::Open()
+	DevicePtr DeviceDescriptor::Open(ContextPtr context)
 	{
 		libusb_device_handle *handle;
 		USB_CALL(libusb_open(_dev, &handle));
-		return std::make_shared<Device>(handle);
+		return std::make_shared<Device>(context, handle);
 	}
 
-	DevicePtr DeviceDescriptor::TryOpen()
+	DevicePtr DeviceDescriptor::TryOpen(ContextPtr context)
 	{
 		libusb_device_handle *handle;
 		int r = libusb_open(_dev, &handle);
-		return r == 0? std::make_shared<Device>(handle): nullptr;
+		return r == 0? std::make_shared<Device>(context, handle): nullptr;
 	}
 
 	DeviceDescriptor::~DeviceDescriptor()

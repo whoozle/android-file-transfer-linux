@@ -6,13 +6,17 @@
 
 namespace mtp { namespace usb
 {
+	class Context;
+	DECLARE_PTR(Context);
+
 	class Device : Noncopyable
 	{
 	private:
-		libusb_device_handle *_handle;
+		ContextPtr				_context;
+		libusb_device_handle *	_handle;
 
 	public:
-		Device(libusb_device_handle * handle);
+		Device(ContextPtr ctx, libusb_device_handle * handle);
 		~Device();
 
 		libusb_device_handle * GetHandle() { return _handle; }
