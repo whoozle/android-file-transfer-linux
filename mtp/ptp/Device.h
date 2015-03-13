@@ -23,6 +23,13 @@ namespace mtp
 		ByteArray ReadMessage();
 	};
 
+	enum struct ObjectFormat
+	{
+		Undefined		= 0x3000,
+		Association		= 0x3001,
+		ExifJpeg		= 0x3801,
+	};
+
 	class Session
 	{
 		PipePacketer	_packeter;
