@@ -21,6 +21,7 @@ set(SOURCES
 
 	mtp/main.cpp
 )
+add_library(mtp-ng STATIC ${SOURCES})
 
-add_executable(mtp-test ${SOURCES})
-target_link_libraries(mtp-test -lusb-1.0 ${CMAKE_THREAD_LIBS_INIT})
+add_executable(mtp-test mtp/main.cpp)
+target_link_libraries(mtp-test mtp-ng -lusb-1.0 ${CMAKE_THREAD_LIBS_INIT})
