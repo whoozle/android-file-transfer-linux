@@ -28,5 +28,6 @@ void MainWindow::showEvent(QShowEvent *)
 			qFatal("device was not found");
 		}
 		_objectModel->setSession(_device->OpenSession(1));
+		_ui->listView->setModel(_objectModel);
 	}
 }
