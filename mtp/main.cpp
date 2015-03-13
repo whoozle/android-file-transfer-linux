@@ -19,6 +19,11 @@ int main(int argc, char **argv)
 	//USB_CALL(libusb_set_interface_alt_setting(device->GetHandle(), mtp_interface, 0));
 
 	DevicePtr mtp(Device::Find());
+	if (!mtp)
+	{
+		printf("no mtp device found\n");
+		return 1;
+	}
 
 	msg::DeviceInfo gdi = mtp->GetDeviceInfo();
 	printf("%s\n", gdi.VendorExtensionDesc.c_str());

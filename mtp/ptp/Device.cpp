@@ -184,7 +184,7 @@ namespace mtp
 		}
 
 		if (!interface || mtp_interface < 0 || mtp_configuration < 0)
-			throw std::runtime_error("no mtp interface found");
+			return nullptr;
 
 		//device->SetConfiguration(configuration->GetIndex());
 		usb::BulkPipePtr pipe = usb::BulkPipe::Create(device, interface);

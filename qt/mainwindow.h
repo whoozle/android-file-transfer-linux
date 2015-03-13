@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <mtp/ptp/Device.h>
 
 namespace Ui {
 class MainWindow;
@@ -16,7 +17,10 @@ public:
 	~MainWindow();
 
 private:
+	void showEvent(QShowEvent *e);
 	Ui::MainWindow *ui;
+
+	mtp::DevicePtr _device;
 };
 
 #endif // MAINWINDOW_H

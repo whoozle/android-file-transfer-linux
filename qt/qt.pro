@@ -11,6 +11,12 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = qt
 TEMPLATE = app
 
+QMAKE_CXXFLAGS += -std=c++14
+INCLUDEPATH += ..
+LIBS += -L.. -lmtp-ng -lusb-1.0
+
+CONFIG += link_pkgconfig
+PKGCONFIG += libusb
 
 SOURCES += main.cpp\
         mainwindow.cpp
