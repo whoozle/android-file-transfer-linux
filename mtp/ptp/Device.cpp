@@ -7,6 +7,16 @@
 
 namespace mtp
 {
+
+	void Session::Close()
+	{
+		OperationRequest req(OperationCode::CloseSession, 0, _sessionId);
+		Container container(req);
+		_packeter.Write(container.Data);
+		ByteArray data = _packeter.Read();
+		HexDump("payload", data);
+	}
+
 	msg::ObjectHandles Session::GetObjectHandles(u32 storageId, u32 objectFormat, u32 parent)
 	{
 		OperationRequest req(OperationCode::GetObjectHandles, _transactionId++, storageId, objectFormat, parent);

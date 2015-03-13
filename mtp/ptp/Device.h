@@ -36,11 +36,15 @@ namespace mtp
 		static const u32 AllFormats = 0;
 
 		Session(usb::BulkPipePtr pipe, u32 sessionId): _packeter(pipe), _sessionId(sessionId), _transactionId(1) { }
+		~Session() { try { Close(); } catch(const std::exception &ex) { } }
 
 		msg::ObjectHandles GetObjectHandles(u32 storageId = AllStorages, u32 objectFormat = AllFormats, u32 parent = Device);
 		msg::StorageIDs GetStorageIDs();
 		msg::StorageInfo GetStorageInfo(u32 storageId);
 		msg::ObjectInfo GetObjectInfo(u32 objectId);
+
+	private:
+		void Close();
 	};
 	DECLARE_PTR(Session);
 
