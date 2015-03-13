@@ -8,6 +8,8 @@ namespace Ui {
 class MainWindow;
 }
 
+class MtpObjectsModel;
+
 class MainWindow : public QMainWindow
 {
 	Q_OBJECT
@@ -18,9 +20,10 @@ public:
 
 private:
 	void showEvent(QShowEvent *e);
-	Ui::MainWindow *ui;
+	Ui::MainWindow *	_ui;
+	MtpObjectsModel *	_objectModel;
 
-	mtp::DevicePtr _device;
+	mtp::DevicePtr		_device;
 };
 
 #endif // MAINWINDOW_H

@@ -19,8 +19,10 @@ CONFIG += link_pkgconfig
 PKGCONFIG += libusb
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    mtpobjectsmodel.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    mtpobjectsmodel.h
 
 FORMS    += mainwindow.ui

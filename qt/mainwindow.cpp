@@ -1,21 +1,23 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "mtpobjectsmodel.h"
 #include <QDebug>
 #include <QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
-	ui(new Ui::MainWindow)
+	_ui(new Ui::MainWindow),
+	_objectModel(new MtpObjectsModel)
 {
-	ui->setupUi(this);
+	_ui->setupUi(this);
 }
 
 MainWindow::~MainWindow()
 {
-	delete ui;
+	delete _ui;
 }
 
-void MainWindow::showEvent(QShowEvent *e)
+void MainWindow::showEvent(QShowEvent *)
 {
 	if (!_device)
 	{
@@ -25,5 +27,6 @@ void MainWindow::showEvent(QShowEvent *e)
 			QMessageBox::critical(this, tr("MTP was not found"), tr("No MTP device found"));
 			qFatal("device was not found");
 		}
+		_objectModel->setSession(_device->OpenSession(1));
 	}
 }
