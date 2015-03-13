@@ -3,6 +3,7 @@
 #include "mtpobjectsmodel.h"
 #include <QDebug>
 #include <QMessageBox>
+#include <QKeyEvent>
 
 MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
@@ -10,6 +11,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	_objectModel(new MtpObjectsModel)
 {
 	_ui->setupUi(this);
+	connect(_ui->listView, SIGNAL(activated(QModelIndex)), SLOT(onActivated(QModelIndex)));
 }
 
 MainWindow::~MainWindow()
@@ -31,3 +33,33 @@ void MainWindow::showEvent(QShowEvent *)
 		_ui->listView->setModel(_objectModel);
 	}
 }
+
+void MainWindow::onActivated ( const QModelIndex & index )
+{
+	if (_objectModel->enter(index.row()))
+		_history.push_back(_objectModel->parentObjectId());
+}
+
+void MainWindow::keyPressEvent ( QKeyEvent * event )
+{
+	switch(event->key())
+	{
+	case Qt::Key_Enter:
+		qDebug() << "ENTER";
+		{
+			if (_objectModel->enter(_ui->listView->currentIndex().row()))
+				_history.push_back(_objectModel->parentObjectId());
+		}
+		break;
+	case Qt::Key_Escape:
+		qDebug() << "Escape";
+		if (!_history.empty())
+		{
+			_history.pop_back();
+			mtp::u32 oid = _history.empty()? mtp::Session::Root: _history.back();
+			_objectModel->setParent(oid);
+		}
+		break;
+	}
+}
+

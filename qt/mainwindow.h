@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QModelIndex>
 #include <mtp/ptp/Device.h>
 
 namespace Ui {
@@ -20,8 +21,15 @@ public:
 
 private:
 	void showEvent(QShowEvent *e);
+	void keyPressEvent ( QKeyEvent * event );
+
+private slots:
+	void onActivated ( const QModelIndex & index );
+
+private:
 	Ui::MainWindow *	_ui;
 	MtpObjectsModel *	_objectModel;
+	QVector<mtp::u32>	_history;
 
 	mtp::DevicePtr		_device;
 };

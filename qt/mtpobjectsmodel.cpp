@@ -16,7 +16,7 @@ void MtpObjectsModel::setParent(mtp::u32 parentObjectId)
 	beginResetModel();
 
 	_parentObjectId = parentObjectId;
-	mtp::msg::ObjectHandles handles = _session->GetObjectHandles(mtp::Session::AllStorages, (mtp::u32)mtp::ObjectFormat::Association, parentObjectId);
+	mtp::msg::ObjectHandles handles = _session->GetObjectHandles(mtp::Session::AllStorages, mtp::Session::AllFormats, parentObjectId);
 	_rows.clear();
 	_rows.reserve(handles.ObjectHandles.size());
 	for(size_t i = 0; i < handles.ObjectHandles.size(); ++i)
@@ -26,6 +26,21 @@ void MtpObjectsModel::setParent(mtp::u32 parentObjectId)
 	}
 
 	endResetModel();
+}
+
+bool MtpObjectsModel::enter(int idx)
+{
+	if (idx < 0 || idx >= _rows.size())
+		return false;
+
+	Row &row = _rows[idx];
+	if (row.Info->ObjectFormat == (mtp::u16)mtp::ObjectFormat::Association)
+	{
+		setParent(row.ObjectId);
+		return true;
+	}
+	else
+		return false;
 }
 
 void MtpObjectsModel::setSession(mtp::SessionPtr session)

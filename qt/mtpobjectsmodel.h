@@ -26,6 +26,11 @@ public:
 	void setSession(mtp::SessionPtr session);
 	void setParent(mtp::u32 parentObjectId);
 
+	bool enter(int idx);
+
+	mtp::u32 parentObjectId() const
+	{ return _parentObjectId; }
+
 	virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
 	virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
 };
