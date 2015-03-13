@@ -14,7 +14,7 @@ namespace mtp
 		Container container(req);
 		_packeter.Write(container.Data);
 		ByteArray data = _packeter.Read();
-		HexDump("payload", data);
+		//HexDump("payload", data);
 	}
 
 	msg::ObjectHandles Session::GetObjectHandles(u32 storageId, u32 objectFormat, u32 parent)
@@ -72,7 +72,7 @@ namespace mtp
 		Container container(req);
 		_packeter.Write(container.Data);
 		ByteArray data = _packeter.Read();
-		HexDump("payload", data);
+		//HexDump("payload", data);
 
 		Stream stream(data, 8); //operation code + session id
 		msg::DeviceInfo gdi;
@@ -86,14 +86,14 @@ namespace mtp
 		Container container(req);
 		_packeter.Write(container.Data);
 		ByteArray data = _packeter.Read();
-		HexDump("payload", data);
+		//HexDump("payload", data);
 
 		return std::make_shared<Session>(_packeter.GetPipe(), sessionId);
 	}
 
 	void PipePacketer::Write(const ByteArray &data)
 	{
-		HexDump("send", data);
+		//HexDump("send", data);
 		_pipe->Write(data);
 	}
 
@@ -118,7 +118,7 @@ namespace mtp
 			}
 			else
 				packet_offset = 0;
-			HexDump("recv", data);
+			//HexDump("recv", data);
 
 			size_t src_n = std::min(data.size() - packet_offset, result.size() - offset);
 			std::copy(data.begin() + packet_offset, data.begin() + packet_offset + src_n, result.begin() + offset);
@@ -134,7 +134,7 @@ namespace mtp
 	{
 		_pipe->ReadInterrupt();
 		ByteArray message = ReadMessage();
-		HexDump("message", message);
+		//HexDump("message", message);
 		Stream stream(message);
 		u16 raw_code;
 		stream >> raw_code;
@@ -143,7 +143,7 @@ namespace mtp
 			return ByteArray();
 
 		ByteArray response = ReadMessage();
-		HexDump("response", response);
+		//HexDump("response", response);
 		return message;
 	}
 
