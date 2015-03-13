@@ -142,16 +142,9 @@ namespace mtp
 		using namespace mtp;
 		usb::ContextPtr ctx(new usb::Context);
 
-		int mtp_configuration = -1;
-		int mtp_interface = -1;
-
-		usb::ConfigurationPtr		configuration;
-		usb::InterfacePtr			interface;
-		usb::DevicePtr				device;
-
 		for (usb::DeviceDescriptorPtr desc : ctx->GetDevices())
 		{
-			device = desc->TryOpen(ctx);
+			usb::DevicePtr device = desc->TryOpen(ctx);
 			if (!device)
 				continue;
 			int confs = desc->GetConfigurationsCount();
@@ -172,23 +165,16 @@ namespace mtp
 					std::string name = device->GetString(name_idx);
 					if (name == "MTP")
 					{
-						configuration = conf;
-						interface = iface;
-						mtp_configuration = i;
-						mtp_interface = j;
-						i = confs;
+						//device->SetConfiguration(configuration->GetIndex());
+						usb::BulkPipePtr pipe = usb::BulkPipe::Create(device, iface);
+						return std::make_shared<Device>(pipe);
 						break;
 					}
 				}
 			}
 		}
 
-		if (!interface || mtp_interface < 0 || mtp_configuration < 0)
-			return nullptr;
-
-		//device->SetConfiguration(configuration->GetIndex());
-		usb::BulkPipePtr pipe = usb::BulkPipe::Create(device, interface);
-		return std::make_shared<Device>(pipe);
+		return nullptr;
 	}
 
 }
