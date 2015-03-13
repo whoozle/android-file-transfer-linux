@@ -44,6 +44,8 @@ namespace mtp
 	};
 	DECLARE_PTR(Session);
 
+	class Device;
+	DECLARE_PTR(Device);
 
 	class Device
 	{
@@ -55,7 +57,7 @@ namespace mtp
 		msg::DeviceInfo GetDeviceInfo();
 		SessionPtr OpenSession(u32 sessionId);
 
-	private:
+		static DevicePtr Find(); //fixme: returns first device only
 	};
 }
 

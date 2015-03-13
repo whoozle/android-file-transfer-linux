@@ -22,6 +22,13 @@ namespace mtp { namespace usb
 		return std::make_shared<Device>(handle);
 	}
 
+	DevicePtr DeviceDescriptor::TryOpen()
+	{
+		libusb_device_handle *handle;
+		int r = libusb_open(_dev, &handle);
+		return r == 0? std::make_shared<Device>(handle): nullptr;
+	}
+
 	DeviceDescriptor::~DeviceDescriptor()
 	{ libusb_unref_device(_dev); }
 

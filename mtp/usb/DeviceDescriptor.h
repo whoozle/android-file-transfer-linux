@@ -46,6 +46,7 @@ namespace mtp { namespace usb
 		{ return _descriptor.idProduct; }
 
 		DevicePtr Open();
+		DevicePtr TryOpen();
 
 		int GetConfigurationsCount() const
 		{ return _descriptor.bNumConfigurations; }

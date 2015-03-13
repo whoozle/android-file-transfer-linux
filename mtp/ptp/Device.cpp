@@ -1,6 +1,7 @@
 #include <mtp/ptp/Device.h>
 #include <mtp/ptp/Response.h>
 #include <mtp/ptp/Container.h>
+#include <mtp/usb/Context.h>
 #include <mtp/ptp/OperationRequest.h>
 
 
@@ -134,6 +135,60 @@ namespace mtp
 		ByteArray response = ReadMessage();
 		HexDump("response", response);
 		return message;
+	}
+
+	DevicePtr Device::Find()
+	{
+		using namespace mtp;
+		usb::ContextPtr ctx(new usb::Context);
+
+		int mtp_configuration = -1;
+		int mtp_interface = -1;
+
+		usb::ConfigurationPtr		configuration;
+		usb::InterfacePtr			interface;
+		usb::DevicePtr				device;
+
+		for (usb::DeviceDescriptorPtr desc : ctx->GetDevices())
+		{
+			device = desc->TryOpen();
+			if (!device)
+				continue;
+			int confs = desc->GetConfigurationsCount();
+			printf("configurations: %d\n", confs);
+
+			for(int i = 0; i < confs; ++i)
+			{
+				usb::ConfigurationPtr conf = desc->GetConfiguration(i);
+				int interfaces = conf->GetInterfaceCount();
+				printf("interfaces: %d\n", interfaces);
+				for(int j = 0; j < interfaces; ++j)
+				{
+					usb::InterfacePtr iface = conf->GetInterface(conf, j, 0);
+					printf("%d:%d index %u, eps %u\n", i, j, iface->GetIndex(), iface->GetEndpointsCount());
+					int name_idx = iface->GetNameIndex();
+					if (!name_idx)
+						continue;
+					std::string name = device->GetString(name_idx);
+					if (name == "MTP")
+					{
+						configuration = conf;
+						interface = iface;
+						mtp_configuration = i;
+						mtp_interface = j;
+						i = confs;
+						break;
+					}
+				}
+			}
+		}
+
+		if (!interface || mtp_interface < 0 || mtp_configuration < 0)
+			throw std::runtime_error("no mtp interface found");
+
+		//device->SetConfiguration(configuration->GetIndex());
+		usb::BulkPipePtr pipe = usb::BulkPipe::Create(device, interface);
+		return std::make_shared<Device>(pipe);
 	}
 
 }
