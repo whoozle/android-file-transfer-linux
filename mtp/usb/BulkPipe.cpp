@@ -18,7 +18,7 @@ namespace mtp { namespace usb
 		int r = libusb_interrupt_transfer(_device->GetHandle(), _interrupt->GetAddress(), data.data(), data.size(), &tr, 1);
 		printf("INTERRUPT %d %d\n", r, tr);
 		data.resize(tr);
-		return std::move(data);
+		return data;
 	}
 
 	ByteArray BulkPipe::Read(int timeout)
@@ -27,7 +27,7 @@ namespace mtp { namespace usb
 		int tr = 0;
 		USB_CALL(libusb_bulk_transfer(_device->GetHandle(), _in->GetAddress(), data.data(), data.size(), &tr, timeout));
 		data.resize(tr);
-		return std::move(data);
+		return data;
 	}
 
 	void BulkPipe::Write(const ByteArray &data, int timeout)

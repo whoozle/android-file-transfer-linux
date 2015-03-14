@@ -17,10 +17,10 @@ namespace mtp
 		ByteArray data = _packeter.Read();
 		//HexDump("payload", data);
 
-		Stream stream(data, 8); //operation code + session id
+		InputStream stream(data, 8); //operation code + session id
 		msg::DeviceInfo gdi;
 		gdi.Read(stream);
-		return std::move(gdi);
+		return gdi;
 	}
 
 	SessionPtr Device::OpenSession(u32 sessionId)
@@ -51,7 +51,7 @@ namespace mtp
 			ByteArray data = _pipe->Read();
 			if (size == ~0u)
 			{
-				Stream stream(data);
+				InputStream stream(data);
 				stream >> size;
 				printf("DATA SIZE = %u\n", size);
 				if (size < 4)
@@ -78,7 +78,7 @@ namespace mtp
 		_pipe->ReadInterrupt();
 		ByteArray message = ReadMessage();
 		//HexDump("message", message);
-		Stream stream(message);
+		InputStream stream(message);
 		u16 raw_code;
 		stream >> raw_code;
 		ContainerType type = ContainerType(raw_code);

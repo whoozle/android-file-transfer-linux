@@ -22,7 +22,7 @@ namespace mtp { namespace msg
 		std::string			DeviceVersion;
 		std::string			SerialNumber;
 
-		void Read(Stream &stream)
+		void Read(InputStream &stream)
 		{
 			stream >> StandardVersion;
 			stream >> VendorExtensionId;
@@ -45,7 +45,7 @@ namespace mtp { namespace msg
 	{
 		std::vector<u32> ObjectHandles;
 
-		void Read(Stream &stream)
+		void Read(InputStream &stream)
 		{
 			stream >> ObjectHandles;
 		}
@@ -55,7 +55,7 @@ namespace mtp { namespace msg
 	{
 		std::vector<u32> StorageIDs;
 
-		void Read(Stream &stream)
+		void Read(InputStream &stream)
 		{
 			stream >> StorageIDs;
 		}
@@ -73,7 +73,7 @@ namespace mtp { namespace msg
 		std::string	VolumeLabel;
 
 
-		void Read(Stream &stream)
+		void Read(InputStream &stream)
 		{
 			stream >> StorageType;
 			stream >> FilesystemType;
@@ -115,7 +115,7 @@ namespace mtp { namespace msg
 			SequenceNumber()
 		{ }
 
-		void Read(Stream &stream)
+		void Read(InputStream &stream)
 		{
 			stream >> StorageId;
 			stream >> ObjectFormat;

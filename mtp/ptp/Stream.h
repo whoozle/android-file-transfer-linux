@@ -6,114 +6,97 @@
 
 namespace mtp
 {
-	namespace impl
-	{
-		template<typename S, typename T>
-		struct Reader;
 
-		template<typename Stream>
-		struct Reader<Stream, u8>
-		{ static void Read(Stream &s, u8 &ref) { ref = s.ReadByte(); } };
-
-		template<typename Stream>
-		struct Reader<Stream, u16>
-		{ static void Read(Stream &s, u16 &ref)
-			{
-				u16 l, h;
-				l = s.ReadByte();
-				h = s.ReadByte() << 8;
-				ref = l | h;
-			}
-		};
-
-		template<typename Stream>
-		struct Reader<Stream, u32>
-		{ static void Read(Stream &s, u32 &ref)
-			{
-				u16 l, h;
-				Reader<Stream, u16>::Read(s, l);
-				Reader<Stream, u16>::Read(s, h);
-				ref = ((u32)h << 16) | l;
-			}
-		};
-
-		template<typename Stream>
-		struct Reader<Stream, u64>
-		{ static void Read(Stream &s, u64 &ref)
-			{
-				u32 l, h;
-				Reader<Stream, u32>::Read(s, l);
-				Reader<Stream, u32>::Read(s, h);
-				ref = ((u64)h << 32) | l;
-			}
-		};
-
-		template<typename Stream>
-		struct Reader<Stream, std::string>
-		{ static void Read(Stream &s, std::string &str)
-			{
-				u8 len = s.ReadByte();
-				str.clear();
-				while(len--)
-				{
-					u16 ch;
-					Reader<Stream, u16>::Read(s, ch);
-					if (ch <= 0x7f)
-						str += (char)ch;
-					else if (ch <= 0x7ff)
-					{
-						str += (char) ((ch >> 6) | 0xc0);
-						str += (char) ((ch & 0x3f) | 0x80);
-				    }
-					else if (ch <= 0xffff)
-					{
-						str += (char)((ch >> 12) | 0xe0);
-						str += (char)(((ch & 0x0fc0) >> 6) | 0x80);
-						str += (char)( (ch & 0x003f) | 0x80);
-					}
-				}
-			}
-		};
-
-		template<typename Stream, typename ElementType>
-		struct Reader<Stream, std::vector<ElementType> >
-		{
-			static void Read(Stream &s, std::vector<ElementType> &ref)
-			{
-				u32 size;
-				s >> size;
-				ref.clear();
-				while(size--)
-				{
-					ElementType el;
-					s >> el;
-					ref.push_back(el);
-				}
-			}
-		};
-	}
-
-	class Stream
+	class InputStream
 	{
 		const ByteArray &	_data;
 		size_t				_offset;
 
 	public:
-		Stream(const ByteArray & data, size_t offset = 0): _data(data), _offset(offset) { }
-
-		u8 ReadByte()
-		{ return _data.at(_offset++); }
+		InputStream(const ByteArray & data, size_t offset = 0): _data(data), _offset(offset) { }
 
 		const ByteArray & GetData() const
 		{ return _data; }
 
-		template<typename T>
-		Stream& operator >> (T &ref)
+		u8 Read8()
+		{ return _data.at(_offset++); }
+
+		u16 Read16()
 		{
-			impl::Reader<Stream, T>::Read(*this, ref);
-			return *this;
+			u8 l = Read8();
+			u8 h = Read8();
+			return l | ((u16)h << 8);
+		}
+		u32 Read32()
+		{
+			u16 l = Read16();
+			u16 h = Read16();
+			return l | ((u32)h << 16);
+		}
+
+		u64 Read64()
+		{
+			u32 l = Read32();
+			u32 h = Read32();
+			return l | ((u64)h << 32);
+		}
+		std::string ReadString()
+		{
+			u8 len = Read8();
+			std::string str;
+			while(len--)
+			{
+				u16 ch = Read16();
+				if (ch <= 0x7f)
+					str += (char)ch;
+				else if (ch <= 0x7ff)
+				{
+					str += (char) ((ch >> 6) | 0xc0);
+					str += (char) ((ch & 0x3f) | 0x80);
+				}
+				else if (ch <= 0xffff)
+				{
+					str += (char)((ch >> 12) | 0xe0);
+					str += (char)(((ch & 0x0fc0) >> 6) | 0x80);
+					str += (char)( (ch & 0x003f) | 0x80);
+				}
+			}
+			return str;
+		}
+
+		template<typename ElementType>
+		std::vector<ElementType> ReadArray()
+		{
+			std::vector<ElementType> array;
+			u32 size = Read32();
+			while(size--)
+			{
+				ElementType el;
+				(*this) >> el;
+				array.push_back(el);
+			}
+			return array;
 		}
 	};
+
+	inline InputStream & operator >> (InputStream &stream, u8 &value)
+	{ value = stream.Read8(); return stream; }
+
+	inline InputStream & operator >> (InputStream &stream, u16 &value)
+	{ value = stream.Read16(); return stream; }
+
+	inline InputStream & operator >> (InputStream &stream, u32 &value)
+	{ value = stream.Read32(); return stream; }
+
+	inline InputStream & operator >> (InputStream &stream, u64 &value)
+	{ value = stream.Read64(); return stream; }
+
+	inline InputStream & operator >> (InputStream &stream, std::string &value)
+	{ value = stream.ReadString(); return stream; }
+
+	template<typename ElementType>
+	inline InputStream & operator >> (InputStream &stream, std::vector<ElementType> &value)
+	{ value = stream.template ReadArray<ElementType>(); return stream; }
 
 }
 

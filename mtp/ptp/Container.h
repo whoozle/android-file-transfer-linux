@@ -28,7 +28,7 @@ namespace mtp
 
 		static void Read(const ByteArray &src, ContainerType &type, ByteArray &data)
 		{
-			Stream stream(src);
+			InputStream stream(src);
 			u32 size;
 			u16 raw_type;
 			stream >> size;
