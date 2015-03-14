@@ -66,6 +66,14 @@ namespace mtp
 		return std::move(goi);
 	}
 
+	void Session::DeleteObject(u32 objectId)
+	{
+		OperationRequest req(OperationCode::DeleteObject, _transactionId++, objectId);
+		Container container(req);
+		_packeter.Write(container.Data);
+		_packeter.Read();
+	}
+
 	msg::DeviceInfo Device::GetDeviceInfo()
 	{
 		OperationRequest req(OperationCode::GetDeviceInfo);
