@@ -21,26 +21,22 @@ namespace mtp
 		StoreReadOnly				= 0x200e,
 		AccessDenied				= 0x200f,
 		NoThumbnailPresent			= 0x2010,
-
-		SessionAlreadyOpen			= 0x201e
-#if 0
-		0x2011 SelfTest Failed
-		0x2012 Partial Deletion
-		0x2013 Store Not Available
-		0x2014 Specification By Format Unsupported
-		0x2015 No Valid ObjectInfo
-		0x2016 Invalid Code Format
-		0x2017 Unknown Vendor Code
-		0x2018 Capture Already Terminated
-		0x2019 Device Busy
-		0x201A Invalid ParentObject
-		0x201B Invalid DeviceProp Format
-		0x201C Invalid DeviceProp Value
-		0x201D Invalid Parameter
-		0x201E Session Already Open
-		0x201F Transaction Cancelled
-		0x2020 Specification of Destination Unsupported
-#endif
+		SelfTestFailed				= 0x2011,
+		PartialDeletion				= 0x2012,
+		StoreNotAvailable			= 0x2013,
+		SpecificationByFormatUnsupported = 0x2014,
+		NoValidObjectInfo			= 0x2015,
+		InvalidCodeFormat			= 0x2016,
+		UnknownVendorCode			= 0x2017,
+		CaptureAlreadyTerminated	= 0x2018,
+		DeviceBusy					= 0x2019,
+		InvalidParentObject			= 0x201a,
+		InvalidDevicePropFormat		= 0x201b,
+		InvalidDevicePropValue		= 0x201c,
+		InvalidParameter			= 0x201d,
+		SessionAlreadyOpen			= 0x201e,
+		TransactionCancelled		= 0x201f,
+		SpecificationOfDestinationUnsupported = 0x2020,
 	};
 }
 
