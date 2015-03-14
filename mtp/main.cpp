@@ -41,6 +41,7 @@ int main(int argc, char **argv)
 	if (argc < 2)
 		return 0;
 
+	SessionPtr session = mtp->OpenSession(1);
 	std::string command = argv[1];
 	if (command == "list")
 	{
@@ -49,14 +50,12 @@ int main(int argc, char **argv)
 			if (sscanf(argv[2], "%x", &parent) != 1)
 				return 1;
 
-		SessionPtr session = mtp->OpenSession(1);
 		msg::ObjectHandles handles = session->GetObjectHandles(mtp::Session::AllStorages, mtp::Session::AllFormats, parent);
 
 		for(u32 objectId : handles.ObjectHandles)
 		{
 			try
 			{
-				printf("GET OBJECT ID INFO 0x%08x\n", objectId);
 				msg::ObjectInfo info = session->GetObjectInfo(objectId);
 				printf("%08x %04x %s %ux%u, parent: 0x%08x\n", objectId, info.ObjectFormat, info.Filename.c_str(), info.ImagePixWidth, info.ImagePixHeight, info.ParentObject);
 			}
@@ -75,6 +74,18 @@ int main(int argc, char **argv)
 		if (sscanf(argv[2], "%x", &objectId) != 1)
 			return 1;
 		printf("object id = %08x\n", objectId);
+		msg::ObjectInfo info = session->GetObjectInfo(objectId);
+		printf("filename = %s\n", info.Filename.c_str());
+		FILE *f = fopen(info.Filename.c_str(), "wb");
+		if (!f)
+		{
+			perror("open");
+			return 1;
+		}
+		ByteArray object = session->GetObject(objectId);
+		if (fwrite(object.data(), object.size(), 1, f) != 1)
+			perror("fwriter");
+		fclose(f);
 	}
 
 	return 0;

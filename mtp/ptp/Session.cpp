@@ -64,6 +64,15 @@ namespace mtp
 		return std::move(goi);
 	}
 
+	ByteArray Session::GetObject(u32 objectId)
+	{
+		OperationRequest req(OperationCode::GetObject, _transactionId++, objectId);
+		Container container(req);
+		_packeter.Write(container.Data);
+		ByteArray data = _packeter.Read();
+		return ByteArray(data.begin() + 8, data.end());
+	}
+
 	void Session::DeleteObject(u32 objectId)
 	{
 		OperationRequest req(OperationCode::DeleteObject, _transactionId++, objectId);
