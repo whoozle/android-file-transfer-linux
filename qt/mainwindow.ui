@@ -19,10 +19,13 @@
      <widget class="QListView" name="listView">
       <property name="font">
        <font>
-        <pointsize>20</pointsize>
-        <weight>75</weight>
-        <bold>true</bold>
+        <pointsize>18</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
        </font>
+      </property>
+      <property name="selectionMode">
+       <enum>QAbstractItemView::ExtendedSelection</enum>
       </property>
       <property name="uniformItemSizes">
        <bool>true</bool>

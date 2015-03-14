@@ -11,7 +11,8 @@ MainWindow::MainWindow(QWidget *parent) :
 	_objectModel(new MtpObjectsModel)
 {
 	_ui->setupUi(this);
-	connect(_ui->listView, SIGNAL(activated(QModelIndex)), SLOT(onActivated(QModelIndex)));
+	connect(_ui->listView, SIGNAL(doubleClicked(QModelIndex)), SLOT(onActivated(QModelIndex)));
+	connect(_ui->listView, SIGNAL(customContextMenuRequested(QPoint)), SLOT(customContextMenuRequested(QPoint)));
 }
 
 MainWindow::~MainWindow()
