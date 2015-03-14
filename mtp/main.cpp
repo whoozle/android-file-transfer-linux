@@ -31,28 +31,51 @@ int main(int argc, char **argv)
 	printf("%s\n", gdi.Model.c_str());
 	printf("%s\n", gdi.DeviceVersion.c_str());
 	printf("%s\n", gdi.SerialNumber.c_str());
+	printf("supported op codes: ");
 	for(u16 code : gdi.OperationsSupported)
 	{
-		printf("supported op code: %04x\n", (unsigned)code);
+		printf("%04x ", (unsigned)code);
 	}
+	printf("\n");
 
-	SessionPtr session = mtp->OpenSession(1);
-	msg::ObjectHandles handles = session->GetObjectHandles();
+	if (argc < 2)
+		return 0;
 
-	for(u32 objectId : handles.ObjectHandles)
+	std::string command = argv[1];
+	if (command == "list")
 	{
-		try
+		mtp::u32 parent = mtp::Session::Root;
+		if (argc > 2)
+			if (sscanf(argv[2], "%x", &parent) != 1)
+				return 1;
+
+		SessionPtr session = mtp->OpenSession(1);
+		msg::ObjectHandles handles = session->GetObjectHandles(mtp::Session::AllStorages, mtp::Session::AllFormats, parent);
+
+		for(u32 objectId : handles.ObjectHandles)
 		{
-			printf("GET OBJECT ID INFO 0x%08x\n", objectId);
-			msg::ObjectInfo info = session->GetObjectInfo(objectId);
-			printf("%04x %s %ux%u, parent: 0x%08x\n", info.ObjectFormat, info.Filename.c_str(), info.ImagePixWidth, info.ImagePixHeight, info.ParentObject);
+			try
+			{
+				printf("GET OBJECT ID INFO 0x%08x\n", objectId);
+				msg::ObjectInfo info = session->GetObjectInfo(objectId);
+				printf("%08x %04x %s %ux%u, parent: 0x%08x\n", objectId, info.ObjectFormat, info.Filename.c_str(), info.ImagePixWidth, info.ImagePixHeight, info.ParentObject);
+			}
+			catch(const std::exception &ex)
+			{
+				printf("error: %s\n", ex.what());
+			}
 		}
-		catch(const std::exception &ex)
-		{
-			printf("error: %s\n", ex.what());
-		}
+		//libusb_release_interface(device->GetHandle(), interface->GetIndex());
 	}
-	//libusb_release_interface(device->GetHandle(), interface->GetIndex());
+	else if (command == "get")
+	{
+		if (argc < 3)
+			return 1;
+		mtp::u32 objectId;
+		if (sscanf(argv[2], "%x", &objectId) != 1)
+			return 1;
+		printf("object id = %08x\n", objectId);
+	}
 
 	return 0;
 }
