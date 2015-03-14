@@ -10,11 +10,13 @@ class MtpObjectsModel : public QAbstractListModel
 	mtp::SessionPtr		_session;
 	mtp::u32			_parentObjectId;
 
-	struct Row
+	class Row
 	{
+		std::shared_ptr<mtp::msg::ObjectInfo>	_info;
+	public:
 		mtp::u32								ObjectId;
-		std::shared_ptr<mtp::msg::ObjectInfo>	Info;
 		Row(mtp::u32 id = 0): ObjectId(id) { }
+		std::shared_ptr<mtp::msg::ObjectInfo> GetInfo(mtp::SessionPtr session);
 	};
 
 	mutable QVector<Row>		_rows;

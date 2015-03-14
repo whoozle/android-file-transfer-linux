@@ -1,5 +1,7 @@
 #include "mtpobjectsmodel.h"
 #include <QDebug>
+#include <QBrush>
+#include <QColor>
 
 MtpObjectsModel::MtpObjectsModel(QObject *parent): QAbstractListModel(parent)
 {
@@ -34,7 +36,7 @@ bool MtpObjectsModel::enter(int idx)
 		return false;
 
 	Row &row = _rows[idx];
-	if (row.Info->ObjectFormat == (mtp::u16)mtp::ObjectFormat::Association)
+	if (row.GetInfo(_session)->ObjectFormat == (mtp::u16)mtp::ObjectFormat::Association)
 	{
 		setParent(row.ObjectId);
 		return true;
@@ -54,31 +56,39 @@ void MtpObjectsModel::setSession(mtp::SessionPtr session)
 int MtpObjectsModel::rowCount(const QModelIndex &parent) const
 { return _rows.size(); }
 
+std::shared_ptr<mtp::msg::ObjectInfo> MtpObjectsModel::Row::GetInfo(mtp::SessionPtr session)
+{
+	if (!_info)
+	{
+		_info = std::make_shared<mtp::msg::ObjectInfo>();
+		try
+		{
+			*_info = session->GetObjectInfo(ObjectId);
+			//qDebug() << QString::fromUtf8(row.Info->Filename.c_str());
+		}
+		catch(const std::exception &ex)
+		{ qDebug() << "failed to get object info " << ex.what(); }
+	}
+	return _info;
+}
+
 QVariant MtpObjectsModel::data(const QModelIndex &index, int role) const
 {
 	int row_idx = index.row();
 	if (row_idx < 0 || row_idx > _rows.size())
 		return QVariant();
 
+	Row &row = _rows[row_idx];
+
 	switch(role)
 	{
 	case Qt::DisplayRole:
-		{
-			Row &row = _rows[row_idx];
-			if (!row.Info)
-			{
-				row.Info = std::make_shared<mtp::msg::ObjectInfo>();
-				try
-				{
-					*row.Info = _session->GetObjectInfo(row.ObjectId);
-					//qDebug() << QString::fromUtf8(row.Info->Filename.c_str());
-				}
-				catch(const std::exception &ex)
-				{ qDebug() << "failed to get object info " << ex.what(); }
-			}
-			return QString::fromUtf8(row.Info->Filename.c_str());
-		}
-		break;
+		return QString::fromUtf8(row.GetInfo(_session)->Filename.c_str());
+
+	case Qt::ForegroundRole:
+		return row.GetInfo(_session)->ObjectFormat == (mtp::u16)mtp::ObjectFormat::Association? QBrush(QColor(0, 0, 128)): QBrush(Qt::black);
+
+	default:
+		return QVariant();
 	}
-	return QVariant();
 }
