@@ -36,6 +36,9 @@ public:
 
 	virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
 	virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+
+protected:
+	bool removeRows ( int row, int count, const QModelIndex & parent = QModelIndex() );
 };
 
 #endif // MTPOBJECTSMODEL_H

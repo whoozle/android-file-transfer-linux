@@ -45,10 +45,20 @@ void MainWindow::customContextMenuRequested ( const QPoint & pos )
 {
 	QItemSelectionModel *selection =_ui->listView->selectionModel();
 	QModelIndexList rows = selection->selectedRows();
+
+	QMenu menu(this);
+	//http://standards.freedesktop.org/icon-naming-spec/icon-naming-spec-latest.html
+	QAction * delete_objects = menu.addAction(QIcon::fromTheme("edit-delete"), "Delete");
+	QAction * action = menu.exec(_ui->listView->mapToGlobal(pos));
+	if (!action)
+		return;
+
 	for(int i = 0; i < rows.size(); ++i)
 	{
-		mtp::u32 oid = _objectModel->objectIdAt(rows[i].row());
-		qDebug() << "selected object " << oid;
+		if (action == delete_objects)
+			_objectModel->removeRow(rows[i].row());
+		else
+			qDebug() << "unknown action!";
 	}
 }
 

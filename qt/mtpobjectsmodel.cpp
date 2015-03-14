@@ -53,7 +53,7 @@ void MtpObjectsModel::setSession(mtp::SessionPtr session)
 	endResetModel();
 }
 
-int MtpObjectsModel::rowCount(const QModelIndex &parent) const
+int MtpObjectsModel::rowCount(const QModelIndex &) const
 { return _rows.size(); }
 
 std::shared_ptr<mtp::msg::ObjectInfo> MtpObjectsModel::Row::GetInfo(mtp::SessionPtr session)
@@ -71,6 +71,24 @@ std::shared_ptr<mtp::msg::ObjectInfo> MtpObjectsModel::Row::GetInfo(mtp::Session
 	}
 	return _info;
 }
+
+bool MtpObjectsModel::removeRows (int row, int count, const QModelIndex & parent )
+{
+	qDebug() << "remove rows " << row << " " << count;
+	beginRemoveRows(parent, row, row + count - 1);
+	for(int i = 0; i < count; ++i)
+	{
+		mtp::u32 oid = objectIdAt(row + i);
+		if (oid == 0)
+			continue;
+		_session->DeleteObject(oid);
+	}
+	_rows.remove(row, count);
+
+	endRemoveRows();
+	return false;
+}
+
 
 mtp::u32 MtpObjectsModel::objectIdAt(int idx)
 {
