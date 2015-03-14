@@ -1,7 +1,7 @@
 #ifndef MESSAGES_H
 #define	MESSAGES_H
 
-#include <mtp/ptp/Stream.h>
+#include <mtp/ptp/InputStream.h>
 
 namespace mtp { namespace msg
 {

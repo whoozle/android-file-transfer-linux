@@ -3,7 +3,7 @@
 
 #include <mtp/types.h>
 #include <mtp/ptp/Packet.h>
-#include <mtp/ptp/Stream.h>
+#include <mtp/ptp/InputStream.h>
 
 namespace mtp
 {
