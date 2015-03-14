@@ -43,8 +43,13 @@ void MainWindow::onActivated ( const QModelIndex & index )
 
 void MainWindow::customContextMenuRequested ( const QPoint & pos )
 {
-	int idx = _ui->listView->indexAt(pos).row();
-	qDebug() << "popup menu at " << pos << " -> " << idx;
+	QItemSelectionModel *selection =_ui->listView->selectionModel();
+	QModelIndexList rows = selection->selectedRows();
+	for(int i = 0; i < rows.size(); ++i)
+	{
+		mtp::u32 oid = _objectModel->objectIdAt(rows[i].row());
+		qDebug() << "selected object " << oid;
+	}
 }
 
 void MainWindow::back()

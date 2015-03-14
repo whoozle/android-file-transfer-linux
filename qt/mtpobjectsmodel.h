@@ -29,6 +29,7 @@ public:
 	void setParent(mtp::u32 parentObjectId);
 
 	bool enter(int idx);
+	mtp::u32 objectIdAt(int idx);
 
 	mtp::u32 parentObjectId() const
 	{ return _parentObjectId; }

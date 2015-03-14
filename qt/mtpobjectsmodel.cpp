@@ -72,6 +72,11 @@ std::shared_ptr<mtp::msg::ObjectInfo> MtpObjectsModel::Row::GetInfo(mtp::Session
 	return _info;
 }
 
+mtp::u32 MtpObjectsModel::objectIdAt(int idx)
+{
+	return (idx >= 0 && idx < _rows.size())? _rows[idx].ObjectId: 0;
+}
+
 QVariant MtpObjectsModel::data(const QModelIndex &index, int role) const
 {
 	int row_idx = index.row();
