@@ -41,6 +41,22 @@ void MainWindow::onActivated ( const QModelIndex & index )
 		_history.push_back(_objectModel->parentObjectId());
 }
 
+void MainWindow::customContextMenuRequested ( const QPoint & pos )
+{
+	int idx = _ui->listView->indexAt(pos).row();
+	qDebug() << "popup menu at " << pos << " -> " << idx;
+}
+
+void MainWindow::back()
+{
+	if (!_history.empty())
+	{
+		_history.pop_back();
+		mtp::u32 oid = _history.empty()? mtp::Session::Root: _history.back();
+		_objectModel->setParent(oid);
+	}
+}
+
 void MainWindow::keyPressEvent ( QKeyEvent * event )
 {
 	switch(event->key())
@@ -53,13 +69,7 @@ void MainWindow::keyPressEvent ( QKeyEvent * event )
 		}
 		break;
 	case Qt::Key_Escape:
-		qDebug() << "Escape";
-		if (!_history.empty())
-		{
-			_history.pop_back();
-			mtp::u32 oid = _history.empty()? mtp::Session::Root: _history.back();
-			_objectModel->setParent(oid);
-		}
+		back();
 		break;
 	}
 }
