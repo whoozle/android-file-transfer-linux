@@ -2,8 +2,8 @@
 #define	CONTAINER_H
 
 #include <mtp/types.h>
-#include <mtp/ptp/Packet.h>
 #include <mtp/ptp/InputStream.h>
+#include <mtp/ptp/OutputStream.h>
 
 namespace mtp
 {
@@ -16,13 +16,16 @@ namespace mtp
 		Event = 4,
 	};
 
-	struct Container : Packet
+	struct Container
 	{
+		ByteArray Data;
+
 		template<typename Message>
 		Container(const Message &msg)
 		{
-			Write((u32)msg.Data.size() + 6);
-			Write((u16)Message::Type);
+			OutputStream stream(Data);
+			stream << ((u32)msg.Data.size() + 6);
+			stream << ((u16)Message::Type);
 			std::copy(msg.Data.begin(), msg.Data.end(), std::back_inserter(Data));
 		}
 

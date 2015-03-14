@@ -2,8 +2,8 @@
 #define	OPERATIONREQUEST_H
 
 #include <mtp/types.h>
-#include <mtp/ptp/Packet.h>
 #include <mtp/ptp/Container.h>
+#include <mtp/ptp/OutputStream.h>
 
 namespace mtp
 {
@@ -39,38 +39,23 @@ namespace mtp
 		InitiateOpenCapture     = 0x101c
 	};
 
-	struct OperationRequest : Packet
+	struct OperationRequest
 	{
 		static const ContainerType	Type = ContainerType::Command;
 
 		std::vector<u8>				Data;
 
-		void Write(u8 byte)
-		{ Data.push_back(byte); }
-
-		void Write(u16 word)
-		{
-			Write((u8)word);
-			Write((u8)(word >> 8));
-		}
-
-		void Write(u32 dword)
-		{
-			Write((u16)dword);
-			Write((u16)(dword >> 16));
-		}
-
 		OperationRequest(OperationCode opcode, u32 transaction = 0, u32 par1 = 0, u32 par2 = 0, u32 par3 = 0, u32 par4 = 0, u32 par5 = 0)
 		{
-			Data.reserve(30);
-			Write((u16)opcode);
+			OutputStream stream(Data);
+			stream << ((u16)opcode);
 			//Write(session); //just one field in mtp
-			Write(transaction);
-			Write(par1);
-			Write(par2);
-			Write(par3);
-			Write(par4);
-			Write(par5);
+			stream << transaction;
+			stream << par1;
+			stream << par2;
+			stream << par3;
+			stream << par4;
+			stream << par5;
 		}
 	};
 }
