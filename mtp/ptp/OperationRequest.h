@@ -71,7 +71,6 @@ namespace mtp
 	{
 		static const ContainerType	Type = ContainerType::Data;
 
-		ByteArray					Data;
 		DataRequest(OperationCode opcode, u32 transaction): RequestBase(opcode, transaction) { }
 	};
 }
