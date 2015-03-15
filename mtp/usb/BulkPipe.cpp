@@ -33,10 +33,17 @@ namespace mtp { namespace usb
 
 	void BulkPipe::Write(const ByteArray &data, int timeout)
 	{
-		int tr = 0;
-		USB_CALL(libusb_bulk_transfer(_device->GetHandle(), _out->GetAddress(), const_cast<u8 *>(data.data()), data.size(), &tr, timeout));
-		if (tr != (int)data.size())
-			throw std::runtime_error("short write");
+		size_t maxPacketSize = _out->GetMaxPacketSize();
+		size_t offset = 0;
+		while(offset < data.size())
+		{
+			size_t writeSize = std::min(data.size() - offset, maxPacketSize);
+			int tr = 0;
+			USB_CALL(libusb_bulk_transfer(_device->GetHandle(), _out->GetAddress(), const_cast<u8 *>(data.data() + offset), writeSize, &tr, timeout));
+			if (tr != (int)writeSize)
+				throw std::runtime_error("short write");
+			offset += tr;
+		}
 	}
 
 	BulkPipePtr BulkPipe::Create(usb::DevicePtr device, usb::InterfacePtr interface)
