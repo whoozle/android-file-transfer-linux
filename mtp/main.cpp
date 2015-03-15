@@ -87,6 +87,27 @@ int main(int argc, char **argv)
 			perror("fwriter");
 		fclose(f);
 	}
+	else if (command == "set")
+	{
+		if (argc < 4)
+			return 1;
+
+		mtp::u32 objectId;
+		if (sscanf(argv[2], "%x", &objectId) != 1)
+			return 1;
+
+		std::string filename(argv[3]);
+		printf("uploading %s to %08x\n", filename.c_str(), objectId);
+		FILE *f = fopen(filename.c_str(), "rb");
+		if (!f)
+		{
+			perror("open");
+			return 1;
+		}
+		msg::ObjectInfo oi;
+		oi.Filename = filename;
+		fclose(f);
+	}
 
 	return 0;
 }
