@@ -38,25 +38,41 @@ namespace mtp
 		GetPartialObject        = 0x101b,
 		InitiateOpenCapture     = 0x101c
 	};
-
-	struct OperationRequest
+	struct RequestBase
 	{
-		static const ContainerType	Type = ContainerType::Command;
+		ByteArray					Data;
 
-		std::vector<u8>				Data;
-
-		OperationRequest(OperationCode opcode, u32 transaction = 0, u32 par1 = 0, u32 par2 = 0, u32 par3 = 0, u32 par4 = 0, u32 par5 = 0)
+		RequestBase(OperationCode opcode, u32 transaction)
 		{
 			OutputStream stream(Data);
 			stream << ((u16)opcode);
 			//Write(session); //just one field in mtp
 			stream << transaction;
+		}
+	};
+
+	struct OperationRequest : RequestBase
+	{
+		static const ContainerType	Type = ContainerType::Command;
+
+		OperationRequest(OperationCode opcode, u32 transaction = 0, u32 par1 = 0, u32 par2 = 0, u32 par3 = 0, u32 par4 = 0, u32 par5 = 0):
+			RequestBase(opcode, transaction)
+		{
+			OutputStream stream(Data);
 			stream << par1;
 			stream << par2;
 			stream << par3;
 			stream << par4;
 			stream << par5;
 		}
+	};
+
+	struct DataRequest : RequestBase
+	{
+		static const ContainerType	Type = ContainerType::Data;
+
+		ByteArray					Data;
+		DataRequest(OperationCode opcode, u32 transaction): RequestBase(opcode, transaction) { }
 	};
 }
 
