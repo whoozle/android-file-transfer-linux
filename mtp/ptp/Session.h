@@ -19,11 +19,11 @@ namespace mtp
 		usb::BulkPipePtr GetPipe() const
 		{ return _pipe; }
 
-		void Write(const ByteArray &data);
-		void Read(ByteArray &data, ByteArray &response);
+		void Write(const ByteArray &data, int timeout = 3000);
+		void Read(ByteArray &data, ByteArray &response, int timeout = 3000);
 
 	private:
-		ByteArray ReadMessage();
+		ByteArray ReadMessage(int timeout);
 	};
 
 	enum struct ObjectFormat : u16

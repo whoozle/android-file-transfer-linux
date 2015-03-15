@@ -36,13 +36,13 @@ namespace mtp
 		return std::make_shared<Session>(_packeter.GetPipe(), sessionId);
 	}
 
-	void PipePacketer::Write(const ByteArray &data)
+	void PipePacketer::Write(const ByteArray &data, int timeout)
 	{
 		//HexDump("send", data);
-		_pipe->Write(data);
+		_pipe->Write(data, timeout);
 	}
 
-	ByteArray PipePacketer::ReadMessage()
+	ByteArray PipePacketer::ReadMessage(int timeout)
 	{
 		ByteArray result;
 		u32 size = ~0u;
@@ -50,7 +50,7 @@ namespace mtp
 		size_t packet_offset;
 		while(true)
 		{
-			ByteArray data = _pipe->Read();
+			ByteArray data = _pipe->Read(timeout);
 			if (size == ~0u)
 			{
 				InputStream stream(data);
@@ -75,12 +75,12 @@ namespace mtp
 
 	}
 
-	void PipePacketer::Read(ByteArray &data, ByteArray &response)
+	void PipePacketer::Read(ByteArray &data, ByteArray &response, int timeout)
 	{
 		_pipe->ReadInterrupt();
 		data.clear();
 		response.clear();
-		ByteArray message = ReadMessage();
+		ByteArray message = ReadMessage(timeout);
 		//HexDump("message", message);
 		InputStream stream(message);
 		u16 raw_code;
@@ -89,11 +89,12 @@ namespace mtp
 		if (type == ContainerType::Data)
 		{
 			data = std::move(message);
-			response = ReadMessage();
-			return;
+			response = ReadMessage(timeout);
 		}
 		else
+		{
 			response = std::move(message);
+		}
 
 		//HexDump("response", response);
 	}
