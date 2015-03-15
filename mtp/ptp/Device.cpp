@@ -14,7 +14,8 @@ namespace mtp
 		OperationRequest req(OperationCode::GetDeviceInfo);
 		Container container(req);
 		_packeter.Write(container.Data);
-		ByteArray data = _packeter.Read();
+		ByteArray data, response;
+		_packeter.Read(data, response);
 		//HexDump("payload", data);
 
 		InputStream stream(data, 8); //operation code + session id
@@ -28,7 +29,8 @@ namespace mtp
 		OperationRequest req(OperationCode::OpenSession, 0, sessionId);
 		Container container(req);
 		_packeter.Write(container.Data);
-		ByteArray data = _packeter.Read();
+		ByteArray data, response;
+		_packeter.Read(data, response);
 		//HexDump("payload", data);
 
 		return std::make_shared<Session>(_packeter.GetPipe(), sessionId);
@@ -73,21 +75,27 @@ namespace mtp
 
 	}
 
-	ByteArray PipePacketer::Read()
+	void PipePacketer::Read(ByteArray &data, ByteArray &response)
 	{
 		_pipe->ReadInterrupt();
+		data.clear();
+		response.clear();
 		ByteArray message = ReadMessage();
 		//HexDump("message", message);
 		InputStream stream(message);
 		u16 raw_code;
 		stream >> raw_code;
 		ContainerType type = ContainerType(raw_code);
-		if (type == ContainerType::Response)
-			return ByteArray();
+		if (type == ContainerType::Data)
+		{
+			data = std::move(message);
+			response = ReadMessage();
+			return;
+		}
+		else
+			response = std::move(message);
 
-		ByteArray response = ReadMessage();
 		//HexDump("response", response);
-		return message;
 	}
 
 	DevicePtr Device::Find()

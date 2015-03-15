@@ -20,7 +20,7 @@ namespace mtp
 		{ return _pipe; }
 
 		void Write(const ByteArray &data);
-		ByteArray Read();
+		void Read(ByteArray &data, ByteArray &response);
 
 	private:
 		ByteArray ReadMessage();

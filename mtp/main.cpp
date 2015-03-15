@@ -107,8 +107,21 @@ int main(int argc, char **argv)
 		msg::ObjectInfo oi;
 		oi.Filename = filename;
 		oi.ObjectFormat = (u16)ObjectFormat::Mp3;
+
+		fseek(f, 0, SEEK_END);
+		oi.ObjectCompressedSize = ftell(f);
+		rewind(f);
+
+		ByteArray data(oi.ObjectCompressedSize);
+		if (fread(data.data(), data.size(), 1, f) != 1)
+			throw std::runtime_error("read failed");
+
 		fclose(f);
+
 		Session::NewObjectInfo noi = session->SendObjectInfo(oi, 0, parentObjectId);
+		printf("new object id = %08x\n", noi.ObjectId);
+		session->SendObject(data);
+		printf("done\n");
 	}
 	else if (command == "delete")
 	{

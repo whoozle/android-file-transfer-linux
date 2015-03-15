@@ -11,7 +11,8 @@ namespace mtp
 		OperationRequest req(OperationCode::CloseSession, 0, _sessionId);
 		Container container(req);
 		_packeter.Write(container.Data);
-		ByteArray data = _packeter.Read();
+		ByteArray data, response;
+		_packeter.Read(data, response);
 		//HexDump("payload", data);
 	}
 
@@ -20,7 +21,8 @@ namespace mtp
 		OperationRequest req(OperationCode::GetObjectHandles, _transactionId++, storageId, objectFormat, parent);
 		Container container(req);
 		_packeter.Write(container.Data);
-		ByteArray data = _packeter.Read();
+		ByteArray data, response;
+		_packeter.Read(data, response);
 		InputStream stream(data, 8); //operation code + session id
 
 		msg::ObjectHandles goh;
@@ -32,7 +34,8 @@ namespace mtp
 		OperationRequest req(OperationCode::GetStorageIDs, _transactionId++, 0xffffffffu);
 		Container container(req);
 		_packeter.Write(container.Data);
-		ByteArray data = _packeter.Read();
+		ByteArray data, response;
+		_packeter.Read(data, response);
 		InputStream stream(data, 8); //operation code + session id
 
 		msg::StorageIDs gsi;
@@ -45,7 +48,8 @@ namespace mtp
 		OperationRequest req(OperationCode::GetStorageInfo, _transactionId++, storageId);
 		Container container(req);
 		_packeter.Write(container.Data);
-		ByteArray data = _packeter.Read();
+		ByteArray data, response;
+		_packeter.Read(data, response);
 		InputStream stream(data, 8); //operation code + session id
 		msg::StorageInfo gsi;
 		gsi.Read(stream);
@@ -57,7 +61,8 @@ namespace mtp
 		OperationRequest req(OperationCode::GetObjectInfo, _transactionId++, objectId);
 		Container container(req);
 		_packeter.Write(container.Data);
-		ByteArray data = _packeter.Read();
+		ByteArray data, response;
+		_packeter.Read(data, response);
 		InputStream stream(data, 8); //operation code + session id
 		msg::ObjectInfo goi;
 		goi.Read(stream);
@@ -69,7 +74,8 @@ namespace mtp
 		OperationRequest req(OperationCode::GetObject, _transactionId++, objectId);
 		Container container(req);
 		_packeter.Write(container.Data);
-		ByteArray data = _packeter.Read();
+		ByteArray data, response;
+		_packeter.Read(data, response);
 		return ByteArray(data.begin() + 8, data.end());
 	}
 
@@ -88,9 +94,10 @@ namespace mtp
 			Container container(req);
 			_packeter.Write(container.Data);
 		}
-		ByteArray data = _packeter.Read();
-		HexDump("response", data);
-		InputStream stream(data, 8); //operation code + session id
+		ByteArray data, response;
+		_packeter.Read(data, response);
+		HexDump("response", response);
+		InputStream stream(response, 8); //operation code + session id
 		NewObjectInfo noi;
 		stream >> noi.StorageId;
 		stream >> noi.ParentObjectId;
@@ -112,7 +119,8 @@ namespace mtp
 			container.Append(object);
 			_packeter.Write(container.Data);
 		}
-		ByteArray data = _packeter.Read();
+		ByteArray data, response;
+		_packeter.Read(data, response);
 		HexDump("response", data);
 	}
 
@@ -122,7 +130,8 @@ namespace mtp
 		OperationRequest req(OperationCode::DeleteObject, _transactionId++, objectId);
 		Container container(req);
 		_packeter.Write(container.Data);
-		_packeter.Read();
+		ByteArray data, response;
+		_packeter.Read(data, response);
 	}
 
 }
