@@ -121,7 +121,7 @@ namespace mtp
 		}
 		ByteArray data, response;
 		_packeter.Read(data, response);
-		HexDump("response", data);
+		HexDump("response", response);
 	}
 
 
