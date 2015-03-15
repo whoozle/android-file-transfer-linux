@@ -73,7 +73,7 @@ namespace mtp
 		return ByteArray(data.begin() + 8, data.end());
 	}
 
-	u32 Session::SendObjectInfo(const msg::ObjectInfo &objectInfo, u32 storageId, u32 parentObject)
+	Session::NewObjectInfo Session::SendObjectInfo(const msg::ObjectInfo &objectInfo, u32 storageId, u32 parentObject)
 	{
 		u32 transaction = _transactionId++;
 		{
@@ -91,7 +91,11 @@ namespace mtp
 		ByteArray data = _packeter.Read();
 		HexDump("response", data);
 		InputStream stream(data, 8); //operation code + session id
-		return stream.Read32();
+		NewObjectInfo noi;
+		stream >> noi.StorageId;
+		stream >> noi.ParentObjectId;
+		stream >> noi.ObjectId;
+		return noi;
 	}
 
 	void Session::SendObject(const ByteArray &object)

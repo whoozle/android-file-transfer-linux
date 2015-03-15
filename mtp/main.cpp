@@ -106,6 +106,7 @@ int main(int argc, char **argv)
 		}
 		msg::ObjectInfo oi;
 		oi.Filename = filename;
+		oi.ObjectFormat = (u16)ObjectFormat::Mp3;
 		fclose(f);
 	}
 
