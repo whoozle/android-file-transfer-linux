@@ -49,6 +49,11 @@ namespace mtp
 			//Write(session); //just one field in mtp
 			stream << transaction;
 		}
+
+		void Append(const ByteArray &data)
+		{
+			std::copy(data.begin(), data.end(), std::back_inserter(Data));
+		}
 	};
 
 	struct OperationRequest : RequestBase

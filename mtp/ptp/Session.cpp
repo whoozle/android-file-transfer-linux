@@ -115,8 +115,8 @@ namespace mtp
 		}
 		{
 			DataRequest req(OperationCode::SendObject, transaction);
+			req.Append(object);
 			Container container(req);
-			container.Append(object);
 			_packeter.Write(container.Data);
 		}
 		ByteArray data, response;
