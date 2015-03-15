@@ -92,12 +92,12 @@ int main(int argc, char **argv)
 		if (argc < 4)
 			return 1;
 
-		mtp::u32 objectId;
-		if (sscanf(argv[2], "%x", &objectId) != 1)
+		mtp::u32 parentObjectId;
+		if (sscanf(argv[2], "%x", &parentObjectId) != 1)
 			return 1;
 
 		std::string filename(argv[3]);
-		printf("uploading %s to %08x\n", filename.c_str(), objectId);
+		printf("uploading %s to %08x\n", filename.c_str(), parentObjectId);
 		FILE *f = fopen(filename.c_str(), "rb");
 		if (!f)
 		{
@@ -108,6 +108,19 @@ int main(int argc, char **argv)
 		oi.Filename = filename;
 		oi.ObjectFormat = (u16)ObjectFormat::Mp3;
 		fclose(f);
+		Session::NewObjectInfo noi = session->SendObjectInfo(oi, 0, parentObjectId);
+	}
+	else if (command == "delete")
+	{
+		if (argc < 3)
+			return 1;
+
+		mtp::u32 objectId;
+		if (sscanf(argv[2], "%x", &objectId) != 1)
+			return 1;
+
+		printf("object id = %08x\n", objectId);
+		session->DeleteObject(objectId);
 	}
 
 	return 0;
