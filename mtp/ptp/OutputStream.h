@@ -106,7 +106,7 @@ namespace mtp
 
 	template<typename ElementType>
 	inline OutputStream & operator << (OutputStream &stream, const std::vector<ElementType> &value)
-	{ stream.template WriteArray<ElementType>(); return stream; }
+	{ stream.template WriteArray<ElementType>(value); return stream; }
 
 }
 

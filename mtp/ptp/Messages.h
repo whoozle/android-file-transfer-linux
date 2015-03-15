@@ -2,6 +2,7 @@
 #define	MESSAGES_H
 
 #include <mtp/ptp/InputStream.h>
+#include <mtp/ptp/OutputStream.h>
 
 namespace mtp { namespace msg
 {
@@ -136,6 +137,29 @@ namespace mtp { namespace msg
 			stream >> CaptureDate;
 			stream >> ModificationDate;
 			stream >> Keywords;
+		}
+//fixme: make me template
+		void Write(OutputStream &stream) const
+		{
+			stream << StorageId;
+			stream << ObjectFormat;
+			stream << ProtectionStatus;
+			stream << ObjectCompressedSize;
+			stream << ThumbFormat;
+			stream << ThumbCompressedSize;
+			stream << ThumbPixWidth;
+			stream << ThumbPixHeight;
+			stream << ImagePixWidth;
+			stream << ImagePixHeight;
+			stream << ImageBitDepth;
+			stream << ParentObject;
+			stream << AssociationType;
+			stream << AssociationDesc;
+			stream << SequenceNumber;
+			stream << Filename;
+			stream << CaptureDate;
+			stream << ModificationDate;
+			stream << Keywords;
 		}
 	};
 

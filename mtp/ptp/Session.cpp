@@ -73,6 +73,46 @@ namespace mtp
 		return ByteArray(data.begin() + 8, data.end());
 	}
 
+	u32 Session::SendObjectInfo(const msg::ObjectInfo &objectInfo, u32 storageId, u32 parentObject)
+	{
+		u32 transaction = _transactionId++;
+		{
+			OperationRequest req(OperationCode::SendObjectInfo, transaction, storageId, parentObject);
+			Container container(req);
+			_packeter.Write(container.Data);
+		}
+		{
+			DataRequest req(OperationCode::SendObjectInfo, transaction);
+			OutputStream stream(req.Data);
+			objectInfo.Write(stream);
+			Container container(req);
+			_packeter.Write(container.Data);
+		}
+		ByteArray data = _packeter.Read();
+		HexDump("response", data);
+		InputStream stream(data, 8); //operation code + session id
+		return stream.Read32();
+	}
+
+	void Session::SendObject(const ByteArray &object)
+	{
+		u32 transaction = _transactionId++;
+		{
+			OperationRequest req(OperationCode::SendObject, transaction);
+			Container container(req);
+			_packeter.Write(container.Data);
+		}
+		{
+			DataRequest req(OperationCode::SendObject, transaction);
+			Container container(req);
+			container.Append(object);
+			_packeter.Write(container.Data);
+		}
+		ByteArray data = _packeter.Read();
+		HexDump("response", data);
+	}
+
+
 	void Session::DeleteObject(u32 objectId)
 	{
 		OperationRequest req(OperationCode::DeleteObject, _transactionId++, objectId);

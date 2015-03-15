@@ -29,6 +29,11 @@ namespace mtp
 			std::copy(msg.Data.begin(), msg.Data.end(), std::back_inserter(Data));
 		}
 
+		void Append(const ByteArray &data)
+		{
+			std::copy(data.begin(), data.end(), std::back_inserter(Data));
+		}
+
 		static void Read(const ByteArray &src, ContainerType &type, ByteArray &data)
 		{
 			InputStream stream(src);

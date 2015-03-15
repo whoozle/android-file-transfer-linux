@@ -53,6 +53,8 @@ namespace mtp
 		msg::StorageInfo GetStorageInfo(u32 storageId);
 		msg::ObjectInfo GetObjectInfo(u32 objectId);
 		ByteArray GetObject(u32 objectId);
+		u32 SendObjectInfo(const msg::ObjectInfo &objectInfo, u32 storageId = 0, u32 parentObject = 0);
+		void SendObject(const ByteArray &array);
 		void DeleteObject(u32 objectId);
 
 	private:
