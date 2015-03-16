@@ -53,7 +53,7 @@ void MainWindow::customContextMenuRequested ( const QPoint & pos )
 	if (!action)
 		return;
 
-	for(int i = 0; i < rows.size(); ++i)
+	for(int i = rows.size() - 1; i >= 0; --i)
 	{
 		if (action == delete_objects)
 			_objectModel->removeRow(rows[i].row());
