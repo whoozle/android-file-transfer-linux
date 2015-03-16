@@ -156,6 +156,22 @@ int main(int argc, char **argv)
 		oi.ObjectFormat = (u16)ObjectFormat::Association;
 		session->SendObjectInfo(oi, 0, parentObjectId);
 	}
+	else if (command == "properties")
+	{
+		if (argc < 3)
+			return 1;
+
+		mtp::u32 objectId;
+		if (sscanf(argv[2], "%x", &objectId) != 1)
+			return 1;
+		msg::ObjectPropsSupported ops = session->GetObjectPropsSupported(objectId);
+		printf("properties supported: ");
+		for(u16 prop: ops.ObjectPropCodes)
+		{
+			printf("%02x ", prop);
+		}
+		printf("\n");
+	}
 
 	return 0;
 }

@@ -90,6 +90,7 @@ namespace mtp
 		NewObjectInfo SendObjectInfo(const msg::ObjectInfo &objectInfo, u32 storageId = 0, u32 parentObject = 0);
 		void SendObject(const ByteArray &array);
 		void DeleteObject(u32 objectId);
+		msg::ObjectPropsSupported GetObjectPropsSupported(u32 objectId);
 
 	private:
 		void Close();

@@ -69,6 +69,19 @@ namespace mtp
 		return goi;
 	}
 
+	msg::ObjectPropsSupported Session::GetObjectPropsSupported(u32 objectId)
+	{
+		OperationRequest req(OperationCode::GetObjectPropsSupported, _transactionId++, objectId);
+		Container container(req);
+		_packeter.Write(container.Data);
+		ByteArray data, response;
+		_packeter.Read(data, response);
+		InputStream stream(data, 8); //operation code + session id
+		msg::ObjectPropsSupported ops;
+		ops.Read(stream);
+		return ops;
+	}
+
 	ByteArray Session::GetObject(u32 objectId)
 	{
 		OperationRequest req(OperationCode::GetObject, _transactionId++, objectId);

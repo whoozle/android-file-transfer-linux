@@ -163,6 +163,16 @@ namespace mtp { namespace msg
 		}
 	};
 
+	struct ObjectPropsSupported
+	{
+		std::vector<u16>	ObjectPropCodes;
+
+		void Read(InputStream &stream)
+		{
+			stream >> ObjectPropCodes;
+		}
+	};
+
 }}
 
 
