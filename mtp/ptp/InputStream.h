@@ -54,7 +54,7 @@ namespace mtp
 					str += (char) ((ch >> 6) | 0xc0);
 					str += (char) ((ch & 0x3f) | 0x80);
 				}
-				else if (ch <= 0xffff)
+				else //if (ch <= 0xffff)
 				{
 					str += (char)((ch >> 12) | 0xe0);
 					str += (char)(((ch & 0x0fc0) >> 6) | 0x80);
