@@ -37,6 +37,12 @@ int main(int argc, char **argv)
 		printf("%04x ", (unsigned)code);
 	}
 	printf("\n");
+	printf("supported properties: ");
+	for(u16 code : gdi.DevicePropertiesSupported)
+	{
+		printf("%04x ", (unsigned)code);
+	}
+	printf("\n");
 
 	if (argc < 2)
 		return 0;
