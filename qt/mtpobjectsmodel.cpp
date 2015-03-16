@@ -122,5 +122,8 @@ void MtpObjectsModel::createDirectory(const QString &name)
 	QByteArray filename = name.toUtf8();
 	oi.Filename = filename.data();
 	oi.ObjectFormat = (mtp::u16)mtp::ObjectFormat::Association;
-	_session->SendObjectInfo(oi, 0, _parentObjectId);
+	mtp::Session::NewObjectInfo noi = _session->SendObjectInfo(oi, 0, _parentObjectId);
+	beginInsertRows(QModelIndex(), _rows.size(), _rows.size());
+	_rows.push_back(Row(noi.ObjectId));
+	endInsertRows();
 }

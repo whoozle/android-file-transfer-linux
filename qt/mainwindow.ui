@@ -60,7 +60,9 @@
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionUpload">
    <property name="icon">
-    <iconset theme="multimedia-player"/>
+    <iconset theme="multimedia-player">
+     <normaloff/>
+    </iconset>
    </property>
    <property name="text">
     <string>Upload</string>
@@ -68,7 +70,9 @@
   </action>
   <action name="actionCreateDirectory">
    <property name="icon">
-    <iconset theme="folder-new"/>
+    <iconset theme="folder-new">
+     <normaloff/>
+    </iconset>
    </property>
    <property name="text">
     <string>CreateDirectory</string>

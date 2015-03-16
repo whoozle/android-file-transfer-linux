@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "createdirectorydialog.h"
 #include "mtpobjectsmodel.h"
 #include <QDebug>
 #include <QMessageBox>
@@ -13,6 +14,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	_ui->setupUi(this);
 	connect(_ui->listView, SIGNAL(doubleClicked(QModelIndex)), SLOT(onActivated(QModelIndex)));
 	connect(_ui->listView, SIGNAL(customContextMenuRequested(QPoint)), SLOT(customContextMenuRequested(QPoint)));
+	connect(_ui->actionCreateDirectory, SIGNAL(triggered()), SLOT(createDirectory()));
 }
 
 MainWindow::~MainWindow()
@@ -87,5 +89,12 @@ void MainWindow::keyPressEvent ( QKeyEvent * event )
 		back();
 		break;
 	}
+}
+
+void MainWindow::createDirectory()
+{
+	CreateDirectoryDialog d;
+	if (d.exec() && !d.name().isEmpty())
+		_objectModel->createDirectory(d.name());
 }
 

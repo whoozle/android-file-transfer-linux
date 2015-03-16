@@ -27,6 +27,7 @@ private slots:
 	void back();
 	void onActivated ( const QModelIndex & index );
 	void customContextMenuRequested ( const QPoint & pos );
+	void createDirectory();
 
 private:
 	Ui::MainWindow *	_ui;
