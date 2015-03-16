@@ -36,7 +36,14 @@ namespace mtp
 		MoveObject              = 0x1019,
 		CopyObject              = 0x101a,
 		GetPartialObject        = 0x101b,
-		InitiateOpenCapture     = 0x101c
+		InitiateOpenCapture     = 0x101c,
+		GetObjectPropsSupported = 0x9801,
+		GetObjectPropDesc		= 0x9802,
+		GetObjectPropValue		= 0x9803,
+		SetObjectPropValue		= 0x9804,
+		GetObjectReferences		= 0x9810,
+		SetObjectReferences		= 0x9811,
+		Skip					= 0x9820
 	};
 	struct RequestBase
 	{
