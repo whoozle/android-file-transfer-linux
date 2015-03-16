@@ -115,3 +115,12 @@ QVariant MtpObjectsModel::data(const QModelIndex &index, int role) const
 		return QVariant();
 	}
 }
+
+void MtpObjectsModel::createDirectory(const QString &name)
+{
+	mtp::msg::ObjectInfo oi;
+	QByteArray filename = name.toUtf8();
+	oi.Filename = filename.data();
+	oi.ObjectFormat = (mtp::u16)mtp::ObjectFormat::Association;
+	_session->SendObjectInfo(oi, 0, _parentObjectId);
+}

@@ -34,6 +34,8 @@ public:
 	mtp::u32 parentObjectId() const
 	{ return _parentObjectId; }
 
+	void createDirectory(const QString &name);
+
 	virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
 	virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
 
