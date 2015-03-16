@@ -20,9 +20,12 @@ PKGCONFIG += libusb
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    mtpobjectsmodel.cpp
+    mtpobjectsmodel.cpp \
+    progressdialog.cpp
 
 HEADERS  += mainwindow.h \
-    mtpobjectsmodel.h
+    mtpobjectsmodel.h \
+    progressdialog.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    progressdialog.ui
