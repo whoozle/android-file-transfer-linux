@@ -2,16 +2,13 @@
 #include <QDebug>
 #include <QBrush>
 #include <QColor>
+#include <QFile>
 
 MtpObjectsModel::MtpObjectsModel(QObject *parent): QAbstractListModel(parent)
-{
-
-}
+{ }
 
 MtpObjectsModel::~MtpObjectsModel()
-{
-
-}
+{ }
 
 void MtpObjectsModel::setParent(mtp::u32 parentObjectId)
 {
@@ -123,6 +120,35 @@ void MtpObjectsModel::createDirectory(const QString &name)
 	oi.Filename = filename.data();
 	oi.ObjectFormat = (mtp::u16)mtp::ObjectFormat::Association;
 	mtp::Session::NewObjectInfo noi = _session->SendObjectInfo(oi, 0, _parentObjectId);
+	beginInsertRows(QModelIndex(), _rows.size(), _rows.size());
+	_rows.push_back(Row(noi.ObjectId));
+	endInsertRows();
+}
+
+void MtpObjectsModel::uploadFile(const QString &filename)
+{
+	qDebug() << "uploadFile " << filename;
+
+	mtp::ByteArray data;
+	{
+		QFile file(filename);
+		file.open(QFile::ReadOnly);
+		if (!file.isOpen())
+		{
+			qWarning() << "file " << filename << " could not be opened";
+			return;
+		}
+		QByteArray qdata = file.readAll();
+		file.close();
+		data.assign(qdata.begin(), qdata.end());
+	}
+
+	mtp::msg::ObjectInfo oi;
+	QByteArray filename_utf = filename.toUtf8();
+	oi.Filename = filename_utf.data();
+	oi.ObjectFormat = (mtp::u16)mtp::ObjectFormat::Mp3;
+	mtp::Session::NewObjectInfo noi = _session->SendObjectInfo(oi, 0, _parentObjectId);
+	_session->SendObject(data);
 	beginInsertRows(QModelIndex(), _rows.size(), _rows.size());
 	_rows.push_back(Row(noi.ObjectId));
 	endInsertRows();

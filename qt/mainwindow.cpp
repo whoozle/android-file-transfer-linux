@@ -5,6 +5,7 @@
 #include <QDebug>
 #include <QMessageBox>
 #include <QKeyEvent>
+#include <QFileDialog>
 
 MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
@@ -15,6 +16,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(_ui->listView, SIGNAL(doubleClicked(QModelIndex)), SLOT(onActivated(QModelIndex)));
 	connect(_ui->listView, SIGNAL(customContextMenuRequested(QPoint)), SLOT(customContextMenuRequested(QPoint)));
 	connect(_ui->actionCreateDirectory, SIGNAL(triggered()), SLOT(createDirectory()));
+	connect(_ui->actionUpload, SIGNAL(triggered()), SLOT(uploadFiles()));
 }
 
 MainWindow::~MainWindow()
@@ -93,8 +95,23 @@ void MainWindow::keyPressEvent ( QKeyEvent * event )
 
 void MainWindow::createDirectory()
 {
-	CreateDirectoryDialog d;
+	CreateDirectoryDialog d(this);
 	if (d.exec() && !d.name().isEmpty())
 		_objectModel->createDirectory(d.name());
+}
+
+void MainWindow::uploadFiles()
+{
+	QFileDialog d(this);
+	d.setAcceptMode(QFileDialog::AcceptOpen);
+	d.setFileMode(QFileDialog::ExistingFiles);
+	d.setOption(QFileDialog::ShowDirsOnly, false);
+	d.exec();
+
+	QStringList files = d.selectedFiles();
+	for(QString file : files)
+	{
+		_objectModel->uploadFile(file);
+	}
 }
 
