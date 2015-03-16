@@ -54,8 +54,26 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionCreateDirectory"/>
+   <addaction name="actionUpload"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
+  <action name="actionUpload">
+   <property name="icon">
+    <iconset theme="multimedia-player"/>
+   </property>
+   <property name="text">
+    <string>Upload</string>
+   </property>
+  </action>
+  <action name="actionCreateDirectory">
+   <property name="icon">
+    <iconset theme="folder-new"/>
+   </property>
+   <property name="text">
+    <string>CreateDirectory</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>
