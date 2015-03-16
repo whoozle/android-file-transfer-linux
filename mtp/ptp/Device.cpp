@@ -11,7 +11,7 @@ namespace mtp
 
 	msg::DeviceInfo Device::GetDeviceInfo()
 	{
-		OperationRequest req(OperationCode::GetDeviceInfo);
+		OperationRequest req(OperationCode::GetDeviceInfo, 0);
 		Container container(req);
 		_packeter.Write(container.Data);
 		ByteArray data, response;

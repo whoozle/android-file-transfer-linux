@@ -60,15 +60,29 @@ namespace mtp
 	{
 		static const ContainerType	Type = ContainerType::Command;
 
-		OperationRequest(OperationCode opcode, u32 transaction = 0, u32 par1 = 0, u32 par2 = 0, u32 par3 = 0, u32 par4 = 0, u32 par5 = 0):
+		OperationRequest(OperationCode opcode, u32 transaction):
+			RequestBase(opcode, transaction)
+		{ }
+		OperationRequest(OperationCode opcode, u32 transaction, u32 par1):
+			RequestBase(opcode, transaction)
+		{
+			OutputStream stream(Data);
+			stream << par1;
+		}
+		OperationRequest(OperationCode opcode, u32 transaction, u32 par1, u32 par2):
+			RequestBase(opcode, transaction)
+		{
+			OutputStream stream(Data);
+			stream << par1;
+			stream << par2;
+		}
+		OperationRequest(OperationCode opcode, u32 transaction, u32 par1, u32 par2, u32 par3):
 			RequestBase(opcode, transaction)
 		{
 			OutputStream stream(Data);
 			stream << par1;
 			stream << par2;
 			stream << par3;
-			stream << par4;
-			stream << par5;
 		}
 	};
 
