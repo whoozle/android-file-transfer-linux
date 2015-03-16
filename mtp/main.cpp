@@ -135,6 +135,21 @@ int main(int argc, char **argv)
 		printf("object id = %08x\n", objectId);
 		session->DeleteObject(objectId);
 	}
+	else if (command == "mkdir")
+	{
+		if (argc < 3)
+			return 1;
+
+		mtp::u32 parentObjectId = mtp::Session::Root;
+		if (argc > 3 && sscanf(argv[3], "%x", &parentObjectId) != 1)
+			return 1;
+
+		std::string filename = argv[2];
+		msg::ObjectInfo oi;
+		oi.Filename = filename;
+		oi.ObjectFormat = (u16)ObjectFormat::Association;
+		session->SendObjectInfo(oi, 0, parentObjectId);
+	}
 
 	return 0;
 }
