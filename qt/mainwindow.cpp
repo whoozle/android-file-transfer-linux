@@ -72,9 +72,10 @@ void MainWindow::customContextMenuRequested ( const QPoint & pos )
 
 void MainWindow::back()
 {
+	if (_history.empty())
+		return;
+	_history.pop_back();
 	mtp::u32 oid = _history.empty()? mtp::Session::Root: _history.back();
-	if (!_history.empty())
-		_history.pop_back();
 	_objectModel->setParent(oid);
 }
 
