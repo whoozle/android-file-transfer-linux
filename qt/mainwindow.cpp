@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "createdirectorydialog.h"
+#include "progressdialog.h"
 #include "mtpobjectsmodel.h"
 #include <QDebug>
 #include <QMessageBox>
@@ -94,8 +95,16 @@ void MainWindow::createDirectory()
 
 void MainWindow::uploadFiles(const QStringList &files)
 {
+	ProgressDialog progressDialog(this);
+	progressDialog.setModal(true);
+	progressDialog.setMaximum(files.size());
+	progressDialog.setValue(0);
+	progressDialog.show();
+	int progress = 0;
 	for(QString file : files)
 	{
+		progressDialog.setValue(++progress);
+		QCoreApplication::processEvents();
 		_objectModel->uploadFile(file);
 	}
 }
@@ -120,7 +129,11 @@ void MainWindow::uploadDirectories()
 	d.setOption(QFileDialog::ShowDirsOnly, true);
 	d.exec();
 */
-	QDir dir = QFileDialog::getExistingDirectory(this);
+	QString dirPath = QFileDialog::getExistingDirectory(this);
+	if (dirPath.isEmpty())
+		return;
+
+	QDir dir(dirPath);
 	qDebug() << "adding directory " << dir.dirName();
 	mtp::u32 dirId = _objectModel->createDirectory(dir.dirName());
 	_objectModel->setParent(dirId);

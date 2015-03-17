@@ -15,6 +15,9 @@ public:
 	explicit ProgressDialog(QWidget *parent = 0);
 	~ProgressDialog();
 
+	void setValue(int current);
+	void setMaximum(int current);
+
 private:
 	Ui::ProgressDialog *ui;
 };

@@ -12,3 +12,13 @@ ProgressDialog::~ProgressDialog()
 {
 	delete ui;
 }
+
+void ProgressDialog::setValue(int current)
+{
+	ui->progressBar->setValue(current);
+}
+
+void ProgressDialog::setMaximum(int current)
+{
+	ui->progressBar->setMaximum(current);
+}
