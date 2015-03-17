@@ -54,13 +54,16 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionBack"/>
+   <addaction name="actionGo_Down"/>
    <addaction name="actionCreateDirectory"/>
+   <addaction name="actionUploadDirectory"/>
    <addaction name="actionUpload"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionUpload">
    <property name="icon">
-    <iconset theme="multimedia-player">
+    <iconset>
      <normaloff/>
     </iconset>
    </property>
@@ -76,6 +79,37 @@
    </property>
    <property name="text">
     <string>CreateDirectory</string>
+   </property>
+  </action>
+  <action name="actionUploadDirectory">
+   <property name="text">
+    <string>UploadDirectory</string>
+   </property>
+  </action>
+  <action name="actionBack">
+   <property name="icon">
+    <iconset theme="go-previous">
+     <normaloff/>
+    </iconset>
+   </property>
+   <property name="text">
+    <string>Back</string>
+   </property>
+   <property name="shortcut">
+    <string>Esc</string>
+   </property>
+  </action>
+  <action name="actionGo_Down">
+   <property name="icon">
+    <iconset theme="go-down">
+     <normaloff/>
+    </iconset>
+   </property>
+   <property name="text">
+    <string>Go Down</string>
+   </property>
+   <property name="shortcut">
+    <string>Return</string>
    </property>
   </action>
  </widget>

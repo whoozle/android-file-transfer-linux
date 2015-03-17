@@ -15,6 +15,8 @@ MainWindow::MainWindow(QWidget *parent) :
 	_ui->setupUi(this);
 	connect(_ui->listView, SIGNAL(doubleClicked(QModelIndex)), SLOT(onActivated(QModelIndex)));
 	connect(_ui->listView, SIGNAL(customContextMenuRequested(QPoint)), SLOT(customContextMenuRequested(QPoint)));
+	connect(_ui->actionBack, SIGNAL(triggered()), SLOT(back()));
+	connect(_ui->actionGo_Down, SIGNAL(triggered()), SLOT(down()));
 	connect(_ui->actionCreateDirectory, SIGNAL(triggered()), SLOT(createDirectory()));
 	connect(_ui->actionUpload, SIGNAL(triggered()), SLOT(uploadFiles()));
 }
@@ -76,21 +78,10 @@ void MainWindow::back()
 	}
 }
 
-void MainWindow::keyPressEvent ( QKeyEvent * event )
+void MainWindow::down()
 {
-	switch(event->key())
-	{
-	case Qt::Key_Enter:
-		qDebug() << "ENTER";
-		{
-			if (_objectModel->enter(_ui->listView->currentIndex().row()))
-				_history.push_back(_objectModel->parentObjectId());
-		}
-		break;
-	case Qt::Key_Escape:
-		back();
-		break;
-	}
+	if (_objectModel->enter(_ui->listView->currentIndex().row()))
+		_history.push_back(_objectModel->parentObjectId());
 }
 
 void MainWindow::createDirectory()

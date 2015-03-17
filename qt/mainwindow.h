@@ -21,10 +21,10 @@ public:
 
 private:
 	void showEvent(QShowEvent *e);
-	void keyPressEvent ( QKeyEvent * event );
 
 private slots:
 	void back();
+	void down();
 	void onActivated ( const QModelIndex & index );
 	void customContextMenuRequested ( const QPoint & pos );
 	void createDirectory();
