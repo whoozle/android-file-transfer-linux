@@ -6,6 +6,7 @@
 #include <QMessageBox>
 #include <QKeyEvent>
 #include <QFileDialog>
+#include <QDir>
 
 MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
@@ -18,6 +19,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(_ui->actionBack, SIGNAL(triggered()), SLOT(back()));
 	connect(_ui->actionGo_Down, SIGNAL(triggered()), SLOT(down()));
 	connect(_ui->actionCreateDirectory, SIGNAL(triggered()), SLOT(createDirectory()));
+	connect(_ui->actionUploadDirectory, SIGNAL(triggered()), SLOT(uploadDirectories()));
 	connect(_ui->actionUpload, SIGNAL(triggered()), SLOT(uploadFiles()));
 }
 
@@ -91,6 +93,14 @@ void MainWindow::createDirectory()
 		_objectModel->createDirectory(d.name());
 }
 
+void MainWindow::uploadFiles(const QStringList &files)
+{
+	for(QString file : files)
+	{
+		_objectModel->uploadFile(file);
+	}
+}
+
 void MainWindow::uploadFiles()
 {
 	QFileDialog d(this);
@@ -99,10 +109,28 @@ void MainWindow::uploadFiles()
 	d.setOption(QFileDialog::ShowDirsOnly, false);
 	d.exec();
 
-	QStringList files = d.selectedFiles();
-	for(QString file : files)
+	uploadFiles(d.selectedFiles());
+}
+
+void MainWindow::uploadDirectories()
+{
+	/*
+	QFileDialog d(this);
+	d.setAcceptMode(QFileDialog::AcceptOpen);
+	d.setFileMode(QFileDialog::Directory);
+	d.setOption(QFileDialog::ShowDirsOnly, true);
+	d.exec();
+*/
+	QDir dir = QFileDialog::getExistingDirectory(this);
+	qDebug() << "adding directory " << dir;
+	mtp::u32 dirId = _objectModel->createDirectory(dir.dirName());
+	_objectModel->setParent(dirId);
+	_history.push_back(dirId);
+	QStringList files;
+	for(QString file : dir.entryList())
 	{
-		_objectModel->uploadFile(file);
+		files.push_back(dir.canonicalPath() + "/" + file);
 	}
+	uploadFiles(files);
 }
 

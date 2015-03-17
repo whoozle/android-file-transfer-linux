@@ -114,7 +114,7 @@ QVariant MtpObjectsModel::data(const QModelIndex &index, int role) const
 	}
 }
 
-void MtpObjectsModel::createDirectory(const QString &name)
+mtp::u32 MtpObjectsModel::createDirectory(const QString &name)
 {
 	mtp::msg::ObjectInfo oi;
 	QByteArray filename = name.toUtf8();
@@ -124,6 +124,7 @@ void MtpObjectsModel::createDirectory(const QString &name)
 	beginInsertRows(QModelIndex(), _rows.size(), _rows.size());
 	_rows.push_back(Row(noi.ObjectId));
 	endInsertRows();
+	return noi.ObjectId;
 }
 
 bool MtpObjectsModel::uploadFile(const QString &filename)
@@ -168,7 +169,7 @@ bool MtpObjectsModel::uploadFile(const QString &filename)
 	mtp::msg::ObjectInfo oi;
 	QByteArray filename_utf = fileInfo.fileName().toUtf8();
 	oi.Filename = filename_utf.data();
-	oi.ObjectFormat = (mtp::u16)mtp::ObjectFormat::Mp3;
+	oi.ObjectFormat = (mtp::u16)objectFormat;
 	oi.ObjectCompressedSize = data.size();
 	mtp::Session::NewObjectInfo noi = _session->SendObjectInfo(oi, 0, _parentObjectId);
 	qDebug() << "new object id: " << noi.ObjectId << ", sending...";

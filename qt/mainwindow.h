@@ -29,8 +29,11 @@ private slots:
 	void customContextMenuRequested ( const QPoint & pos );
 	void createDirectory();
 	void uploadFiles();
+	void uploadDirectories();
 
 private:
+	void uploadFiles(const QStringList &files);
+
 	Ui::MainWindow *	_ui;
 	MtpObjectsModel *	_objectModel;
 	QVector<mtp::u32>	_history;

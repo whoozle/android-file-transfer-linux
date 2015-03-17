@@ -34,7 +34,7 @@ public:
 	mtp::u32 parentObjectId() const
 	{ return _parentObjectId; }
 
-	void createDirectory(const QString &name);
+	mtp::u32 createDirectory(const QString &name);
 	bool uploadFile(const QString &filename);
 
 	virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
