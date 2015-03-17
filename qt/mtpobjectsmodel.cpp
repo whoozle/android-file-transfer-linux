@@ -13,6 +13,9 @@ MtpObjectsModel::~MtpObjectsModel()
 
 void MtpObjectsModel::setParent(mtp::u32 parentObjectId)
 {
+	if (_parentObjectId == parentObjectId)
+		return;
+
 	beginResetModel();
 
 	_parentObjectId = parentObjectId;
