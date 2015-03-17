@@ -35,7 +35,7 @@ public:
 	{ return _parentObjectId; }
 
 	void createDirectory(const QString &name);
-	void uploadFile(const QString &filename);
+	bool uploadFile(const QString &filename);
 
 	virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
 	virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;

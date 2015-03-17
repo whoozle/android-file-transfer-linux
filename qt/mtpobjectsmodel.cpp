@@ -3,6 +3,7 @@
 #include <QBrush>
 #include <QColor>
 #include <QFile>
+#include <QFileInfo>
 
 MtpObjectsModel::MtpObjectsModel(QObject *parent): QAbstractListModel(parent)
 { }
@@ -125,9 +126,29 @@ void MtpObjectsModel::createDirectory(const QString &name)
 	endInsertRows();
 }
 
-void MtpObjectsModel::uploadFile(const QString &filename)
+bool MtpObjectsModel::uploadFile(const QString &filename)
 {
-	qDebug() << "uploadFile " << filename;
+	QFileInfo fileInfo(filename);
+	qDebug() << "uploadFile " << fileInfo.fileName();
+	QString ext = fileInfo.suffix();
+	mtp::ObjectFormat objectFormat;
+	if (ext == "mp3")
+		objectFormat = mtp::ObjectFormat::Mp3;
+	else if (ext == "txt")
+		objectFormat = mtp::ObjectFormat::Text;
+	else if (ext == "jpeg" || ext == "jpg")
+		objectFormat = mtp::ObjectFormat::Jfif;
+	else if (ext == "gif")
+		objectFormat = mtp::ObjectFormat::Gif;
+	else if (ext == "bmp")
+		objectFormat = mtp::ObjectFormat::Bmp;
+	else if (ext == "png")
+		objectFormat = mtp::ObjectFormat::Png;
+	else
+	{
+		qDebug() << "unknown file type " << ext;
+		return false;
+	}
 
 	mtp::ByteArray data;
 	{
@@ -136,20 +157,25 @@ void MtpObjectsModel::uploadFile(const QString &filename)
 		if (!file.isOpen())
 		{
 			qWarning() << "file " << filename << " could not be opened";
-			return;
+			return false;
 		}
 		QByteArray qdata = file.readAll();
 		file.close();
 		data.assign(qdata.begin(), qdata.end());
 	}
+	qDebug() << "sending " << data.size() << " bytes";
 
 	mtp::msg::ObjectInfo oi;
-	QByteArray filename_utf = filename.toUtf8();
+	QByteArray filename_utf = fileInfo.fileName().toUtf8();
 	oi.Filename = filename_utf.data();
 	oi.ObjectFormat = (mtp::u16)mtp::ObjectFormat::Mp3;
+	oi.ObjectCompressedSize = data.size();
 	mtp::Session::NewObjectInfo noi = _session->SendObjectInfo(oi, 0, _parentObjectId);
+	qDebug() << "new object id: " << noi.ObjectId << ", sending...";
 	_session->SendObject(data);
+	qDebug() << "ok";
 	beginInsertRows(QModelIndex(), _rows.size(), _rows.size());
 	_rows.push_back(Row(noi.ObjectId));
 	endInsertRows();
+	return true;
 }
