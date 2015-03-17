@@ -130,7 +130,6 @@ namespace mtp
 						//device->SetConfiguration(configuration->GetIndex());
 						usb::BulkPipePtr pipe = usb::BulkPipe::Create(device, iface);
 						return std::make_shared<Device>(pipe);
-						break;
 					}
 				}
 			}
