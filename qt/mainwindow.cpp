@@ -122,13 +122,15 @@ void MainWindow::uploadDirectories()
 	d.exec();
 */
 	QDir dir = QFileDialog::getExistingDirectory(this);
-	qDebug() << "adding directory " << dir;
+	qDebug() << "adding directory " << dir.dirName();
 	mtp::u32 dirId = _objectModel->createDirectory(dir.dirName());
 	_objectModel->setParent(dirId);
 	_history.push_back(dirId);
 	QStringList files;
 	for(QString file : dir.entryList())
 	{
+		if (file == "." || file == "..")
+			continue;
 		files.push_back(dir.canonicalPath() + "/" + file);
 	}
 	uploadFiles(files);
