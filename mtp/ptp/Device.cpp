@@ -55,7 +55,7 @@ namespace mtp
 			{
 				InputStream stream(data);
 				stream >> size;
-				printf("DATA SIZE = %u\n", size);
+				//printf("DATA SIZE = %u\n", size);
 				if (size < 4)
 					throw std::runtime_error("invalid size");
 				packet_offset = 4;
