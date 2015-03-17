@@ -6,6 +6,7 @@ namespace
 {
 	class Application : public QApplication
 	{
+	public:
 		Application(int &argc, char **argv, int flags = ApplicationFlags):
 			QApplication(argc, argv, flags)
 		{ }
@@ -24,7 +25,7 @@ namespace
 
 int main(int argc, char *argv[])
 {
-	QApplication a(argc, argv);
+	Application a(argc, argv);
 	MainWindow w;
 	w.show();
 
