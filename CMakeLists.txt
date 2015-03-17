@@ -7,7 +7,7 @@ find_package( Threads )
 
 pkg_check_modules(LIBUSB libusb REQUIRED)
 
-add_definitions(-Wall -fstrict-aliasing -Wno-variadic-macros -pthread -std=c++1y)
+add_definitions(-Wall -pthread -std=c++1y)
 include_directories(. ${CMAKE_SOURCE_DIR} ${LIBUSB_INCLUDE_DIRS})
 
 set(SOURCES
