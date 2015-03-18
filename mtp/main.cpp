@@ -112,7 +112,7 @@ int main(int argc, char **argv)
 		}
 		msg::ObjectInfo oi;
 		oi.Filename = filename;
-		oi.ObjectFormat = ObjectFormat::Mp3;
+		oi.ObjectFormat = ObjectFormatFromFilename(filename);
 
 		fseek(f, 0, SEEK_END);
 		oi.ObjectCompressedSize = ftell(f);

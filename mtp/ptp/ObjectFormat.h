@@ -1,8 +1,12 @@
 #ifndef OBJECTFORMAT_H
 #define	OBJECTFORMAT_H
 
+#include <mtp/types.h>
+#include <string>
+
 namespace mtp
 {
+	//please look here: https://msdn.microsoft.com/en-us/library/jj584872(v=winembedded.70).aspx
 
 	enum struct ObjectFormat : u16
 	{
@@ -36,7 +40,39 @@ namespace mtp
 		TiffIt			= 0x380e,
 		Jp2				= 0x380f,
 		Jpx				= 0x3810,
+
+		//audio
+		Wma				= 0xb901,
+		Ogg				= 0xb902,
+		Aac				= 0xb903,
+		Audible			= 0xb904,
+		Flac			= 0xb906,
+
+		//video
+		Wmv				= 0xb980,
+		Mp4				= 0xb982,
+		Mp2				= 0xb983,
+		_3gp			= 0xb984,
+
+		AudioAlbum		= 0xba03,
+
+		//playlists
+		Wpl				= 0xba10,
+		M3u				= 0xba11,
+		Mpl				= 0xba12,
+		Asx				= 0xba13,
+		Pls				= 0xba14,
+
+		Xml				= 0xba82,
+		Doc				= 0xba83,
+		Mht				= 0xba84,
+		Xls				= 0xba85,
+		Ppt				= 0xba86,
+
+		VCard2			= 0xbb82
 	};
+
+	ObjectFormat ObjectFormatFromFilename(const std::string &filename);
 
 	DECLARE_ENUM(ObjectFormat, u16);
 

@@ -133,26 +133,15 @@ mtp::u32 MtpObjectsModel::createDirectory(const QString &name)
 bool MtpObjectsModel::uploadFile(const QString &filename)
 {
 	QFileInfo fileInfo(filename);
-	qDebug() << "uploadFile " << fileInfo.fileName();
 	QString ext = fileInfo.suffix();
-	mtp::ObjectFormat objectFormat;
-	if (ext == "mp3")
-		objectFormat = mtp::ObjectFormat::Mp3;
-	else if (ext == "txt")
-		objectFormat = mtp::ObjectFormat::Text;
-	else if (ext == "jpeg" || ext == "jpg")
-		objectFormat = mtp::ObjectFormat::Jfif;
-	else if (ext == "gif")
-		objectFormat = mtp::ObjectFormat::Gif;
-	else if (ext == "bmp")
-		objectFormat = mtp::ObjectFormat::Bmp;
-	else if (ext == "png")
-		objectFormat = mtp::ObjectFormat::Png;
-	else
+	mtp::ObjectFormat objectFormat = mtp::ObjectFormatFromFilename(filename.toStdString());
+	if (objectFormat == mtp::ObjectFormat::Undefined)
 	{
-		qDebug() << "unknown file type " << ext;
+		qDebug() << "unknown format for " << fileInfo.fileName();
 		return false;
 	}
+
+	qDebug() << "uploadFile " << fileInfo.fileName();
 
 	mtp::ByteArray data;
 	{
