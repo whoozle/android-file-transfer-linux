@@ -103,11 +103,10 @@ namespace mtp
 	void PipePacketer::Read(u32 transaction, ByteArray &data, ByteArray &response, int timeout)
 	{
 		try
-		{
-			PollEvent();
-		}
+		{ PollEvent(); }
 		catch(const std::exception &ex)
 		{ printf("exception in interrupt: %s\n", ex.what()); }
+
 		data.clear();
 		response.clear();
 
