@@ -58,6 +58,12 @@ namespace mtp
 		mtp::ResponseType		ResponseType;
 		u32						Transaction;
 
+		Response() { }
+
+		template<typename Stream>
+		Response(Stream &stream)
+		{ Read(stream); }
+
 		template<typename Stream>
 		void Read(Stream &stream)
 		{
@@ -70,7 +76,7 @@ namespace mtp
 	struct InvalidResponseException : public std::runtime_error
 	{
 		ResponseType Type;
-		InvalidResponseException(ResponseType type);
+		InvalidResponseException(const std::string &where, ResponseType type);
 	};
 
 }

@@ -56,7 +56,7 @@ namespace mtp
 		}
 	}
 
-	InvalidResponseException::InvalidResponseException(ResponseType type): std::runtime_error(FormatMessage(type)), Type(type)
+	InvalidResponseException::InvalidResponseException(const std::string &where, ResponseType type): std::runtime_error(where + ": " + FormatMessage(type)), Type(type)
 	{ }
 
 }
