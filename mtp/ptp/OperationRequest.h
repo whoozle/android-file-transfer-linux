@@ -15,7 +15,7 @@ namespace mtp
 		RequestBase(OperationCode opcode, u32 transaction)
 		{
 			OutputStream stream(Data);
-			stream << ((u16)opcode);
+			stream << opcode;
 			//Write(session); //just one field in mtp
 			stream << transaction;
 		}

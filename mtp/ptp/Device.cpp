@@ -82,25 +82,20 @@ namespace mtp
 		response.clear();
 
 		ByteArray message;
-		u16 raw_code;
+		Response header;
 		while(true)
 		{
 			message = ReadMessage(timeout);
-			HexDump("message", message);
+			//HexDump("message", message);
 			InputStream stream(message);
-			u16 op_code;
-			u32 t;
-			stream >> raw_code;
-			stream >> op_code;
-			stream >> t;
-			if (t == transaction)
+			header.Read(stream);
+			if (header.Transaction == transaction)
 				break;
 
-			printf("drop message %04x %04x, transaction %08x\n", raw_code, op_code, t);
+			printf("drop message %04x %04x, transaction %08x\n", header.ContainerType, header.ResponseType, header.Transaction);
 		}
 
-		ContainerType type = ContainerType(raw_code);
-		if (type == ContainerType::Data)
+		if (header.ContainerType == ContainerType::Data)
 		{
 			data = std::move(message);
 			response = ReadMessage(timeout);

@@ -1,9 +1,20 @@
 #ifndef RESPONSE_H
 #define	RESPONSE_H
 
+#include <mtp/ptp/OperationCode.h>
+
 namespace mtp
 {
-	enum struct ResponseType
+	enum struct ContainerType : u16
+	{
+		Command = 1,
+		Data = 2,
+		Response = 3,
+		Event = 4,
+	};
+	DECLARE_ENUM(ContainerType, u16);
+
+	enum struct ResponseType : u16
 	{
 		OK							= 0x2001,
 		GeneralError				= 0x2002,
@@ -37,6 +48,22 @@ namespace mtp
 		SessionAlreadyOpen			= 0x201e,
 		TransactionCancelled		= 0x201f,
 		SpecificationOfDestinationUnsupported = 0x2020,
+	};
+	DECLARE_ENUM(ResponseType, u16);
+
+	struct Response
+	{
+		mtp::ContainerType		ContainerType;
+		mtp::ResponseType		ResponseType;
+		u32						Transaction;
+
+		template<typename Stream>
+		void Read(Stream &stream)
+		{
+			stream >> ContainerType;
+			stream >> ResponseType;
+			stream >> Transaction;
+		}
 	};
 
 }
