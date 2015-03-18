@@ -5,7 +5,13 @@
 
 namespace mtp
 {
-#define THROW_INVALID_RESPONSE
+
+#define CHECK_RESPONSE(RDATA) do { \
+	InputStream s(response); \
+	Response header(s);\
+	if (header.ResponseType != ResponseType::OK && header.ResponseType != ResponseType::SessionAlreadyOpen) \
+		throw InvalidResponseException(__func__, header.ResponseType); \
+} while(false)
 
 	void Session::Close()
 	{
@@ -25,6 +31,7 @@ namespace mtp
 		_packeter.Write(container.Data);
 		ByteArray data, response;
 		_packeter.Read(transaction, data, response);
+		CHECK_RESPONSE(response);
 		InputStream stream(data, 8); //operation code + session id
 
 		msg::ObjectHandles goh;
@@ -40,6 +47,7 @@ namespace mtp
 		_packeter.Write(container.Data);
 		ByteArray data, response;
 		_packeter.Read(transaction, data, response);
+		CHECK_RESPONSE(response);
 		InputStream stream(data, 8); //operation code + session id
 
 		msg::StorageIDs gsi;
@@ -55,6 +63,7 @@ namespace mtp
 		_packeter.Write(container.Data);
 		ByteArray data, response;
 		_packeter.Read(transaction, data, response);
+		CHECK_RESPONSE(response);
 		InputStream stream(data, 8); //operation code + session id
 		msg::StorageInfo gsi;
 		gsi.Read(stream);
@@ -69,6 +78,7 @@ namespace mtp
 		_packeter.Write(container.Data);
 		ByteArray data, response;
 		_packeter.Read(transaction, data, response);
+		CHECK_RESPONSE(response);
 		InputStream stream(data, 8); //operation code + session id
 		msg::ObjectInfo goi;
 		goi.Read(stream);
@@ -83,6 +93,7 @@ namespace mtp
 		_packeter.Write(container.Data);
 		ByteArray data, response;
 		_packeter.Read(transaction, data, response);
+		CHECK_RESPONSE(response);
 		InputStream stream(data, 8); //operation code + session id
 		msg::ObjectPropsSupported ops;
 		ops.Read(stream);
@@ -97,6 +108,7 @@ namespace mtp
 		_packeter.Write(container.Data);
 		ByteArray data, response;
 		_packeter.Read(transaction, data, response);
+		CHECK_RESPONSE(response);
 		return ByteArray(data.begin() + 8, data.end());
 	}
 
@@ -118,6 +130,7 @@ namespace mtp
 		ByteArray data, response;
 		_packeter.Read(transaction, data, response);
 		//HexDump("response", response);
+		CHECK_RESPONSE(response);
 		InputStream stream(response, 8); //operation code + session id
 		NewObjectInfo noi;
 		stream >> noi.StorageId;
@@ -142,7 +155,7 @@ namespace mtp
 		}
 		ByteArray data, response;
 		_packeter.Read(transaction, data, response);
-		HexDump("response", response);
+		CHECK_RESPONSE(response);
 	}
 
 
@@ -154,6 +167,7 @@ namespace mtp
 		_packeter.Write(container.Data);
 		ByteArray data, response;
 		_packeter.Read(transaction, data, response);
+		CHECK_RESPONSE(response);
 	}
 
 }
