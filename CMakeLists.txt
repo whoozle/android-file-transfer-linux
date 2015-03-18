@@ -5,7 +5,7 @@ set(CMAKE_USE_RELATIVE_PATHS TRUE)
 include(FindPkgConfig)
 find_package( Threads )
 
-pkg_check_modules(LIBUSB libusb REQUIRED)
+pkg_check_modules(LIBUSB libusb-1.0 REQUIRED)
 
 add_definitions(-Wall -pthread -std=c++1y)
 include_directories(. ${CMAKE_SOURCE_DIR} ${LIBUSB_INCLUDE_DIRS})
