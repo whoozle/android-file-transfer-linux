@@ -17,7 +17,7 @@ namespace mtp
 		{
 			OutputStream stream(Data);
 			stream << ((u32)msg.Data.size() + 6);
-			stream << ((u16)Message::Type);
+			stream << Message::Type;
 			std::copy(msg.Data.begin(), msg.Data.end(), std::back_inserter(Data));
 		}
 	};
