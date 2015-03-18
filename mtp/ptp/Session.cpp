@@ -158,6 +158,39 @@ namespace mtp
 		CHECK_RESPONSE(response);
 	}
 
+	void Session::SetObjectProperty(u32 objectId, ObjectProperty property, const ByteArray &value)
+	{
+		u32 transaction = _transactionId++;
+		{
+			OperationRequest req(OperationCode::SetObjectPropValue, transaction, objectId, (u16)property);
+			Container container(req);
+			_packeter.Write(container.Data);
+		}
+		{
+			DataRequest req(OperationCode::SetObjectPropValue, transaction);
+			req.Append(value);
+			Container container(req);
+			_packeter.Write(container.Data, 0);
+		}
+		ByteArray data, response;
+		_packeter.Read(transaction, data, response);
+		CHECK_RESPONSE(response);
+	}
+
+	ByteArray Session::GetObjectProperty(u32 objectId, ObjectProperty property)
+	{
+		u32 transaction = _transactionId++;
+		{
+			OperationRequest req(OperationCode::GetObjectPropValue, transaction, objectId, (u16)property);
+			Container container(req);
+			_packeter.Write(container.Data);
+		}
+		ByteArray data, response;
+		_packeter.Read(transaction, data, response);
+		CHECK_RESPONSE(response);
+		return data;
+	}
+
 
 	void Session::DeleteObject(u32 objectId)
 	{

@@ -3,6 +3,7 @@
 
 #include <mtp/usb/BulkPipe.h>
 #include <mtp/ptp/Messages.h>
+#include <mtp/ptp/ObjectProperty.h>
 
 namespace mtp
 {
@@ -59,6 +60,8 @@ namespace mtp
 		void SendObject(const ByteArray &array);
 		void DeleteObject(u32 objectId);
 		msg::ObjectPropsSupported GetObjectPropsSupported(u32 objectId);
+		void SetObjectProperty(u32 objectId, ObjectProperty property, const ByteArray &value);
+		ByteArray GetObjectProperty(u32 objectId, ObjectProperty property);
 
 	private:
 		void Close();
