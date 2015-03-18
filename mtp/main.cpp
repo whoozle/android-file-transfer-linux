@@ -112,7 +112,7 @@ int main(int argc, char **argv)
 		}
 		msg::ObjectInfo oi;
 		oi.Filename = filename;
-		oi.ObjectFormat = (u16)ObjectFormat::Mp3;
+		oi.ObjectFormat = ObjectFormat::Mp3;
 
 		fseek(f, 0, SEEK_END);
 		oi.ObjectCompressedSize = ftell(f);
@@ -153,7 +153,7 @@ int main(int argc, char **argv)
 		std::string filename = argv[2];
 		msg::ObjectInfo oi;
 		oi.Filename = filename;
-		oi.ObjectFormat = (u16)ObjectFormat::Association;
+		oi.ObjectFormat = ObjectFormat::Association;
 		session->SendObjectInfo(oi, 0, parentObjectId);
 	}
 	else if (command == "properties")

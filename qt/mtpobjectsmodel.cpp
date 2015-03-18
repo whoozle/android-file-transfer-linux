@@ -37,7 +37,7 @@ bool MtpObjectsModel::enter(int idx)
 		return false;
 
 	Row &row = _rows[idx];
-	if (row.GetInfo(_session)->ObjectFormat == (mtp::u16)mtp::ObjectFormat::Association)
+	if (row.GetInfo(_session)->ObjectFormat == mtp::ObjectFormat::Association)
 	{
 		setParent(row.ObjectId);
 		return true;
@@ -110,7 +110,7 @@ QVariant MtpObjectsModel::data(const QModelIndex &index, int role) const
 		return QString::fromUtf8(row.GetInfo(_session)->Filename.c_str());
 
 	case Qt::ForegroundRole:
-		return row.GetInfo(_session)->ObjectFormat == (mtp::u16)mtp::ObjectFormat::Association? QBrush(QColor(0, 0, 128)): QBrush(Qt::black);
+		return row.GetInfo(_session)->ObjectFormat == mtp::ObjectFormat::Association? QBrush(QColor(0, 0, 128)): QBrush(Qt::black);
 
 	default:
 		return QVariant();
@@ -122,7 +122,7 @@ mtp::u32 MtpObjectsModel::createDirectory(const QString &name)
 	mtp::msg::ObjectInfo oi;
 	QByteArray filename = name.toUtf8();
 	oi.Filename = filename.data();
-	oi.ObjectFormat = (mtp::u16)mtp::ObjectFormat::Association;
+	oi.ObjectFormat = mtp::ObjectFormat::Association;
 	mtp::Session::NewObjectInfo noi = _session->SendObjectInfo(oi, 0, _parentObjectId);
 	beginInsertRows(QModelIndex(), _rows.size(), _rows.size());
 	_rows.push_back(Row(noi.ObjectId));
@@ -172,7 +172,7 @@ bool MtpObjectsModel::uploadFile(const QString &filename)
 	mtp::msg::ObjectInfo oi;
 	QByteArray filename_utf = fileInfo.fileName().toUtf8();
 	oi.Filename = filename_utf.data();
-	oi.ObjectFormat = (mtp::u16)objectFormat;
+	oi.ObjectFormat = objectFormat;
 	oi.ObjectCompressedSize = data.size();
 	mtp::Session::NewObjectInfo noi = _session->SendObjectInfo(oi, 0, _parentObjectId);
 	qDebug() << "new object id: " << noi.ObjectId << ", sending...";

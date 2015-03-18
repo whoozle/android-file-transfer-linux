@@ -3,6 +3,7 @@
 
 #include <mtp/ptp/InputStream.h>
 #include <mtp/ptp/OutputStream.h>
+#include <mtp/ptp/ObjectFormat.h>
 
 namespace mtp { namespace msg
 {
@@ -89,25 +90,25 @@ namespace mtp { namespace msg
 
 	struct ObjectInfo
 	{
-		u32			StorageId;
-		u16			ObjectFormat;
-		u16			ProtectionStatus;
-		u32			ObjectCompressedSize;
-		u16			ThumbFormat;
-		u32			ThumbCompressedSize;
-		u32			ThumbPixWidth;
-		u32			ThumbPixHeight;
-		u32			ImagePixWidth;
-		u32			ImagePixHeight;
-		u32			ImageBitDepth;
-		u32			ParentObject;
-		u16			AssociationType;
-		u32			AssociationDesc;
-		u32			SequenceNumber;
-		std::string	Filename;
-		std::string	CaptureDate;
-		std::string	ModificationDate;
-		std::string	Keywords;
+		u32					StorageId;
+		mtp::ObjectFormat	ObjectFormat;
+		u16					ProtectionStatus;
+		u32					ObjectCompressedSize;
+		u16					ThumbFormat;
+		u32					ThumbCompressedSize;
+		u32					ThumbPixWidth;
+		u32					ThumbPixHeight;
+		u32					ImagePixWidth;
+		u32					ImagePixHeight;
+		u32					ImageBitDepth;
+		u32					ParentObject;
+		u16					AssociationType;
+		u32					AssociationDesc;
+		u32					SequenceNumber;
+		std::string			Filename;
+		std::string			CaptureDate;
+		std::string			ModificationDate;
+		std::string			Keywords;
 
 		ObjectInfo(): StorageId(), ObjectFormat(), ProtectionStatus(), ObjectCompressedSize(),
 			ThumbFormat(), ThumbCompressedSize(), ThumbPixWidth(), ThumbPixHeight(),
