@@ -37,7 +37,7 @@ bool MtpObjectsModel::enter(int idx)
 		return false;
 
 	Row &row = _rows[idx];
-	if (row.GetInfo(_session)->ObjectFormat == mtp::ObjectFormat::Association)
+	if (row.IsAssociation(_session))
 	{
 		setParent(row.ObjectId);
 		return true;
@@ -71,6 +71,12 @@ std::shared_ptr<mtp::msg::ObjectInfo> MtpObjectsModel::Row::GetInfo(mtp::Session
 		{ qDebug() << "failed to get object info " << ex.what(); }
 	}
 	return _info;
+}
+
+bool MtpObjectsModel::Row::IsAssociation(mtp::SessionPtr session)
+{
+	mtp::ObjectFormat format = GetInfo(session)->ObjectFormat;
+	return format == mtp::ObjectFormat::Association || format == mtp::ObjectFormat::AudioAlbum;
 }
 
 bool MtpObjectsModel::removeRows (int row, int count, const QModelIndex & parent )
@@ -110,7 +116,7 @@ QVariant MtpObjectsModel::data(const QModelIndex &index, int role) const
 		return QString::fromUtf8(row.GetInfo(_session)->Filename.c_str());
 
 	case Qt::ForegroundRole:
-		return row.GetInfo(_session)->ObjectFormat == mtp::ObjectFormat::Association? QBrush(QColor(0, 0, 128)): QBrush(Qt::black);
+		return row.IsAssociation(_session)? QBrush(QColor(0, 0, 128)): QBrush(Qt::black);
 
 	default:
 		return QVariant();

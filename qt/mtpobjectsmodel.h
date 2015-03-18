@@ -17,6 +17,7 @@ class MtpObjectsModel : public QAbstractListModel
 		mtp::u32								ObjectId;
 		Row(mtp::u32 id = 0): ObjectId(id) { }
 		std::shared_ptr<mtp::msg::ObjectInfo> GetInfo(mtp::SessionPtr session);
+		bool IsAssociation(mtp::SessionPtr);
 	};
 
 	mutable QVector<Row>		_rows;
