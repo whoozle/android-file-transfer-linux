@@ -38,6 +38,7 @@ namespace mtp
 		TransactionCancelled		= 0x201f,
 		SpecificationOfDestinationUnsupported = 0x2020,
 	};
+
 }
 
 #endif	/* RESPONSE_H */

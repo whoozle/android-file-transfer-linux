@@ -15,7 +15,7 @@ namespace mtp
 		Container container(req);
 		_packeter.Write(container.Data);
 		ByteArray data, response;
-		_packeter.Read(data, response);
+		_packeter.Read(0, data, response);
 		//HexDump("payload", data);
 
 		InputStream stream(data, 8); //operation code + session id
@@ -30,7 +30,7 @@ namespace mtp
 		Container container(req);
 		_packeter.Write(container.Data);
 		ByteArray data, response;
-		_packeter.Read(data, response);
+		_packeter.Read(0, data, response);
 		//HexDump("payload", data);
 
 		return std::make_shared<Session>(_packeter.GetPipe(), sessionId);
@@ -75,16 +75,30 @@ namespace mtp
 
 	}
 
-	void PipePacketer::Read(ByteArray &data, ByteArray &response, int timeout)
+	void PipePacketer::Read(u32 transaction, ByteArray &data, ByteArray &response, int timeout)
 	{
 		_pipe->ReadInterrupt();
 		data.clear();
 		response.clear();
-		ByteArray message = ReadMessage(timeout);
-		//HexDump("message", message);
-		InputStream stream(message);
+
+		ByteArray message;
 		u16 raw_code;
-		stream >> raw_code;
+		while(true)
+		{
+			message = ReadMessage(timeout);
+			HexDump("message", message);
+			InputStream stream(message);
+			u16 op_code;
+			u32 t;
+			stream >> raw_code;
+			stream >> op_code;
+			stream >> t;
+			if (t == transaction)
+				break;
+
+			printf("drop message %04x %04x, transaction %08x\n", raw_code, op_code, t);
+		}
+
 		ContainerType type = ContainerType(raw_code);
 		if (type == ContainerType::Data)
 		{

@@ -20,7 +20,7 @@ namespace mtp
 		{ return _pipe; }
 
 		void Write(const ByteArray &data, int timeout = 3000);
-		void Read(ByteArray &data, ByteArray &response, int timeout = 3000);
+		void Read(u32 transaction, ByteArray &data, ByteArray &response, int timeout = 3000);
 
 	private:
 		ByteArray ReadMessage(int timeout);
