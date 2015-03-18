@@ -95,7 +95,7 @@ namespace mtp
 		stream >> transactionId;
 		if (containerType != ContainerType::Event)
 			throw std::runtime_error("not an event");
-		printf("event %04x", eventCode);
+		printf("event %04x\n", eventCode);
 	}
 
 
