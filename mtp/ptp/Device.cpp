@@ -75,9 +75,39 @@ namespace mtp
 
 	}
 
+	void PipePacketer::PollEvent()
+	{
+		ByteArray interruptData = _pipe->ReadInterrupt();
+		if (interruptData.empty())
+			return;
+
+		InputStream stream(interruptData);
+		ContainerType containerType;
+		u32 size;
+		u16 eventCode;
+		u32 transactionId;
+		u32 par1, par2, par3;
+		stream >> size;
+		stream >> containerType;
+		stream >> eventCode;
+		stream >> transactionId;
+		stream >> par1;
+		stream >> par2;
+		stream >> par3;
+		if (containerType != ContainerType::Event)
+			throw std::runtime_error("not an event");
+		printf("event %04x %04x %04x %04x", eventCode, par1, par2, par3);
+	}
+
+
 	void PipePacketer::Read(u32 transaction, ByteArray &data, ByteArray &response, int timeout)
 	{
-		_pipe->ReadInterrupt();
+		try
+		{
+			PollEvent();
+		}
+		catch(const std::exception &ex)
+		{ printf("exception in interrupt: %s\n", ex.what()); }
 		data.clear();
 		response.clear();
 

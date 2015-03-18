@@ -16,9 +16,10 @@ namespace mtp { namespace usb
 		ByteArray data(_interrupt->GetMaxPacketSize());
 		int tr = 0;
 		int r = libusb_interrupt_transfer(_device->GetHandle(), _interrupt->GetAddress(), data.data(), data.size(), &tr, 1);
-		data.resize(tr);
 		if (r == 0)
-			HexDump("interrupt data", data);
+			data.resize(tr);
+		else
+			data.clear();
 		return data;
 	}
 
