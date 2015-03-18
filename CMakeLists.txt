@@ -18,6 +18,7 @@ set(SOURCES
 	mtp/usb/Exception.cpp
 
 	mtp/ptp/Device.cpp
+	mtp/ptp/Response.cpp
 	mtp/ptp/Session.cpp
 
 	mtp/main.cpp

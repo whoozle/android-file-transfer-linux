@@ -5,6 +5,7 @@
 
 namespace mtp
 {
+#define THROW_INVALID_RESPONSE
 
 	void Session::Close()
 	{
@@ -30,6 +31,7 @@ namespace mtp
 		goh.Read(stream);
 		return goh;
 	}
+
 	msg::StorageIDs Session::GetStorageIDs()
 	{
 		u32 transaction = _transactionId++;
@@ -115,7 +117,7 @@ namespace mtp
 		}
 		ByteArray data, response;
 		_packeter.Read(transaction, data, response);
-		HexDump("response", response);
+		//HexDump("response", response);
 		InputStream stream(response, 8); //operation code + session id
 		NewObjectInfo noi;
 		stream >> noi.StorageId;

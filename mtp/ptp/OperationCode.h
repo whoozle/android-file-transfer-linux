@@ -1,6 +1,8 @@
 #ifndef OPERATIONCODE_H
 #define	OPERATIONCODE_H
 
+#include <mtp/types.h>
+
 namespace mtp
 {
 	enum class OperationCode : u16

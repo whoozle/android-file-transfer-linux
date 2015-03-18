@@ -2,6 +2,7 @@
 #define	RESPONSE_H
 
 #include <mtp/ptp/OperationCode.h>
+#include <stdexcept>
 
 namespace mtp
 {
@@ -64,6 +65,11 @@ namespace mtp
 			stream >> ResponseType;
 			stream >> Transaction;
 		}
+	};
+
+	struct InvalidResponseException : public std::runtime_error
+	{
+		InvalidResponseException(ResponseType type);
 	};
 
 }
