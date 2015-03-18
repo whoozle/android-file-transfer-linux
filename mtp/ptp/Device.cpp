@@ -81,22 +81,21 @@ namespace mtp
 		if (interruptData.empty())
 			return;
 
+		HexDump("interrupt", interruptData);
 		InputStream stream(interruptData);
 		ContainerType containerType;
 		u32 size;
 		u16 eventCode;
+		u32 sessionId;
 		u32 transactionId;
-		u32 par1, par2, par3;
 		stream >> size;
 		stream >> containerType;
 		stream >> eventCode;
+		stream >> sessionId;
 		stream >> transactionId;
-		stream >> par1;
-		stream >> par2;
-		stream >> par3;
 		if (containerType != ContainerType::Event)
 			throw std::runtime_error("not an event");
-		printf("event %04x %04x %04x %04x", eventCode, par1, par2, par3);
+		printf("event %04x", eventCode);
 	}
 
 
