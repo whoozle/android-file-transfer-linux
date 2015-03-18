@@ -69,6 +69,7 @@ namespace mtp
 
 	struct InvalidResponseException : public std::runtime_error
 	{
+		ResponseType Type;
 		InvalidResponseException(ResponseType type);
 	};
 

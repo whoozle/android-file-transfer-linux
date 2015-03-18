@@ -51,12 +51,12 @@ namespace mtp
 		std::string FormatMessage(ResponseType r)
 		{
 			char buf[1024];
-			snprintf(buf, sizeof(buf), "%s (0x%04x)", GetResponseName(r).c_str(), r);
+			snprintf(buf, sizeof(buf), "invalid response code %s (0x%04x)", GetResponseName(r).c_str(), r);
 			return buf;
 		}
 	}
 
-	InvalidResponseException::InvalidResponseException(ResponseType type): std::runtime_error(FormatMessage(type))
+	InvalidResponseException::InvalidResponseException(ResponseType type): std::runtime_error(FormatMessage(type)), Type(type)
 	{ }
 
 }
