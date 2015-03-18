@@ -52,4 +52,14 @@ namespace mtp
 #define ASSERT(expr) if (!(expr)) throw std::runtime_error("assertion " #expr " failed")
 #define CATCH(WHAT, ...) catch(const std::exception &ex) { LOG(WARNING) << WHAT << ": " << ex.what(); __VA_ARGS__ }
 
+#define DECLARE_ENUM(TYPE, BASETYPE) \
+	template<typename Stream> \
+	Stream &operator << (Stream & stream, TYPE format) \
+	{ stream << static_cast<BASETYPE>(format); return stream; } \
+ \
+	template<typename Stream> \
+	Stream &operator >> (Stream & stream, TYPE &format) \
+	{ BASETYPE value; stream >> value; format = static_cast<TYPE>(value); return stream; }
+
+
 #endif

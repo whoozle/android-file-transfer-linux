@@ -38,13 +38,7 @@ namespace mtp
 		Jpx				= 0x3810,
 	};
 
-	template<typename Stream>
-	Stream &operator << (Stream & stream, ObjectFormat format)
-	{ stream << (u16)format; return stream; }
-
-	template<typename Stream>
-	Stream &operator >> (Stream & stream, ObjectFormat &format)
-	{ u16 value; stream >> value; format = (ObjectFormat)value; return stream; }
+	DECLARE_ENUM(ObjectFormat, u16);
 
 }
 
