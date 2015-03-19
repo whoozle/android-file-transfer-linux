@@ -147,17 +147,17 @@ namespace mtp
 			if (!device)
 				continue;
 			int confs = desc->GetConfigurationsCount();
-			printf("configurations: %d\n", confs);
+			//printf("configurations: %d\n", confs);
 
 			for(int i = 0; i < confs; ++i)
 			{
 				usb::ConfigurationPtr conf = desc->GetConfiguration(i);
 				int interfaces = conf->GetInterfaceCount();
-				printf("interfaces: %d\n", interfaces);
+				//printf("interfaces: %d\n", interfaces);
 				for(int j = 0; j < interfaces; ++j)
 				{
 					usb::InterfacePtr iface = conf->GetInterface(conf, j, 0);
-					printf("%d:%d index %u, eps %u\n", i, j, iface->GetIndex(), iface->GetEndpointsCount());
+					//printf("%d:%d index %u, eps %u\n", i, j, iface->GetIndex(), iface->GetEndpointsCount());
 					int name_idx = iface->GetNameIndex();
 					if (!name_idx)
 						continue;
