@@ -29,7 +29,7 @@ int main(int argc, char **argv)
 	printf("%s\n", gdi.VendorExtensionDesc.c_str());
 	printf("%s ", gdi.Manufactorer.c_str());
 	printf("%s ", gdi.Model.c_str());
-	printf("%s", gdi.DeviceVersion.c_str());
+	printf("%s ", gdi.DeviceVersion.c_str());
 	printf("%s\n", gdi.SerialNumber.c_str());
 	printf("supported op codes: ");
 	for(u16 code : gdi.OperationsSupported)
