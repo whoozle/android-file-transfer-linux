@@ -30,6 +30,8 @@ private slots:
 	void createDirectory();
 	void uploadFiles();
 	void uploadDirectories();
+	void uploadAlbum();
+	void uploadAlbum(QString path);
 
 private:
 	void uploadFiles(const QStringList &files);

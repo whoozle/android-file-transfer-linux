@@ -136,26 +136,27 @@ mtp::u32 MtpObjectsModel::createDirectory(const QString &name)
 	return noi.ObjectId;
 }
 
-bool MtpObjectsModel::uploadFile(const QString &filename)
+bool MtpObjectsModel::uploadFile(const QString &filePath, QString filename)
 {
-	QFileInfo fileInfo(filename);
-	QString ext = fileInfo.suffix();
-	mtp::ObjectFormat objectFormat = mtp::ObjectFormatFromFilename(filename.toStdString());
+	QFileInfo fileInfo(filePath);
+	mtp::ObjectFormat objectFormat = mtp::ObjectFormatFromFilename(filePath.toStdString());
 	if (objectFormat == mtp::ObjectFormat::Undefined)
 	{
 		qDebug() << "unknown format for " << fileInfo.fileName();
 		return false;
 	}
 
-	qDebug() << "uploadFile " << fileInfo.fileName();
+	if (filename.isEmpty())
+		filename = fileInfo.fileName();
+	qDebug() << "uploadFile " << fileInfo.fileName() << " as " << filename;
 
 	mtp::ByteArray data;
 	{
-		QFile file(filename);
+		QFile file(filePath);
 		file.open(QFile::ReadOnly);
 		if (!file.isOpen())
 		{
-			qWarning() << "file " << filename << " could not be opened";
+			qWarning() << "file " << filePath << " could not be opened";
 			return false;
 		}
 		QByteArray qdata = file.readAll();
@@ -165,7 +166,7 @@ bool MtpObjectsModel::uploadFile(const QString &filename)
 	qDebug() << "sending " << data.size() << " bytes";
 
 	mtp::msg::ObjectInfo oi;
-	QByteArray filename_utf = fileInfo.fileName().toUtf8();
+	QByteArray filename_utf = filename.toUtf8();
 	oi.Filename = filename_utf.data();
 	oi.ObjectFormat = objectFormat;
 	oi.ObjectCompressedSize = data.size();

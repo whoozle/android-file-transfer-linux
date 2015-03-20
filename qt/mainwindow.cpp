@@ -21,6 +21,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(_ui->actionGo_Down, SIGNAL(triggered()), SLOT(down()));
 	connect(_ui->actionCreateDirectory, SIGNAL(triggered()), SLOT(createDirectory()));
 	connect(_ui->actionUploadDirectory, SIGNAL(triggered()), SLOT(uploadDirectories()));
+	connect(_ui->actionUpload_Album, SIGNAL(triggered()), SLOT(uploadAlbum()));
 	connect(_ui->actionUpload, SIGNAL(triggered()), SLOT(uploadFiles()));
 }
 
@@ -138,13 +139,81 @@ void MainWindow::uploadDirectories()
 	mtp::u32 dirId = _objectModel->createDirectory(dir.dirName());
 	_objectModel->setParent(dirId);
 	_history.push_back(dirId);
+
 	QStringList files;
-	for(QString file : dir.entryList())
+	for(QString file : dir.entryList(QDir::Files))
 	{
-		if (file == "." || file == "..")
-			continue;
 		files.push_back(dir.canonicalPath() + "/" + file);
 	}
 	uploadFiles(files);
 }
 
+void MainWindow::uploadAlbum()
+{
+	QString dirPath = QFileDialog::getExistingDirectory(this);
+	if (!dirPath.isEmpty())
+		uploadAlbum(dirPath);
+}
+
+namespace
+{
+	int GetScore(const QString &str_)
+	{
+		QString str = str_.toLower();
+		int score = 0;
+		if (str.contains("art"))
+			score += 1;
+		if (str.contains("album"))
+			score += 1;
+		if (str.contains("large"))
+			score += 2;
+		if (str.contains("small"))
+			score += 1;
+		if (str.contains("folder"))
+			score += 1;
+		return score;
+	}
+
+	bool HeuristicLess(const QString &s1, const QString &s2)
+	{
+		return GetScore(s1) > GetScore(s2);
+	}
+}
+
+void MainWindow::uploadAlbum(QString dirPath)
+{
+	QDir dir(dirPath);
+	qDebug() << "adding directory " << dir.dirName();
+
+	mtp::u32 dirId = _objectModel->createDirectory(dir.dirName());
+	_objectModel->setParent(dirId);
+	_history.push_back(dirId);
+
+	QString cover, coverTarget;
+	QStringList covers;
+	{
+		QStringList ext({"*.png", "*.jpg", "*.jpeg"});
+		covers = dir.entryList(ext, QDir::Files);
+		qSort(covers.begin(), covers.end(), &HeuristicLess);
+		qDebug() << "covers" << covers;
+		if (!covers.isEmpty())
+			cover = covers.front();
+
+		if (cover.endsWith(".png"))
+			coverTarget = "albumart.png";
+		else
+			coverTarget = "albumart.jpg";
+
+		qDebug() << "use " << cover << " as album art -> " << coverTarget;
+	}
+
+	_objectModel->uploadFile(dir.canonicalPath() + "/" + cover, coverTarget);
+
+	QStringList files;
+	for(QString file : dir.entryList(QDir::Files))
+	{
+		if (!covers.contains(file))
+			files.push_back(dir.canonicalPath() + "/" + file);
+	}
+	uploadFiles(files);
+}

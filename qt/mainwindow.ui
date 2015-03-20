@@ -57,6 +57,7 @@
    <addaction name="actionBack"/>
    <addaction name="actionGo_Down"/>
    <addaction name="actionCreateDirectory"/>
+   <addaction name="actionUpload_Album"/>
    <addaction name="actionUploadDirectory"/>
    <addaction name="actionUpload"/>
   </widget>
@@ -110,6 +111,11 @@
    </property>
    <property name="shortcut">
     <string>Return</string>
+   </property>
+  </action>
+  <action name="actionUpload_Album">
+   <property name="text">
+    <string>Upload Album</string>
    </property>
   </action>
  </widget>
