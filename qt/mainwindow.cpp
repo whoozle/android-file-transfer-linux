@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include "createdirectorydialog.h"
 #include "progressdialog.h"
+#include "renamedialog.h"
 #include "mtpobjectsmodel.h"
 #include <QDebug>
 #include <QMessageBox>
@@ -59,6 +60,8 @@ void MainWindow::customContextMenuRequested ( const QPoint & pos )
 
 	QMenu menu(this);
 	//http://standards.freedesktop.org/icon-naming-spec/icon-naming-spec-latest.html
+	QAction * rename_object = menu.addAction("Rename");
+	rename_object->setEnabled(rows.size() == 1);
 	QAction * delete_objects = menu.addAction(QIcon::fromTheme("edit-delete"), "Delete");
 	QAction * action = menu.exec(_ui->listView->mapToGlobal(pos));
 	if (!action)
@@ -66,8 +69,16 @@ void MainWindow::customContextMenuRequested ( const QPoint & pos )
 
 	for(int i = rows.size() - 1; i >= 0; --i)
 	{
+		QModelIndex row = rows[i];
 		if (action == delete_objects)
-			_objectModel->removeRow(rows[i].row());
+			_objectModel->removeRow(row.row());
+		else if (action == rename_object)
+		{
+			RenameDialog d(_objectModel->data(row).toString(), this);
+			int r = d.exec();
+			if (r)
+				_objectModel->rename(row.row(), d.name());
+		}
 		else
 			qDebug() << "unknown action!";
 	}

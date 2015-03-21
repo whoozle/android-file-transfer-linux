@@ -191,6 +191,15 @@ namespace mtp
 		return data;
 	}
 
+	void Session::SetObjectProperty(u32 objectId, ObjectProperty property, const std::string &value)
+	{
+		ByteArray data;
+		data.reserve(value.size() * 2 + 1);
+		OutputStream stream(data);
+		stream << value;
+		SetObjectProperty(objectId, property, data);
+	}
+
 
 	void Session::DeleteObject(u32 objectId)
 	{

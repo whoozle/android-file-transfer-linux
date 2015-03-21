@@ -79,6 +79,14 @@ bool MtpObjectsModel::Row::IsAssociation(mtp::SessionPtr session)
 	return format == mtp::ObjectFormat::Association || format == mtp::ObjectFormat::AudioAlbum;
 }
 
+void MtpObjectsModel::rename(int idx, const QString &fileName)
+{
+	qDebug() << "renaming row " << idx << " to " << fileName;
+	_session->SetObjectProperty(objectIdAt(idx), mtp::ObjectProperty::ObjectFilename, fileName.toStdString());
+	_rows[idx].ResetInfo();
+	emit dataChanged(createIndex(idx, 0), createIndex(idx, 0));
+}
+
 bool MtpObjectsModel::removeRows (int row, int count, const QModelIndex & parent )
 {
 	qDebug() << "remove rows " << row << " " << count;

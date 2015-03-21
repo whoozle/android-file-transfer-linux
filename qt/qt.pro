@@ -22,13 +22,16 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     mtpobjectsmodel.cpp \
     progressdialog.cpp \
-    createdirectorydialog.cpp
+    createdirectorydialog.cpp \
+    renamedialog.cpp
 
 HEADERS  += mainwindow.h \
     mtpobjectsmodel.h \
     progressdialog.h \
-    createdirectorydialog.h
+    createdirectorydialog.h \
+    renamedialog.h
 
 FORMS    += mainwindow.ui \
     progressdialog.ui \
-    createdirectorydialog.ui
+    createdirectorydialog.ui \
+    renamedialog.ui
