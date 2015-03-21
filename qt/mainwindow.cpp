@@ -7,6 +7,7 @@
 #include <QMessageBox>
 #include <QKeyEvent>
 #include <QFileDialog>
+#include <QSettings>
 #include <QDir>
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -113,26 +114,39 @@ void MainWindow::uploadFiles(const QStringList &files)
 void MainWindow::uploadFiles()
 {
 	QFileDialog d(this);
+
+	QSettings settings;
+	{
+		QVariant ld = settings.value("the-latest-directory");
+		if (ld.isValid())
+			d.setDirectory(ld.toString());
+	}
+
 	d.setAcceptMode(QFileDialog::AcceptOpen);
 	d.setFileMode(QFileDialog::ExistingFiles);
 	d.setOption(QFileDialog::ShowDirsOnly, false);
 	d.exec();
+
+	settings.setValue("the-latest-directory", d.directory().absolutePath());
 
 	uploadFiles(d.selectedFiles());
 }
 
 void MainWindow::uploadDirectories()
 {
-	/*
-	QFileDialog d(this);
-	d.setAcceptMode(QFileDialog::AcceptOpen);
-	d.setFileMode(QFileDialog::Directory);
-	d.setOption(QFileDialog::ShowDirsOnly, true);
-	d.exec();
-*/
-	QString dirPath = QFileDialog::getExistingDirectory(this);
+	QSettings settings;
+	QString dirPath;
+	{
+		QVariant ld = settings.value("the-latest-directory");
+		if (ld.isValid())
+			dirPath = ld.toString();
+	}
+
+	dirPath = QFileDialog::getExistingDirectory(this, "Upload Directories", dirPath);
 	if (dirPath.isEmpty())
 		return;
+
+	settings.setValue("the-latest-directory", dirPath);
 
 	QDir dir(dirPath);
 	qDebug() << "adding directory " << dir.dirName();
@@ -150,9 +164,19 @@ void MainWindow::uploadDirectories()
 
 void MainWindow::uploadAlbum()
 {
-	QString dirPath = QFileDialog::getExistingDirectory(this);
-	if (!dirPath.isEmpty())
+	QString dirPath;
+	QSettings settings;
+	{
+		QVariant ld = settings.value("the-latest-directory");
+		if (ld.isValid())
+			dirPath = ld.toString();
+	}
+
+	dirPath = QFileDialog::getExistingDirectory(this, "Upload Album", dirPath);
+	if (!dirPath.isEmpty()) {
+		settings.setValue("the-latest-directory", dirPath);
 		uploadAlbum(dirPath);
+	}
 }
 
 namespace
