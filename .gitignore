@@ -5,3 +5,4 @@ CMakeCache*
 nbproject
 mtp-test
 build
+*.user
