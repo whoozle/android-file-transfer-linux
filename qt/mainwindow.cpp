@@ -108,12 +108,29 @@ void MainWindow::createDirectory()
 
 void MainWindow::uploadFiles(const QStringList &files)
 {
+	if (files.isEmpty())
+		return;
+
+	qDebug() << "uploadFiles " << files;
 	ProgressDialog progressDialog(this);
 	progressDialog.setModal(true);
 	progressDialog.setMaximum(files.size());
 	progressDialog.setValue(0);
 	progressDialog.show();
 	int progress = 0;
+	int limit = 0;
+	//temp workaround kernel/libusb bug
+	{
+		QFile f("/sys/module/usbcore/parameters/usbfs_memory_mb");
+		if (f.open(QIODevice::ReadOnly | QIODevice::Text))
+		{
+			QTextStream stream(&f);
+			stream >> limit;
+			qDebug() << "usbfs limit: " << limit << "Mib";
+		}
+		else
+			qDebug() << "cannot read limit on usbfs transaction";
+	}
 	for(QString file : files)
 	{
 		progressDialog.setValue(++progress);
