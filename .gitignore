@@ -1,5 +1,6 @@
 *.ninja*
 cmake_*
-CMake*
+CMakeFiles*
+CMakeCache*
 nbproject
 mtp-test
