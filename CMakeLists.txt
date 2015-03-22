@@ -7,7 +7,7 @@ find_package( Threads )
 
 pkg_check_modules(LIBUSB libusb-1.0 REQUIRED)
 
-add_definitions(-Wall -pthread -std=c++1y)
+add_definitions(-Wall -pthread -std=c++11)
 include_directories(. ${CMAKE_SOURCE_DIR} ${LIBUSB_INCLUDE_DIRS})
 
 set(SOURCES
@@ -21,10 +21,12 @@ set(SOURCES
 	mtp/ptp/ObjectFormat.cpp
 	mtp/ptp/Response.cpp
 	mtp/ptp/Session.cpp
-
-	mtp/main.cpp
 )
+
 add_library(mtp-ng STATIC ${SOURCES})
 
 add_executable(mtp-test mtp/main.cpp)
 target_link_libraries(mtp-test mtp-ng -lusb-1.0 ${CMAKE_THREAD_LIBS_INIT})
+
+set(MTP_LIBRARIES mtp-ng -lusb-1.0)
+add_subdirectory(qt)
