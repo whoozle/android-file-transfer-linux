@@ -118,7 +118,7 @@ void MainWindow::uploadFiles(const QStringList &files)
 	progressDialog.setValue(0);
 	progressDialog.show();
 	int progress = 0;
-	int limit = 0;
+	unsigned limit = 0;
 	//temp workaround kernel/libusb bug
 	{
 		QFile f("/sys/module/usbcore/parameters/usbfs_memory_mb");
@@ -131,6 +131,25 @@ void MainWindow::uploadFiles(const QStringList &files)
 		else
 			qDebug() << "cannot read limit on usbfs transaction";
 	}
+	unsigned max = 0;
+	for(QString file : files)
+	{
+		QFileInfo fi(file);
+		unsigned mb = (fi.size() + 1024 * 1024 - 1) / 1024 / 1024;
+		if (mb > max)
+			max = mb;
+	}
+
+	if (limit && max > limit)
+	{
+		QMessageBox::warning(this, "Error", "This file(s) will trigger the bug in libusb-1.0.\n"
+			"Please increase usbfs memory usage limit with the following command as root:\n"
+			"echo -n " + QString::number(max + 1) + " > /sys/module/usbcore/parameters/usbfs_memory_mb\n"
+			"and then, try again"
+		);
+		return;
+	}
+
 	for(QString file : files)
 	{
 		progressDialog.setValue(++progress);
