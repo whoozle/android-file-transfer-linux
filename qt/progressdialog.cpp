@@ -28,7 +28,10 @@ void ProgressDialog::setProgress(float current)
 {
 	ui->progressBar->setValue(current * 10000);
 	if (current >= 0.99)
+	{
 		ui->buttonBox->setEnabled(true);
+		accept();
+	}
 }
 
 void ProgressDialog::setValue(float current)
