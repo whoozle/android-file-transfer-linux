@@ -3,9 +3,7 @@
 
 #include <QObject>
 #include <QThread>
-#include <QVariant>
 
-class QPropertyAnimation;
 class MtpObjectsModel;
 
 class FileUploaderWorker: public QObject
@@ -29,21 +27,14 @@ signals:
 class FileUploader : public QObject
 {
 	Q_OBJECT
-	Q_PROPERTY(qlonglong uploadedBytes READ uploadedBytes WRITE setUploadedBytes);
 
 private:
 	MtpObjectsModel	*	_model;
 	QThread				_workerThread;
-	qlonglong			_total, _current, _uploadedBytes;
-	QPropertyAnimation *_animation;
+	qlonglong			_total, _current;
 
 private slots:
 	void onProgress(qlonglong size);
-	void setUploadedBytes(qlonglong bytes);
-	void onValueChanged(QVariant variant);
-
-	qlonglong uploadedBytes() const
-	{ return _uploadedBytes; }
 
 public:
 	explicit FileUploader(MtpObjectsModel * model, QObject *parent = 0);

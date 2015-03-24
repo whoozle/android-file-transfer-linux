@@ -2,7 +2,6 @@
 #include "mtpobjectsmodel.h"
 #include <QStringList>
 #include <QFileInfo>
-#include <QPropertyAnimation>
 #include <QDebug>
 
 #include <unistd.h>
@@ -35,9 +34,6 @@ FileUploader::FileUploader(MtpObjectsModel * model, QObject *parent) :
 	QObject(parent),
 	_model(model)
 {
-	_animation = new QPropertyAnimation(this, "uploadedBytes");
-	connect(_animation, SIGNAL(valueChanged(QVariant)), SLOT(onValueChanged(QVariant)));
-
 	FileUploaderWorker * worker = new FileUploaderWorker(_model);
 	worker->moveToThread(&_workerThread);
 
@@ -53,31 +49,11 @@ FileUploader::~FileUploader()
 	_workerThread.wait();
 }
 
-void FileUploader::onValueChanged(QVariant variant)
-{
-	setUploadedBytes(variant.toLongLong());
-}
-
 void FileUploader::onProgress(qlonglong size)
 {
 	qDebug() << "progress size" << size;
 	_current += size;
-	int duration = 1 + _animation->currentTime();
-	qDebug() << "progress" << _current << _total << duration;
-
-	_animation->stop();
-	_animation->setEndValue(_current);
-	_animation->setDuration(10000);
-	_animation->start();
-
-	setUploadedBytes(_current);
-}
-
-void FileUploader::setUploadedBytes(qlonglong bytes)
-{
-	qDebug() << "ub = " << bytes;
-	_uploadedBytes = bytes;
-	emit uploadProgress(1.0 * _uploadedBytes / _total);
+	emit uploadProgress(1.0 * _current / _total);
 }
 
 void FileUploader::upload(const QStringList &files)
@@ -88,11 +64,6 @@ void FileUploader::upload(const QStringList &files)
 		QFileInfo fi(file);
 		_total += fi.size();
 	}
-
-	_animation->setStartValue(0);
-	_animation->setEndValue(_total);
-	_animation->setDuration(60000);
-	_animation->start();
 
 	for(QString file : files)
 	{
