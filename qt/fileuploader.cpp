@@ -22,8 +22,7 @@ void FileUploaderWorker::uploadFile(const QString &file)
 	QFileInfo fi(file);
 	try
 	{
-		//_model->uploadFile(file)
-		sleep(1);
+		_model->uploadFile(file);
 	} catch(const std::exception &ex)
 	{ qDebug() << "uploading file " << file << " failed: " << ex.what(); }
 

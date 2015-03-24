@@ -194,9 +194,9 @@ void MainWindow::uploadDirectories()
 
 	QDir dir(dirPath);
 	qDebug() << "adding directory " << dir.dirName();
-	//mtp::u32 dirId = _objectModel->createDirectory(dir.dirName());
-	//_objectModel->setParent(dirId);
-	//_history.push_back(dirId);
+	mtp::u32 dirId = _objectModel->createDirectory(dir.dirName());
+	_objectModel->setParent(dirId);
+	_history.push_back(dirId);
 
 	QStringList files;
 	for(QString file : dir.entryList(QDir::Files))
