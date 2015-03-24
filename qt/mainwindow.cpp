@@ -4,6 +4,7 @@
 #include "progressdialog.h"
 #include "renamedialog.h"
 #include "mtpobjectsmodel.h"
+#include "fileuploader.h"
 #include <QDebug>
 #include <QMessageBox>
 #include <QKeyEvent>
@@ -14,7 +15,8 @@
 MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
 	_ui(new Ui::MainWindow),
-	_objectModel(new MtpObjectsModel)
+	_objectModel(new MtpObjectsModel(this)),
+	_uploader(new FileUploader(_objectModel, this))
 {
 	_ui->setupUi(this);
 	connect(_ui->listView, SIGNAL(doubleClicked(QModelIndex)), SLOT(onActivated(QModelIndex)));
@@ -112,12 +114,6 @@ void MainWindow::uploadFiles(const QStringList &files)
 		return;
 
 	qDebug() << "uploadFiles " << files;
-	ProgressDialog progressDialog(this);
-	progressDialog.setModal(true);
-	progressDialog.setMaximum(files.size());
-	progressDialog.setValue(0);
-	progressDialog.show();
-	int progress = 0;
 	unsigned limit = 0;
 	//temp workaround kernel/libusb bug
 	{
@@ -144,18 +140,19 @@ void MainWindow::uploadFiles(const QStringList &files)
 	{
 		QMessageBox::warning(this, "Error", "This file(s) will trigger the bug in libusb-1.0.\n"
 			"Please increase usbfs memory usage limit with the following command as root:\n"
-			"echo -n " + QString::number(max + 1) + " > /sys/module/usbcore/parameters/usbfs_memory_mb\n"
+			"echo -n " + QString::number(max * 3 / 2) + " > /sys/module/usbcore/parameters/usbfs_memory_mb\n"
 			"and then, try again"
 		);
 		return;
 	}
+	ProgressDialog progressDialog(this);
+	progressDialog.setModal(true);
+	progressDialog.setValue(0);
 
-	for(QString file : files)
-	{
-		progressDialog.setValue(++progress);
-		QCoreApplication::processEvents();
-		_objectModel->uploadFile(file);
-	}
+	connect(_uploader, SIGNAL(uploadProgress(float)), &progressDialog, SLOT(setValue(float)));
+	_uploader->upload(files);
+
+	progressDialog.exec();
 }
 
 void MainWindow::uploadFiles()
@@ -197,9 +194,9 @@ void MainWindow::uploadDirectories()
 
 	QDir dir(dirPath);
 	qDebug() << "adding directory " << dir.dirName();
-	mtp::u32 dirId = _objectModel->createDirectory(dir.dirName());
-	_objectModel->setParent(dirId);
-	_history.push_back(dirId);
+	//mtp::u32 dirId = _objectModel->createDirectory(dir.dirName());
+	//_objectModel->setParent(dirId);
+	//_history.push_back(dirId);
 
 	QStringList files;
 	for(QString file : dir.entryList(QDir::Files))

@@ -3,6 +3,7 @@ find_package(Qt4)
 
 set(SOURCES main.cpp
     mainwindow.cpp
+    fileuploader.cpp
     mtpobjectsmodel.cpp
     progressdialog.cpp
     createdirectorydialog.cpp
@@ -10,6 +11,7 @@ set(SOURCES main.cpp
 )
 
 set(HEADERS mainwindow.h
+    fileuploader.h
     mtpobjectsmodel.h
     progressdialog.h
     createdirectorydialog.h

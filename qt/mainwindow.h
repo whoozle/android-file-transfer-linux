@@ -10,6 +10,7 @@ class MainWindow;
 }
 
 class MtpObjectsModel;
+class FileUploader;
 
 class MainWindow : public QMainWindow
 {
@@ -38,6 +39,7 @@ private:
 
 	Ui::MainWindow *	_ui;
 	MtpObjectsModel *	_objectModel;
+	FileUploader *		_uploader;
 	QVector<mtp::u32>	_history;
 
 	mtp::DevicePtr		_device;

@@ -15,10 +15,11 @@ public:
 	explicit ProgressDialog(QWidget *parent = 0);
 	~ProgressDialog();
 
-	void setValue(int current);
-	void setMaximum(int current);
+public slots:
+	void setValue(float current);
 
 private:
+	void closeEvent(QCloseEvent *event);
 	Ui::ProgressDialog *ui;
 };
 
