@@ -21,6 +21,7 @@ public slots:
 	void uploadFile(const QString &file);
 
 signals:
+	void started(QString);
 	void progress(qlonglong bytes);
 };
 
@@ -35,6 +36,7 @@ private:
 
 private slots:
 	void onProgress(qlonglong size);
+	void onStarted(const QString &file);
 
 public:
 	explicit FileUploader(MtpObjectsModel * model, QObject *parent = 0);
@@ -44,6 +46,7 @@ public:
 
 signals:
 	void uploadFile(QString file);
+	void uploadStarted(QString file);
 	void uploadProgress(float);
 	void finished();
 };

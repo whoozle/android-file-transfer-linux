@@ -45,6 +45,11 @@ void ProgressDialog::setValue(float current)
 	_animation->setDuration(estimate);
 }
 
+void ProgressDialog::setFilename(const QString &filename)
+{
+	ui->label->setText(filename);
+}
+
 void ProgressDialog::closeEvent(QCloseEvent *event)
 {
 	event->ignore();

@@ -20,6 +20,7 @@ void FileUploaderWorker::uploadFile(const QString &file)
 {
 	qDebug() << "uploading file " << file;
 	QFileInfo fi(file);
+	emit started(fi.fileName());
 	try
 	{
 		_model->uploadFile(file);
@@ -39,6 +40,7 @@ FileUploader::FileUploader(MtpObjectsModel * model, QObject *parent) :
 	connect(&_workerThread, SIGNAL(finished()), SLOT(deleteLater()));
 	connect(this, SIGNAL(uploadFile(QString)), worker, SLOT(uploadFile(QString)));
 	connect(worker, SIGNAL(progress(qlonglong)), SLOT(onProgress(qlonglong)));
+	connect(worker, SIGNAL(started(QString)), SLOT(onStarted(QString)));
 	_workerThread.start();
 }
 
@@ -53,6 +55,11 @@ void FileUploader::onProgress(qlonglong size)
 	qDebug() << "progress size" << size;
 	_current += size;
 	emit uploadProgress(1.0 * _current / _total);
+}
+
+void FileUploader::onStarted(const QString &file)
+{
+	emit uploadStarted(file);
 }
 
 void FileUploader::upload(const QStringList &files)

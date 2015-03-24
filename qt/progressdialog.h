@@ -24,6 +24,7 @@ public:
 	void setProgress(float value);
 
 public slots:
+	void setFilename(const QString &filename);
 	void setValue(float current);
 
 private:
