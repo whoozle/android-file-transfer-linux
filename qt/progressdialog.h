@@ -26,6 +26,7 @@ public:
 public slots:
 	void setFilename(const QString &filename);
 	void setValue(float current);
+	virtual void reject();
 
 private:
 	void closeEvent(QCloseEvent *event);

@@ -24,6 +24,9 @@ ProgressDialog::~ProgressDialog()
 	delete ui;
 }
 
+void ProgressDialog::reject()
+{ }
+
 void ProgressDialog::setProgress(float current)
 {
 	ui->progressBar->setValue(current * 10000);
