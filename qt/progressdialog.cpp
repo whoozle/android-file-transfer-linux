@@ -6,7 +6,7 @@
 
 ProgressDialog::ProgressDialog(QWidget *parent) :
 	QDialog(parent),
-	ui(new Ui::ProgressDialog), _progress(0)
+	ui(new Ui::ProgressDialog), _progress(0), _duration(0)
 {
 	ui->setupUi(this);
 	ui->progressBar->setMaximum(10000);
@@ -39,13 +39,17 @@ void ProgressDialog::setProgress(float current)
 
 void ProgressDialog::setValue(float current)
 {
-	int duration = _animation->currentTime();
-	if (duration <= 0)
+	_duration += _animation->currentTime();
+	float currentAnimated = _animation->currentValue().toFloat();
+	if (_duration <= 0)
 		return;
-	float currentSpeed = current * 1000 / duration;
+	float currentSpeed = current * 1000 / _duration;
 	int estimate = 1000 / currentSpeed;
 	//qDebug() << current << currentSpeed << estimate;
-	_animation->setDuration(estimate);
+	_animation->stop();
+	_animation->setStartValue(currentAnimated);
+	_animation->setDuration(estimate - _duration);
+	_animation->start();
 }
 
 void ProgressDialog::setFilename(const QString &filename)

@@ -35,6 +35,7 @@ private:
 	Ui::ProgressDialog *ui;
 	QPropertyAnimation *_animation;
 	float				_progress;
+	int					_duration;
 };
 
 #endif // PROGRESSDIALOG_H
