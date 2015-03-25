@@ -205,6 +205,7 @@ void MainWindow::uploadDirectories()
 		files.push_back(dir.canonicalPath() + "/" + file);
 	}
 	uploadFiles(files);
+	back();
 }
 
 void MainWindow::uploadAlbum()
@@ -222,6 +223,7 @@ void MainWindow::uploadAlbum()
 		settings.setValue("the-latest-directory", dirPath);
 		uploadAlbum(dirPath);
 	}
+	back();
 }
 
 namespace
