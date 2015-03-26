@@ -151,6 +151,7 @@ void MainWindow::uploadFiles(const QStringList &files)
 
 	connect(_uploader, SIGNAL(uploadProgress(float)), &progressDialog, SLOT(setValue(float)));
 	connect(_uploader, SIGNAL(uploadStarted(QString)), &progressDialog, SLOT(setFilename(QString)));
+	connect(_uploader, SIGNAL(finished()), &progressDialog, SLOT(accept()));
 	_uploader->upload(files);
 
 	progressDialog.exec();

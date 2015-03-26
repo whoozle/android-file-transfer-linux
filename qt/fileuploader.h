@@ -23,6 +23,7 @@ public slots:
 signals:
 	void started(QString);
 	void progress(qlonglong bytes);
+	void finished();
 };
 
 class FileUploader : public QObject
@@ -37,6 +38,7 @@ private:
 private slots:
 	void onProgress(qlonglong size);
 	void onStarted(const QString &file);
+	void onFinished();
 
 public:
 	explicit FileUploader(MtpObjectsModel * model, QObject *parent = 0);
