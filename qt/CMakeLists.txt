@@ -30,5 +30,5 @@ include(${QT_USE_FILE})
 add_definitions(${QT_DEFINITIONS})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-add_executable(qt-mtp ${SOURCES} ${HEADERS_MOC} ${FORMS_HEADERS})
-target_link_libraries(qt-mtp ${QT_LIBRARIES} ${MTP_LIBRARIES})
+add_executable(android-file-transfer ${SOURCES} ${HEADERS_MOC} ${FORMS_HEADERS})
+target_link_libraries(android-file-transfer ${QT_LIBRARIES} ${MTP_LIBRARIES})
