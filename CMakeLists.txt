@@ -26,7 +26,7 @@ set(SOURCES
 add_library(mtp-ng STATIC ${SOURCES})
 
 add_executable(mtp-test mtp/main.cpp)
-target_link_libraries(mtp-test mtp-ng -lusb-1.0 ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(mtp-test mtp-ng ${LIBUSB_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
-set(MTP_LIBRARIES mtp-ng -lusb-1.0)
+set(MTP_LIBRARIES mtp-ng ${LIBUSB_LIBRARIES})
 add_subdirectory(qt)
