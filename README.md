@@ -7,7 +7,7 @@ If you're happy with gmtp/gvfs/mtpfs or any other mtp software, you might not ne
 ## Building instructions
 ### Prerequisites
 You will need libusb-1.0 and qt libraries for building this software.
-For debian based distros use the following command: `sudo apt-get install libusb-1.0-0-dev libqt4-dev ninja`
+For debian based distros use the following command: `sudo apt-get install libusb-1.0-0-dev libqt4-dev ninja-build`
 
 ### Building with ninja
 ```
