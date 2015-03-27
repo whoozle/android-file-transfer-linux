@@ -38,7 +38,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
 	_ui->setupUi(this);
 	connect(_ui->listView, SIGNAL(doubleClicked(QModelIndex)), SLOT(onActivated(QModelIndex)));
-	connect(_ui->listView, SIGNAL(customContextMenuRequested(QPoint)), SLOT(customContextMenuRequested(QPoint)));
+	connect(_ui->listView, SIGNAL(showContextMenu(QPoint)), SLOT(showContextMenu(QPoint)));
 	connect(_ui->actionBack, SIGNAL(triggered()), SLOT(back()));
 	connect(_ui->actionGo_Down, SIGNAL(triggered()), SLOT(down()));
 	connect(_ui->actionCreateDirectory, SIGNAL(triggered()), SLOT(createDirectory()));
@@ -73,7 +73,7 @@ void MainWindow::onActivated ( const QModelIndex & index )
 		_history.push_back(_objectModel->parentObjectId());
 }
 
-void MainWindow::customContextMenuRequested ( const QPoint & pos )
+void MainWindow::showContextMenu ( const QPoint & pos )
 {
 	QItemSelectionModel *selection =_ui->listView->selectionModel();
 	QModelIndexList rows = selection->selectedRows();

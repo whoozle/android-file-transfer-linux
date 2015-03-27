@@ -45,7 +45,7 @@ private slots:
 	void back();
 	void down();
 	void onActivated ( const QModelIndex & index );
-	void customContextMenuRequested ( const QPoint & pos );
+	void showContextMenu ( const QPoint & pos );
 	void createDirectory();
 	void uploadFiles();
 	void uploadDirectories();
