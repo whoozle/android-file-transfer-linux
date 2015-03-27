@@ -32,3 +32,4 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 add_executable(android-file-transfer ${SOURCES} ${HEADERS_MOC} ${FORMS_HEADERS})
 target_link_libraries(android-file-transfer ${QT_LIBRARIES} ${MTP_LIBRARIES})
+install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/android-file-transfer DESTINATION bin)
