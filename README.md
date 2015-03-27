@@ -29,6 +29,11 @@ make
 ./qt/android-file-transfer
 ```
 
+###Installation
+
+`sudo ninja install` or `sudo make install` will install program into cmake prefix/bin directory (usually /usr/local/bin)
+
+
 ## How to use
 
 Start application, choose destination folder and click any button on toolbar. There's several options there: «Upload Album», «Upload Directory» and «Upload Files». The latter two are self-explanatory. Uploading album tries searching source directory for album cover and send best available cover as "albumart.xxx", or android media player will not show it as album art.
