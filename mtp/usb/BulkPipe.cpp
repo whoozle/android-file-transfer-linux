@@ -63,17 +63,17 @@ namespace mtp { namespace usb
 		int epn = interface->GetEndpointsCount();
 
 		usb::EndpointPtr out, in, interrupt;
-		//printf("endpoints: %d\n", epn);
+		//fprintf(stderr, "endpoints: %d\n", epn);
 		for(int i = 0; i < epn; ++i)
 		{
 			usb::EndpointPtr ep = interface->GetEndpoint(i);
-			//printf("endpoint: %d: %02x\n", i, ep->GetAddress());
+			//fprintf(stderr, "endpoint: %d: %02x\n", i, ep->GetAddress());
 			//check for bulk here
 			if (ep->GetDirection() == usb::EndpointDirection::Out)
 			{
 				if (ep->GetType() == usb::EndpointType::Bulk)
 				{
-					//printf("OUT\n");
+					//fprintf(stderr, "OUT\n");
 					out = ep;
 				}
 			}
@@ -81,12 +81,12 @@ namespace mtp { namespace usb
 			{
 				if (ep->GetType() == usb::EndpointType::Bulk)
 				{
-					//printf("IN\n");
+					//fprintf(stderr, "IN\n");
 					in = ep;
 				}
 				else
 				{
-					//printf("INTERRUPT\n");
+					//fprintf(stderr, "INTERRUPT\n");
 					interrupt = ep;
 				}
 			}

@@ -73,7 +73,7 @@ namespace mtp
 			{
 				InputStream stream(data);
 				stream >> size;
-				//printf("DATA SIZE = %u\n", size);
+				//fprintf(stderr, "DATA SIZE = %u\n", size);
 				if (size < 4)
 					throw std::runtime_error("invalid size");
 				packet_offset = 4;
@@ -113,7 +113,7 @@ namespace mtp
 		stream >> transactionId;
 		if (containerType != ContainerType::Event)
 			throw std::runtime_error("not an event");
-		printf("event %04x\n", eventCode);
+		fprintf(stderr, "event %04x\n", eventCode);
 	}
 
 
@@ -122,7 +122,7 @@ namespace mtp
 		try
 		{ PollEvent(); }
 		catch(const std::exception &ex)
-		{ printf("exception in interrupt: %s\n", ex.what()); }
+		{ fprintf(stderr, "exception in interrupt: %s\n", ex.what()); }
 
 		data.clear();
 		response.clear();
@@ -138,7 +138,7 @@ namespace mtp
 			if (header.Transaction == transaction)
 				break;
 
-			printf("drop message %04x %04x, transaction %08x\n", header.ContainerType, header.ResponseType, header.Transaction);
+			fprintf(stderr, "drop message %04x %04x, transaction %08x\n", header.ContainerType, header.ResponseType, header.Transaction);
 		}
 
 		if (header.ContainerType == ContainerType::Data)
@@ -165,17 +165,17 @@ namespace mtp
 			if (!device)
 				continue;
 			int confs = desc->GetConfigurationsCount();
-			//printf("configurations: %d\n", confs);
+			//fprintf(stderr, "configurations: %d\n", confs);
 
 			for(int i = 0; i < confs; ++i)
 			{
 				usb::ConfigurationPtr conf = desc->GetConfiguration(i);
 				int interfaces = conf->GetInterfaceCount();
-				//printf("interfaces: %d\n", interfaces);
+				//fprintf(stderr, "interfaces: %d\n", interfaces);
 				for(int j = 0; j < interfaces; ++j)
 				{
 					usb::InterfacePtr iface = conf->GetInterface(conf, j, 0);
-					//printf("%d:%d index %u, eps %u\n", i, j, iface->GetIndex(), iface->GetEndpointsCount());
+					//fprintf(stderr, "%d:%d index %u, eps %u\n", i, j, iface->GetIndex(), iface->GetEndpointsCount());
 					int name_idx = iface->GetNameIndex();
 					if (!name_idx)
 						continue;
