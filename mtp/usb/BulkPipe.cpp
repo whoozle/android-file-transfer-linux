@@ -24,9 +24,15 @@ namespace mtp { namespace usb
 	BulkPipe::BulkPipe(DevicePtr device, InterfacePtr interface, EndpointPtr in, EndpointPtr out, EndpointPtr interrupt):
 		_device(device), _interface(interface), _in(in), _out(out), _interrupt(interrupt)
 	{
+		USB_CALL(libusb_claim_interface(_device->GetHandle(), interface->GetIndex()));
 		//libusb_clear_halt(device->GetHandle(), in->GetAddress());
 		//libusb_clear_halt(device->GetHandle(), out->GetAddress());
 		//libusb_clear_halt(device->GetHandle(), interrupt->GetAddress());
+	}
+
+	BulkPipe::~BulkPipe()
+	{
+		libusb_release_interface(_device->GetHandle(), _interface->GetIndex());
 	}
 
 	ByteArray BulkPipe::ReadInterrupt()
