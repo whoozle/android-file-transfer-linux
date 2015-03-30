@@ -67,7 +67,10 @@ public:
 	void download(const QString &path, const QList<quint32> & objectIds);
 
 signals:
+	//outgoing signal (to worker)
 	void uploadFile(QString file);
+
+	//incoming signals (from worker)
 	void uploadStarted(QString file);
 	void uploadProgress(float);
 	void finished();
