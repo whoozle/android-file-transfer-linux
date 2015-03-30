@@ -53,15 +53,24 @@ void FileUploaderWorker::uploadFile(const QString &file)
 	emit progress(fi.size());
 }
 
-void FileUploaderWorker::downloadFile(const QString &path, quint32 objectId)
+void FileUploaderWorker::downloadFile(const QString &file, quint32 objectId)
 {
-	if (objectId == 0 || path.isEmpty())
+	if (objectId == 0 || file.isEmpty())
 	{
 		emit finished();
 		return;
 	}
-	qDebug() << "downloading " << objectId << "to" << path;
-	//emit progress()
+	qDebug() << "downloading " << objectId << "to" << file;
+
+	QFileInfo fi(file);
+	emit started(fi.fileName());
+	try
+	{
+		_model->downloadFile(file, objectId);
+	} catch(const std::exception &ex)
+	{ qDebug() << "downloading file " << file << " failed: " << ex.what(); }
+
+	emit progress(fi.size());
 }
 
 FileUploader::FileUploader(MtpObjectsModel * model, QObject *parent) :

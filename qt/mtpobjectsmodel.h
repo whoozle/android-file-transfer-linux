@@ -56,6 +56,7 @@ public:
 
 	mtp::u32 createDirectory(const QString &name);
 	bool uploadFile(const QString &filePath, QString filename = QString());
+	bool downloadFile(const QString &filePath, mtp::u32 objectId);
 	void rename(int idx, const QString &fileName);
 	mtp::msg::ObjectInfoPtr getInfo(mtp::u32 objectId);
 

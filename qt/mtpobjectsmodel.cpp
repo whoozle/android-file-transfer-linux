@@ -206,6 +206,19 @@ bool MtpObjectsModel::uploadFile(const QString &filePath, QString filename)
 	return true;
 }
 
+bool MtpObjectsModel::downloadFile(const QString &filePath, mtp::u32 objectId)
+{
+	QFile file(filePath);
+	file.open(QFile::WriteOnly);
+	if (!file.isOpen())
+		return false;
+
+	mtp::ByteArray data = _session->GetObject(objectId);
+	file.write(reinterpret_cast<const char *>(data.data()), data.size());
+	file.close();
+	return true;
+}
+
 mtp::msg::ObjectInfoPtr MtpObjectsModel::getInfo(mtp::u32 objectId)
 {
 	return std::make_shared<mtp::msg::ObjectInfo>(_session->GetObjectInfo(objectId));
