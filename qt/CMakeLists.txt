@@ -1,5 +1,9 @@
 project(mtp-qt)
-find_package(Qt4)
+if (USE_QT5)
+    find_package(Qt5Widgets)
+else()
+    find_package(Qt4)
+endif()
 
 set(SOURCES main.cpp
     mainwindow.cpp
@@ -23,13 +27,20 @@ set(FORMS mainwindow.ui
     createdirectorydialog.ui
     renamedialog.ui)
 
-qt4_wrap_cpp(HEADERS_MOC ${HEADERS})
-qt4_wrap_ui(FORMS_HEADERS ${FORMS})
-
-include(${QT_USE_FILE})
+if (USE_QT5)
+    qt5_wrap_cpp(HEADERS_MOC ${HEADERS})
+    qt5_wrap_ui(FORMS_HEADERS ${FORMS})
+    include_directories(${Qt5Widgets_INCLUDE_DIRS})
+    set(EXTRA_QT_LINK ${Qt5Widgets_LIBRARIES})
+else()
+    qt4_wrap_cpp(HEADERS_MOC ${HEADERS})
+    qt4_wrap_ui(FORMS_HEADERS ${FORMS})
+    include(${QT_USE_FILE})
+    set(EXTRA_QT_LINK ${QT_LIBRARIES})
+endif()
 add_definitions(${QT_DEFINITIONS})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 add_executable(android-file-transfer ${SOURCES} ${HEADERS_MOC} ${FORMS_HEADERS})
-target_link_libraries(android-file-transfer ${QT_LIBRARIES} ${MTP_LIBRARIES})
+target_link_libraries(android-file-transfer ${EXTRA_QT_LINK} ${MTP_LIBRARIES})
 install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/android-file-transfer DESTINATION bin)
