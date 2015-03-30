@@ -80,6 +80,7 @@ void MainWindow::showContextMenu ( const QPoint & pos )
 
 	QMenu menu(this);
 	//http://standards.freedesktop.org/icon-naming-spec/icon-naming-spec-latest.html
+	QAction * download_objects = menu.addAction("Download");
 	QAction * rename_object = menu.addAction("Rename");
 	rename_object->setEnabled(rows.size() == 1);
 	QAction * delete_objects = menu.addAction(QIcon::fromTheme("edit-delete"), "Delete");
@@ -99,9 +100,23 @@ void MainWindow::showContextMenu ( const QPoint & pos )
 			if (r)
 				_objectModel->rename(row.row(), d.name());
 		}
+		else if (action == download_objects)
+		{
+			downloadObjects();
+		}
 		else
 			qDebug() << "unknown action!";
 	}
+}
+
+void MainWindow::downloadObjects()
+{
+	QString path = QFileDialog::getExistingDirectory(this, tr("Enter destination directory"));
+	if (path.isEmpty())
+		return;
+
+	qDebug() << "downloading to " << path;
+	ProgressDialog d(this);
 }
 
 void MainWindow::back()
