@@ -75,6 +75,12 @@ namespace mtp { namespace usb
 	public:
 		Interface(ConfigurationPtr config, const libusb_interface_descriptor &interface): _config(config), _interface(interface) { }
 
+		u8 GetClass() const
+		{ return _interface.bInterfaceClass; }
+
+		u8 GetSubclass() const
+		{ return _interface.bInterfaceSubClass; }
+
 		int GetIndex() const
 		{ return _interface.bInterfaceNumber; }
 
