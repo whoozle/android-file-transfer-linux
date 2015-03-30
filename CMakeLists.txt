@@ -8,6 +8,7 @@ find_package( Threads )
 pkg_check_modules(LIBUSB libusb-1.0 REQUIRED)
 
 option(USE_QT5 "Enable Qt5 interface" OFF)
+option(BUILD_QT_UI "Build reference Qt application" ON)
 
 add_definitions(-Wall -pthread -std=c++11)
 include_directories(. ${CMAKE_SOURCE_DIR} ${LIBUSB_INCLUDE_DIRS})
@@ -31,4 +32,6 @@ add_executable(mtp-test mtp/main.cpp)
 target_link_libraries(mtp-test mtp-ng ${LIBUSB_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
 set(MTP_LIBRARIES mtp-ng ${LIBUSB_LIBRARIES})
-add_subdirectory(qt)
+if (BUILD_QT_UI)
+	add_subdirectory(qt)
+endif()
