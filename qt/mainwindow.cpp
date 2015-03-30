@@ -88,35 +88,34 @@ void MainWindow::showContextMenu ( const QPoint & pos )
 	if (!action)
 		return;
 
-	for(int i = rows.size() - 1; i >= 0; --i)
+	if (action == download_objects)
 	{
-		QModelIndex row = rows[i];
-		if (action == delete_objects)
-			_objectModel->removeRow(row.row());
-		else if (action == rename_object)
+		QList<quint32> objects;
+		for(int i = 0; i < rows.size(); ++i)
 		{
-			RenameDialog d(_objectModel->data(row).toString(), this);
-			int r = d.exec();
-			if (r)
-				_objectModel->rename(row.row(), d.name());
+			QModelIndex row = rows[i];
+			objects.push_back(_objectModel->objectIdAt(row.row()));
 		}
-		else if (action == download_objects)
-		{
-			downloadObjects();
-		}
-		else
-			qDebug() << "unknown action!";
+		downloadFiles(objects);
 	}
-}
-
-void MainWindow::downloadObjects()
-{
-	QString path = QFileDialog::getExistingDirectory(this, tr("Enter destination directory"));
-	if (path.isEmpty())
-		return;
-
-	qDebug() << "downloading to " << path;
-	ProgressDialog d(this);
+	else
+	{
+		for(int i = rows.size() - 1; i >= 0; --i)
+		{
+			QModelIndex row = rows[i];
+			if (action == delete_objects)
+				_objectModel->removeRow(row.row());
+			else if (action == rename_object)
+			{
+				RenameDialog d(_objectModel->data(row).toString(), this);
+				int r = d.exec();
+				if (r)
+					_objectModel->rename(row.row(), d.name());
+			}
+			else
+				qDebug() << "unknown action!";
+		}
+	}
 }
 
 void MainWindow::back()
@@ -189,6 +188,29 @@ void MainWindow::uploadFiles(const QStringList &files)
 
 	progressDialog.exec();
 }
+
+
+void MainWindow::downloadFiles(const QList<quint32> &objects)
+{
+	if (objects.isEmpty())
+		return;
+
+	QString path = QFileDialog::getExistingDirectory(this, tr("Enter destination directory"));
+	if (path.isEmpty())
+		return;
+
+	qDebug() << "downloading to " << path;
+	ProgressDialog progressDialog(this);
+	progressDialog.show();
+
+	connect(_uploader, SIGNAL(uploadProgress(float)), &progressDialog, SLOT(setValue(float)));
+	connect(_uploader, SIGNAL(uploadStarted(QString)), &progressDialog, SLOT(setFilename(QString)));
+	connect(_uploader, SIGNAL(finished()), &progressDialog, SLOT(accept()));
+	_uploader->download(path, objects);
+
+	//progressDialog.exec();
+}
+
 
 void MainWindow::uploadFiles()
 {

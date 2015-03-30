@@ -53,6 +53,17 @@ void FileUploaderWorker::uploadFile(const QString &file)
 	emit progress(fi.size());
 }
 
+void FileUploaderWorker::downloadFile(const QString &path, unsigned objectId)
+{
+	if (objectId == 0 || path.isEmpty())
+	{
+		emit finished();
+		return;
+	}
+	qDebug() << "downloading " << objectId << "to" << path;
+	//emit progress()
+}
+
 FileUploader::FileUploader(MtpObjectsModel * model, QObject *parent) :
 	QObject(parent),
 	_model(model)
@@ -106,4 +117,9 @@ void FileUploader::upload(const QStringList &files)
 		emit uploadFile(file);
 	}
 	emit uploadFile(QString());
+}
+
+void FileUploader::download(const QString &path, const QList<quint32> &objectIds)
+{
+
 }

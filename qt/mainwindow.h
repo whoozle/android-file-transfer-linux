@@ -54,9 +54,8 @@ private slots:
 	void uploadDirectories();
 	void uploadAlbum();
 	void uploadAlbum(QString path);
-	void downloadObjects();
-
 private:
+	void downloadFiles(const QList<quint32> &objects);
 	void uploadFiles(const QStringList &files);
 
 	Ui::MainWindow *	_ui;
