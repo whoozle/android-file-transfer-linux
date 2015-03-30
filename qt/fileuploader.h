@@ -37,7 +37,7 @@ public:
 
 public slots:
 	void uploadFile(const QString &file);
-	void downloadFile(const QString &path, unsigned objectId);
+	void downloadFile(const QString &path, quint32 objectId);
 
 signals:
 	void started(QString);
@@ -67,8 +67,9 @@ public:
 	void download(const QString &path, const QList<quint32> & objectIds);
 
 signals:
-	//outgoing signal (to worker)
+	//outgoing signals (to worker)
 	void uploadFile(QString file);
+	void downloadFile(QString file, quint32 objectId);
 
 	//incoming signals (from worker)
 	void uploadStarted(QString file);

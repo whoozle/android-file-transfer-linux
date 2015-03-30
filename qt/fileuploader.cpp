@@ -53,7 +53,7 @@ void FileUploaderWorker::uploadFile(const QString &file)
 	emit progress(fi.size());
 }
 
-void FileUploaderWorker::downloadFile(const QString &path, unsigned objectId)
+void FileUploaderWorker::downloadFile(const QString &path, quint32 objectId)
 {
 	if (objectId == 0 || path.isEmpty())
 	{
@@ -73,6 +73,7 @@ FileUploader::FileUploader(MtpObjectsModel * model, QObject *parent) :
 
 	connect(&_workerThread, SIGNAL(finished()), SLOT(deleteLater()));
 	connect(this, SIGNAL(uploadFile(QString)), worker, SLOT(uploadFile(QString)));
+	connect(this, SIGNAL(downloadFile(QString,quint32)), worker, SLOT(downloadFile(QString,quint32)));
 	connect(worker, SIGNAL(progress(qlonglong)), SLOT(onProgress(qlonglong)));
 	connect(worker, SIGNAL(started(QString)), SLOT(onStarted(QString)));
 	connect(worker, SIGNAL(finished()), SLOT(onFinished()));
@@ -121,5 +122,18 @@ void FileUploader::upload(const QStringList &files)
 
 void FileUploader::download(const QString &path, const QList<quint32> &objectIds)
 {
+	_total = _current = 1;
+	QVector<QPair<QString, mtp::u32> > files;
+	for(quint32 id : objectIds)
+	{
+		mtp::msg::ObjectInfoPtr oi = _model->getInfo(id);
+		_total += oi->ObjectCompressedSize;
+		files.push_back(QPair<QString, mtp::u32>(QString::fromUtf8(oi->Filename.c_str()), id));
+	}
 
+	for(const auto & file : files)
+	{
+		emit downloadFile(path + "/" + file.first, file.second);
+	}
+	emit downloadFile(QString(), 0);
 }

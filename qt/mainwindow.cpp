@@ -208,7 +208,7 @@ void MainWindow::downloadFiles(const QList<quint32> &objects)
 	connect(_uploader, SIGNAL(finished()), &progressDialog, SLOT(accept()));
 	_uploader->download(path, objects);
 
-	//progressDialog.exec();
+	progressDialog.exec();
 }
 
 

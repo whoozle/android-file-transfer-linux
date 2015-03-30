@@ -30,12 +30,12 @@ class MtpObjectsModel : public QAbstractListModel
 
 	class Row
 	{
-		std::shared_ptr<mtp::msg::ObjectInfo>	_info;
+		mtp::msg::ObjectInfoPtr					_info;
 	public:
 		mtp::u32								ObjectId;
 		Row(mtp::u32 id = 0): ObjectId(id) { }
 		void ResetInfo() { _info.reset(); }
-		std::shared_ptr<mtp::msg::ObjectInfo> GetInfo(mtp::SessionPtr session);
+		mtp::msg::ObjectInfoPtr GetInfo(mtp::SessionPtr session);
 		bool IsAssociation(mtp::SessionPtr);
 	};
 
@@ -57,6 +57,7 @@ public:
 	mtp::u32 createDirectory(const QString &name);
 	bool uploadFile(const QString &filePath, QString filename = QString());
 	void rename(int idx, const QString &fileName);
+	mtp::msg::ObjectInfoPtr getInfo(mtp::u32 objectId);
 
 	virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
 	virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;

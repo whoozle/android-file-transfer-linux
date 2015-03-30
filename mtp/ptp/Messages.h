@@ -181,6 +181,7 @@ namespace mtp { namespace msg
 			stream << Keywords;
 		}
 	};
+	DECLARE_PTR(ObjectInfo);
 
 	struct ObjectPropsSupported
 	{

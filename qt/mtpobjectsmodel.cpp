@@ -75,7 +75,7 @@ void MtpObjectsModel::setSession(mtp::SessionPtr session)
 int MtpObjectsModel::rowCount(const QModelIndex &) const
 { return _rows.size(); }
 
-std::shared_ptr<mtp::msg::ObjectInfo> MtpObjectsModel::Row::GetInfo(mtp::SessionPtr session)
+mtp::msg::ObjectInfoPtr MtpObjectsModel::Row::GetInfo(mtp::SessionPtr session)
 {
 	if (!_info)
 	{
@@ -204,4 +204,9 @@ bool MtpObjectsModel::uploadFile(const QString &filePath, QString filename)
 	_rows.push_back(Row(noi.ObjectId));
 	endInsertRows();
 	return true;
+}
+
+mtp::msg::ObjectInfoPtr MtpObjectsModel::getInfo(mtp::u32 objectId)
+{
+	return std::make_shared<mtp::msg::ObjectInfo>(_session->GetObjectInfo(objectId));
 }
