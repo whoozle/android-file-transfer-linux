@@ -7,6 +7,8 @@ find_package( Threads )
 
 pkg_check_modules(LIBUSB libusb-1.0 REQUIRED)
 
+option(USE_QT5 "Enable Qt5 interface" OFF)
+
 add_definitions(-Wall -pthread -std=c++11)
 include_directories(. ${CMAKE_SOURCE_DIR} ${LIBUSB_INCLUDE_DIRS})
 
