@@ -38,6 +38,9 @@ public:
 	explicit MainWindow(QWidget *parent = 0);
 	~MainWindow();
 
+	bool started() const
+	{ return _device != 0; }
+
 private:
 	void showEvent(QShowEvent *e);
 

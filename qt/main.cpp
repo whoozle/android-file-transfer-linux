@@ -51,5 +51,8 @@ int main(int argc, char *argv[])
 	MainWindow w;
 	w.show();
 
+	if (!w.started())
+		return 1;
+
 	return a.exec();
 }

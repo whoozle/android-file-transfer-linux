@@ -59,8 +59,8 @@ void MainWindow::showEvent(QShowEvent *)
 		_device = mtp::Device::Find();
 		if (!_device)
 		{
-			QMessageBox::critical(this, tr("MTP was not found"), tr("No MTP device found"));
-			qFatal("device was not found");
+			QMessageBox::critical(this, tr("No MTP device found"), tr("No MTP device found"));
+			return;
 		}
 		_objectModel->setSession(_device->OpenSession(1));
 		_ui->listView->setModel(_objectModel);
