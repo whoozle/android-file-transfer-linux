@@ -9,6 +9,7 @@ pkg_check_modules(LIBUSB libusb-1.0 REQUIRED)
 
 option(USE_QT5 "Enable Qt5 interface" OFF)
 option(BUILD_QT_UI "Build reference Qt application" ON)
+option(BUILD_SHARED_LIB "Build shared library" OFF)
 
 add_definitions(-Wall -pthread -std=c++11)
 include_directories(. ${CMAKE_SOURCE_DIR} ${LIBUSB_INCLUDE_DIRS})
@@ -26,10 +27,11 @@ set(SOURCES
 	mtp/ptp/Session.cpp
 )
 
-add_library(mtp-ng STATIC ${SOURCES})
+add_library(mtp-ng-static STATIC ${SOURCES})
+add_library(mtp-ng SHARED ${SOURCES})
 
 add_executable(mtp-test mtp/main.cpp)
-target_link_libraries(mtp-test mtp-ng ${LIBUSB_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(mtp-test mtp-ng-static ${LIBUSB_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
 set(MTP_LIBRARIES mtp-ng ${LIBUSB_LIBRARIES})
 if (BUILD_QT_UI)
