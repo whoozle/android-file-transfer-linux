@@ -39,6 +39,7 @@ namespace mtp { namespace usb
 
 		libusb_device_handle * GetHandle() { return _handle; }
 
+		int GetConfiguration() const;
 		void SetConfiguration(int idx);
 
 		std::string GetString(int idx) const;

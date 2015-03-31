@@ -31,6 +31,13 @@ namespace mtp { namespace usb
 		libusb_close(_handle);
 	}
 
+	int Device::GetConfiguration() const
+	{
+		int config;
+		USB_CALL(libusb_get_configuration(_handle, &config));
+		return config;
+	}
+
 	void Device::SetConfiguration(int idx)
 	{
 		USB_CALL(libusb_set_configuration(_handle, idx));
