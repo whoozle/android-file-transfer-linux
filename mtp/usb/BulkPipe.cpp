@@ -25,6 +25,9 @@ namespace mtp { namespace usb
 	BulkPipe::BulkPipe(DevicePtr device, ConfigurationPtr conf, InterfacePtr interface, EndpointPtr in, EndpointPtr out, EndpointPtr interrupt):
 		_device(device), _conf(conf), _interface(interface), _in(in), _out(out), _interrupt(interrupt)
 	{
+		int currentConfigurationIndex = _device->GetConfiguration();
+		if (conf->GetIndex() != currentConfigurationIndex)
+			_device->SetConfiguration(conf->GetIndex());
 		USB_CALL(libusb_claim_interface(_device->GetHandle(), interface->GetIndex()));
 		//libusb_clear_halt(device->GetHandle(), in->GetAddress());
 		//libusb_clear_halt(device->GetHandle(), out->GetAddress());
