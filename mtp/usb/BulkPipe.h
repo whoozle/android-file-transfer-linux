@@ -30,19 +30,20 @@ namespace mtp { namespace usb
 
 	class BulkPipe
 	{
-		DevicePtr		_device;
-		InterfacePtr	_interface;
-		EndpointPtr		_in, _out, _interrupt;
+		DevicePtr			_device;
+		ConfigurationPtr	_conf;
+		InterfacePtr		_interface;
+		EndpointPtr			_in, _out, _interrupt;
 
 	public:
-		BulkPipe(DevicePtr device, InterfacePtr interface, EndpointPtr in, EndpointPtr out, EndpointPtr interrupt);
+		BulkPipe(DevicePtr device, ConfigurationPtr conf, InterfacePtr interface, EndpointPtr in, EndpointPtr out, EndpointPtr interrupt);
 		~BulkPipe();
 
 		ByteArray ReadInterrupt();
 		ByteArray Read(int timeout = 3000);
 		void Write(const ByteArray &data, int timeout = 3000);
 
-		static BulkPipePtr Create(usb::DevicePtr device, usb::InterfacePtr owner);
+		static BulkPipePtr Create(usb::DevicePtr device, ConfigurationPtr conf, usb::InterfacePtr owner);
 	};
 
 }}

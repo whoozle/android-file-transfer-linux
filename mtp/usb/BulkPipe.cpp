@@ -17,12 +17,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 #include <mtp/usb/BulkPipe.h>
+#include <mtp/usb/DeviceDescriptor.h>
 #include <mtp/usb/call.h>
 
 namespace mtp { namespace usb
 {
-	BulkPipe::BulkPipe(DevicePtr device, InterfacePtr interface, EndpointPtr in, EndpointPtr out, EndpointPtr interrupt):
-		_device(device), _interface(interface), _in(in), _out(out), _interrupt(interrupt)
+	BulkPipe::BulkPipe(DevicePtr device, ConfigurationPtr conf, InterfacePtr interface, EndpointPtr in, EndpointPtr out, EndpointPtr interrupt):
+		_device(device), _conf(conf), _interface(interface), _in(in), _out(out), _interrupt(interrupt)
 	{
 		USB_CALL(libusb_claim_interface(_device->GetHandle(), interface->GetIndex()));
 		//libusb_clear_halt(device->GetHandle(), in->GetAddress());
@@ -64,7 +65,7 @@ namespace mtp { namespace usb
 			throw std::runtime_error("short write");
 	}
 
-	BulkPipePtr BulkPipe::Create(usb::DevicePtr device, usb::InterfacePtr interface)
+	BulkPipePtr BulkPipe::Create(usb::DevicePtr device, ConfigurationPtr conf, usb::InterfacePtr interface)
 	{
 		int epn = interface->GetEndpointsCount();
 
@@ -100,7 +101,7 @@ namespace mtp { namespace usb
 		if (!in || !out || !interrupt)
 			throw std::runtime_error("invalid endpoint");
 
-		return std::make_shared<BulkPipe>(device, interface, in, out, interrupt);
+		return std::make_shared<BulkPipe>(device, conf, interface, in, out, interrupt);
 	}
 
 }}
