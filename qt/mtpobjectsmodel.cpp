@@ -23,7 +23,7 @@
 #include <QFile>
 #include <QFileInfo>
 
-MtpObjectsModel::MtpObjectsModel(QObject *parent): QAbstractListModel(parent)
+MtpObjectsModel::MtpObjectsModel(QObject *parent): QAbstractListModel(parent), _parentObjectId(mtp::Session::Root)
 { }
 
 MtpObjectsModel::~MtpObjectsModel()
