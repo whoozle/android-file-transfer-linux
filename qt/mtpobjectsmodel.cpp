@@ -166,11 +166,6 @@ bool MtpObjectsModel::uploadFile(const QString &filePath, QString filename)
 {
 	QFileInfo fileInfo(filePath);
 	mtp::ObjectFormat objectFormat = mtp::ObjectFormatFromFilename(filePath.toStdString());
-	if (objectFormat == mtp::ObjectFormat::Undefined)
-	{
-		qDebug() << "unknown format for " << fileInfo.fileName();
-		return false;
-	}
 
 	if (filename.isEmpty())
 		filename = fileInfo.fileName();
