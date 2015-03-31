@@ -54,7 +54,7 @@ public:
 	mtp::u32 parentObjectId() const
 	{ return _parentObjectId; }
 
-	mtp::u32 createDirectory(const QString &name);
+	mtp::u32 createDirectory(const QString &name, bool album); //fixme: put mtp::AssociationType here
 	bool uploadFile(const QString &filePath, QString filename = QString());
 	bool downloadFile(const QString &filePath, mtp::u32 objectId);
 	void rename(int idx, const QString &fileName);

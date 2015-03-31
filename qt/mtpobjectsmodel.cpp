@@ -146,12 +146,13 @@ QVariant MtpObjectsModel::data(const QModelIndex &index, int role) const
 	}
 }
 
-mtp::u32 MtpObjectsModel::createDirectory(const QString &name)
+mtp::u32 MtpObjectsModel::createDirectory(const QString &name, bool album)
 {
 	mtp::msg::ObjectInfo oi;
 	QByteArray filename = name.toUtf8();
 	oi.Filename = filename.data();
 	oi.ObjectFormat = mtp::ObjectFormat::Association;
+	oi.AssociationType = album? 2: 1; //fixme: move into enum
 	mtp::Session::NewObjectInfo noi = _session->SendObjectInfo(oi, 0, _parentObjectId);
 	beginInsertRows(QModelIndex(), _rows.size(), _rows.size());
 	_rows.push_back(Row(noi.ObjectId));
