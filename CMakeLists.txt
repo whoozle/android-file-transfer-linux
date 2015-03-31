@@ -28,12 +28,16 @@ set(SOURCES
 )
 
 add_library(mtp-ng-static STATIC ${SOURCES})
-add_library(mtp-ng SHARED ${SOURCES})
+if (BUILD_SHARED_LIB)
+	add_library(mtp-ng SHARED ${SOURCES})
+	target_link_libraries(mtp-ng ${LIBUSB_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+endif (BUILD_SHARED_LIB)
 
 add_executable(mtp-test mtp/main.cpp)
 target_link_libraries(mtp-test mtp-ng-static ${LIBUSB_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
-set(MTP_LIBRARIES mtp-ng ${LIBUSB_LIBRARIES})
+set(MTP_LIBRARIES mtp-ng-static ${LIBUSB_LIBRARIES})
+
 if (BUILD_QT_UI)
 	add_subdirectory(qt)
 endif()
