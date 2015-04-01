@@ -39,7 +39,7 @@ namespace mtp
 		{ return _pipe; }
 
 		void Write(const ByteArray &data, int timeout = 3000);
-		void Read(u32 transaction, ByteArray &data, ByteArray &response, int timeout = 3000);
+		void Read(u32 transaction, ByteArray &data, ByteArray &response, bool ignoreTransaction = false, int timeout = 3000);
 
 		void PollEvent();
 

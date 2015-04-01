@@ -37,7 +37,7 @@ namespace mtp
 		Container container(req);
 		_packeter.Write(container.Data);
 		ByteArray data, response;
-		_packeter.Read(0, data, response);
+		_packeter.Read(0, data, response, true);
 		//HexDump("payload", data);
 	}
 

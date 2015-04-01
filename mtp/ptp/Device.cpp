@@ -33,7 +33,7 @@ namespace mtp
 		Container container(req);
 		_packeter.Write(container.Data);
 		ByteArray data, response;
-		_packeter.Read(0, data, response);
+		_packeter.Read(0, data, response, true);
 		//HexDump("payload", data);
 
 		InputStream stream(data, 8); //operation code + session id
@@ -48,7 +48,7 @@ namespace mtp
 		Container container(req);
 		_packeter.Write(container.Data);
 		ByteArray data, response;
-		_packeter.Read(0, data, response);
+		_packeter.Read(0, data, response, true);
 		//HexDump("payload", data);
 
 		return std::make_shared<Session>(_packeter.GetPipe(), sessionId);
@@ -117,7 +117,7 @@ namespace mtp
 	}
 
 
-	void PipePacketer::Read(u32 transaction, ByteArray &data, ByteArray &response, int timeout)
+	void PipePacketer::Read(u32 transaction, ByteArray &data, ByteArray &response, bool ignoreTransaction, int timeout)
 	{
 		try
 		{ PollEvent(); }
@@ -135,7 +135,7 @@ namespace mtp
 			//HexDump("message", message);
 			InputStream stream(message);
 			header.Read(stream);
-			if (header.Transaction == transaction)
+			if (ignoreTransaction || header.Transaction == transaction)
 				break;
 
 			fprintf(stderr, "drop message %04x %04x, transaction %08x, expected: %08x\n", header.ContainerType, header.ResponseType, header.Transaction, transaction);
