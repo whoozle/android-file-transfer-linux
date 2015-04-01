@@ -16,28 +16,35 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-#ifndef PROTOCOL_H
-#define	PROTOCOL_H
+#ifndef PIPEPACKETER_H
+#define PIPEPACKETER_H
 
 #include <mtp/usb/BulkPipe.h>
-#include <mtp/ptp/PipePacketer.h>
-#include <mtp/ptp/Session.h>
 
 namespace mtp
 {
-	class Device
+	class Device;
+	DECLARE_PTR(Device);
+
+	class PipePacketer
 	{
-		PipePacketer	_packeter;
+		usb::BulkPipePtr	_pipe;
 
 	public:
-		Device(usb::BulkPipePtr pipe): _packeter(pipe) { }
+		PipePacketer(const usb::BulkPipePtr &pipe): _pipe(pipe) { }
 
-		msg::DeviceInfo GetDeviceInfo();
-		SessionPtr OpenSession(u32 sessionId);
+		usb::BulkPipePtr GetPipe() const
+		{ return _pipe; }
 
-		static DevicePtr Find(); //fixme: returns first device only
+		void Write(const ByteArray &data, int timeout = 3000);
+		void Read(u32 transaction, ByteArray &data, ByteArray &response, bool ignoreTransaction = false, int timeout = 3000);
+
+		void PollEvent();
+
+	private:
+		ByteArray ReadMessage(int timeout);
 	};
+
 }
 
-#endif	/* PROTOCOL_H */
-
+#endif

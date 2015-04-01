@@ -21,31 +21,11 @@
 
 #include <mtp/usb/BulkPipe.h>
 #include <mtp/ptp/Messages.h>
+#include <mtp/ptp/PipePacketer.h>
 #include <mtp/ptp/ObjectProperty.h>
 
 namespace mtp
 {
-	class Device;
-	DECLARE_PTR(Device);
-
-	class PipePacketer
-	{
-		usb::BulkPipePtr	_pipe;
-
-	public:
-		PipePacketer(const usb::BulkPipePtr &pipe): _pipe(pipe) { }
-
-		usb::BulkPipePtr GetPipe() const
-		{ return _pipe; }
-
-		void Write(const ByteArray &data, int timeout = 3000);
-		void Read(u32 transaction, ByteArray &data, ByteArray &response, bool ignoreTransaction = false, int timeout = 3000);
-
-		void PollEvent();
-
-	private:
-		ByteArray ReadMessage(int timeout);
-	};
 
 	class Session
 	{
