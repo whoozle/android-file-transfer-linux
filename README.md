@@ -1,5 +1,5 @@
 # Android File Transfer For Linux
-Android File Transfer for Linux - interactive MTP client implemented in C++ with no dependencies on libmtp/libptp. Simple reference Qt4/Qt5 application included.
+Android File Transfer for Linux - interactive MTP client implemented in C++ with no dependencies on libmtp/libptp. Simple reference Qt4/Qt5 application included. Now with Nokia Lumia support!
 
 ## Do I need it?
 If you're happy with gmtp/gvfs/mtpfs or any other mtp software, you might not need this software(but give it a try!). If you suffered from crashes, missing tags and album covers, usb transfer freezes and corrupted files, this software is right for you. It just works. Thank you for your interest! :)
