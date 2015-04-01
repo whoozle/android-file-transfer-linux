@@ -64,9 +64,14 @@ namespace mtp
 
 		void WriteString(const std::string &value)
 		{
-			size_t len = Utf8Length(value);
+			if (value.empty())
+			{
+				Write8(0);
+				return;
+			}
+			size_t len = 1 + Utf8Length(value);
 			if (len > 255)
-				throw std::runtime_error("string is too big (only 255 chars allowed)");
+				throw std::runtime_error("string is too big (only 255 chars allowed, including null terminator)");
 			Write8(len);
 			for(size_t i = 0, p = 0; i < len && p < value.size(); ++i)
 			{
@@ -96,6 +101,7 @@ namespace mtp
 				}
 				Write16(uni);
 			}
+			Write8(0);
 		}
 
 		template<typename ElementType>

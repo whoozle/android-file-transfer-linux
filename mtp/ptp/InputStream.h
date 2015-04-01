@@ -62,9 +62,12 @@ namespace mtp
 		{
 			u8 len = Read8();
 			std::string str;
+			str.reserve(2 * len);
 			while(len--)
 			{
 				u16 ch = Read16();
+				if (ch == 0)
+					continue;
 				if (ch <= 0x7f)
 					str += (char)ch;
 				else if (ch <= 0x7ff)
