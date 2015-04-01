@@ -1,4 +1,4 @@
-# android-file-transfer-linux
+# Android File Transfer For Linux
 Android File Transfer for Linux - interactive MTP client implemented in C++ using Qt toolkit
 
 ## Do I need it?
