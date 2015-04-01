@@ -7,7 +7,6 @@ find_package( Threads )
 
 pkg_check_modules(LIBUSB libusb-1.0 REQUIRED)
 
-option(USE_QT5 "Enable Qt5 interface" OFF)
 option(BUILD_QT_UI "Build reference Qt application" ON)
 option(BUILD_SHARED_LIB "Build shared library" OFF)
 
