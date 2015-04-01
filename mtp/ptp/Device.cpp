@@ -138,7 +138,7 @@ namespace mtp
 			if (header.Transaction == transaction)
 				break;
 
-			fprintf(stderr, "drop message %04x %04x, transaction %08x\n", header.ContainerType, header.ResponseType, header.Transaction);
+			fprintf(stderr, "drop message %04x %04x, transaction %08x, expected: %08x\n", header.ContainerType, header.ResponseType, header.Transaction, transaction);
 		}
 
 		if (header.ContainerType == ContainerType::Data)
