@@ -61,6 +61,17 @@ namespace mtp
 				R(SessionAlreadyOpen);
 				R(TransactionCancelled);
 				R(SpecificationOfDestinationUnsupported);
+				R(InvalidObjectPropCode);
+				R(InvalidObjectPropFormat);
+				R(InvalidObjectPropValue);
+				R(InvalidObjectReference);
+				R(GroupNotSupported);
+				R(InvalidDataset);
+				R(UnsupportedSpecByGroup);
+				R(UnsupportedSpecByDepth);
+				R(ObjectTooLarge);
+				R(ObjectPropNotSupported);
+
 				default:
 					return "Unknown";
 			}

@@ -67,6 +67,17 @@ namespace mtp
 		SessionAlreadyOpen			= 0x201e,
 		TransactionCancelled		= 0x201f,
 		SpecificationOfDestinationUnsupported = 0x2020,
+
+		InvalidObjectPropCode		= 0xa801,
+		InvalidObjectPropFormat		= 0xa802,
+		InvalidObjectPropValue		= 0xa803,
+		InvalidObjectReference		= 0xa804,
+		GroupNotSupported			= 0xa805,
+		InvalidDataset				= 0xa806,
+		UnsupportedSpecByGroup		= 0xa807,
+		UnsupportedSpecByDepth		= 0xa808,
+		ObjectTooLarge				= 0xa809,
+		ObjectPropNotSupported		= 0xa80a
 	};
 	DECLARE_ENUM(ResponseType, u16);
 
