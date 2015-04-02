@@ -36,6 +36,8 @@ if (USE_LIBUSB)
 		mtp/backend/libusb/usb/Exception.cpp
 	)
 	list(APPEND MTP_LIBRARIES ${LIBUSB_LIBRARIES})
+else()
+	include_directories(mtp/backend/linux)
 endif()
 
 

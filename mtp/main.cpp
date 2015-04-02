@@ -21,7 +21,6 @@
 
 #include <usb/BulkPipe.h>
 #include <usb/Context.h>
-#include <usb/call.h>
 #include <mtp/ptp/Container.h>
 #include <mtp/ptp/Device.h>
 #include <mtp/ptp/Messages.h>
