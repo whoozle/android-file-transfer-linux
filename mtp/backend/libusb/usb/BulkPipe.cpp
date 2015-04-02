@@ -16,9 +16,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-#include <mtp/usb/BulkPipe.h>
-#include <mtp/usb/DeviceDescriptor.h>
-#include <mtp/usb/call.h>
+#include <usb/BulkPipe.h>
+#include <usb/DeviceDescriptor.h>
+#include <usb/call.h>
 
 namespace mtp { namespace usb
 {

@@ -19,7 +19,7 @@
 #ifndef PROTOCOL_H
 #define	PROTOCOL_H
 
-#include <mtp/usb/BulkPipe.h>
+#include <usb/BulkPipe.h>
 #include <mtp/ptp/PipePacketer.h>
 #include <mtp/ptp/Session.h>
 

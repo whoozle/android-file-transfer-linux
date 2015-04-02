@@ -16,40 +16,38 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-#ifndef USB_CONTEXT_H
-#define USB_CONTEXT_H
-
-#include <libusb.h>
-#include <mtp/types.h>
-#include <mtp/usb/DeviceDescriptor.h>
-#include <vector>
+#include <usb/DeviceDescriptor.h>
+#include <usb/call.h>
 
 namespace mtp { namespace usb
 {
-
-	class Context : Noncopyable
+	DeviceDescriptor::DeviceDescriptor(libusb_device *dev): _dev(dev)
 	{
-	private:
-		libusb_context *		_ctx;
+		USB_CALL(libusb_get_device_descriptor(_dev, &_descriptor));
+	}
 
-	public:
-		typedef std::vector<DeviceDescriptorPtr> Devices;
+	ConfigurationPtr DeviceDescriptor::GetConfiguration(int conf)
+	{
+		libusb_config_descriptor *desc;
+		USB_CALL(libusb_get_config_descriptor(_dev, conf, &desc));
+		return std::make_shared<Configuration>(desc);
+	}
 
-	private:
-		Devices					_devices;
+	DevicePtr DeviceDescriptor::Open(ContextPtr context)
+	{
+		libusb_device_handle *handle;
+		USB_CALL(libusb_open(_dev, &handle));
+		return std::make_shared<Device>(context, handle);
+	}
 
-	public:
-		Context(int debugLevel = 3);
-		~Context();
+	DevicePtr DeviceDescriptor::TryOpen(ContextPtr context)
+	{
+		libusb_device_handle *handle;
+		int r = libusb_open(_dev, &handle);
+		return r == 0? std::make_shared<Device>(context, handle): nullptr;
+	}
 
-		void Wait();
-
-		const Devices & GetDevices() const
-		{ return _devices; }
-	};
-	DECLARE_PTR(Context);
+	DeviceDescriptor::~DeviceDescriptor()
+	{ libusb_unref_device(_dev); }
 
 }}
-
-#endif
-

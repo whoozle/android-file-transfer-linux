@@ -19,9 +19,9 @@
 #include <stdio.h>
 #include <stdexcept>
 
-#include <mtp/usb/BulkPipe.h>
-#include <mtp/usb/Context.h>
-#include <mtp/usb/call.h>
+#include <usb/BulkPipe.h>
+#include <usb/Context.h>
+#include <usb/call.h>
 #include <mtp/ptp/Container.h>
 #include <mtp/ptp/Device.h>
 #include <mtp/ptp/Messages.h>

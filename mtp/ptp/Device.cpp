@@ -20,7 +20,7 @@
 #include <mtp/ptp/Response.h>
 #include <mtp/ptp/Container.h>
 #include <mtp/ptp/Messages.h>
-#include <mtp/usb/Context.h>
+#include <usb/Context.h>
 #include <mtp/ptp/OperationRequest.h>
 
 

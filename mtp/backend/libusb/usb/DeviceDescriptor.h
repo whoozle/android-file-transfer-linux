@@ -21,8 +21,8 @@
 
 #include <libusb.h>
 #include <mtp/types.h>
-#include <mtp/usb/Device.h>
-#include <mtp/usb/Interface.h>
+#include <usb/Device.h>
+#include <usb/Interface.h>
 
 namespace mtp { namespace usb
 {

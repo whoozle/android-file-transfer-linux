@@ -26,13 +26,14 @@ if (USE_LIBUSB)
 
 	pkg_check_modules(LIBUSB libusb-1.0 REQUIRED)
 	include_directories(${LIBUSB_INCLUDE_DIRS})
+	include_directories(mtp/backend/libusb)
 
 	list(APPEND SOURCES
-		mtp/usb/BulkPipe.cpp
-		mtp/usb/Context.cpp
-		mtp/usb/Device.cpp
-		mtp/usb/DeviceDescriptor.cpp
-		mtp/usb/Exception.cpp
+		mtp/backend/libusb/usb/BulkPipe.cpp
+		mtp/backend/libusb/usb/Context.cpp
+		mtp/backend/libusb/usb/Device.cpp
+		mtp/backend/libusb/usb/DeviceDescriptor.cpp
+		mtp/backend/libusb/usb/Exception.cpp
 	)
 	list(APPEND MTP_LIBRARIES ${LIBUSB_LIBRARIES})
 endif()

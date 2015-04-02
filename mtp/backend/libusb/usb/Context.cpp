@@ -16,8 +16,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-#include <mtp/usb/Context.h>
-#include <mtp/usb/call.h>
+#include <usb/Context.h>
+#include <usb/call.h>
 #include <stdio.h>
 
 namespace mtp { namespace usb

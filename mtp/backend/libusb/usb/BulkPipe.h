@@ -16,14 +16,36 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-#ifndef USB_USB_H
-#define USB_USB_H
+#ifndef BULKPIPE_H
+#define	BULKPIPE_H
 
-#include <mtp/usb/Exception.h>
+#include <usb/Device.h>
+#include <usb/Interface.h>
+#include <mtp/ByteArray.h>
 
-#include <libusb.h>
+namespace mtp { namespace usb
+{
+	class BulkPipe;
+	DECLARE_PTR(BulkPipe);
 
-#define USB_CALL(...) do { int r = (__VA_ARGS__); if (r != 0) throw mtp::usb::Exception(#__VA_ARGS__, r) ; } while(false)
+	class BulkPipe
+	{
+		DevicePtr			_device;
+		ConfigurationPtr	_conf;
+		InterfacePtr		_interface;
+		EndpointPtr			_in, _out, _interrupt;
 
-#endif
+	public:
+		BulkPipe(DevicePtr device, ConfigurationPtr conf, InterfacePtr interface, EndpointPtr in, EndpointPtr out, EndpointPtr interrupt);
+		~BulkPipe();
 
+		ByteArray ReadInterrupt();
+		ByteArray Read(int timeout = 3000);
+		void Write(const ByteArray &data, int timeout = 3000);
+
+		static BulkPipePtr Create(usb::DevicePtr device, ConfigurationPtr conf, usb::InterfacePtr owner);
+	};
+
+}}
+
+#endif	/* BULKPIPE_H */

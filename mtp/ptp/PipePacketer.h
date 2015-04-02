@@ -19,7 +19,7 @@
 #ifndef PIPEPACKETER_H
 #define PIPEPACKETER_H
 
-#include <mtp/usb/BulkPipe.h>
+#include <usb/BulkPipe.h>
 
 namespace mtp
 {
