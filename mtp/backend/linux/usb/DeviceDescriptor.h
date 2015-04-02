@@ -22,6 +22,7 @@
 #include <mtp/types.h>
 #include <usb/Device.h>
 #include <usb/Interface.h>
+#include <vector>
 
 namespace mtp { namespace usb
 {
@@ -46,23 +47,24 @@ namespace mtp { namespace usb
 
 	class DeviceDescriptor
 	{
+		std::string						_path;
+		std::vector<ConfigurationPtr>	_configurations;
+
 	public:
-		DeviceDescriptor();
+		DeviceDescriptor(const std::string &path);
 		~DeviceDescriptor();
 
-		u16 GetVendorId() const
-		{ return 0; }
-
-		u16 GetProductId() const
-		{ return 0; }
+		u16 GetVendorId() const;
+		u16 GetProductId() const;
 
 		DevicePtr Open(ContextPtr context);
 		DevicePtr TryOpen(ContextPtr context);
 
 		int GetConfigurationsCount() const
-		{ return 0; }
+		{ return _configurations.size(); }
 
-		ConfigurationPtr GetConfiguration(int conf);
+		ConfigurationPtr GetConfiguration(int conf)
+		{ return _configurations.at(conf); }
 	};
 	DECLARE_PTR(DeviceDescriptor);
 

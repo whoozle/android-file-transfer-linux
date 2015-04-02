@@ -25,14 +25,17 @@ namespace mtp { namespace usb
 
 	Context::Context()
 	{
-		Directory usbDir("/sys/bus/usb/devices");
+		std::string bus("/sys/bus/usb/devices");
+		Directory usbDir(bus);
 		while(true)
 		{
 			std::string entry = usbDir.Read();
 			if (entry.empty())
 				break;
-			printf("USB %s\n", entry.c_str());
-			//_devices.push_back(std::make_shared<DeviceDescriptor>(devs[i]));
+			if (entry.compare(0, 3, "usb") != 0)
+				continue;
+
+			_devices.push_back(std::make_shared<DeviceDescriptor>(bus + "/" + entry));
 		}
 	}
 

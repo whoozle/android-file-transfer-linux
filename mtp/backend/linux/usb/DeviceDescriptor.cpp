@@ -17,17 +17,22 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 #include <usb/DeviceDescriptor.h>
+#include <usb/Directory.h>
 
 namespace mtp { namespace usb
 {
-	DeviceDescriptor::DeviceDescriptor()
+	DeviceDescriptor::DeviceDescriptor(const std::string &path): _path(path)
 	{
+		Directory dir(path);
+		int count = Directory::ReadInt(path + "/bNumConfigurations");
+		printf("CONFIGS: %d\n", count);
 	}
 
-	ConfigurationPtr DeviceDescriptor::GetConfiguration(int conf)
-	{
-		return nullptr;
-	}
+	u16 DeviceDescriptor::GetVendorId() const
+	{ return 0; }
+
+	u16 DeviceDescriptor::GetProductId() const
+	{ return 0; }
 
 	DevicePtr DeviceDescriptor::Open(ContextPtr context)
 	{
