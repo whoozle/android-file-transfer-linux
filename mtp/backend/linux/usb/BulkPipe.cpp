@@ -18,7 +18,6 @@
  */
 #include <usb/BulkPipe.h>
 #include <usb/DeviceDescriptor.h>
-#include <usb/call.h>
 
 namespace mtp { namespace usb
 {
@@ -28,7 +27,7 @@ namespace mtp { namespace usb
 		int currentConfigurationIndex = _device->GetConfiguration();
 		if (conf->GetIndex() != currentConfigurationIndex)
 			_device->SetConfiguration(conf->GetIndex());
-		USB_CALL(libusb_claim_interface(_device->GetHandle(), interface->GetIndex()));
+		//USB_CALL(libusb_claim_interface(_device->GetHandle(), interface->GetIndex()));
 		//libusb_clear_halt(device->GetHandle(), in->GetAddress());
 		//libusb_clear_halt(device->GetHandle(), out->GetAddress());
 		//libusb_clear_halt(device->GetHandle(), interrupt->GetAddress());
@@ -36,36 +35,23 @@ namespace mtp { namespace usb
 
 	BulkPipe::~BulkPipe()
 	{
-		libusb_release_interface(_device->GetHandle(), _interface->GetIndex());
+		//libusb_release_interface(_device->GetHandle(), _interface->GetIndex());
 	}
 
 	ByteArray BulkPipe::ReadInterrupt()
 	{
 		ByteArray data(_interrupt->GetMaxPacketSize());
-		int tr = 0;
-		int r = libusb_interrupt_transfer(_device->GetHandle(), _interrupt->GetAddress(), data.data(), data.size(), &tr, 1);
-		if (r == 0)
-			data.resize(tr);
-		else
-			data.clear();
 		return data;
 	}
 
 	ByteArray BulkPipe::Read(int timeout)
 	{
 		ByteArray data(_in->GetMaxPacketSize());
-		int tr = 0;
-		USB_CALL(libusb_bulk_transfer(_device->GetHandle(), _in->GetAddress(), data.data(), data.size(), &tr, timeout));
-		data.resize(tr);
 		return data;
 	}
 
 	void BulkPipe::Write(const ByteArray &data, int timeout)
 	{
-		int tr = 0;
-		USB_CALL(libusb_bulk_transfer(_device->GetHandle(), _out->GetAddress(), const_cast<u8 *>(data.data()), data.size(), &tr, timeout));
-		if (tr != (int)data.size())
-			throw std::runtime_error("short write");
 	}
 
 	BulkPipePtr BulkPipe::Create(usb::DevicePtr device, ConfigurationPtr conf, usb::InterfacePtr interface)

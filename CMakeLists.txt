@@ -38,6 +38,13 @@ if (USE_LIBUSB)
 	list(APPEND MTP_LIBRARIES ${LIBUSB_LIBRARIES})
 else()
 	include_directories(mtp/backend/linux)
+	list(APPEND SOURCES
+		mtp/backend/linux/usb/BulkPipe.cpp
+		mtp/backend/linux/usb/Exception.cpp
+		mtp/backend/linux/usb/Context.cpp
+		mtp/backend/linux/usb/Device.cpp
+		mtp/backend/linux/usb/DeviceDescriptor.cpp
+	)
 endif()
 
 

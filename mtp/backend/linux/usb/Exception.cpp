@@ -17,16 +17,22 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 #include <usb/Exception.h>
-#include <libusb.h>
+#include <string.h>
 
 namespace mtp { namespace usb
 {
+
+	Exception::Exception(const std::string &what) throw() : std::runtime_error(what + ": " + GetErrorMessage(errno))
+	{ }
+
 	Exception::Exception(const std::string &what, int returnCode) throw() : std::runtime_error(what + ": " + GetErrorMessage(returnCode))
 	{ }
 
 	std::string Exception::GetErrorMessage(int returnCode)
 	{
-		return libusb_error_name(returnCode);
+		char buf[1024] = { 0 };
+		strerror_r(returnCode, buf, sizeof(buf));
+		return buf;
 	}
 
 }}

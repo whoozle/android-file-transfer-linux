@@ -17,35 +17,27 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 #include <usb/Context.h>
-#include <usb/call.h>
 #include <stdio.h>
+#include <usb/Directory.h>
 
 namespace mtp { namespace usb
 {
 
-	Context::Context(int debugLevel)
+	Context::Context()
 	{
-		USB_CALL(libusb_init(&_ctx));
-		libusb_set_debug(_ctx, debugLevel);
-		libusb_device **devs;
-		int count = libusb_get_device_list(_ctx, &devs);
-		if (count < 0)
-			throw Exception("libusb_get_device_list", count);
-
-		_devices.reserve(count);
-		for(int i = 0; i < count; ++i)
-			_devices.push_back(std::make_shared<DeviceDescriptor>(devs[i]));
-		libusb_free_device_list(devs, 0);
+		Directory usbDir("/sys/bus/usb/devices");
+		while(true)
+		{
+			std::string entry = usbDir.Read();
+			if (entry.empty())
+				break;
+			printf("USB %s\n", entry.c_str());
+			//_devices.push_back(std::make_shared<DeviceDescriptor>(devs[i]));
+		}
 	}
 
 	Context::~Context()
 	{
-		libusb_exit(_ctx);
-	}
-
-	void Context::Wait()
-	{
-		USB_CALL(libusb_handle_events(_ctx));
 	}
 
 

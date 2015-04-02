@@ -26,6 +26,7 @@ namespace mtp { namespace usb
 	class Exception : public std::runtime_error
 	{
 	public:
+		Exception(const std::string &what) throw();
 		Exception(const std::string &what, int retCode) throw();
 		static std::string GetErrorMessage(int retCode);
 	};
