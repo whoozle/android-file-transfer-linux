@@ -67,7 +67,7 @@ namespace mtp { namespace usb
 			if (!f)
 				throw Exception("opening " + path);
 			int r = 0;
-			fscanf(f, "%d", &r);
+			fscanf(f, "%x", &r);
 			fclose(f);
 			return r;
 		}

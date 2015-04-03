@@ -17,25 +17,37 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 #include <usb/Context.h>
-#include <stdio.h>
 #include <usb/Directory.h>
+#include <map>
+#include <stdio.h>
 
 namespace mtp { namespace usb
 {
 
 	Context::Context()
 	{
-		std::string bus("/sys/bus/usb/devices");
-		Directory usbDir(bus);
+		std::string rootPath("/sys/bus/usb/devices");
+		Directory usbDir(rootPath);
+		std::map<int, std::map<int, DeviceDescriptorPtr> > devices;
 		while(true)
 		{
 			std::string entry = usbDir.Read();
 			if (entry.empty())
 				break;
-			if (entry.compare(0, 3, "usb") != 0)
-				continue;
 
-			_devices.push_back(std::make_shared<DeviceDescriptor>(bus + "/" + entry));
+			unsigned busId, port, conf, interface;
+			if (sscanf(entry.c_str(), "%u-%u:%u.%u", &busId, &port, &conf, &interface) == 4 && port != 0)
+			{
+				DeviceDescriptorPtr &device = devices[busId][port];
+				if (!device)
+				{
+					char deviceRoot[64];
+					snprintf(deviceRoot, sizeof(deviceRoot), "%u-%u", busId, port);
+					device = std::make_shared<DeviceDescriptor>(rootPath + "/" + std::string(deviceRoot));
+					_devices.push_back(device);
+				}
+			}
+
 		}
 	}
 

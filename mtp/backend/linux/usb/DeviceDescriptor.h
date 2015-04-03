@@ -48,14 +48,17 @@ namespace mtp { namespace usb
 	class DeviceDescriptor
 	{
 		std::string						_path;
+		u16								_vendor, _product;
 		std::vector<ConfigurationPtr>	_configurations;
 
 	public:
 		DeviceDescriptor(const std::string &path);
 		~DeviceDescriptor();
 
-		u16 GetVendorId() const;
-		u16 GetProductId() const;
+		u16 GetVendorId() const
+		{ return _vendor; }
+		u16 GetProductId() const
+		{ return _product; }
 
 		DevicePtr Open(ContextPtr context);
 		DevicePtr TryOpen(ContextPtr context);

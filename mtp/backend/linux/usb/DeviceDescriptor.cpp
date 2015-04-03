@@ -23,16 +23,9 @@ namespace mtp { namespace usb
 {
 	DeviceDescriptor::DeviceDescriptor(const std::string &path): _path(path)
 	{
-		Directory dir(path);
-		int count = Directory::ReadInt(path + "/bNumConfigurations");
-		printf("CONFIGS: %d\n", count);
+		_vendor = Directory::ReadInt(path + "/idVendor");
+		_product = Directory::ReadInt(path + "/idProduct");
 	}
-
-	u16 DeviceDescriptor::GetVendorId() const
-	{ return 0; }
-
-	u16 DeviceDescriptor::GetProductId() const
-	{ return 0; }
 
 	DevicePtr DeviceDescriptor::Open(ContextPtr context)
 	{
