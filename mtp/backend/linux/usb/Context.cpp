@@ -46,6 +46,7 @@ namespace mtp { namespace usb
 					device = std::make_shared<DeviceDescriptor>(rootPath + "/" + std::string(deviceRoot));
 					_devices.push_back(device);
 				}
+				device->AddInterface(conf, interface, rootPath + "/" + entry);
 			}
 
 		}

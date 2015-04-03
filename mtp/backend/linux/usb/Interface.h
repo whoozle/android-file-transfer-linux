@@ -61,10 +61,11 @@ namespace mtp { namespace usb
 
 	class Interface
 	{
-		ConfigurationPtr					_config;
+		std::string _path;
 
 	public:
-		Interface(ConfigurationPtr config, int index, int settings): _config(config) { }
+		Interface(int index, const std::string &path): _path(path)
+		{ }
 
 		u8 GetClass() const
 		{ return 0; }

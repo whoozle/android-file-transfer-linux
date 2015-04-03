@@ -22,12 +22,13 @@
 #include <mtp/types.h>
 #include <usb/Device.h>
 #include <usb/Interface.h>
-#include <vector>
+#include <map>
 
 namespace mtp { namespace usb
 {
 	class Configuration : Noncopyable
 	{
+		std::map<int, InterfacePtr> _interfaces;
 	public:
 		Configuration() { }
 		~Configuration() { }
@@ -36,20 +37,25 @@ namespace mtp { namespace usb
 		{ return 0; }
 
 		int GetInterfaceCount() const
-		{ return 0; }
+		{ return _interfaces.size(); }
 
 		int GetInterfaceAltSettingsCount(int idx) const
-		{ return 0; }
+		{ return 1; }
 
 		InterfacePtr GetInterface(ConfigurationPtr config, int idx, int settings) const
-		{ return std::make_shared<Interface>(config, idx, settings); }
+		{ return _interfaces.at(idx); }
+
+		void AddInterface(int index, const std::string &path)
+		{
+			_interfaces[index] = std::make_shared<Interface>(index, path);
+		}
 	};
 
 	class DeviceDescriptor
 	{
 		std::string						_path;
 		u16								_vendor, _product;
-		std::vector<ConfigurationPtr>	_configurations;
+		std::map<int, ConfigurationPtr>	_configurations;
 
 	public:
 		DeviceDescriptor(const std::string &path);
@@ -68,6 +74,14 @@ namespace mtp { namespace usb
 
 		ConfigurationPtr GetConfiguration(int conf)
 		{ return _configurations.at(conf); }
+
+		void AddInterface(int confIndex, int interface, const std::string &path)
+		{
+			ConfigurationPtr &conf = _configurations[confIndex];
+			if (!conf)
+				conf = std::make_shared<Configuration>();
+			conf->AddInterface(interface, path);
+		}
 	};
 	DECLARE_PTR(DeviceDescriptor);
 
