@@ -80,7 +80,6 @@ namespace mtp { namespace usb
 
 		void AddInterface(int confIndex, int interface, const std::string &path)
 		{
-			printf("added %d %d %s\n", confIndex, interface, path.c_str());
 			ConfigurationPtr &conf = _configurationMap[confIndex];
 			if (!conf)
 			{
