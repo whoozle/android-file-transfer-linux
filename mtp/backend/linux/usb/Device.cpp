@@ -17,14 +17,30 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 #include <usb/Device.h>
+#include <usb/Exception.h>
+
 #include <unistd.h>
+#include <sys/ioctl.h>
+
+#include "linux/usbdevice_fs.h"
 
 namespace mtp { namespace usb
 {
+	Device::InterfaceToken::InterfaceToken(int fd, unsigned interfaceNumber): _fd(fd), _interfaceNumber(interfaceNumber)
+	{
+		int r = ioctl(_fd, USBDEVFS_CLAIMINTERFACE, &interfaceNumber);
+		if (r < 0)
+			throw Exception("ioctl(USBDEVFS_CLAIMINTERFACE)");
+	}
+
+	Device::InterfaceToken::~InterfaceToken()
+	{
+		ioctl(_fd, USBDEVFS_RELEASEINTERFACE, _interfaceNumber);
+	}
 
 	Device::Device(int fd): _fd(fd)
 	{
-		
+
 	}
 
 	Device::~Device()

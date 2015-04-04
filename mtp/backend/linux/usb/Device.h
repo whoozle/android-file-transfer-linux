@@ -35,6 +35,19 @@ namespace mtp { namespace usb
 		Device(int fd);
 		~Device();
 
+		class InterfaceToken : Noncopyable
+		{
+			int			_fd;
+			unsigned	_interfaceNumber;
+		public:
+			InterfaceToken(int fd, unsigned interfaceNumber);
+			~InterfaceToken();
+		};
+		DECLARE_PTR(InterfaceToken);
+
+		InterfaceTokenPtr ClaimInterface(int interfaceNumber)
+		{ return std::make_shared<InterfaceToken>(_fd, interfaceNumber); }
+
 		int GetConfiguration() const;
 		void SetConfiguration(int idx);
 	};

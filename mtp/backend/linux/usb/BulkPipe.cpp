@@ -27,6 +27,8 @@ namespace mtp { namespace usb
 		int currentConfigurationIndex = _device->GetConfiguration();
 		if (conf->GetIndex() != currentConfigurationIndex)
 			_device->SetConfiguration(conf->GetIndex());
+
+		_claimToken = _device->ClaimInterface(interface->GetIndex());
 		//USB_CALL(libusb_claim_interface(_device->GetHandle(), interface->GetIndex()));
 		//libusb_clear_halt(device->GetHandle(), in->GetAddress());
 		//libusb_clear_halt(device->GetHandle(), out->GetAddress());
