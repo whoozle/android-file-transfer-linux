@@ -69,11 +69,12 @@ namespace mtp { namespace usb
 
 	class Interface
 	{
+		DevicePtr							_device;
 		ConfigurationPtr					_config;
 		const libusb_interface_descriptor &	_interface;
 
 	public:
-		Interface(ConfigurationPtr config, const libusb_interface_descriptor &interface): _config(config), _interface(interface) { }
+		Interface(DevicePtr device, ConfigurationPtr config, const libusb_interface_descriptor &interface): _device(device), _config(config), _interface(interface) { }
 
 		u8 GetClass() const
 		{ return _interface.bInterfaceClass; }
@@ -84,8 +85,8 @@ namespace mtp { namespace usb
 		int GetIndex() const
 		{ return _interface.bInterfaceNumber; }
 
-		int GetNameIndex() const
-		{ return _interface.iInterface; }
+		std::string GetName() const
+		{ return _interface.iInterface? _device->GetString(_interface.iInterface): std::string(); }
 
 		EndpointPtr GetEndpoint(int idx) const
 		{ return std::make_shared<Endpoint>(_interface.endpoint[idx]); }

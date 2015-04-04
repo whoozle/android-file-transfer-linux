@@ -42,7 +42,7 @@ namespace mtp { namespace usb
 		int GetInterfaceAltSettingsCount(int idx) const
 		{ return 1; }
 
-		InterfacePtr GetInterface(ConfigurationPtr config, int idx, int settings) const
+		InterfacePtr GetInterface(DevicePtr device, ConfigurationPtr config, int idx, int settings) const
 		{ return _interfaces.at(idx); }
 
 		void AddInterface(int index, const std::string &path)

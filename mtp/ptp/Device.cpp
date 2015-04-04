@@ -74,18 +74,14 @@ namespace mtp
 				//fprintf(stderr, "interfaces: %d\n", interfaces);
 				for(int j = 0; j < interfaces; ++j)
 				{
-					usb::InterfacePtr iface = conf->GetInterface(conf, j, 0);
+					usb::InterfacePtr iface = conf->GetInterface(device, conf, j, 0);
 					//fprintf(stderr, "%d:%d index %u, eps %u\n", i, j, iface->GetIndex(), iface->GetEndpointsCount());
-					int name_idx = iface->GetNameIndex();
-					if (name_idx)
+					std::string name = iface->GetName();
+					if (name == "MTP")
 					{
-						std::string name = device->GetString(name_idx);
-						if (name == "MTP")
-						{
-							//device->SetConfiguration(configuration->GetIndex());
-							usb::BulkPipePtr pipe = usb::BulkPipe::Create(device, conf, iface);
-							return std::make_shared<Device>(pipe);
-						}
+						//device->SetConfiguration(configuration->GetIndex());
+						usb::BulkPipePtr pipe = usb::BulkPipe::Create(device, conf, iface);
+						return std::make_shared<Device>(pipe);
 					}
 					if (iface->GetClass() == 6 && iface->GetSubclass() == 1)
 					{
