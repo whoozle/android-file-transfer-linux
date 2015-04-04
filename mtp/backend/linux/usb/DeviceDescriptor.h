@@ -57,7 +57,8 @@ namespace mtp { namespace usb
 		std::string						_path;
 		u16								_vendor, _product;
 		int								_deviceNumber;
-		std::map<int, ConfigurationPtr>	_configurations;
+		std::map<int, ConfigurationPtr>	_configurationMap;
+		std::vector<ConfigurationPtr>	_configuration;
 
 	public:
 		DeviceDescriptor(int busId, const std::string &path);
@@ -72,16 +73,20 @@ namespace mtp { namespace usb
 		DevicePtr TryOpen(ContextPtr context);
 
 		int GetConfigurationsCount() const
-		{ return _configurations.size(); }
+		{ return _configuration.size(); }
 
 		ConfigurationPtr GetConfiguration(int conf)
-		{ return _configurations.at(conf); }
+		{ return _configuration.at(conf); }
 
 		void AddInterface(int confIndex, int interface, const std::string &path)
 		{
-			ConfigurationPtr &conf = _configurations[confIndex];
+			printf("added %d %d %s\n", confIndex, interface, path.c_str());
+			ConfigurationPtr &conf = _configurationMap[confIndex];
 			if (!conf)
+			{
 				conf = std::make_shared<Configuration>();
+				_configuration.push_back(conf);
+			}
 			conf->AddInterface(interface, path);
 		}
 	};
