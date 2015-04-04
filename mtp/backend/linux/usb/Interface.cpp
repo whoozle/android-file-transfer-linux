@@ -21,6 +21,32 @@
 
 namespace mtp { namespace usb
 {
+	Endpoint::Endpoint(const std::string &path): _maxPacketSize(0)
+	{
+		_addr				= Directory::ReadInt(path + "/bEndpointAddress");
+
+		std::string	type	= Directory::ReadString(path + "/type");
+		if (type == "Bulk")
+			_type = EndpointType::Bulk;
+		else if (type == "Control")
+			_type = EndpointType::Control;
+		else if (type == "Interrupt")
+			_type = EndpointType::Interrupt;
+		else if (type == "Isochronous")
+			_type = EndpointType::Isochronous;
+		else
+			throw std::runtime_error("invalid endpoint type " + type);
+
+		std::string	dir		= Directory::ReadString(path + "/direction");
+		if (dir == "out")
+			_direction = EndpointDirection::Out;
+		else if (dir == "in")
+			_direction = EndpointDirection::In;
+		else
+			throw std::runtime_error("invalid endpoint direction " + dir);
+
+		_maxPacketSize		= Directory::ReadInt(path + "/wMaxPacketSize");
+	}
 
 	Interface::Interface(int index, const std::string &path): _path(path)
 	{
@@ -30,6 +56,17 @@ namespace mtp { namespace usb
 		try
 		{ _name		= Directory::ReadString(path + "/interface"); } catch(const std::exception &ex)
 		{ }
+
+		Directory dir(path);
+		while(true)
+		{
+			std::string entry = dir.Read();
+			if (entry.empty())
+				break;
+
+			if (entry.compare(0, 3, "ep_") == 0)
+				_endpoints.push_back(std::make_shared<Endpoint>(path + "/" + entry));
+		}
 	}
 
 }}
