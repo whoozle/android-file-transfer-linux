@@ -30,7 +30,6 @@ namespace mtp { namespace usb
 		_vendor			= Directory::ReadInt(path + "/idVendor");
 		_product		= Directory::ReadInt(path + "/idProduct");
 		_deviceNumber	= Directory::ReadInt(path + "/devnum", 10);
-		printf("device at %s\n", path.c_str());
 	}
 
 	DevicePtr DeviceDescriptor::Open(ContextPtr context)
