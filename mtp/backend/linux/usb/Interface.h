@@ -20,6 +20,7 @@
 #define	INTERFACE_H
 
 #include <mtp/types.h>
+#include <vector>
 
 namespace mtp { namespace usb
 {
@@ -38,15 +39,17 @@ namespace mtp { namespace usb
 	{
 		EndpointDirection	_direction;
 		EndpointType		_type;
+		u8					_addr;
+		u16					_maxPacketSize;
 
 	public:
-		Endpoint() { }
+		Endpoint(const std::string &path);
 
 		u8 GetAddress() const
-		{ return 0; }
+		{ return _addr; }
 
 		int GetMaxPacketSize() const
-		{ return 0; }
+		{ return _maxPacketSize; }
 
 		EndpointDirection GetDirection() const
 		{ return _direction; }
@@ -61,29 +64,34 @@ namespace mtp { namespace usb
 
 	class Interface
 	{
-		std::string _path;
+		std::string					_path;
+		std::vector<EndpointPtr>	_endpoints;
+		u8							_class;
+		u8							_subclass;
+		int							_index;
+		std::string					_name;
+
 
 	public:
-		Interface(int index, const std::string &path): _path(path)
-		{ }
+		Interface(int index, const std::string &path);
 
 		u8 GetClass() const
-		{ return 0; }
+		{ return _class; }
 
 		u8 GetSubclass() const
-		{ return 0; }
+		{ return _subclass; }
 
 		int GetIndex() const
-		{ return 0; }
+		{ return _index; }
 
-		int GetNameIndex() const
-		{ return 0; }
+		const std::string GetName() const
+		{ return _name; }
 
 		EndpointPtr GetEndpoint(int idx) const
-		{ return std::make_shared<Endpoint>(); }
+		{ return _endpoints.at(idx); }
 
 		int GetEndpointsCount() const
-		{ return 0; }
+		{ return _endpoints.size(); }
 	};
 	DECLARE_PTR(Interface);
 

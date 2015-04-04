@@ -35,20 +35,26 @@ namespace mtp { namespace usb
 			if (entry.empty())
 				break;
 
-			unsigned busId, port, conf, interface;
-			if (sscanf(entry.c_str(), "%u-%u:%u.%u", &busId, &port, &conf, &interface) == 4 && port != 0)
+			try
 			{
-				DeviceDescriptorPtr &device = devices[busId][port];
-				if (!device)
+				unsigned busId, port, conf, interface;
+				if (sscanf(entry.c_str(), "%u-%u:%u.%u", &busId, &port, &conf, &interface) == 4 && port != 0)
 				{
-					char deviceRoot[64];
-					snprintf(deviceRoot, sizeof(deviceRoot), "%u-%u", busId, port);
-					device = std::make_shared<DeviceDescriptor>(rootPath + "/" + std::string(deviceRoot));
-					_devices.push_back(device);
+					DeviceDescriptorPtr &device = devices[busId][port];
+					if (!device)
+					{
+						char deviceRoot[64];
+						snprintf(deviceRoot, sizeof(deviceRoot), "%u-%u", busId, port);
+						device = std::make_shared<DeviceDescriptor>(rootPath + "/" + std::string(deviceRoot));
+						_devices.push_back(device);
+					}
+					device->AddInterface(conf, interface, rootPath + "/" + entry);
 				}
-				device->AddInterface(conf, interface, rootPath + "/" + entry);
 			}
-
+			catch(const std::exception &ex)
+			{
+				fprintf(stderr, "%s\n", ex.what());
+			}
 		}
 	}
 

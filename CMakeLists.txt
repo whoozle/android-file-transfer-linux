@@ -43,6 +43,7 @@ else()
 		mtp/backend/linux/usb/Exception.cpp
 		mtp/backend/linux/usb/Context.cpp
 		mtp/backend/linux/usb/Device.cpp
+		mtp/backend/linux/usb/Interface.cpp
 		mtp/backend/linux/usb/DeviceDescriptor.cpp
 	)
 endif()

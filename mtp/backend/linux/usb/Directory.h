@@ -72,6 +72,19 @@ namespace mtp { namespace usb
 			fclose(f);
 			return r;
 		}
+
+		static std::string ReadString(const std::string &path)
+		{
+			FILE *f = fopen(path.c_str(), "rt");
+			if (!f)
+				throw Exception("opening " + path);
+			char buf[1024];
+			fgets(buf, sizeof(buf), f);
+			std::string str(buf);
+			fclose(f);
+			size_t end = str.find_last_not_of(" \t\r\n\f");
+			return end != str.npos? std::string(buf, buf + end + 1): buf;
+		}
 	};
 }}
 
