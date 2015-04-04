@@ -20,6 +20,8 @@
 #define	DEVICE_H
 
 #include <mtp/types.h>
+#include <usb/Interface.h>
+#include <mtp/ByteArray.h>
 
 namespace mtp { namespace usb
 {
@@ -30,6 +32,7 @@ namespace mtp { namespace usb
 	{
 	private:
 		int		_fd;
+		u32		_capabilities;
 
 	public:
 		Device(int fd);
@@ -50,6 +53,11 @@ namespace mtp { namespace usb
 
 		int GetConfiguration() const;
 		void SetConfiguration(int idx);
+
+		void WriteBulk(const EndpointPtr & ep, const ByteArray &data, int timeout);
+		ByteArray ReadBulk(const EndpointPtr & ep, int timeout);
+	private:
+		void Reap(void *urb, int timeout);
 	};
 	DECLARE_PTR(Device);
 }}

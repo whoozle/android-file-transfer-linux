@@ -21,16 +21,17 @@
 
 #include <unistd.h>
 #include <sys/ioctl.h>
+#include <time.h>
 
 #include "linux/usbdevice_fs.h"
+
+#define IOCTL(...) do { int r = ioctl(__VA_ARGS__); if (r < 0) throw Exception(#__VA_ARGS__); } while(false)
 
 namespace mtp { namespace usb
 {
 	Device::InterfaceToken::InterfaceToken(int fd, unsigned interfaceNumber): _fd(fd), _interfaceNumber(interfaceNumber)
 	{
-		int r = ioctl(_fd, USBDEVFS_CLAIMINTERFACE, &interfaceNumber);
-		if (r < 0)
-			throw Exception("ioctl(USBDEVFS_CLAIMINTERFACE)");
+		IOCTL(_fd, USBDEVFS_CLAIMINTERFACE, &interfaceNumber);
 	}
 
 	Device::InterfaceToken::~InterfaceToken()
@@ -40,7 +41,7 @@ namespace mtp { namespace usb
 
 	Device::Device(int fd): _fd(fd)
 	{
-
+		IOCTL(_fd, USBDEVFS_GET_CAPABILITIES, &_capabilities);
 	}
 
 	Device::~Device()
@@ -56,6 +57,61 @@ namespace mtp { namespace usb
 	void Device::SetConfiguration(int idx)
 	{
 		fprintf(stderr, "SetConfiguration(%d): not implemented", idx);
+	}
+
+	void Device::Reap(void *urb, int timeout)
+	{
+		timespec started = {};
+		if (clock_gettime(CLOCK_MONOTONIC, &started) == -1)
+			throw Exception("clock_gettime");
+
+		while(true)
+		{
+			int r = ioctl(_fd, USBDEVFS_REAPURBNDELAY, urb);
+			if (r == 0)
+			{
+				break;
+			}
+			if (r == -1 && errno == EAGAIN)
+			{
+				timespec now = {};
+				if (clock_gettime(CLOCK_MONOTONIC, &now) == -1)
+					throw Exception("clock_gettime");
+				int delta = (now.tv_sec - started.tv_sec) * 1000 + (now.tv_nsec - started.tv_nsec) / 1000000;
+				if (delta >= timeout)
+					throw std::runtime_error("timeout reaping usb urb");
+				usleep(1000);
+				continue;
+			}
+		}
+	}
+
+	void Device::WriteBulk(const EndpointPtr & ep, const ByteArray &data, int timeout)
+	{
+		usbdevfs_urb urb = {};
+		urb.usercontext = this;
+		urb.type = USBDEVFS_URB_TYPE_BULK;
+		urb.endpoint = ep->GetAddress();
+		urb.buffer = const_cast<u8 *>(data.data());
+		urb.buffer_length = data.size();
+		IOCTL(_fd, USBDEVFS_SUBMITURB, &urb);
+		Reap(&urb, timeout);
+	}
+
+	ByteArray Device::ReadBulk(const EndpointPtr & ep, int timeout)
+	{
+		ByteArray data(ep->GetMaxPacketSize() * 1024);
+		usbdevfs_urb urb = {};
+		urb.usercontext = this;
+		urb.type = USBDEVFS_URB_TYPE_BULK;
+		urb.endpoint = ep->GetAddress();
+		urb.buffer = data.data();
+		urb.buffer_length = data.size();
+		IOCTL(_fd, USBDEVFS_SUBMITURB, &urb);
+
+		Reap(&urb, timeout);
+		data.resize(urb.actual_length);
+		return data;
 	}
 
 }}

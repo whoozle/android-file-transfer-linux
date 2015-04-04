@@ -42,18 +42,18 @@ namespace mtp { namespace usb
 
 	ByteArray BulkPipe::ReadInterrupt()
 	{
-		ByteArray data(_interrupt->GetMaxPacketSize());
+		ByteArray data;//_interrupt->GetMaxPacketSize());
 		return data;
 	}
 
 	ByteArray BulkPipe::Read(int timeout)
 	{
-		ByteArray data(_in->GetMaxPacketSize());
-		return data;
+		return _device->ReadBulk(_in, timeout);
 	}
 
 	void BulkPipe::Write(const ByteArray &data, int timeout)
 	{
+		_device->WriteBulk(_out, data, timeout);
 	}
 
 	BulkPipePtr BulkPipe::Create(usb::DevicePtr device, ConfigurationPtr conf, usb::InterfacePtr interface)
