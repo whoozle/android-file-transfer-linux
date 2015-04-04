@@ -17,17 +17,19 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 #include <usb/Device.h>
-#include <usb/Context.h>
+#include <unistd.h>
 
 namespace mtp { namespace usb
 {
 
-	Device::Device(ContextPtr context): _context(context)
-	{}
+	Device::Device(int fd): _fd(fd)
+	{
+		
+	}
 
 	Device::~Device()
 	{
-
+		close(_fd);
 	}
 
 	int Device::GetConfiguration() const
@@ -37,11 +39,7 @@ namespace mtp { namespace usb
 
 	void Device::SetConfiguration(int idx)
 	{
-	}
-
-	std::string Device::GetString(int idx) const
-	{
-		return std::string();
+		fprintf(stderr, "SetConfiguration(%d): not implemented", idx);
 	}
 
 }}

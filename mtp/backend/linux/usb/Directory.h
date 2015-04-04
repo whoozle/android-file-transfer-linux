@@ -62,13 +62,18 @@ namespace mtp { namespace usb
 		~Directory()
 		{ closedir(_dir); }
 
-		static int ReadInt(const std::string &path)
+		static int ReadInt(const std::string &path, int base = 16)
 		{
 			FILE *f = fopen(path.c_str(), "rt");
 			if (!f)
 				throw Exception("opening " + path);
 			int r = 0;
-			fscanf(f, "%x", &r);
+			switch(base)
+			{
+				case 16: if (fscanf(f, "%x", &r) != 1) throw std::runtime_error("cannot read number"); break;
+				case 10: if (fscanf(f, "%d", &r) != 1) throw std::runtime_error("cannot read number"); break;
+				default: throw std::runtime_error("invalid base");
+			}
 			fclose(f);
 			return r;
 		}

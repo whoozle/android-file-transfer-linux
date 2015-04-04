@@ -19,22 +19,34 @@
 #include <usb/DeviceDescriptor.h>
 #include <usb/Directory.h>
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
 namespace mtp { namespace usb
 {
-	DeviceDescriptor::DeviceDescriptor(const std::string &path): _path(path)
+	DeviceDescriptor::DeviceDescriptor(int busId, const std::string &path): _busId(busId), _path(path)
 	{
-		_vendor = Directory::ReadInt(path + "/idVendor");
-		_product = Directory::ReadInt(path + "/idProduct");
+		_vendor			= Directory::ReadInt(path + "/idVendor");
+		_product		= Directory::ReadInt(path + "/idProduct");
+		_deviceNumber	= Directory::ReadInt(path + "/devnum", 10);
+		printf("device at %s\n", path.c_str());
 	}
 
 	DevicePtr DeviceDescriptor::Open(ContextPtr context)
 	{
-		return nullptr;
+		DevicePtr device = TryOpen(context);
+		if (!device)
+			throw std::runtime_error("cannot open device at " + _path);
+		return device;
 	}
 
 	DevicePtr DeviceDescriptor::TryOpen(ContextPtr context)
 	{
-		return nullptr;
+		char fname[256];
+		snprintf(fname, sizeof(fname), "/dev/bus/usb/%03d/%03u", _busId, _deviceNumber);
+		int fd = open(fname, O_RDWR);
+		return fd != -1? std::make_shared<Device>(fd): nullptr;
 	}
 
 	DeviceDescriptor::~DeviceDescriptor()

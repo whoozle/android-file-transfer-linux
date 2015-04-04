@@ -29,16 +29,14 @@ namespace mtp { namespace usb
 	class Device : Noncopyable
 	{
 	private:
-		ContextPtr				_context;
+		int		_fd;
 
 	public:
-		Device(ContextPtr ctx);
+		Device(int fd);
 		~Device();
 
 		int GetConfiguration() const;
 		void SetConfiguration(int idx);
-
-		std::string GetString(int idx) const;
 	};
 	DECLARE_PTR(Device);
 }}
