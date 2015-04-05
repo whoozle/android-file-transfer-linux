@@ -81,7 +81,7 @@ namespace mtp { namespace usb
 				int delta = (now.tv_sec - started.tv_sec) * 1000 + (now.tv_nsec - started.tv_nsec) / 1000000;
 				if (timeout > 0 && delta >= timeout)
 					throw std::runtime_error("timeout reaping usb urb");
-				usleep(1000);
+				usleep(100); //0.1ms
 				continue;
 			}
 		}
