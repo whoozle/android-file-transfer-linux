@@ -79,7 +79,7 @@ namespace mtp { namespace usb
 				if (clock_gettime(CLOCK_MONOTONIC, &now) == -1)
 					throw Exception("clock_gettime");
 				int delta = (now.tv_sec - started.tv_sec) * 1000 + (now.tv_nsec - started.tv_nsec) / 1000000;
-				if (delta >= timeout)
+				if (timeout > 0 && delta >= timeout)
 					throw std::runtime_error("timeout reaping usb urb");
 				usleep(1000);
 				continue;
@@ -89,14 +89,22 @@ namespace mtp { namespace usb
 
 	void Device::WriteBulk(const EndpointPtr & ep, const ByteArray &data, int timeout)
 	{
-		usbdevfs_urb urb = {};
-		urb.usercontext = this;
-		urb.type = USBDEVFS_URB_TYPE_BULK;
-		urb.endpoint = ep->GetAddress();
-		urb.buffer = const_cast<u8 *>(data.data());
-		urb.buffer_length = data.size();
-		IOCTL(_fd, USBDEVFS_SUBMITURB, &urb);
-		Reap(timeout);
+		size_t transferSize = ep->GetMaxPacketSize() * 1024;
+
+		for(size_t offset = 0; offset <= data.size(); offset += transferSize)
+		{
+			fflush(stdout);
+			usbdevfs_urb urb = {};
+			urb.usercontext = this;
+			urb.type = USBDEVFS_URB_TYPE_BULK;
+			urb.endpoint = ep->GetAddress();
+			urb.buffer = const_cast<u8 *>(data.data() + offset);
+			urb.buffer_length = std::min(transferSize, data.size() - offset);
+			if (offset)
+				urb.flags |= USBDEVFS_URB_BULK_CONTINUATION;
+			IOCTL(_fd, USBDEVFS_SUBMITURB, &urb);
+			Reap(timeout);
+		}
 	}
 
 	ByteArray Device::ReadBulk(const EndpointPtr & ep, int timeout)
