@@ -70,7 +70,7 @@ int main(int argc, char **argv)
 	{
 		mtp::u32 parent = mtp::Session::Root;
 		if (argc > 2)
-			if (sscanf(argv[2], "%x", &parent) != 1)
+			if (sscanf(argv[2], "%u", &parent) != 1)
 				return 1;
 
 		msg::ObjectHandles handles = session->GetObjectHandles(mtp::Session::AllStorages, mtp::Session::AllFormats, parent);
@@ -80,7 +80,7 @@ int main(int argc, char **argv)
 			try
 			{
 				msg::ObjectInfo info = session->GetObjectInfo(objectId);
-				printf("%08x %04x %s %u %ux%u, %s\n", objectId, info.ObjectFormat, info.Filename.c_str(), info.ObjectCompressedSize, info.ImagePixWidth, info.ImagePixHeight, info.CaptureDate.c_str());
+				printf("%-10u %04x %s %u %ux%u, %s\n", objectId, info.ObjectFormat, info.Filename.c_str(), info.ObjectCompressedSize, info.ImagePixWidth, info.ImagePixHeight, info.CaptureDate.c_str());
 			}
 			catch(const std::exception &ex)
 			{
@@ -94,9 +94,9 @@ int main(int argc, char **argv)
 		if (argc < 3)
 			return 1;
 		mtp::u32 objectId;
-		if (sscanf(argv[2], "%x", &objectId) != 1)
+		if (sscanf(argv[2], "%u", &objectId) != 1)
 			return 1;
-		printf("object id = %08x\n", objectId);
+		printf("object id = %u\n", objectId);
 		msg::ObjectInfo info = session->GetObjectInfo(objectId);
 		printf("filename = %s\n", info.Filename.c_str());
 		FILE *f = fopen(info.Filename.c_str(), "wb");
@@ -116,11 +116,11 @@ int main(int argc, char **argv)
 			return 1;
 
 		mtp::u32 parentObjectId;
-		if (sscanf(argv[2], "%x", &parentObjectId) != 1)
+		if (sscanf(argv[2], "%u", &parentObjectId) != 1)
 			return 1;
 
 		std::string filename(argv[3]);
-		printf("uploading %s to %08x\n", filename.c_str(), parentObjectId);
+		printf("uploading %s to %u\n", filename.c_str(), parentObjectId);
 		FILE *f = fopen(filename.c_str(), "rb");
 		if (!f)
 		{
@@ -142,7 +142,7 @@ int main(int argc, char **argv)
 		fclose(f);
 
 		Session::NewObjectInfo noi = session->SendObjectInfo(oi, 0, parentObjectId);
-		printf("new object id = %08x\n", noi.ObjectId);
+		printf("new object id = %u\n", noi.ObjectId);
 		session->SendObject(data);
 		printf("done\n");
 	}
@@ -152,10 +152,10 @@ int main(int argc, char **argv)
 			return 1;
 
 		mtp::u32 objectId;
-		if (sscanf(argv[2], "%x", &objectId) != 1)
+		if (sscanf(argv[2], "%u", &objectId) != 1)
 			return 1;
 
-		printf("object id = %08x\n", objectId);
+		printf("object id = %u\n", objectId);
 		session->DeleteObject(objectId);
 	}
 	else if (command == "mkdir")
@@ -164,7 +164,7 @@ int main(int argc, char **argv)
 			return 1;
 
 		mtp::u32 parentObjectId = mtp::Session::Root;
-		if (argc > 3 && sscanf(argv[3], "%x", &parentObjectId) != 1)
+		if (argc > 3 && sscanf(argv[3], "%u", &parentObjectId) != 1)
 			return 1;
 
 		std::string filename = argv[2];
@@ -179,7 +179,7 @@ int main(int argc, char **argv)
 			return 1;
 
 		mtp::u32 objectId;
-		if (sscanf(argv[2], "%x", &objectId) != 1)
+		if (sscanf(argv[2], "%u", &objectId) != 1)
 			return 1;
 		msg::ObjectPropsSupported ops = session->GetObjectPropsSupported(objectId);
 		printf("properties supported: ");
