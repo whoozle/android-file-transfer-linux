@@ -57,7 +57,7 @@ namespace mtp { namespace usb
 		void WriteBulk(const EndpointPtr & ep, const ByteArray &data, int timeout);
 		ByteArray ReadBulk(const EndpointPtr & ep, int timeout);
 	private:
-		void Reap(void *urb, int timeout);
+		void Reap(int timeout);
 	};
 	DECLARE_PTR(Device);
 }}

@@ -59,15 +59,16 @@ namespace mtp { namespace usb
 		fprintf(stderr, "SetConfiguration(%d): not implemented", idx);
 	}
 
-	void Device::Reap(void *urb, int timeout)
+	void Device::Reap(int timeout)
 	{
+		usbdevfs_urb *urb;
 		timespec started = {};
 		if (clock_gettime(CLOCK_MONOTONIC, &started) == -1)
 			throw Exception("clock_gettime");
 
 		while(true)
 		{
-			int r = ioctl(_fd, USBDEVFS_REAPURBNDELAY, urb);
+			int r = ioctl(_fd, USBDEVFS_REAPURBNDELAY, &urb);
 			if (r == 0)
 			{
 				break;
@@ -95,7 +96,7 @@ namespace mtp { namespace usb
 		urb.buffer = const_cast<u8 *>(data.data());
 		urb.buffer_length = data.size();
 		IOCTL(_fd, USBDEVFS_SUBMITURB, &urb);
-		Reap(&urb, timeout);
+		Reap(timeout);
 	}
 
 	ByteArray Device::ReadBulk(const EndpointPtr & ep, int timeout)
@@ -109,7 +110,7 @@ namespace mtp { namespace usb
 		urb.buffer_length = data.size();
 		IOCTL(_fd, USBDEVFS_SUBMITURB, &urb);
 
-		Reap(&urb, timeout);
+		Reap(timeout);
 		data.resize(urb.actual_length);
 		return data;
 	}
