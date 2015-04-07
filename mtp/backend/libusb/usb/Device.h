@@ -34,10 +34,25 @@ namespace mtp { namespace usb
 		libusb_device_handle *	_handle;
 
 	public:
+		class InterfaceToken
+		{
+			libusb_device_handle *	_handle;
+			int						_index;
+
+		public:
+			InterfaceToken(libusb_device_handle *handle, int index);
+			~InterfaceToken();
+		};
+		DECLARE_PTR(InterfaceToken);
+
 		Device(ContextPtr ctx, libusb_device_handle * handle);
 		~Device();
 
-		libusb_device_handle * GetHandle() { return _handle; }
+		libusb_device_handle * GetHandle()
+		{ return _handle; }
+
+		InterfaceTokenPtr ClaimInterface(int index)
+		{ return std::make_shared<InterfaceToken>(_handle, index); }
 
 		int GetConfiguration() const;
 		void SetConfiguration(int idx);

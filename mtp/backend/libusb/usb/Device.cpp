@@ -43,6 +43,14 @@ namespace mtp { namespace usb
 		USB_CALL(libusb_set_configuration(_handle, idx));
 	}
 
+	Device::InterfaceToken::InterfaceToken(libusb_device_handle *handle, int index): _handle(handle), _index(index)
+	{
+		USB_CALL(libusb_claim_interface(handle, index));
+	}
+
+	Device::InterfaceToken::~InterfaceToken()
+	{ libusb_release_interface(_handle, _index); }
+
 	std::string Device::GetString(int idx) const
 	{
 		unsigned char buffer[4096];
