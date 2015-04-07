@@ -23,6 +23,47 @@
 #include <QFile>
 #include <QFileInfo>
 
+namespace
+{
+
+	class QtObjectInputStream : public mtp::IObjectInputStream
+	{
+		QFile _file;
+
+	public:
+		QtObjectInputStream(const QString &file) : _file(file) {
+			_file.open(QFile::ReadOnly);
+		}
+
+		bool Valid() const
+		{ return _file.isOpen(); }
+
+		virtual size_t GetSize() const
+		{ return _file.size(); }
+
+		virtual size_t Read(mtp::u8 *data, size_t size)
+		{ return _file.read(static_cast<char *>(static_cast<void *>(data)), size); }
+	};
+
+	class QtObjectOutputStream : public mtp::IObjectOutputStream
+	{
+		QFile _file;
+	public:
+		QtObjectOutputStream(const QString &file): _file(file)
+		{ _file.open(QFile::WriteOnly); }
+
+		bool Valid() const
+		{ return _file.isOpen(); }
+
+		virtual size_t GetSize() const
+		{ return _file.size(); }
+
+		virtual size_t Write(const mtp::u8 *data, size_t size)
+		{ return _file.write(static_cast<const char *>(static_cast<const void *>(data)), size); }
+	};
+
+}
+
 MtpObjectsModel::MtpObjectsModel(QObject *parent): QAbstractListModel(parent), _parentObjectId(mtp::Session::Root)
 { }
 
@@ -169,29 +210,22 @@ bool MtpObjectsModel::uploadFile(const QString &filePath, QString filename)
 		filename = fileInfo.fileName();
 	qDebug() << "uploadFile " << fileInfo.fileName() << " as " << filename;
 
-	mtp::ByteArray data;
+	std::shared_ptr<QtObjectInputStream> object(new QtObjectInputStream(filePath));
+	if (!object->Valid())
 	{
-		QFile file(filePath);
-		file.open(QFile::ReadOnly);
-		if (!file.isOpen())
-		{
-			qWarning() << "file " << filePath << " could not be opened";
-			return false;
-		}
-		QByteArray qdata = file.readAll();
-		file.close();
-		data.assign(qdata.begin(), qdata.end());
+		qWarning() << "file " << filePath << " could not be opened";
+		return false;
 	}
-	qDebug() << "sending " << data.size() << " bytes";
+	qDebug() << "sending " << fileInfo.size() << " bytes";
 
 	mtp::msg::ObjectInfo oi;
 	QByteArray filename_utf = filename.toUtf8();
 	oi.Filename = filename_utf.data();
 	oi.ObjectFormat = objectFormat;
-	oi.ObjectCompressedSize = data.size();
+	oi.ObjectCompressedSize = fileInfo.size();
 	mtp::Session::NewObjectInfo noi = _session->SendObjectInfo(oi, 0, _parentObjectId);
 	qDebug() << "new object id: " << noi.ObjectId << ", sending...";
-	_session->SendObject(data);
+	_session->SendObject(object);
 	qDebug() << "ok";
 	beginInsertRows(QModelIndex(), _rows.size(), _rows.size());
 	_rows.push_back(Row(noi.ObjectId));
@@ -201,14 +235,13 @@ bool MtpObjectsModel::uploadFile(const QString &filePath, QString filename)
 
 bool MtpObjectsModel::downloadFile(const QString &filePath, mtp::u32 objectId)
 {
-	QFile file(filePath);
-	file.open(QFile::WriteOnly);
-	if (!file.isOpen())
+	std::shared_ptr<QtObjectOutputStream> object(new QtObjectOutputStream(filePath));
+	if (!object->Valid())
+	{
+		qWarning() << "cannot open file " << filePath;
 		return false;
-
-	mtp::ByteArray data = _session->GetObject(objectId);
-	file.write(reinterpret_cast<const char *>(data.data()), data.size());
-	file.close();
+	}
+	_session->GetObject(objectId, object);
 	return true;
 }
 
