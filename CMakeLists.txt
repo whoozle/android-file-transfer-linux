@@ -7,7 +7,7 @@ find_package( Threads )
 
 option(BUILD_QT_UI "Build reference Qt application" ON)
 option(BUILD_SHARED_LIB "Build shared library" OFF)
-option(USE_LIBUSB "Use libusb-1.0" ON)
+option(USE_LIBUSB "Use libusb-1.0" OFF)
 
 add_definitions(-Wall -pthread -std=c++11)
 include_directories(. ${CMAKE_SOURCE_DIR})
