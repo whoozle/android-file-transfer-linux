@@ -19,7 +19,7 @@
 #ifndef PIPEPACKETER_H
 #define PIPEPACKETER_H
 
-#include <usb/BulkPipe.h>
+#include <mtp/usb/BulkPipe.h>
 #include <mtp/ptp/IObjectStream.h>
 #include <mtp/ptp/Response.h>
 

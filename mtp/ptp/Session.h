@@ -19,7 +19,7 @@
 #ifndef SESSION_H
 #define	SESSION_H
 
-#include <usb/BulkPipe.h>
+#include <mtp/usb/BulkPipe.h>
 #include <mtp/ptp/Messages.h>
 #include <mtp/ptp/PipePacketer.h>
 #include <mtp/ptp/ObjectProperty.h>

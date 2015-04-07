@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-#include <usb/BulkPipe.h>
+#include <mtp/usb/BulkPipe.h>
 #include <usb/DeviceDescriptor.h>
 
 namespace mtp { namespace usb
@@ -29,16 +29,10 @@ namespace mtp { namespace usb
 			_device->SetConfiguration(conf->GetIndex());
 
 		_claimToken = _device->ClaimInterface(interface->GetIndex());
-		//USB_CALL(libusb_claim_interface(_device->GetHandle(), interface->GetIndex()));
-		//libusb_clear_halt(device->GetHandle(), in->GetAddress());
-		//libusb_clear_halt(device->GetHandle(), out->GetAddress());
-		//libusb_clear_halt(device->GetHandle(), interrupt->GetAddress());
 	}
 
 	BulkPipe::~BulkPipe()
-	{
-		//libusb_release_interface(_device->GetHandle(), _interface->GetIndex());
-	}
+	{ }
 
 	ByteArray BulkPipe::ReadInterrupt()
 	{

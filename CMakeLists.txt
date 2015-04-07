@@ -18,6 +18,8 @@ set(SOURCES
 	mtp/ptp/PipePacketer.cpp
 	mtp/ptp/Response.cpp
 	mtp/ptp/Session.cpp
+
+	mtp/usb/BulkPipe.cpp
 )
 
 set(MTP_LIBRARIES mtp-ng-static)
@@ -29,7 +31,6 @@ if (USE_LIBUSB)
 	include_directories(mtp/backend/libusb)
 
 	list(APPEND SOURCES
-		mtp/backend/libusb/usb/BulkPipe.cpp
 		mtp/backend/libusb/usb/Context.cpp
 		mtp/backend/libusb/usb/Device.cpp
 		mtp/backend/libusb/usb/DeviceDescriptor.cpp
@@ -39,7 +40,6 @@ if (USE_LIBUSB)
 else()
 	include_directories(mtp/backend/linux)
 	list(APPEND SOURCES
-		mtp/backend/linux/usb/BulkPipe.cpp
 		mtp/backend/linux/usb/Exception.cpp
 		mtp/backend/linux/usb/Context.cpp
 		mtp/backend/linux/usb/Device.cpp

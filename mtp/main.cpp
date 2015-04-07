@@ -19,7 +19,6 @@
 #include <stdio.h>
 #include <stdexcept>
 
-#include <usb/BulkPipe.h>
 #include <usb/Context.h>
 #include <mtp/ptp/Container.h>
 #include <mtp/ptp/Device.h>
