@@ -21,7 +21,7 @@
 
 #include <mtp/types.h>
 #include <usb/Interface.h>
-#include <mtp/ByteArray.h>
+#include <mtp/ptp/IObjectStream.h>
 
 namespace mtp { namespace usb
 {
@@ -54,8 +54,8 @@ namespace mtp { namespace usb
 		int GetConfiguration() const;
 		void SetConfiguration(int idx);
 
-		void WriteBulk(const EndpointPtr & ep, const ByteArray &data, int timeout);
-		ByteArray ReadBulk(const EndpointPtr & ep, int timeout);
+		void WriteBulk(const EndpointPtr & ep, const IObjectInputStreamPtr &inputStream, int timeout);
+		void ReadBulk(const EndpointPtr & ep, const IObjectOutputStreamPtr &outputStream, int timeout);
 	private:
 		void Reap(int timeout);
 	};

@@ -20,48 +20,67 @@
 #include <mtp/ptp/PipePacketer.h>
 #include <mtp/ptp/Response.h>
 #include <mtp/ptp/InputStream.h>
+#include <mtp/ptp/ByteArrayObjectStream.h>
+#include <mtp/ptp/JoinedObjectStream.h>
 
 
 namespace mtp
 {
 
+	void PipePacketer::Write(const IObjectInputStreamPtr &inputStream, int timeout)
+	{ _pipe->Write(inputStream, timeout); }
+
 	void PipePacketer::Write(const ByteArray &data, int timeout)
+	{ Write(std::make_shared<ByteArrayObjectInputStream>(data), timeout); }
+
+	namespace
 	{
-		//HexDump("send", data);
-		_pipe->Write(data, timeout);
+		class MessageParsingStream : public JoinedObjectOutputStreamBase
+		{
+			FixedSizeByteArrayObjectOutputStreamPtr	_header;
+			IObjectOutputStreamPtr					_stream;
+			size_t									_offset;
+			size_t									_size;
+		private:
+			IObjectOutputStreamPtr GetStream1() const
+			{ return _header; }
+
+			IObjectOutputStreamPtr GetStream2() const
+			{ return _stream; }
+
+		public:
+			MessageParsingStream(IObjectOutputStreamPtr stream): _header(new FixedSizeByteArrayObjectOutputStream(4)), _stream(stream), _offset(0), _size(4) { }
+
+			bool Done() const
+			{ return _offset >= _size; }
+
+			virtual void OnStream1Exhausted()
+			{
+				InputStream is(_header->GetData());
+				u32 size;
+				is >> size;
+				if (size < 4)
+					throw std::runtime_error("invalid size/malformed message");
+				_size = size;
+			}
+
+			virtual size_t Write(const u8 *data, size_t size)
+			{
+				size_t r = JoinedObjectOutputStreamBase::Write(data, size);
+				_offset += r;
+				if (_offset == _header->GetData().size())
+					OnStream1Exhausted();
+				return r;
+			}
+		};
+		DECLARE_PTR(MessageParsingStream);
 	}
 
-	ByteArray PipePacketer::ReadMessage(int timeout)
+	void PipePacketer::ReadMessage(const IObjectOutputStreamPtr &outputStream, int timeout)
 	{
-		ByteArray result;
-		u32 size = ~0u;
-		size_t offset = 0;
-		size_t packet_offset;
-		while(true)
-		{
-			ByteArray data = _pipe->Read(timeout);
-			if (size == ~0u)
-			{
-				InputStream stream(data);
-				stream >> size;
-				//fprintf(stderr, "DATA SIZE = %u\n", size);
-				if (size < 4)
-					throw std::runtime_error("invalid size");
-				packet_offset = 4;
-				result.resize(size - 4);
-			}
-			else
-				packet_offset = 0;
-			//HexDump("recv", data);
-
-			size_t src_n = std::min(data.size() - packet_offset, result.size() - offset);
-			std::copy(data.begin() + packet_offset, data.begin() + packet_offset + src_n, result.begin() + offset);
-			offset += data.size();
-			if (offset >= result.size())
-				break;
-		}
-		return result;
-
+		MessageParsingStreamPtr output(new MessageParsingStream(outputStream));
+		while(!output->Done())
+			_pipe->Read(output, timeout);
 	}
 
 	void PipePacketer::PollEvent()
@@ -87,42 +106,123 @@ namespace mtp
 		fprintf(stderr, "event %04x\n", eventCode);
 	}
 
+	namespace
+	{
+		struct DummyOutputStream : IObjectOutputStream
+		{
+			virtual size_t Write(const u8 *data, size_t size)
+			{ return size; }
+		};
 
-	void PipePacketer::Read(u32 transaction, ByteArray &data, ByteArray &response, bool ignoreTransaction, int timeout)
+		class HeaderParserObjectOutputStream : public JoinedObjectOutputStreamBase
+		{
+			size_t									_offset;
+			u32										_transaction;
+			FixedSizeByteArrayObjectOutputStreamPtr	_header;
+			ByteArrayObjectOutputStreamPtr			_response;
+			IObjectOutputStreamPtr					_dataOutput;
+			IObjectOutputStreamPtr					_output;
+			bool									_valid;
+			bool									_finished;
+			ResponseType							_responseCode;
+
+		private:
+			virtual IObjectOutputStreamPtr GetStream1() const
+			{ return _header; }
+			virtual IObjectOutputStreamPtr GetStream2() const
+			{ if (!_output) throw std::runtime_error("no data stream"); return _output; }
+
+			virtual void OnStream1Exhausted()
+			{
+				InputStream stream(_header->GetData());
+				Response header;
+				header.Read(stream);
+				if (_transaction && _transaction != header.Transaction)
+				{
+					fprintf(stderr, "drop message %04x %04x, transaction %08x, expected: %08x\n", header.ContainerType, header.ResponseType, header.Transaction, _transaction);
+					_valid = false;
+					_output = std::make_shared<DummyOutputStream>();
+					return;
+				}
+
+				switch(header.ContainerType)
+				{
+				case ContainerType::Data:
+					_output			= _dataOutput;
+					break;
+				case ContainerType::Response:
+					_output			= _response;
+					_responseCode	= header.ResponseType;
+					_finished		= true;
+					break;
+				default:
+					_valid			= false;
+					_output			= std::make_shared<DummyOutputStream>();
+				}
+			}
+
+		public:
+			HeaderParserObjectOutputStream(u32 transaction, IObjectOutputStreamPtr dataOutput):
+				_offset(0), _transaction(transaction),
+				_header(new FixedSizeByteArrayObjectOutputStream(Response::Size)),
+				_response(new ByteArrayObjectOutputStream),
+				_dataOutput(dataOutput),
+				_valid(true), _finished(false) { }
+
+			ResponseType GetResponseCode() const
+			{ return _responseCode; }
+
+			const ByteArray &GetResponse() const
+			{ return _response->GetData(); }
+
+			bool Valid() const
+			{ return _valid; }
+			bool Finished() const
+			{ return _finished; }
+
+			virtual size_t Write(const u8 *data, size_t size)
+			{
+				size_t r = JoinedObjectOutputStreamBase::Write(data, size);
+				_offset += r;
+				if (_offset == _header->GetData().size())
+					OnStream1Exhausted();
+				return r;
+			}
+		};
+		DECLARE_PTR(HeaderParserObjectOutputStream);
+	}
+
+	void PipePacketer::Read(u32 transaction, const IObjectOutputStreamPtr &object, ResponseType &code, ByteArray &response, int timeout)
 	{
 		try
 		{ PollEvent(); }
 		catch(const std::exception &ex)
 		{ fprintf(stderr, "exception in interrupt: %s\n", ex.what()); }
 
-		data.clear();
 		response.clear();
 
-		ByteArray message;
-		Response header;
 		while(true)
 		{
-			message = ReadMessage(timeout);
-			//HexDump("message", message);
-			InputStream stream(message);
-			header.Read(stream);
-			if (ignoreTransaction || header.Transaction == transaction)
+			HeaderParserObjectOutputStreamPtr parser(new HeaderParserObjectOutputStream(transaction, object));
+			ReadMessage(parser, timeout);
+			if (parser->Finished())
+			{
+				response = parser->GetResponse();
+				code = parser->GetResponseCode();
 				break;
-
-			fprintf(stderr, "drop message %04x %04x, transaction %08x, expected: %08x\n", header.ContainerType, header.ResponseType, header.Transaction, transaction);
-		}
-
-		if (header.ContainerType == ContainerType::Data)
-		{
-			data = std::move(message);
-			response = ReadMessage(timeout);
-		}
-		else
-		{
-			response = std::move(message);
+			}
 		}
 
 		//HexDump("response", response);
 	}
+
+	void PipePacketer::Read(u32 transaction, ByteArray &data, ResponseType &code, ByteArray &response, int timeout)
+	{
+		ByteArrayObjectOutputStreamPtr stream(new ByteArrayObjectOutputStream);
+		Read(transaction, stream, code, response, timeout);
+		data = stream->GetData();
+	}
+
+
 
 }

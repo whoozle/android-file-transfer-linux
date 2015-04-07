@@ -46,14 +46,14 @@ namespace mtp { namespace usb
 		return data;
 	}
 
-	ByteArray BulkPipe::Read(int timeout)
+	void BulkPipe::Read(const IObjectOutputStreamPtr &outputStream, int timeout)
 	{
-		return _device->ReadBulk(_in, timeout);
+		_device->ReadBulk(_in, outputStream, timeout);
 	}
 
-	void BulkPipe::Write(const ByteArray &data, int timeout)
+	void BulkPipe::Write(const IObjectInputStreamPtr &inputStream, int timeout)
 	{
-		_device->WriteBulk(_out, data, timeout);
+		_device->WriteBulk(_out, inputStream, timeout);
 	}
 
 	BulkPipePtr BulkPipe::Create(usb::DevicePtr device, ConfigurationPtr conf, usb::InterfacePtr interface)

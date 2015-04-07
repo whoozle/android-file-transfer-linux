@@ -18,6 +18,7 @@
  */
 #include <usb/Device.h>
 #include <usb/Exception.h>
+#include <mtp/ByteArray.h>
 
 #include <unistd.h>
 #include <sys/ioctl.h>
@@ -87,27 +88,34 @@ namespace mtp { namespace usb
 		}
 	}
 
-	void Device::WriteBulk(const EndpointPtr & ep, const ByteArray &data, int timeout)
+	void Device::WriteBulk(const EndpointPtr & ep, const IObjectInputStreamPtr &inputStream, int timeout)
 	{
 		size_t transferSize = ep->GetMaxPacketSize() * 1024;
+		ByteArray data(transferSize);
 
-		for(size_t offset = 0; offset <= data.size(); offset += transferSize)
+		size_t r;
+		bool continuation = false;
+		do
 		{
-			fflush(stdout);
+			r = inputStream->Read(data.data(), data.size());
+			//HexDump("write", ByteArray(data.data(), data.data() + r));
 			usbdevfs_urb urb = {};
 			urb.usercontext = this;
 			urb.type = USBDEVFS_URB_TYPE_BULK;
 			urb.endpoint = ep->GetAddress();
-			urb.buffer = const_cast<u8 *>(data.data() + offset);
-			urb.buffer_length = std::min(transferSize, data.size() - offset);
-			if (offset)
+			urb.buffer = const_cast<u8 *>(data.data());
+			urb.buffer_length = r;
+			if (continuation)
 				urb.flags |= USBDEVFS_URB_BULK_CONTINUATION;
+			else
+				continuation = true;
 			IOCTL(_fd, USBDEVFS_SUBMITURB, &urb);
 			Reap(timeout);
 		}
+		while(r == transferSize);
 	}
 
-	ByteArray Device::ReadBulk(const EndpointPtr & ep, int timeout)
+	void Device::ReadBulk(const EndpointPtr & ep, const IObjectOutputStreamPtr &outputStream, int timeout)
 	{
 		ByteArray data(ep->GetMaxPacketSize() * 1024);
 		usbdevfs_urb urb = {};
@@ -119,8 +127,8 @@ namespace mtp { namespace usb
 		IOCTL(_fd, USBDEVFS_SUBMITURB, &urb);
 
 		Reap(timeout);
-		data.resize(urb.actual_length);
-		return data;
+		//HexDump("read", ByteArray(data.data(), data.data() + urb.actual_length));
+		outputStream->Write(data.data(), urb.actual_length);
 	}
 
 }}

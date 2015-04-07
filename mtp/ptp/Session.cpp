@@ -20,15 +20,15 @@
 #include <mtp/ptp/Messages.h>
 #include <mtp/ptp/Container.h>
 #include <mtp/ptp/OperationRequest.h>
+#include <mtp/ptp/ByteArrayObjectStream.h>
+#include <mtp/ptp/JoinedObjectStream.h>
 
 namespace mtp
 {
 
-#define CHECK_RESPONSE(RDATA) do { \
-	InputStream s(response); \
-	Response header(s);\
-	if (header.ResponseType != ResponseType::OK && header.ResponseType != ResponseType::SessionAlreadyOpen) \
-		throw InvalidResponseException(__func__, header.ResponseType); \
+#define CHECK_RESPONSE(RCODE) do { \
+	if ((RCODE) != ResponseType::OK && (RCODE) != ResponseType::SessionAlreadyOpen) \
+		throw InvalidResponseException(__func__, (RCODE)); \
 } while(false)
 
 	void Session::Close()
@@ -37,7 +37,8 @@ namespace mtp
 		Container container(req);
 		_packeter.Write(container.Data);
 		ByteArray data, response;
-		_packeter.Read(0, data, response, true);
+		ResponseType responseCode;
+		_packeter.Read(0, data, responseCode, response);
 		//HexDump("payload", data);
 	}
 
@@ -48,9 +49,10 @@ namespace mtp
 		Container container(req);
 		_packeter.Write(container.Data);
 		ByteArray data, response;
-		_packeter.Read(transaction, data, response);
-		CHECK_RESPONSE(response);
-		InputStream stream(data, 8); //operation code + session id
+		ResponseType responseCode;
+		_packeter.Read(transaction, data, responseCode, response);
+		CHECK_RESPONSE(responseCode);
+		InputStream stream(data);
 
 		msg::ObjectHandles goh;
 		goh.Read(stream);
@@ -64,9 +66,10 @@ namespace mtp
 		Container container(req);
 		_packeter.Write(container.Data);
 		ByteArray data, response;
-		_packeter.Read(transaction, data, response);
-		CHECK_RESPONSE(response);
-		InputStream stream(data, 8); //operation code + session id
+		ResponseType responseCode;
+		_packeter.Read(transaction, data, responseCode, response);
+		CHECK_RESPONSE(responseCode);
+		InputStream stream(data);
 
 		msg::StorageIDs gsi;
 		gsi.Read(stream);
@@ -80,9 +83,10 @@ namespace mtp
 		Container container(req);
 		_packeter.Write(container.Data);
 		ByteArray data, response;
-		_packeter.Read(transaction, data, response);
-		CHECK_RESPONSE(response);
-		InputStream stream(data, 8); //operation code + session id
+		ResponseType responseCode;
+		_packeter.Read(transaction, data, responseCode, response);
+		CHECK_RESPONSE(responseCode);
+		InputStream stream(data);
 		msg::StorageInfo gsi;
 		gsi.Read(stream);
 		return gsi;
@@ -95,9 +99,10 @@ namespace mtp
 		Container container(req);
 		_packeter.Write(container.Data);
 		ByteArray data, response;
-		_packeter.Read(transaction, data, response);
-		CHECK_RESPONSE(response);
-		InputStream stream(data, 8); //operation code + session id
+		ResponseType responseCode;
+		_packeter.Read(transaction, data, responseCode, response);
+		CHECK_RESPONSE(responseCode);
+		InputStream stream(data);
 		msg::ObjectInfo goi;
 		goi.Read(stream);
 		return goi;
@@ -110,24 +115,25 @@ namespace mtp
 		Container container(req);
 		_packeter.Write(container.Data);
 		ByteArray data, response;
-		_packeter.Read(transaction, data, response);
-		CHECK_RESPONSE(response);
-		InputStream stream(data, 8); //operation code + session id
+		ResponseType responseCode;
+		_packeter.Read(transaction, data, responseCode, response);
+		CHECK_RESPONSE(responseCode);
+		InputStream stream(data);
 		msg::ObjectPropsSupported ops;
 		ops.Read(stream);
 		return ops;
 	}
 
-	ByteArray Session::GetObject(u32 objectId)
+	void Session::GetObject(u32 objectId, const IObjectOutputStreamPtr &outputStream)
 	{
 		u32 transaction = _transactionId++;
 		OperationRequest req(OperationCode::GetObject, transaction, objectId);
 		Container container(req);
 		_packeter.Write(container.Data);
-		ByteArray data, response;
-		_packeter.Read(transaction, data, response);
-		CHECK_RESPONSE(response);
-		return ByteArray(data.begin() + 8, data.end());
+		ByteArray response;
+		ResponseType responseCode;
+		_packeter.Read(transaction, outputStream, responseCode, response);
+		CHECK_RESPONSE(responseCode);
 	}
 
 	Session::NewObjectInfo Session::SendObjectInfo(const msg::ObjectInfo &objectInfo, u32 storageId, u32 parentObject)
@@ -146,10 +152,11 @@ namespace mtp
 			_packeter.Write(container.Data);
 		}
 		ByteArray data, response;
-		_packeter.Read(transaction, data, response);
+		ResponseType responseCode;
+		_packeter.Read(transaction, data, responseCode, response);
 		//HexDump("response", response);
-		CHECK_RESPONSE(response);
-		InputStream stream(response, 8); //operation code + session id
+		CHECK_RESPONSE(responseCode);
+		InputStream stream(response);
 		NewObjectInfo noi;
 		stream >> noi.StorageId;
 		stream >> noi.ParentObjectId;
@@ -157,7 +164,7 @@ namespace mtp
 		return noi;
 	}
 
-	void Session::SendObject(const ByteArray &object)
+	void Session::SendObject(const IObjectInputStreamPtr &inputStream)
 	{
 		u32 transaction = _transactionId++;
 		{
@@ -167,13 +174,13 @@ namespace mtp
 		}
 		{
 			DataRequest req(OperationCode::SendObject, transaction);
-			req.Append(object);
-			Container container(req);
-			_packeter.Write(container.Data, 0);
+			Container container(req, inputStream);
+			_packeter.Write(std::make_shared<JoinedObjectInputStream>(std::make_shared<ByteArrayObjectInputStream>(container.Data), inputStream));
 		}
 		ByteArray data, response;
-		_packeter.Read(transaction, data, response);
-		CHECK_RESPONSE(response);
+		ResponseType responseCode;
+		_packeter.Read(transaction, data, responseCode, response);
+		CHECK_RESPONSE(responseCode);
 	}
 
 	void Session::SetObjectProperty(u32 objectId, ObjectProperty property, const ByteArray &value)
@@ -191,8 +198,9 @@ namespace mtp
 			_packeter.Write(container.Data, 0);
 		}
 		ByteArray data, response;
-		_packeter.Read(transaction, data, response);
-		CHECK_RESPONSE(response);
+		ResponseType responseCode;
+		_packeter.Read(transaction, data, responseCode, response);
+		CHECK_RESPONSE(responseCode);
 	}
 
 	ByteArray Session::GetObjectProperty(u32 objectId, ObjectProperty property)
@@ -204,8 +212,9 @@ namespace mtp
 			_packeter.Write(container.Data);
 		}
 		ByteArray data, response;
-		_packeter.Read(transaction, data, response);
-		CHECK_RESPONSE(response);
+		ResponseType responseCode;
+		_packeter.Read(transaction, data, responseCode, response);
+		CHECK_RESPONSE(responseCode);
 		return data;
 	}
 
@@ -226,8 +235,9 @@ namespace mtp
 		Container container(req);
 		_packeter.Write(container.Data);
 		ByteArray data, response;
-		_packeter.Read(transaction, data, response);
-		CHECK_RESPONSE(response);
+		ResponseType responseCode;
+		_packeter.Read(transaction, data, responseCode, response);
+		CHECK_RESPONSE(responseCode);
 	}
 
 }

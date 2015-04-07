@@ -24,16 +24,75 @@
 #include <mtp/ptp/Container.h>
 #include <mtp/ptp/Device.h>
 #include <mtp/ptp/Messages.h>
+#include <mtp/ptp/IObjectStream.h>
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+namespace
+{
+
+	class ObjectInputStream : public mtp::IObjectInputStream
+	{
+		int		_fd;
+		size_t	_size;
+
+	public:
+		ObjectInputStream(const std::string &fname) : _fd(open(fname.c_str(), O_RDONLY))
+		{
+			if (_fd < 0)
+				throw std::runtime_error("cannot open file: " + fname);
+			struct stat st;
+			if (stat(fname.c_str(), &st) != 0)
+				throw std::runtime_error("stat failed");
+			_size = st.st_size;
+		}
+
+		~ObjectInputStream()
+		{ close(_fd); }
+
+		size_t GetSize() const
+		{ return _size; }
+
+		virtual size_t Read(mtp::u8 *data, size_t size)
+		{
+			ssize_t r = read(_fd, data, size);
+			if (r < 0)
+				throw std::runtime_error("read failed");
+			return r;
+		}
+	};
+
+	class ObjectOutputStream : public mtp::IObjectOutputStream
+	{
+		int		_fd;
+
+	public:
+		ObjectOutputStream(const std::string &fname) : _fd(open(fname.c_str(), O_WRONLY))
+		{
+			if (_fd < 0)
+				throw std::runtime_error("cannot open file: " + fname);
+		}
+
+		~ObjectOutputStream()
+		{ close(_fd); }
+
+		virtual size_t Write(const mtp::u8 *data, size_t size)
+		{
+			ssize_t r = write(_fd, data, size);
+			if (r < 0)
+				throw std::runtime_error("write failed");
+			return r;
+		}
+	};
+
+}
 
 int main(int argc, char **argv)
 {
 	using namespace mtp;
-	//USB_CALL(libusb_reset_device(device->GetHandle()));
-
-	//printf("claiming interface %d...\n", interface->GetIndex());
-	//USB_CALL(libusb_claim_interface(device->GetHandle(), interface->GetIndex()));
-	//printf("claimed interface\n");
-	//USB_CALL(libusb_set_interface_alt_setting(device->GetHandle(), mtp_interface, 0));
 
 	DevicePtr mtp(Device::Find());
 	if (!mtp)
@@ -99,16 +158,8 @@ int main(int argc, char **argv)
 		printf("object id = %u\n", objectId);
 		msg::ObjectInfo info = session->GetObjectInfo(objectId);
 		printf("filename = %s\n", info.Filename.c_str());
-		FILE *f = fopen(info.Filename.c_str(), "wb");
-		if (!f)
-		{
-			perror("open");
-			return 1;
-		}
-		ByteArray object = session->GetObject(objectId);
-		if (fwrite(object.data(), object.size(), 1, f) != 1)
-			perror("fwriter");
-		fclose(f);
+
+		session->GetObject(objectId, std::make_shared<ObjectOutputStream>(info.Filename));
 	}
 	else if (command == "set")
 	{
@@ -121,29 +172,17 @@ int main(int argc, char **argv)
 
 		std::string filename(argv[3]);
 		printf("uploading %s to %u\n", filename.c_str(), parentObjectId);
-		FILE *f = fopen(filename.c_str(), "rb");
-		if (!f)
-		{
-			perror("open");
-			return 1;
-		}
+
 		msg::ObjectInfo oi;
 		oi.Filename = filename;
 		oi.ObjectFormat = ObjectFormatFromFilename(filename);
 
-		fseek(f, 0, SEEK_END);
-		oi.ObjectCompressedSize = ftell(f);
-		rewind(f);
-
-		ByteArray data(oi.ObjectCompressedSize);
-		if (fread(data.data(), data.size(), 1, f) != 1)
-			throw std::runtime_error("read failed");
-
-		fclose(f);
+		std::shared_ptr<ObjectInputStream> objectInput(new ObjectInputStream(filename));
+		oi.ObjectCompressedSize = objectInput->GetSize();
 
 		Session::NewObjectInfo noi = session->SendObjectInfo(oi, 0, parentObjectId);
 		printf("new object id = %u\n", noi.ObjectId);
-		session->SendObject(data);
+		session->SendObject(objectInput);
 		printf("done\n");
 	}
 	else if (command == "delete")

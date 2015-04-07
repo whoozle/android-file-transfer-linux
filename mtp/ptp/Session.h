@@ -23,6 +23,7 @@
 #include <mtp/ptp/Messages.h>
 #include <mtp/ptp/PipePacketer.h>
 #include <mtp/ptp/ObjectProperty.h>
+#include <mtp/ptp/IObjectStream.h>
 
 namespace mtp
 {
@@ -53,9 +54,9 @@ namespace mtp
 		msg::StorageIDs GetStorageIDs();
 		msg::StorageInfo GetStorageInfo(u32 storageId);
 		msg::ObjectInfo GetObjectInfo(u32 objectId);
-		ByteArray GetObject(u32 objectId);
+		void GetObject(u32 objectId, const IObjectOutputStreamPtr &outputStream);
 		NewObjectInfo SendObjectInfo(const msg::ObjectInfo &objectInfo, u32 storageId = 0, u32 parentObject = 0);
-		void SendObject(const ByteArray &array);
+		void SendObject(const IObjectInputStreamPtr &inputStream);
 		void DeleteObject(u32 objectId);
 		msg::ObjectPropsSupported GetObjectPropsSupported(u32 objectId);
 

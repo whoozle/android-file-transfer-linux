@@ -20,9 +20,9 @@
 #define	CONTAINER_H
 
 #include <mtp/types.h>
-#include <mtp/ptp/InputStream.h>
 #include <mtp/ptp/OutputStream.h>
 #include <mtp/ptp/Response.h>
+#include <mtp/ptp/IObjectStream.h>
 
 namespace mtp
 {
@@ -37,6 +37,14 @@ namespace mtp
 			stream << ((u32)msg.Data.size() + 6);
 			stream << Message::Type;
 			std::copy(msg.Data.begin(), msg.Data.end(), std::back_inserter(Data));
+		}
+
+		template<typename Message>
+		Container(const Message &msg, IObjectInputStreamPtr inputStream)
+		{
+			OutputStream stream(Data);
+			stream << ((u32)inputStream->GetSize() + 6);
+			stream << Message::Type;
 		}
 	};
 

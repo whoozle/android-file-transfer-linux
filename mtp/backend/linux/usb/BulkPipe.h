@@ -22,6 +22,7 @@
 #include <usb/Device.h>
 #include <usb/Interface.h>
 #include <mtp/ByteArray.h>
+#include <mtp/ptp/IObjectStream.h>
 
 namespace mtp { namespace usb
 {
@@ -41,8 +42,9 @@ namespace mtp { namespace usb
 		~BulkPipe();
 
 		ByteArray ReadInterrupt();
-		ByteArray Read(int timeout = 3000);
-		void Write(const ByteArray &data, int timeout = 3000);
+
+		void Read(const IObjectOutputStreamPtr &outputStream, int timeout = 3000);
+		void Write(const IObjectInputStreamPtr &inputStream, int timeout = 3000);
 
 		static BulkPipePtr Create(usb::DevicePtr device, ConfigurationPtr conf, usb::InterfacePtr owner);
 	};

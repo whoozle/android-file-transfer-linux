@@ -33,10 +33,11 @@ namespace mtp
 		Container container(req);
 		_packeter.Write(container.Data);
 		ByteArray data, response;
-		_packeter.Read(0, data, response, true);
+		ResponseType code;
+		_packeter.Read(0, data, code, response);
 		//HexDump("payload", data);
 
-		InputStream stream(data, 8); //operation code + session id
+		InputStream stream(data); //operation code + session id
 		msg::DeviceInfo gdi;
 		gdi.Read(stream);
 		return gdi;
@@ -48,7 +49,8 @@ namespace mtp
 		Container container(req);
 		_packeter.Write(container.Data);
 		ByteArray data, response;
-		_packeter.Read(0, data, response, true);
+		ResponseType code;
+		_packeter.Read(0, data, code, response);
 		//HexDump("payload", data);
 
 		return std::make_shared<Session>(_packeter.GetPipe(), sessionId);

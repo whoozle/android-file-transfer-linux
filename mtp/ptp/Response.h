@@ -83,6 +83,8 @@ namespace mtp
 
 	struct Response
 	{
+		static const size_t		Size = 8;
+
 		mtp::ContainerType		ContainerType;
 		mtp::ResponseType		ResponseType;
 		u32						Transaction;

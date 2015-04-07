@@ -20,6 +20,8 @@
 #define PIPEPACKETER_H
 
 #include <usb/BulkPipe.h>
+#include <mtp/ptp/IObjectStream.h>
+#include <mtp/ptp/Response.h>
 
 namespace mtp
 {
@@ -36,13 +38,16 @@ namespace mtp
 		usb::BulkPipePtr GetPipe() const
 		{ return _pipe; }
 
+		void Write(const IObjectInputStreamPtr &inputStream, int timeout = 3000);
 		void Write(const ByteArray &data, int timeout = 3000);
-		void Read(u32 transaction, ByteArray &data, ByteArray &response, bool ignoreTransaction = false, int timeout = 3000);
+
+		void Read(u32 transaction, const IObjectOutputStreamPtr &outputStream, ResponseType &code, ByteArray &response, int timeout = 3000);
+		void Read(u32 transaction, ByteArray &data, ResponseType &code, ByteArray &response, int timeout = 3000);
 
 		void PollEvent();
 
 	private:
-		ByteArray ReadMessage(int timeout);
+		void ReadMessage(const IObjectOutputStreamPtr &outputStream, int timeout);
 	};
 
 }
