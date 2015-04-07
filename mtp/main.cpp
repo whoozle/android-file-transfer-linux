@@ -43,7 +43,10 @@ namespace
 		ObjectInputStream(const std::string &fname) : _fd(open(fname.c_str(), O_RDONLY))
 		{
 			if (_fd < 0)
+			{
+				perror("open");
 				throw std::runtime_error("cannot open file: " + fname);
+			}
 			struct stat st;
 			if (stat(fname.c_str(), &st) != 0)
 				throw std::runtime_error("stat failed");
@@ -70,10 +73,13 @@ namespace
 		int		_fd;
 
 	public:
-		ObjectOutputStream(const std::string &fname) : _fd(open(fname.c_str(), O_WRONLY))
+		ObjectOutputStream(const std::string &fname) : _fd(open(fname.c_str(), O_WRONLY | O_CREAT | O_TRUNC))
 		{
 			if (_fd < 0)
+			{
+				perror("open");
 				throw std::runtime_error("cannot open file: " + fname);
+			}
 		}
 
 		~ObjectOutputStream()
