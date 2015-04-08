@@ -102,7 +102,7 @@
   </action>
   <action name="actionGo_Down">
    <property name="icon">
-    <iconset theme="go-down">
+    <iconset theme="go-next">
      <normaloff/>
     </iconset>
    </property>
