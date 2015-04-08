@@ -19,6 +19,7 @@
 #ifndef DEVICE_H
 #define	DEVICE_H
 
+#include <mtp/ptp/IObjectStream.h>
 #include <mtp/types.h>
 #include <libusb.h>
 
@@ -26,6 +27,46 @@ namespace mtp { namespace usb
 {
 	class Context;
 	DECLARE_PTR(Context);
+
+	enum struct EndpointType
+	{
+		Control = 0, Isochronous = 1, Bulk = 2, Interrupt = 3
+	};
+
+	enum struct EndpointDirection
+	{
+		In, Out
+	};
+
+
+	class Endpoint
+	{
+		const libusb_endpoint_descriptor & _endpoint;
+
+	public:
+		Endpoint(const libusb_endpoint_descriptor & endpoint) : _endpoint(endpoint) { }
+
+		u8 GetAddress() const
+		{ return _endpoint.bEndpointAddress; }
+
+		int GetMaxPacketSize() const
+		{ return _endpoint.wMaxPacketSize; }
+
+		EndpointDirection GetDirection() const
+		{
+			u8 dir = GetAddress() & LIBUSB_ENDPOINT_DIR_MASK;
+			if (dir == LIBUSB_ENDPOINT_IN)
+				return EndpointDirection::In;
+			else
+				return EndpointDirection::Out;
+		}
+
+		EndpointType GetType() const
+		{
+			return EndpointType(_endpoint.bmAttributes & 3);
+		}
+	};
+	DECLARE_PTR(Endpoint);
 
 	class Device : Noncopyable
 	{
@@ -56,6 +97,9 @@ namespace mtp { namespace usb
 
 		int GetConfiguration() const;
 		void SetConfiguration(int idx);
+
+		void WriteBulk(const EndpointPtr & ep, const IObjectInputStreamPtr &inputStream, int timeout);
+		void ReadBulk(const EndpointPtr & ep, const IObjectOutputStreamPtr &outputStream, int timeout);
 
 		std::string GetString(int idx) const;
 	};

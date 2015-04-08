@@ -19,6 +19,7 @@
 #include <usb/Device.h>
 #include <usb/Context.h>
 #include <usb/call.h>
+#include <mtp/ByteArray.h>
 
 namespace mtp { namespace usb
 {
@@ -50,6 +51,25 @@ namespace mtp { namespace usb
 
 	Device::InterfaceToken::~InterfaceToken()
 	{ libusb_release_interface(_handle, _index); }
+
+	void Device::WriteBulk(const EndpointPtr & ep, const IObjectInputStreamPtr &inputStream, int timeout)
+	{
+		ByteArray data(inputStream->GetSize());
+		inputStream->Read(data.data(), data.size());
+		int tr = 0;
+		USB_CALL(libusb_bulk_transfer(_handle, ep->GetAddress(), const_cast<u8 *>(data.data()), data.size(), &tr, timeout));
+		if (tr != (int)data.size())
+			throw std::runtime_error("short write");
+	}
+
+	void Device::ReadBulk(const EndpointPtr & ep, const IObjectOutputStreamPtr &outputStream, int timeout)
+	{
+		ByteArray data(ep->GetMaxPacketSize() * 1024);
+		int tr = 0;
+		USB_CALL(libusb_bulk_transfer(_handle, ep->GetAddress(), data.data(), data.size(), &tr, timeout));
+		outputStream->Write(data.data(), tr);
+	}
+
 
 	std::string Device::GetString(int idx) const
 	{
