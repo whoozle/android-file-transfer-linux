@@ -52,6 +52,7 @@ void ProgressDialog::setProgress(float current)
 
 void ProgressDialog::setValue(float current)
 {
+	//qDebug() << "setValue " << current;
 	_duration += _animation->currentTime();
 	float currentAnimated = _animation->currentValue().toFloat();
 	if (_duration <= 0)

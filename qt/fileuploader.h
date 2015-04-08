@@ -54,10 +54,10 @@ class FileUploader : public QObject
 private:
 	MtpObjectsModel	*	_model;
 	QThread				_workerThread;
-	qlonglong			_total;
+	qint64				_total;
 
 private slots:
-	void onProgress(qlonglong current);
+	void onProgress(qint64 current);
 	void onStarted(const QString &file);
 	void onFinished();
 

@@ -26,7 +26,7 @@
 
 FileUploaderWorker::FileUploaderWorker(MtpObjectsModel *model): _model(model), _completedFilesSize(0)
 {
-	connect(_model, SIGNAL(filePositionChanged(qint64,qint64)), this, SLOT(onFileProgress(qint64,qint64)));
+	//connect(_model, SIGNAL(filePositionChanged(qint64,qint64)), this, SLOT(onFileProgress(qint64,qint64)));
 	qDebug() << "upload worker started";
 }
 
@@ -104,9 +104,9 @@ FileUploader::~FileUploader()
 	_workerThread.wait();
 }
 
-void FileUploader::onProgress(qlonglong current)
+void FileUploader::onProgress(qint64 current)
 {
-	qDebug() << "progress " << current;
+	qDebug() << "progress " << current << " of " << _total;
 	emit uploadProgress(1.0 * current / _total);
 }
 
