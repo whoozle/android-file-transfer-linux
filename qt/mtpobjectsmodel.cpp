@@ -24,12 +24,6 @@
 #include <QFile>
 #include <QFileInfo>
 
-namespace
-{
-
-
-}
-
 MtpObjectsModel::MtpObjectsModel(QObject *parent): QAbstractListModel(parent), _parentObjectId(mtp::Session::Root)
 { }
 
@@ -183,6 +177,7 @@ bool MtpObjectsModel::uploadFile(const QString &filePath, QString filename)
 		return false;
 	}
 	qDebug() << "sending " << fileInfo.size() << " bytes";
+	connect(object.get(), SIGNAL(positionChanged(qint64,qint64)), this, SIGNAL(filePositionChanged(qint64,qint64)));
 
 	mtp::msg::ObjectInfo oi;
 	QByteArray filename_utf = filename.toUtf8();
@@ -207,6 +202,7 @@ bool MtpObjectsModel::downloadFile(const QString &filePath, mtp::u32 objectId)
 		qWarning() << "cannot open file " << filePath;
 		return false;
 	}
+	connect(object.get(), SIGNAL(positionChanged(qint64,qint64)), this, SIGNAL(filePositionChanged(qint64,qint64)));
 	_session->GetObject(objectId, object);
 	return true;
 }

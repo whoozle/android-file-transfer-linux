@@ -25,6 +25,9 @@
 
 class MtpObjectsModel : public QAbstractListModel
 {
+	Q_OBJECT
+
+private:
 	mtp::SessionPtr		_session;
 	mtp::u32			_parentObjectId;
 
@@ -40,6 +43,9 @@ class MtpObjectsModel : public QAbstractListModel
 	};
 
 	mutable QVector<Row>		_rows;
+
+signals:
+	void filePositionChanged(qint64, qint64);
 
 public:
 	MtpObjectsModel(QObject *parent = 0);
