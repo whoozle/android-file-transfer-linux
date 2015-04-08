@@ -7,7 +7,11 @@ find_package( Threads )
 
 option(BUILD_QT_UI "Build reference Qt application" ON)
 option(BUILD_SHARED_LIB "Build shared library" OFF)
-option(USE_LIBUSB "Use libusb-1.0" OFF)
+
+option(USB_BACKEND_LIBUSB "Use libusb-1.0" OFF)
+if (USB_BACKEND_LIBUSB)
+	message(WARNING "WARNING! You're using libusb, this is known to be broken -- large memory consumption, violating kernel memory limits and bugs. Continue at your own risk")
+endif()
 
 add_definitions(-Wall -pthread -std=c++11)
 include_directories(. ${CMAKE_SOURCE_DIR})
@@ -24,7 +28,7 @@ set(SOURCES
 
 set(MTP_LIBRARIES mtp-ng-static)
 
-if (USE_LIBUSB)
+if (USB_BACKEND_LIBUSB)
 
 	pkg_check_modules(LIBUSB libusb-1.0 REQUIRED)
 	include_directories(${LIBUSB_INCLUDE_DIRS})
@@ -54,7 +58,7 @@ if (BUILD_SHARED_LIB)
 	add_library(mtp-ng SHARED ${SOURCES})
 	target_link_libraries(mtp-ng ${CMAKE_THREAD_LIBS_INIT})
 
-	if (USE_LIBUSB)
+	if (USB_BACKEND_LIBUSB)
 		target_link_libraries(mtp-ng ${LIBUSB_LIBRARIES})
 	endif()
 endif (BUILD_SHARED_LIB)
