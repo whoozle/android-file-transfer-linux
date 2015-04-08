@@ -12,6 +12,7 @@ set(SOURCES main.cpp
     progressdialog.cpp
     createdirectorydialog.cpp
     renamedialog.cpp
+    qtobjectstream.cpp
 )
 
 set(HEADERS mainwindow.h
@@ -20,6 +21,7 @@ set(HEADERS mainwindow.h
     progressdialog.h
     createdirectorydialog.h
     renamedialog.h
+    qtobjectstream.h
 )
 
 set(FORMS mainwindow.ui

@@ -17,6 +17,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 #include "mtpobjectsmodel.h"
+#include "qtobjectstream.h"
 #include <QDebug>
 #include <QBrush>
 #include <QColor>
@@ -26,41 +27,6 @@
 namespace
 {
 
-	class QtObjectInputStream : public mtp::IObjectInputStream
-	{
-		QFile _file;
-
-	public:
-		QtObjectInputStream(const QString &file) : _file(file) {
-			_file.open(QFile::ReadOnly);
-		}
-
-		bool Valid() const
-		{ return _file.isOpen(); }
-
-		virtual size_t GetSize() const
-		{ return _file.size(); }
-
-		virtual size_t Read(mtp::u8 *data, size_t size)
-		{ return _file.read(static_cast<char *>(static_cast<void *>(data)), size); }
-	};
-
-	class QtObjectOutputStream : public mtp::IObjectOutputStream
-	{
-		QFile _file;
-	public:
-		QtObjectOutputStream(const QString &file): _file(file)
-		{ _file.open(QFile::WriteOnly); }
-
-		bool Valid() const
-		{ return _file.isOpen(); }
-
-		virtual size_t GetSize() const
-		{ return _file.size(); }
-
-		virtual size_t Write(const mtp::u8 *data, size_t size)
-		{ return _file.write(static_cast<const char *>(static_cast<const void *>(data)), size); }
-	};
 
 }
 
