@@ -60,9 +60,9 @@ namespace mtp { namespace usb
 		fprintf(stderr, "SetConfiguration(%d): not implemented", idx);
 	}
 
-	void Device::Reap(int timeout)
+	void Device::Reap(void *urbPtr, int timeout)
 	{
-		usbdevfs_urb *urb;
+		usbdevfs_urb *urb = static_cast<usbdevfs_urb *>(urbPtr);
 		timespec started = {};
 		if (clock_gettime(CLOCK_MONOTONIC, &started) == -1)
 			throw Exception("clock_gettime");
@@ -110,7 +110,7 @@ namespace mtp { namespace usb
 			else
 				continuation = true;
 			IOCTL(_fd, USBDEVFS_SUBMITURB, &urb);
-			Reap(timeout);
+			Reap(&urb, timeout);
 		}
 		while(r == transferSize);
 	}
@@ -126,7 +126,7 @@ namespace mtp { namespace usb
 		urb.buffer_length = data.size();
 		IOCTL(_fd, USBDEVFS_SUBMITURB, &urb);
 
-		Reap(timeout);
+		Reap(&urb, timeout);
 		//HexDump("read", ByteArray(data.data(), data.data() + urb.actual_length));
 		outputStream->Write(data.data(), urb.actual_length);
 	}

@@ -24,8 +24,9 @@
 
 #include <unistd.h>
 
-FileUploaderWorker::FileUploaderWorker(MtpObjectsModel *model): _model(model)
+FileUploaderWorker::FileUploaderWorker(MtpObjectsModel *model): _model(model), _completedFilesSize(0)
 {
+	connect(_model, SIGNAL(filePositionChanged(qint64,qint64)), this, SLOT(onFileProgress(qint64,qint64)));
 	qDebug() << "upload worker started";
 }
 
@@ -50,7 +51,8 @@ void FileUploaderWorker::uploadFile(const QString &file)
 	} catch(const std::exception &ex)
 	{ qDebug() << "uploading file " << file << " failed: " << ex.what(); }
 
-	emit progress(fi.size());
+	_completedFilesSize += fi.size();
+	emit progress(_completedFilesSize);
 }
 
 void FileUploaderWorker::downloadFile(const QString &file, quint32 objectId)
@@ -58,6 +60,7 @@ void FileUploaderWorker::downloadFile(const QString &file, quint32 objectId)
 	if (objectId == 0 || file.isEmpty())
 	{
 		emit finished();
+		_completedFilesSize = 0;
 		return;
 	}
 	qDebug() << "downloading " << objectId << "to" << file;
@@ -70,7 +73,13 @@ void FileUploaderWorker::downloadFile(const QString &file, quint32 objectId)
 	} catch(const std::exception &ex)
 	{ qDebug() << "downloading file " << file << " failed: " << ex.what(); }
 
-	emit progress(fi.size());
+	_completedFilesSize += fi.size();
+	emit progress(_completedFilesSize);
+}
+
+void FileUploaderWorker::onFileProgress(qint64 pos, qint64)
+{
+	emit progress(_completedFilesSize + pos);
 }
 
 FileUploader::FileUploader(MtpObjectsModel * model, QObject *parent) :
@@ -95,11 +104,10 @@ FileUploader::~FileUploader()
 	_workerThread.wait();
 }
 
-void FileUploader::onProgress(qlonglong size)
+void FileUploader::onProgress(qlonglong current)
 {
-	qDebug() << "progress size" << size;
-	_current += size;
-	emit uploadProgress(1.0 * _current / _total);
+	qDebug() << "progress " << current;
+	emit uploadProgress(1.0 * current / _total);
 }
 
 void FileUploader::onStarted(const QString &file)
@@ -115,7 +123,7 @@ void FileUploader::onFinished()
 
 void FileUploader::upload(const QStringList &files)
 {
-	_total = _current = 1;
+	_total = 1;
 	for(QString file : files)
 	{
 		QFileInfo fi(file);
@@ -131,7 +139,7 @@ void FileUploader::upload(const QStringList &files)
 
 void FileUploader::download(const QString &path, const QList<quint32> &objectIds)
 {
-	_total = _current = 1;
+	_total = 1;
 	QVector<QPair<QString, mtp::u32> > files;
 	for(quint32 id : objectIds)
 	{

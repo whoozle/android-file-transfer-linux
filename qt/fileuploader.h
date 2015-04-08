@@ -30,18 +30,20 @@ class FileUploaderWorker: public QObject
 
 private:
 	MtpObjectsModel *	_model;
+	qint64				_completedFilesSize;
 
 public:
 	FileUploaderWorker(MtpObjectsModel *model);
 	~FileUploaderWorker();
 
 public slots:
+	void onFileProgress(qint64, qint64);
 	void uploadFile(const QString &file);
 	void downloadFile(const QString &path, quint32 objectId);
 
 signals:
 	void started(QString);
-	void progress(qlonglong bytes);
+	void progress(qint64 bytes);
 	void finished();
 };
 
@@ -52,10 +54,10 @@ class FileUploader : public QObject
 private:
 	MtpObjectsModel	*	_model;
 	QThread				_workerThread;
-	qlonglong			_total, _current;
+	qlonglong			_total;
 
 private slots:
-	void onProgress(qlonglong size);
+	void onProgress(qlonglong current);
 	void onStarted(const QString &file);
 	void onFinished();
 

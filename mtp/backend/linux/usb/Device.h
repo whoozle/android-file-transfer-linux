@@ -56,8 +56,9 @@ namespace mtp { namespace usb
 
 		void WriteBulk(const EndpointPtr & ep, const IObjectInputStreamPtr &inputStream, int timeout);
 		void ReadBulk(const EndpointPtr & ep, const IObjectOutputStreamPtr &outputStream, int timeout);
+
 	private:
-		void Reap(int timeout);
+		void Reap(void *urb, int timeout);
 	};
 	DECLARE_PTR(Device);
 }}
