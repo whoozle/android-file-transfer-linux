@@ -6,7 +6,7 @@ If you're happy with gmtp/gvfs/mtpfs or any other mtp software, you might not ne
 
 ## Building instructions
 ### Prerequisites
-You will need qt libraries for building this software.
+You will need qt libraries for building ui program. If you're want to use only library *Qt is not needed*, you could turn the option ```BUILD_QT_UI``` off.
 For debian based distros use the following command: `sudo apt-get install libqt4-dev ninja-build`
 
 ### Building with ninja
