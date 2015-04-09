@@ -60,16 +60,15 @@ namespace mtp { namespace usb
 		fprintf(stderr, "SetConfiguration(%d): not implemented", idx);
 	}
 
-	void Device::Reap(void *urbPtr, int timeout)
+	void Device::Reap(void *urb, int timeout)
 	{
-		usbdevfs_urb *urb = static_cast<usbdevfs_urb *>(urbPtr);
 		timespec started = {};
 		if (clock_gettime(CLOCK_MONOTONIC, &started) == -1)
 			throw Exception("clock_gettime");
 
 		while(true)
 		{
-			int r = ioctl(_fd, USBDEVFS_REAPURBNDELAY, &urb);
+			int r = ioctl(_fd, USBDEVFS_REAPURBNDELAY, urb);
 			if (r == 0)
 			{
 				break;
