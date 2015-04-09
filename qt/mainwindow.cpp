@@ -147,6 +147,7 @@ void MainWindow::uploadFiles(const QStringList &files)
 		return;
 
 	qDebug() << "uploadFiles " << files;
+	_ui->listView->setModel(NULL);
 	ProgressDialog progressDialog(this);
 	progressDialog.setModal(true);
 	progressDialog.setValue(0);
@@ -159,6 +160,7 @@ void MainWindow::uploadFiles(const QStringList &files)
 	progressDialog.exec();
 
 	_objectModel->moveToThread(QApplication::instance()->thread());
+	_ui->listView->setModel(_objectModel);
 }
 
 
