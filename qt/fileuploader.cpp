@@ -82,7 +82,7 @@ void FileUploaderWorker::downloadFile(const QString &file, quint32 objectId)
 
 void FileUploaderWorker::onFileProgress(qint64 pos, qint64)
 {
-	qDebug() << "on file progress " << _completedFilesSize << " " << pos;
+	//qDebug() << "on file progress " << _completedFilesSize << " " << pos;
 	emit progress(_completedFilesSize + pos);
 }
 
@@ -110,7 +110,7 @@ FileUploader::~FileUploader()
 
 void FileUploader::onProgress(qint64 current)
 {
-	qDebug() << "progress " << current << " of " << _total;
+	//qDebug() << "progress " << current << " of " << _total;
 	emit uploadProgress(1.0 * current / _total);
 }
 
