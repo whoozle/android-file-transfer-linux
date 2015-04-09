@@ -72,7 +72,7 @@ namespace
 		int		_fd;
 
 	public:
-		ObjectOutputStream(const std::string &fname) : _fd(open(fname.c_str(), O_WRONLY | O_CREAT | O_TRUNC), 0644)
+		ObjectOutputStream(const std::string &fname) : _fd(open(fname.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644))
 		{
 			if (_fd < 0)
 			{
