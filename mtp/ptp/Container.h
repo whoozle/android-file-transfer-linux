@@ -34,7 +34,7 @@ namespace mtp
 		Container(const Message &msg)
 		{
 			OutputStream stream(Data);
-			stream << ((u32)msg.Data.size() + 6);
+			stream << (u32)(msg.Data.size() + 6);
 			stream << Message::Type;
 			std::copy(msg.Data.begin(), msg.Data.end(), std::back_inserter(Data));
 		}
@@ -43,8 +43,9 @@ namespace mtp
 		Container(const Message &msg, IObjectInputStreamPtr inputStream)
 		{
 			OutputStream stream(Data);
-			stream << ((u32)inputStream->GetSize() + 6);
+			stream << (u32)(inputStream->GetSize() + msg.Data.size() + 6);
 			stream << Message::Type;
+			std::copy(msg.Data.begin(), msg.Data.end(), std::back_inserter(Data));
 		}
 	};
 
