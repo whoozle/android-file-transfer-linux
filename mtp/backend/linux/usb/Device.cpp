@@ -70,10 +70,9 @@ namespace mtp { namespace usb
 		{
 			int r = ioctl(_fd, USBDEVFS_REAPURBNDELAY, urb);
 			if (r == 0)
-			{
 				break;
-			}
-			if (r == -1 && errno == EAGAIN)
+
+			if (errno == EAGAIN)
 			{
 				timespec now = {};
 				if (clock_gettime(CLOCK_MONOTONIC, &now) == -1)
@@ -84,6 +83,8 @@ namespace mtp { namespace usb
 				usleep(100); //0.1ms
 				continue;
 			}
+			else
+				throw Exception("ioctl");
 		}
 	}
 
