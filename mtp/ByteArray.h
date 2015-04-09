@@ -29,19 +29,19 @@ namespace mtp
 
 	inline void HexDump(const std::string &prefix, const ByteArray &data)
 	{
-		printf("%s:\n", prefix.c_str());
+		fprintf(stderr, "%s:\n", prefix.c_str());
 		for(size_t i = 0; i < data.size(); ++i)
 		{
 			bool first = ((i & 0xf) == 0);
 			bool last = ((i & 0xf) == 0x0f);
 			if (first)
-				printf("%08lx: ", (unsigned long)i);
+				fprintf(stderr, "%08lx: ", (unsigned long)i);
 			u8 byte = data[i];
-			printf("%02x ", byte);
+			fprintf(stderr, "%02x ", byte);
 			if (last)
-				printf("\n");
+				fprintf(stderr, "\n");
 		}
-		printf("\n");
+		fprintf(stderr, "\n");
 	}
 }
 
