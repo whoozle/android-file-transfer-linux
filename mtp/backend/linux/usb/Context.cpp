@@ -28,7 +28,7 @@ namespace mtp { namespace usb
 	{
 		std::string rootPath("/sys/bus/usb/devices");
 		Directory usbDir(rootPath);
-		std::map<int, std::map<int, DeviceDescriptorPtr> > devices;
+		std::map<int, std::map<std::string, DeviceDescriptorPtr> > devices;
 		while(true)
 		{
 			std::string entry = usbDir.Read();
@@ -37,14 +37,18 @@ namespace mtp { namespace usb
 
 			try
 			{
-				unsigned busId, port, conf, interface;
-				if (sscanf(entry.c_str(), "%u-%u:%u.%u", &busId, &port, &conf, &interface) == 4 && port != 0)
+				unsigned busId, conf, interface;
+				char portBuf[256];
+				if (sscanf(entry.c_str(), "%u-%256[0-9.]:%u.%u", &busId, portBuf, &conf, &interface) == 4)
 				{
+					std::string port = portBuf;
+					if ((port.size() == 1 && port[0] == '0') || (port.size() > 2 && port.compare(port.size() - 2, 2, ".0") == 0))
+						continue;
 					DeviceDescriptorPtr &device = devices[busId][port];
 					if (!device)
 					{
 						char deviceRoot[64];
-						snprintf(deviceRoot, sizeof(deviceRoot), "%u-%u", busId, port);
+						snprintf(deviceRoot, sizeof(deviceRoot), "%u-%s", busId, port.c_str());
 						device = std::make_shared<DeviceDescriptor>(busId, rootPath + "/" + std::string(deviceRoot));
 						_devices.push_back(device);
 					}
