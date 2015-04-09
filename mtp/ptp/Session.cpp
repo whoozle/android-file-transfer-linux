@@ -175,7 +175,7 @@ namespace mtp
 		{
 			DataRequest req(OperationCode::SendObject, transaction);
 			Container container(req, inputStream);
-			_packeter.Write(std::make_shared<JoinedObjectInputStream>(std::make_shared<ByteArrayObjectInputStream>(container.Data), inputStream));
+			_packeter.Write(std::make_shared<JoinedObjectInputStream>(std::make_shared<ByteArrayObjectInputStream>(container.Data), inputStream), 6000);
 		}
 		ByteArray data, response;
 		ResponseType responseCode;
