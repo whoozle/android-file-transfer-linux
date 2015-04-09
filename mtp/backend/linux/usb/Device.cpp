@@ -114,12 +114,14 @@ namespace mtp { namespace usb
 			try
 			{
 				usbdevfs_urb *reapedUrb = static_cast<usbdevfs_urb *>(Reap(timeout));
-				printf("write %p %p\n", &urb, reapedUrb);
+				fprintf(stderr, "write %p %p\n", &urb, reapedUrb);
 			}
 			catch(const std::exception &ex)
 			{
 				int r = ioctl(_fd, USBDEVFS_DISCARDURB, &urb);
-				printf("exception %s: discard = %d\n", ex.what(), r);
+				if (r)
+					perror("ioctl");
+				fprintf(stderr, "exception %s: discard = %d\n", ex.what(), r);
 				throw;
 			}
 		}
@@ -140,12 +142,14 @@ namespace mtp { namespace usb
 		try
 		{
 			usbdevfs_urb *reapedUrb = static_cast<usbdevfs_urb *>(Reap(timeout));
-			printf("read %p %p\n", &urb, reapedUrb);
+			fprintf(stderr, "read %p %p\n", &urb, reapedUrb);
 		}
 		catch(const std::exception &ex)
 		{
 			int r = ioctl(_fd, USBDEVFS_DISCARDURB, &urb);
-			printf("exception %s: discard = %d\n", ex.what(), r);
+			if (r)
+				perror("ioctl");
+			fprintf(stderr, "exception %s: discard = %d\n", ex.what(), r);
 			throw;
 		}
 		//HexDump("read", ByteArray(data.data(), data.data() + urb.actual_length));
