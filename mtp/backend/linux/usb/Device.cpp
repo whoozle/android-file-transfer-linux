@@ -111,7 +111,17 @@ namespace mtp { namespace usb
 			else
 				continuation = true;
 			IOCTL(_fd, USBDEVFS_SUBMITURB, &urb);
-			usbdevfs_urb *reapedUrb = static_cast<usbdevfs_urb *>(Reap(timeout));
+			try
+			{
+				usbdevfs_urb *reapedUrb = static_cast<usbdevfs_urb *>(Reap(timeout));
+				printf("write %p %p\n", &urb, reapedUrb);
+			}
+			catch(const std::exception &ex)
+			{
+				int r = ioctl(_fd, USBDEVFS_DISCARDURB, &urb);
+				printf("exception %s: discard = %d\n", ex.what(), r);
+				throw;
+			}
 		}
 		while(r == transferSize);
 	}
@@ -127,7 +137,17 @@ namespace mtp { namespace usb
 		urb.buffer_length = data.size();
 		IOCTL(_fd, USBDEVFS_SUBMITURB, &urb);
 
-		usbdevfs_urb *reapedUrb = static_cast<usbdevfs_urb *>(Reap(timeout));
+		try
+		{
+			usbdevfs_urb *reapedUrb = static_cast<usbdevfs_urb *>(Reap(timeout));
+			printf("read %p %p\n", &urb, reapedUrb);
+		}
+		catch(const std::exception &ex)
+		{
+			int r = ioctl(_fd, USBDEVFS_DISCARDURB, &urb);
+			printf("exception %s: discard = %d\n", ex.what(), r);
+			throw;
+		}
 		//HexDump("read", ByteArray(data.data(), data.data() + urb.actual_length));
 		outputStream->Write(data.data(), urb.actual_length);
 	}
