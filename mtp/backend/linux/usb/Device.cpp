@@ -99,7 +99,7 @@ namespace mtp { namespace usb
 		do
 		{
 			r = inputStream->Read(data.data(), data.size());
-			HexDump("write", ByteArray(data.data(), data.data() + r));
+			//HexDump("write", ByteArray(data.data(), data.data() + r));
 			usbdevfs_urb urb = {};
 			urb.usercontext = this;
 			urb.type = USBDEVFS_URB_TYPE_BULK;
@@ -114,7 +114,8 @@ namespace mtp { namespace usb
 			try
 			{
 				usbdevfs_urb *reapedUrb = static_cast<usbdevfs_urb *>(Reap(timeout));
-				fprintf(stderr, "write %p %p\n", &urb, reapedUrb);
+				if (reapedUrb != &urb)
+					std::terminate();
 			}
 			catch(const std::exception &ex)
 			{
@@ -142,7 +143,9 @@ namespace mtp { namespace usb
 		try
 		{
 			usbdevfs_urb *reapedUrb = static_cast<usbdevfs_urb *>(Reap(timeout));
-			fprintf(stderr, "read %p %p\n", &urb, reapedUrb);
+			if (reapedUrb != &urb)
+				std::terminate();
+			//fprintf(stderr, "read %p %p\n", &urb, reapedUrb);
 		}
 		catch(const std::exception &ex)
 		{
@@ -152,7 +155,7 @@ namespace mtp { namespace usb
 			fprintf(stderr, "exception %s: discard = %d\n", ex.what(), r);
 			throw;
 		}
-		HexDump("read", ByteArray(data.data(), data.data() + urb.actual_length));
+		//HexDump("read", ByteArray(data.data(), data.data() + urb.actual_length));
 		outputStream->Write(data.data(), urb.actual_length);
 	}
 
