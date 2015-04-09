@@ -56,6 +56,7 @@ namespace mtp
 
 			virtual void OnStream1Exhausted()
 			{
+				_stream1Exhausted = true;
 				InputStream is(_header->GetData());
 				u32 size;
 				is >> size;
@@ -134,6 +135,7 @@ namespace mtp
 
 			virtual void OnStream1Exhausted()
 			{
+				_stream1Exhausted = true;
 				InputStream stream(_header->GetData());
 				Response header;
 				header.Read(stream);

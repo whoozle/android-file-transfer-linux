@@ -7,9 +7,9 @@ namespace mtp
 {
 	class JoinedObjectInputStreamBase : public IObjectInputStream
 	{
+	protected:
 		bool					_stream1Exhausted;
 
-	protected:
 		virtual IObjectInputStreamPtr GetStream1() const = 0;
 		virtual IObjectInputStreamPtr GetStream2() const = 0;
 		virtual void OnStream1Exhausted() { }
@@ -60,9 +60,9 @@ namespace mtp
 
 	class JoinedObjectOutputStreamBase : public IObjectOutputStream
 	{
+	protected:
 		bool					_stream1Exhausted;
 
-	protected:
 		virtual IObjectOutputStreamPtr GetStream1() const = 0;
 		virtual IObjectOutputStreamPtr GetStream2() const = 0;
 		virtual void OnStream1Exhausted() { }
