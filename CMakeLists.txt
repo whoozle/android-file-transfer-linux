@@ -14,6 +14,15 @@ if (USB_BACKEND_LIBUSB)
 endif()
 
 add_definitions(-Wall -pthread -std=c++11)
+
+if (NOT CMAKE_BUILD_TYPE)
+	set(CMAKE_BUILD_TYPE Release)
+endif()
+
+if (CMAKE_BUILD_TYPE STREQUAL Debug)
+	add_definitions(-ggdb)
+endif()
+
 include_directories(. ${CMAKE_SOURCE_DIR})
 
 set(SOURCES
