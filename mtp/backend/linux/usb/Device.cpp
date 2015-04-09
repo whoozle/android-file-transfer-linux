@@ -37,7 +37,7 @@ namespace mtp { namespace usb
 
 	Device::InterfaceToken::~InterfaceToken()
 	{
-		ioctl(_fd, USBDEVFS_RELEASEINTERFACE, _interfaceNumber);
+		ioctl(_fd, USBDEVFS_RELEASEINTERFACE, &_interfaceNumber);
 	}
 
 	Device::Device(int fd): _fd(fd)
