@@ -33,10 +33,11 @@
 MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
 	_ui(new Ui::MainWindow),
-	_objectModel(new MtpObjectsModel(this)),
+	_objectModel(new MtpObjectsModel()),
 	_uploader(new FileUploader(_objectModel, this))
 {
 	_ui->setupUi(this);
+	_objectModel->moveToThread(QApplication::instance()->thread());
 	connect(_ui->listView, SIGNAL(doubleClicked(QModelIndex)), SLOT(onActivated(QModelIndex)));
 	connect(_ui->listView, SIGNAL(customContextMenuRequested(QPoint)), SLOT(showContextMenu(QPoint)));
 	connect(_ui->actionBack, SIGNAL(triggered()), SLOT(back()));
@@ -156,6 +157,8 @@ void MainWindow::uploadFiles(const QStringList &files)
 	_uploader->upload(files);
 
 	progressDialog.exec();
+
+	_objectModel->moveToThread(QApplication::instance()->thread());
 }
 
 
