@@ -59,6 +59,9 @@ void ProgressDialog::setValue(float current)
 		return;
 	float currentSpeed = current * 1000 / _duration;
 	int estimate = 1000 / currentSpeed;
+	int duration = estimate - _duration;
+	if (duration < 100)
+		duration = 100;
 	//qDebug() << current << currentSpeed << estimate;
 	_animation->stop();
 	_animation->setStartValue(currentAnimated);
