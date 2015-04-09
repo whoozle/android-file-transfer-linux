@@ -42,6 +42,7 @@ void FileUploaderWorker::uploadFile(const QString &file)
 	{
 		_model->moveToThread(QApplication::instance()->thread());
 		emit finished();
+		_completedFilesSize = 0;
 		return;
 	}
 	qDebug() << "uploading file " << file;
