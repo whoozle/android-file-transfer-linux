@@ -42,7 +42,7 @@ namespace mtp { namespace usb
 				if (sscanf(entry.c_str(), "%u-%256[0-9.]:%u.%u", &busId, portBuf, &conf, &interface) == 4)
 				{
 					std::string port = portBuf;
-					if ((port.size() == 1 && port[0] == '0') || (port.size() > 2 && port.compare(port.size() - 2, 2, ".0") == 0))
+					if ((port.size() == 1 && port[0] == '0'))
 						continue;
 					DeviceDescriptorPtr &device = devices[busId][port];
 					if (!device)
