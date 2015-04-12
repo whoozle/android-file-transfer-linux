@@ -40,9 +40,9 @@ namespace mtp { namespace usb
 		return data;
 	}
 
-	bool BulkPipe::Read(const IObjectOutputStreamPtr &outputStream, int timeout)
+	void BulkPipe::Read(const IObjectOutputStreamPtr &outputStream, int timeout)
 	{
-		return _device->ReadBulk(_in, outputStream, timeout);
+		_device->ReadBulk(_in, outputStream, timeout);
 	}
 
 	void BulkPipe::Write(const IObjectInputStreamPtr &inputStream, int timeout)

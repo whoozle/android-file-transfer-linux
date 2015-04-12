@@ -78,7 +78,7 @@ namespace mtp
 	void PipePacketer::ReadMessage(const IObjectOutputStreamPtr &outputStream, int timeout)
 	{
 		MessageParsingStreamPtr output(new MessageParsingStream(outputStream));
-		while(_pipe->Read(output, timeout));
+		_pipe->Read(output, timeout);
 	}
 
 	void PipePacketer::PollEvent()

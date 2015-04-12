@@ -101,7 +101,6 @@ namespace mtp { namespace usb
 			r = inputStream->Read(data.data(), data.size());
 			//HexDump("write", ByteArray(data.data(), data.data() + r));
 			usbdevfs_urb urb = {};
-			urb.usercontext = this;
 			urb.type = USBDEVFS_URB_TYPE_BULK;
 			urb.endpoint = ep->GetAddress();
 			urb.buffer = const_cast<u8 *>(data.data());
@@ -129,35 +128,42 @@ namespace mtp { namespace usb
 		while(r == transferSize);
 	}
 
-	bool Device::ReadBulk(const EndpointPtr & ep, const IObjectOutputStreamPtr &outputStream, int timeout)
+	void Device::ReadBulk(const EndpointPtr & ep, const IObjectOutputStreamPtr &outputStream, int timeout)
 	{
 		ByteArray data(ep->GetMaxPacketSize() * 1024);
 		usbdevfs_urb urb = {};
-		urb.usercontext = this;
-		urb.type = USBDEVFS_URB_TYPE_BULK;
-		urb.endpoint = ep->GetAddress();
-		urb.buffer = data.data();
-		urb.buffer_length = data.size();
-		IOCTL(_fd, USBDEVFS_SUBMITURB, &urb);
+		bool continuation = false;
+		do
+		{
+			urb.type = USBDEVFS_URB_TYPE_BULK;
+			urb.endpoint = ep->GetAddress();
+			urb.buffer = data.data();
+			urb.buffer_length = data.size();
+			if (continuation)
+				urb.flags |= USBDEVFS_URB_BULK_CONTINUATION;
+			else
+				continuation = true;
+			IOCTL(_fd, USBDEVFS_SUBMITURB, &urb);
 
-		try
-		{
-			usbdevfs_urb *reapedUrb = static_cast<usbdevfs_urb *>(Reap(timeout));
-			if (reapedUrb != &urb)
-				std::terminate();
-			//fprintf(stderr, "read %p %p\n", &urb, reapedUrb);
+			try
+			{
+				usbdevfs_urb *reapedUrb = static_cast<usbdevfs_urb *>(Reap(timeout));
+				if (reapedUrb != &urb)
+					std::terminate();
+				//fprintf(stderr, "read %p %p\n", &urb, reapedUrb);
+			}
+			catch(const std::exception &ex)
+			{
+				int r = ioctl(_fd, USBDEVFS_DISCARDURB, &urb);
+				if (r != 0)
+					std::terminate();
+				fprintf(stderr, "exception %s: discard = %d\n", ex.what(), r);
+				throw;
+			}
+			//HexDump("read", ByteArray(data.data(), data.data() + urb.actual_length));
+			outputStream->Write(data.data(), urb.actual_length);
 		}
-		catch(const std::exception &ex)
-		{
-			int r = ioctl(_fd, USBDEVFS_DISCARDURB, &urb);
-			if (r != 0)
-				std::terminate();
-			fprintf(stderr, "exception %s: discard = %d\n", ex.what(), r);
-			throw;
-		}
-		//HexDump("read", ByteArray(data.data(), data.data() + urb.actual_length));
-		outputStream->Write(data.data(), urb.actual_length);
-		return urb.actual_length == (int)data.size();
+		while(urb.actual_length == (int)data.size());
 	}
 
 }}
