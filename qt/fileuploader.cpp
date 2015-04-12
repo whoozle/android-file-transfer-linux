@@ -153,7 +153,7 @@ void FileUploader::download(const QString &path, const QList<quint32> &objectIds
 	for(quint32 id : objectIds)
 	{
 		mtp::msg::ObjectInfoPtr oi = _model->getInfo(id);
-		_total += oi->ObjectCompressedSize;
+		_total += oi->ObjectCompressedSize; //fixme: invalid for > 4Gb
 		files.push_back(QPair<QString, mtp::u32>(QString::fromUtf8(oi->Filename.c_str()), id));
 	}
 

@@ -108,6 +108,8 @@ namespace mtp { namespace msg
 
 	struct ObjectInfo
 	{
+		static const u64	MaxObjectSize = 0xffffffffull;
+
 		u32					StorageId;
 		mtp::ObjectFormat	ObjectFormat;
 		u16					ProtectionStatus;
@@ -134,6 +136,11 @@ namespace mtp { namespace msg
 			ParentObject(), AssociationType(), AssociationDesc(),
 			SequenceNumber()
 		{ }
+
+		void SetSize(u64 size)
+		{
+			ObjectCompressedSize = (size > MaxObjectSize)? MaxObjectSize: size;
+		}
 
 		void Read(InputStream &stream)
 		{

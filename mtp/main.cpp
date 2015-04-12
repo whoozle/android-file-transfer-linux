@@ -190,7 +190,7 @@ int main(int argc, char **argv)
 		oi.ObjectFormat = ObjectFormatFromFilename(filename);
 
 		std::shared_ptr<ObjectInputStream> objectInput(new ObjectInputStream(filename));
-		oi.ObjectCompressedSize = objectInput->GetSize();
+		oi.SetSize(objectInput->GetSize());
 
 		Session::NewObjectInfo noi = session->SendObjectInfo(oi, 0, parentObjectId);
 		printf("new object id = %u\n", noi.ObjectId);
