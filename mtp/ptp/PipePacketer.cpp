@@ -39,8 +39,9 @@ namespace mtp
 		{
 			FixedSizeByteArrayObjectOutputStreamPtr	_header;
 			IObjectOutputStreamPtr					_stream;
-			size_t									_offset;
-			size_t									_size;
+			u64										_offset;
+			u64										_size;
+
 		private:
 			IObjectOutputStreamPtr GetStream1() const
 			{ return _header; }
@@ -50,9 +51,6 @@ namespace mtp
 
 		public:
 			MessageParsingStream(IObjectOutputStreamPtr stream): _header(new FixedSizeByteArrayObjectOutputStream(4)), _stream(stream), _offset(0), _size(4) { }
-
-			bool Done() const
-			{ return _offset >= _size; }
 
 			virtual void OnStream1Exhausted()
 			{
@@ -80,8 +78,7 @@ namespace mtp
 	void PipePacketer::ReadMessage(const IObjectOutputStreamPtr &outputStream, int timeout)
 	{
 		MessageParsingStreamPtr output(new MessageParsingStream(outputStream));
-		while(!output->Done())
-			_pipe->Read(output, timeout);
+		while(_pipe->Read(output, timeout));
 	}
 
 	void PipePacketer::PollEvent()

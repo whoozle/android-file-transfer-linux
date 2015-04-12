@@ -129,7 +129,7 @@ namespace mtp { namespace usb
 		while(r == transferSize);
 	}
 
-	void Device::ReadBulk(const EndpointPtr & ep, const IObjectOutputStreamPtr &outputStream, int timeout)
+	bool Device::ReadBulk(const EndpointPtr & ep, const IObjectOutputStreamPtr &outputStream, int timeout)
 	{
 		ByteArray data(ep->GetMaxPacketSize() * 1024);
 		usbdevfs_urb urb = {};
@@ -157,6 +157,7 @@ namespace mtp { namespace usb
 		}
 		//HexDump("read", ByteArray(data.data(), data.data() + urb.actual_length));
 		outputStream->Write(data.data(), urb.actual_length);
+		return urb.actual_length == (int)data.size();
 	}
 
 }}
