@@ -77,13 +77,16 @@ namespace mtp { namespace usb
 			throw std::runtime_error("short write");
 	}
 
-	bool Device::ReadBulk(const EndpointPtr & ep, const IObjectOutputStreamPtr &outputStream, int timeout)
+	void Device::ReadBulk(const EndpointPtr & ep, const IObjectOutputStreamPtr &outputStream, int timeout)
 	{
 		ByteArray data(ep->GetMaxPacketSize() * 1024);
-		int tr = 0;
-		USB_CALL(libusb_bulk_transfer(_handle, ep->GetAddress(), data.data(), data.size(), &tr, timeout));
-		outputStream->Write(data.data(), tr);
-		return tr == (int)data.size();
+		int tr;
+		do
+		{
+			USB_CALL(libusb_bulk_transfer(_handle, ep->GetAddress(), data.data(), data.size(), &tr, timeout));
+			outputStream->Write(data.data(), tr);
+		}
+		while(tr == (int)data.size());
 	}
 
 
