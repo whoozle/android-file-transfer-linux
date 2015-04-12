@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 2.8)
 set(CMAKE_USE_RELATIVE_PATHS TRUE)
 
 include(FindPkgConfig)
+include(CheckFunctionExists)
+
 find_package( Threads )
 
 option(BUILD_QT_UI "Build reference Qt application" ON)
@@ -71,6 +73,11 @@ if (BUILD_SHARED_LIB)
 		target_link_libraries(mtp-ng ${LIBUSB_LIBRARIES})
 	endif()
 endif (BUILD_SHARED_LIB)
+
+check_function_exists(stat64 USE_STAT64)
+if (USE_STAT64)
+	add_definitions(-DMTP_USES_STAT64=1)
+endif()
 
 add_executable(mtp-test mtp/main.cpp)
 target_link_libraries(mtp-test ${MTP_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
