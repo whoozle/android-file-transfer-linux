@@ -84,7 +84,8 @@ namespace mtp { namespace usb
 			if (!f)
 				throw Exception("opening " + path);
 			char buf[1024];
-			fgets(buf, sizeof(buf), f);
+			if (!fgets(buf, sizeof(buf), f))
+				throw Exception("fgets " + path);
 			std::string str(buf);
 			fclose(f);
 			size_t end = str.find_last_not_of(" \t\r\n\f");
