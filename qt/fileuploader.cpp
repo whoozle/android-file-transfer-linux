@@ -152,9 +152,9 @@ void FileUploader::download(const QString &path, const QList<quint32> &objectIds
 	QVector<QPair<QString, mtp::u32> > files;
 	for(quint32 id : objectIds)
 	{
-		mtp::msg::ObjectInfoPtr oi = _model->getInfo(id);
-		_total += oi->ObjectCompressedSize; //fixme: invalid for > 4Gb
-		files.push_back(QPair<QString, mtp::u32>(QString::fromUtf8(oi->Filename.c_str()), id));
+		MtpObjectsModel::ObjectInfo oi = _model->getInfo(id);
+		_total += oi.Size; //fixme: invalid for > 4Gb
+		files.push_back(QPair<QString, mtp::u32>(oi.Filename, id));
 	}
 
 	for(const auto & file : files)

@@ -48,6 +48,15 @@ signals:
 	void filePositionChanged(qint64, qint64);
 
 public:
+	struct ObjectInfo
+	{
+		QString Filename;
+		qint64	Size;
+
+		ObjectInfo(): Filename(), Size(0) { }
+		ObjectInfo(const QString &fname, qint64 size): Filename(fname), Size(size) { }
+	};
+
 	MtpObjectsModel(QObject *parent = 0);
 	~MtpObjectsModel();
 
@@ -64,7 +73,7 @@ public:
 	bool uploadFile(const QString &filePath, QString filename = QString());
 	bool downloadFile(const QString &filePath, mtp::u32 objectId);
 	void rename(int idx, const QString &fileName);
-	mtp::msg::ObjectInfoPtr getInfo(mtp::u32 objectId);
+	ObjectInfo getInfo(mtp::u32 objectId);
 
 	virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
 	virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;

@@ -207,7 +207,9 @@ bool MtpObjectsModel::downloadFile(const QString &filePath, mtp::u32 objectId)
 	return true;
 }
 
-mtp::msg::ObjectInfoPtr MtpObjectsModel::getInfo(mtp::u32 objectId)
+MtpObjectsModel::ObjectInfo MtpObjectsModel::getInfo(mtp::u32 objectId)
 {
-	return std::make_shared<mtp::msg::ObjectInfo>(_session->GetObjectInfo(objectId));
+	mtp::msg::ObjectInfo oi(_session->GetObjectInfo(objectId));
+	qint64 size = oi.ObjectCompressedSize;
+	return ObjectInfo(QString::fromStdString(oi.Filename), size);
 }
