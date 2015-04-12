@@ -24,13 +24,28 @@ namespace mtp
 
 	enum struct ObjectProperty
 	{
-		StorageId			= 0xdc01,
-		ObjectFormat		= 0xdc02,
-		ObjectSize			= 0xdc04,
-		ObjectFilename		= 0xdc07,
+		StorageId					= 0xdc01,
+		ObjectFormat				= 0xdc02,
+		ProtectionStatus			= 0xdc03,
+		ObjectSize					= 0xdc04,
+		AssociationType				= 0xdc05,
+		AssociationDesc				= 0xdc06,
+		ObjectFilename				= 0xdc07,
+		DateCreated					= 0xdc08,
+		DateModified				= 0xdc09,
+		Keywords					= 0xdc0a,
+		ParentObject				= 0xdc0b,
+		AllowedFolderContents		= 0xdc0c,
+		Hidden						= 0xdc0d,
+		SystemObject				= 0xdc0e,
+
+		PersistentUniqueObjectId	= 0xdc41,
+		SyncId						= 0xdc42,
 
 		RepresentativeSampleFormat	= 0xdc81,
 		RepresentativeSampleData	= 0xdc86,
+
+		MediaGUID					= 0xdd72
 	};
 
 }
