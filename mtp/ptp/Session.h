@@ -66,6 +66,7 @@ namespace mtp
 		void SetObjectProperty(u32 objectId, ObjectProperty property, const ByteArray &value);
 		void SetObjectProperty(u32 objectId, ObjectProperty property, const std::string &value);
 		ByteArray GetObjectProperty(u32 objectId, ObjectProperty property);
+		u64 GetObjectIntegerProperty(u32 objectId, ObjectProperty property);
 
 		ByteArray GetDeviceProperty(DeviceProperty property);
 

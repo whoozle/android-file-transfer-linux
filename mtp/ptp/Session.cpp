@@ -218,6 +218,21 @@ namespace mtp
 		return data;
 	}
 
+	u64 Session::GetObjectIntegerProperty(u32 objectId, ObjectProperty property)
+	{
+		ByteArray data = GetObjectProperty(objectId, property);
+		InputStream s(data);
+		switch(data.size())
+		{
+		case 8: return s.Read64();
+		case 4: return s.Read32();
+		case 2: return s.Read16();
+		case 1: return s.Read8();
+		default:
+			throw std::runtime_error("unexpected length for numeric property");
+		}
+	}
+
 	void Session::SetObjectProperty(u32 objectId, ObjectProperty property, const std::string &value)
 	{
 		ByteArray data;
@@ -252,7 +267,6 @@ namespace mtp
 		_packeter.Read(transaction, data, responseCode, response);
 		CHECK_RESPONSE(responseCode);
 		return data;
-
 	}
 
 }
