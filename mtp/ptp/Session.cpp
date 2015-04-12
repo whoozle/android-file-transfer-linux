@@ -39,6 +39,7 @@ namespace mtp
 
 	void Session::Close()
 	{
+		scoped_mutex_lock l(_mutex);
 		Send(OperationRequest(OperationCode::CloseSession, 0, _sessionId));
 		ByteArray data, response;
 		ResponseType responseCode;
@@ -48,6 +49,7 @@ namespace mtp
 
 	msg::ObjectHandles Session::GetObjectHandles(u32 storageId, u32 objectFormat, u32 parent)
 	{
+		scoped_mutex_lock l(_mutex);
 		u32 transaction = _transactionId++;
 		Send(OperationRequest(OperationCode::GetObjectHandles, transaction, storageId, objectFormat, parent));
 		ByteArray data, response;
@@ -63,6 +65,7 @@ namespace mtp
 
 	msg::StorageIDs Session::GetStorageIDs()
 	{
+		scoped_mutex_lock l(_mutex);
 		u32 transaction = _transactionId++;
 		Send(OperationRequest(OperationCode::GetStorageIDs, transaction, 0xffffffffu));
 		ByteArray data, response;
@@ -78,6 +81,7 @@ namespace mtp
 
 	msg::StorageInfo Session::GetStorageInfo(u32 storageId)
 	{
+		scoped_mutex_lock l(_mutex);
 		u32 transaction = _transactionId++;
 		Send(OperationRequest(OperationCode::GetStorageInfo, transaction, storageId));
 		ByteArray data, response;
@@ -92,6 +96,7 @@ namespace mtp
 
 	msg::ObjectInfo Session::GetObjectInfo(u32 objectId)
 	{
+		scoped_mutex_lock l(_mutex);
 		u32 transaction = _transactionId++;
 		Send(OperationRequest(OperationCode::GetObjectInfo, transaction, objectId));
 		ByteArray data, response;
@@ -106,6 +111,7 @@ namespace mtp
 
 	msg::ObjectPropsSupported Session::GetObjectPropsSupported(u32 objectId)
 	{
+		scoped_mutex_lock l(_mutex);
 		u32 transaction = _transactionId++;
 		Send(OperationRequest(OperationCode::GetObjectPropsSupported, transaction, objectId));
 		ByteArray data, response;
@@ -120,6 +126,7 @@ namespace mtp
 
 	void Session::GetObject(u32 objectId, const IObjectOutputStreamPtr &outputStream)
 	{
+		scoped_mutex_lock l(_mutex);
 		u32 transaction = _transactionId++;
 		Send(OperationRequest(OperationCode::GetObject, transaction, objectId));
 		ByteArray response;
@@ -130,6 +137,7 @@ namespace mtp
 
 	Session::NewObjectInfo Session::SendObjectInfo(const msg::ObjectInfo &objectInfo, u32 storageId, u32 parentObject)
 	{
+		scoped_mutex_lock l(_mutex);
 		u32 transaction = _transactionId++;
 		Send(OperationRequest(OperationCode::SendObjectInfo, transaction, storageId, parentObject));
 		{
@@ -154,6 +162,7 @@ namespace mtp
 
 	void Session::SendObject(const IObjectInputStreamPtr &inputStream)
 	{
+		scoped_mutex_lock l(_mutex);
 		u32 transaction = _transactionId++;
 		Send(OperationRequest(OperationCode::SendObject, transaction));
 		{
@@ -169,6 +178,7 @@ namespace mtp
 
 	void Session::SetObjectProperty(u32 objectId, ObjectProperty property, const ByteArray &value)
 	{
+		scoped_mutex_lock l(_mutex);
 		u32 transaction = _transactionId++;
 		Send(OperationRequest(OperationCode::SetObjectPropValue, transaction, objectId, (u16)property));
 		{
@@ -185,6 +195,7 @@ namespace mtp
 
 	ByteArray Session::GetObjectProperty(u32 objectId, ObjectProperty property)
 	{
+		scoped_mutex_lock l(_mutex);
 		u32 transaction = _transactionId++;
 		Send(OperationRequest(OperationCode::GetObjectPropValue, transaction, objectId, (u16)property));
 		ByteArray data, response;
@@ -211,6 +222,7 @@ namespace mtp
 
 	void Session::SetObjectProperty(u32 objectId, ObjectProperty property, const std::string &value)
 	{
+		scoped_mutex_lock l(_mutex);
 		ByteArray data;
 		data.reserve(value.size() * 2 + 1);
 		OutputStream stream(data);
@@ -220,6 +232,7 @@ namespace mtp
 
 	void Session::DeleteObject(u32 objectId)
 	{
+		scoped_mutex_lock l(_mutex);
 		u32 transaction = _transactionId++;
 		Send(OperationRequest(OperationCode::DeleteObject, transaction, objectId));
 		ByteArray data, response;
@@ -230,6 +243,7 @@ namespace mtp
 
 	ByteArray Session::GetDeviceProperty(DeviceProperty property)
 	{
+		scoped_mutex_lock l(_mutex);
 		u32 transaction = _transactionId++;
 		Send(OperationRequest(OperationCode::GetDevicePropValue, transaction, (u16)property));
 		ByteArray data, response;

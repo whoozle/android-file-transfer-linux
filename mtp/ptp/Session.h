@@ -32,6 +32,7 @@ namespace mtp
 
 	class Session
 	{
+		std::mutex		_mutex;
 		PipePacketer	_packeter;
 		u32				_sessionId;
 		u32				_transactionId;
