@@ -49,14 +49,11 @@ private:
 	qint64		_size;
 
 public:
-	QtObjectOutputStream(const QString &file): _file(file), _size(_file.size())
-	{ _file.open(QFile::WriteOnly); }
+	QtObjectOutputStream(const QString &file): _file(file)
+	{ _file.open(QFile::WriteOnly | QFile::Truncate); }
 
 	bool Valid() const
 	{ return _file.isOpen(); }
-
-	virtual mtp::u64 GetSize() const
-	{ return _size; }
 
 	virtual size_t Write(const mtp::u8 *data, size_t size)
 	{
