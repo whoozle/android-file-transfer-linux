@@ -47,6 +47,10 @@ void ProgressDialog::reject()
 
 void ProgressDialog::setProgress(float current)
 {
+	if (current < 0)
+		current = 0;
+	if (current > 1)
+		current = 1;
 	ui->progressBar->setValue(current * 10000);
 }
 
