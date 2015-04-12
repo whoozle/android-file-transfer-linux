@@ -99,7 +99,7 @@ namespace mtp { namespace usb
 		void SetConfiguration(int idx);
 
 		void WriteBulk(const EndpointPtr & ep, const IObjectInputStreamPtr &inputStream, int timeout);
-		void ReadBulk(const EndpointPtr & ep, const IObjectOutputStreamPtr &outputStream, int timeout);
+		bool ReadBulk(const EndpointPtr & ep, const IObjectOutputStreamPtr &outputStream, int timeout);
 
 		std::string GetString(int idx) const;
 	};
