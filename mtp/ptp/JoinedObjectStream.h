@@ -52,7 +52,7 @@ namespace mtp
 			_stream1(s1), _stream2(s2), _stream1Size(s1->GetSize()), _stream2Size(s2->GetSize())
 		{ }
 
-		virtual size_t GetSize() const
+		virtual u64 GetSize() const
 		{ return _stream1Size + _stream2Size; }
 
 	};

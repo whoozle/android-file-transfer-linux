@@ -55,7 +55,7 @@ namespace
 		~ObjectInputStream()
 		{ close(_fd); }
 
-		size_t GetSize() const
+		mtp::u64 GetSize() const
 		{ return _size; }
 
 		virtual size_t Read(mtp::u8 *data, size_t size)

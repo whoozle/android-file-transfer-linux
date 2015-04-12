@@ -18,7 +18,7 @@ namespace mtp
 		const ByteArray &GetData() const
 		{ return _data; }
 
-		virtual size_t GetSize() const
+		virtual u64 GetSize() const
 		{ return _data.size(); }
 
 		virtual size_t Read(u8 *data, size_t size)

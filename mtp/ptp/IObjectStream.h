@@ -9,7 +9,7 @@ namespace mtp
 	struct IObjectInputStream
 	{
 		virtual ~IObjectInputStream() { }
-		virtual size_t GetSize() const = 0;
+		virtual u64 GetSize() const = 0;
 		virtual size_t Read(u8 *data, size_t size) = 0;
 	};
 	DECLARE_PTR(IObjectInputStream);

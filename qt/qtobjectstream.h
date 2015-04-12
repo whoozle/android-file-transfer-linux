@@ -24,7 +24,7 @@ public:
 	bool Valid() const
 	{ return _file.isOpen(); }
 
-	virtual size_t GetSize() const
+	virtual mtp::u64 GetSize() const
 	{ return _size; }
 
 	virtual size_t Read(mtp::u8 *data, size_t size)
@@ -55,7 +55,7 @@ public:
 	bool Valid() const
 	{ return _file.isOpen(); }
 
-	virtual size_t GetSize() const
+	virtual mtp::u64 GetSize() const
 	{ return _size; }
 
 	virtual size_t Write(const mtp::u8 *data, size_t size)
