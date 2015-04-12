@@ -137,7 +137,7 @@ QVariant MtpObjectsModel::data(const QModelIndex &index, int role) const
 	switch(role)
 	{
 	case Qt::DisplayRole:
-		return QString::fromUtf8(row.GetInfo(_session)->Filename.c_str());
+		return QString::fromStdString(row.GetInfo(_session)->Filename);
 
 	case Qt::ForegroundRole:
 		return row.IsAssociation(_session)? QBrush(QColor(0, 0, 128)): QBrush(Qt::black);
