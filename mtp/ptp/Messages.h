@@ -108,8 +108,6 @@ namespace mtp { namespace msg
 
 	struct ObjectInfo
 	{
-		static const u64	MaxObjectSize = 0xffffffffull;
-
 		u32					StorageId;
 		mtp::ObjectFormat	ObjectFormat;
 		u16					ProtectionStatus;

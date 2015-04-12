@@ -24,6 +24,8 @@
 
 namespace mtp
 {
+	static const u64	MaxObjectSize = 0xffffffffull;
+
 	//please look here: https://msdn.microsoft.com/en-us/library/jj584872(v=winembedded.70).aspx
 
 	enum struct ObjectFormat : u16

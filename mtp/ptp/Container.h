@@ -23,6 +23,7 @@
 #include <mtp/ptp/OutputStream.h>
 #include <mtp/ptp/Response.h>
 #include <mtp/ptp/IObjectStream.h>
+#include <mtp/ptp/ObjectFormat.h>
 
 namespace mtp
 {
@@ -30,11 +31,18 @@ namespace mtp
 	{
 		ByteArray Data;
 
+		void WriteSize(OutputStream &stream, u64 size)
+		{
+			if (size > MaxObjectSize)
+				size = MaxObjectSize;
+			stream << (u32)size;
+		}
+
 		template<typename Message>
 		Container(const Message &msg)
 		{
 			OutputStream stream(Data);
-			stream << (u32)(msg.Data.size() + 6);
+			WriteSize(stream, msg.Data.size() + 6);
 			stream << Message::Type;
 			std::copy(msg.Data.begin(), msg.Data.end(), std::back_inserter(Data));
 		}
@@ -43,7 +51,7 @@ namespace mtp
 		Container(const Message &msg, IObjectInputStreamPtr inputStream)
 		{
 			OutputStream stream(Data);
-			stream << (u32)(inputStream->GetSize() + msg.Data.size() + 6);
+			WriteSize(stream, inputStream->GetSize() + msg.Data.size() + 6);
 			stream << Message::Type;
 			std::copy(msg.Data.begin(), msg.Data.end(), std::back_inserter(Data));
 		}
