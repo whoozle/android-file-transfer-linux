@@ -227,7 +227,6 @@ namespace mtp
 		SetObjectProperty(objectId, property, data);
 	}
 
-
 	void Session::DeleteObject(u32 objectId)
 	{
 		u32 transaction = _transactionId++;
@@ -238,6 +237,22 @@ namespace mtp
 		ResponseType responseCode;
 		_packeter.Read(transaction, data, responseCode, response);
 		CHECK_RESPONSE(responseCode);
+	}
+
+	ByteArray Session::GetDeviceProperty(DeviceProperty property)
+	{
+		u32 transaction = _transactionId++;
+		{
+			OperationRequest req(OperationCode::GetDevicePropValue, transaction, (u16)property);
+			Container container(req);
+			_packeter.Write(container.Data);
+		}
+		ByteArray data, response;
+		ResponseType responseCode;
+		_packeter.Read(transaction, data, responseCode, response);
+		CHECK_RESPONSE(responseCode);
+		return data;
+
 	}
 
 }

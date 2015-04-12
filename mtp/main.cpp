@@ -240,6 +240,17 @@ int main(int argc, char **argv)
 		}
 		printf("\n");
 	}
+	else if (command == "device-properties")
+	{
+		for(u16 code : gdi.DevicePropertiesSupported)
+		{
+			if ((code & 0xff00) != 0x5000 )
+				continue;
+			printf("property code: %04x\n", (unsigned)code);
+			ByteArray data = session->GetDeviceProperty((mtp::DeviceProperty)code);
+			HexDump("value", data);
+		}
+	}
 
 	return 0;
 }
