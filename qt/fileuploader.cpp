@@ -156,6 +156,7 @@ void FileUploader::download(const QString &path, const QList<quint32> &objectIds
 		_total += oi.Size; //fixme: invalid for > 4Gb
 		files.push_back(QPair<QString, mtp::u32>(oi.Filename, id));
 	}
+	qDebug() << "downloading " << files.size() << " file(s), " << _total << " bytes";
 
 	for(const auto & file : files)
 	{
