@@ -28,6 +28,7 @@
 
 namespace mtp
 {
+	struct OperationRequest;
 
 	class Session
 	{
@@ -71,6 +72,7 @@ namespace mtp
 		ByteArray GetDeviceProperty(DeviceProperty property);
 
 	private:
+		void Send(const OperationRequest &req);
 		void Close();
 	};
 	DECLARE_PTR(Session);

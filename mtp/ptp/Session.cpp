@@ -31,11 +31,15 @@ namespace mtp
 		throw InvalidResponseException(__func__, (RCODE)); \
 } while(false)
 
-	void Session::Close()
+	void Session::Send(const OperationRequest &req)
 	{
-		OperationRequest req(OperationCode::CloseSession, 0, _sessionId);
 		Container container(req);
 		_packeter.Write(container.Data);
+	}
+
+	void Session::Close()
+	{
+		Send(OperationRequest(OperationCode::CloseSession, 0, _sessionId));
 		ByteArray data, response;
 		ResponseType responseCode;
 		_packeter.Read(0, data, responseCode, response);
@@ -45,9 +49,7 @@ namespace mtp
 	msg::ObjectHandles Session::GetObjectHandles(u32 storageId, u32 objectFormat, u32 parent)
 	{
 		u32 transaction = _transactionId++;
-		OperationRequest req(OperationCode::GetObjectHandles, transaction, storageId, objectFormat, parent);
-		Container container(req);
-		_packeter.Write(container.Data);
+		Send(OperationRequest(OperationCode::GetObjectHandles, transaction, storageId, objectFormat, parent));
 		ByteArray data, response;
 		ResponseType responseCode;
 		_packeter.Read(transaction, data, responseCode, response);
@@ -62,9 +64,7 @@ namespace mtp
 	msg::StorageIDs Session::GetStorageIDs()
 	{
 		u32 transaction = _transactionId++;
-		OperationRequest req(OperationCode::GetStorageIDs, transaction, 0xffffffffu);
-		Container container(req);
-		_packeter.Write(container.Data);
+		Send(OperationRequest(OperationCode::GetStorageIDs, transaction, 0xffffffffu));
 		ByteArray data, response;
 		ResponseType responseCode;
 		_packeter.Read(transaction, data, responseCode, response);
@@ -79,9 +79,7 @@ namespace mtp
 	msg::StorageInfo Session::GetStorageInfo(u32 storageId)
 	{
 		u32 transaction = _transactionId++;
-		OperationRequest req(OperationCode::GetStorageInfo, transaction, storageId);
-		Container container(req);
-		_packeter.Write(container.Data);
+		Send(OperationRequest(OperationCode::GetStorageInfo, transaction, storageId));
 		ByteArray data, response;
 		ResponseType responseCode;
 		_packeter.Read(transaction, data, responseCode, response);
@@ -95,9 +93,7 @@ namespace mtp
 	msg::ObjectInfo Session::GetObjectInfo(u32 objectId)
 	{
 		u32 transaction = _transactionId++;
-		OperationRequest req(OperationCode::GetObjectInfo, transaction, objectId);
-		Container container(req);
-		_packeter.Write(container.Data);
+		Send(OperationRequest(OperationCode::GetObjectInfo, transaction, objectId));
 		ByteArray data, response;
 		ResponseType responseCode;
 		_packeter.Read(transaction, data, responseCode, response);
@@ -111,9 +107,7 @@ namespace mtp
 	msg::ObjectPropsSupported Session::GetObjectPropsSupported(u32 objectId)
 	{
 		u32 transaction = _transactionId++;
-		OperationRequest req(OperationCode::GetObjectPropsSupported, transaction, objectId);
-		Container container(req);
-		_packeter.Write(container.Data);
+		Send(OperationRequest(OperationCode::GetObjectPropsSupported, transaction, objectId));
 		ByteArray data, response;
 		ResponseType responseCode;
 		_packeter.Read(transaction, data, responseCode, response);
@@ -127,9 +121,7 @@ namespace mtp
 	void Session::GetObject(u32 objectId, const IObjectOutputStreamPtr &outputStream)
 	{
 		u32 transaction = _transactionId++;
-		OperationRequest req(OperationCode::GetObject, transaction, objectId);
-		Container container(req);
-		_packeter.Write(container.Data);
+		Send(OperationRequest(OperationCode::GetObject, transaction, objectId));
 		ByteArray response;
 		ResponseType responseCode;
 		_packeter.Read(transaction, outputStream, responseCode, response);
@@ -139,11 +131,7 @@ namespace mtp
 	Session::NewObjectInfo Session::SendObjectInfo(const msg::ObjectInfo &objectInfo, u32 storageId, u32 parentObject)
 	{
 		u32 transaction = _transactionId++;
-		{
-			OperationRequest req(OperationCode::SendObjectInfo, transaction, storageId, parentObject);
-			Container container(req);
-			_packeter.Write(container.Data);
-		}
+		Send(OperationRequest(OperationCode::SendObjectInfo, transaction, storageId, parentObject));
 		{
 			DataRequest req(OperationCode::SendObjectInfo, transaction);
 			OutputStream stream(req.Data);
@@ -167,11 +155,7 @@ namespace mtp
 	void Session::SendObject(const IObjectInputStreamPtr &inputStream)
 	{
 		u32 transaction = _transactionId++;
-		{
-			OperationRequest req(OperationCode::SendObject, transaction);
-			Container container(req);
-			_packeter.Write(container.Data);
-		}
+		Send(OperationRequest(OperationCode::SendObject, transaction));
 		{
 			DataRequest req(OperationCode::SendObject, transaction);
 			Container container(req, inputStream);
@@ -186,11 +170,7 @@ namespace mtp
 	void Session::SetObjectProperty(u32 objectId, ObjectProperty property, const ByteArray &value)
 	{
 		u32 transaction = _transactionId++;
-		{
-			OperationRequest req(OperationCode::SetObjectPropValue, transaction, objectId, (u16)property);
-			Container container(req);
-			_packeter.Write(container.Data);
-		}
+		Send(OperationRequest(OperationCode::SetObjectPropValue, transaction, objectId, (u16)property));
 		{
 			DataRequest req(OperationCode::SetObjectPropValue, transaction);
 			req.Append(value);
@@ -206,11 +186,7 @@ namespace mtp
 	ByteArray Session::GetObjectProperty(u32 objectId, ObjectProperty property)
 	{
 		u32 transaction = _transactionId++;
-		{
-			OperationRequest req(OperationCode::GetObjectPropValue, transaction, objectId, (u16)property);
-			Container container(req);
-			_packeter.Write(container.Data);
-		}
+		Send(OperationRequest(OperationCode::GetObjectPropValue, transaction, objectId, (u16)property));
 		ByteArray data, response;
 		ResponseType responseCode;
 		_packeter.Read(transaction, data, responseCode, response);
@@ -245,9 +221,7 @@ namespace mtp
 	void Session::DeleteObject(u32 objectId)
 	{
 		u32 transaction = _transactionId++;
-		OperationRequest req(OperationCode::DeleteObject, transaction, objectId);
-		Container container(req);
-		_packeter.Write(container.Data);
+		Send(OperationRequest(OperationCode::DeleteObject, transaction, objectId));
 		ByteArray data, response;
 		ResponseType responseCode;
 		_packeter.Read(transaction, data, responseCode, response);
@@ -257,11 +231,7 @@ namespace mtp
 	ByteArray Session::GetDeviceProperty(DeviceProperty property)
 	{
 		u32 transaction = _transactionId++;
-		{
-			OperationRequest req(OperationCode::GetDevicePropValue, transaction, (u16)property);
-			Container container(req);
-			_packeter.Write(container.Data);
-		}
+		Send(OperationRequest(OperationCode::GetDevicePropValue, transaction, (u16)property));
 		ByteArray data, response;
 		ResponseType responseCode;
 		_packeter.Read(transaction, data, responseCode, response);
