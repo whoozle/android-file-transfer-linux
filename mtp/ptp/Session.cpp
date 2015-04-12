@@ -131,7 +131,7 @@ namespace mtp
 		Send(OperationRequest(OperationCode::GetObject, transaction, objectId));
 		ByteArray response;
 		ResponseType responseCode;
-		_packeter.Read(transaction, outputStream, responseCode, response);
+		_packeter.Read(transaction, outputStream, responseCode, response, 10000);
 		CHECK_RESPONSE(responseCode);
 	}
 
