@@ -211,5 +211,7 @@ MtpObjectsModel::ObjectInfo MtpObjectsModel::getInfo(mtp::u32 objectId)
 {
 	mtp::msg::ObjectInfo oi(_session->GetObjectInfo(objectId));
 	qint64 size = oi.ObjectCompressedSize;
+	if (size == mtp::MaxObjectSize)
+		size = _session->GetObjectIntegerProperty(objectId, mtp::ObjectProperty::ObjectSize);
 	return ObjectInfo(QString::fromStdString(oi.Filename), size);
 }
