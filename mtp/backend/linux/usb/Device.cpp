@@ -18,6 +18,7 @@
  */
 #include <usb/Device.h>
 #include <usb/Exception.h>
+#include <mtp/usb/TimeoutException.h>
 #include <mtp/ByteArray.h>
 
 #include <unistd.h>
@@ -80,7 +81,7 @@ namespace mtp { namespace usb
 					throw Exception("clock_gettime");
 				int delta = (now.tv_sec - started.tv_sec) * 1000 + (now.tv_nsec - started.tv_nsec) / 1000000;
 				if (timeout > 0 && delta >= timeout)
-					throw std::runtime_error("timeout reaping usb urb");
+					throw TimeoutException("timeout reaping usb urb");
 				usleep(100); //0.1ms
 				continue;
 			}
