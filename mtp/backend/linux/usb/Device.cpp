@@ -27,7 +27,7 @@
 
 #include "linux/usbdevice_fs.h"
 
-#define IOCTL(...) do { int r = ioctl(__VA_ARGS__); if (r < 0) throw Exception(#__VA_ARGS__); } while(false)
+#define IOCTL(...) do { int r = ioctl(__VA_ARGS__); if (r < 0) throw Exception("ioctl(" #__VA_ARGS__ ")"); } while(false)
 
 namespace mtp { namespace usb
 {
