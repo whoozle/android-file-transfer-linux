@@ -81,6 +81,17 @@ namespace mtp { namespace usb
 			throw Exception("ioctl");
 	}
 
+	void Device::ReapSingleUrb(void *urb, int timeout)
+	{
+		void * reapUrb = Reap(timeout);
+		if (urb != reapUrb)
+		{
+			fprintf(stderr, "reaping unknown urb, usb bus conflict: %p %p\n", urb, reapUrb);
+			std::terminate();
+		}
+	}
+
+
 	void Device::WriteBulk(const EndpointPtr & ep, const IObjectInputStreamPtr &inputStream, int timeout)
 	{
 		size_t transferSize = ep->GetMaxPacketSize() * 1024;
@@ -104,9 +115,7 @@ namespace mtp { namespace usb
 			IOCTL(_fd, USBDEVFS_SUBMITURB, &urb);
 			try
 			{
-				usbdevfs_urb *reapedUrb = static_cast<usbdevfs_urb *>(Reap(timeout));
-				if (reapedUrb != &urb)
-					std::terminate();
+				ReapSingleUrb(&urb, timeout);
 			}
 			catch(const std::exception &ex)
 			{
@@ -139,10 +148,7 @@ namespace mtp { namespace usb
 
 			try
 			{
-				usbdevfs_urb *reapedUrb = static_cast<usbdevfs_urb *>(Reap(timeout));
-				if (reapedUrb != &urb)
-					std::terminate();
-				//fprintf(stderr, "read %p %p\n", &urb, reapedUrb);
+				ReapSingleUrb(&urb, timeout);
 			}
 			catch(const std::exception &ex)
 			{

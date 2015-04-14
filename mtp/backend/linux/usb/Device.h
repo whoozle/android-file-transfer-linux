@@ -59,6 +59,7 @@ namespace mtp { namespace usb
 
 	private:
 		void * Reap(int timeout);
+		void ReapSingleUrb(void *urb, int timeout);
 	};
 	DECLARE_PTR(Device);
 }}
