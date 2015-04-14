@@ -23,7 +23,7 @@
 
 #include <unistd.h>
 #include <sys/ioctl.h>
-#include <time.h>
+#include <poll.h>
 
 #include "linux/usbdevice_fs.h"
 
@@ -63,31 +63,22 @@ namespace mtp { namespace usb
 
 	void * Device::Reap(int timeout)
 	{
-		timespec started = {};
-		if (clock_gettime(CLOCK_MONOTONIC, &started) == -1)
-			throw Exception("clock_gettime");
+		pollfd fd = {};
+		fd.fd		= _fd;
+		fd.events	= POLLOUT;
+		int r = poll(&fd, 1, timeout);
 
-		while(true)
-		{
-			usbdevfs_urb *urb;
-			int r = ioctl(_fd, USBDEVFS_REAPURBNDELAY, &urb);
-			if (r == 0)
-				return urb;
+		if (r < 0)
+			throw Exception("poll");
+		if (r == 0)
+			throw TimeoutException("timeout reaping usb urb");
 
-			if (errno == EAGAIN)
-			{
-				timespec now = {};
-				if (clock_gettime(CLOCK_MONOTONIC, &now) == -1)
-					throw Exception("clock_gettime");
-				int delta = (now.tv_sec - started.tv_sec) * 1000 + (now.tv_nsec - started.tv_nsec) / 1000000;
-				if (timeout > 0 && delta >= timeout)
-					throw TimeoutException("timeout reaping usb urb");
-				usleep(100); //0.1ms
-				continue;
-			}
-			else
-				throw Exception("ioctl");
-		}
+		usbdevfs_urb *urb;
+		r = ioctl(_fd, USBDEVFS_REAPURBNDELAY, &urb);
+		if (r == 0)
+			return urb;
+		else
+			throw Exception("ioctl");
 	}
 
 	void Device::WriteBulk(const EndpointPtr & ep, const IObjectInputStreamPtr &inputStream, int timeout)
