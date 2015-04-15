@@ -65,7 +65,8 @@ void MainWindow::showEvent(QShowEvent *)
 			return;
 		}
 
-		for(int i = 0; i < 3; ++i)
+		static const int MaxAttempts = 3;
+		for(int attempt = 0; attempt < MaxAttempts; ++attempt)
 		{
 			try
 			{
@@ -77,6 +78,11 @@ void MainWindow::showEvent(QShowEvent *)
 			{
 				qDebug() << "timed out getting device info: " << ex.what() << ", retrying...";
 				_device.reset();
+				if (attempt + 1 == MaxAttempts)
+				{
+					QMessageBox::critical(this, tr("MTP"), tr("MTP device does not respond"));
+					return;
+				}
 				_device = mtp::Device::Find();
 			}
 		}
