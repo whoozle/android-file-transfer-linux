@@ -23,6 +23,7 @@
 #include "renamedialog.h"
 #include "mtpobjectsmodel.h"
 #include "fileuploader.h"
+#include <mtp/usb/TimeoutException.h>
 #include <QDebug>
 #include <QMessageBox>
 #include <QKeyEvent>
@@ -63,6 +64,23 @@ void MainWindow::showEvent(QShowEvent *)
 			QMessageBox::critical(this, tr("No MTP device found"), tr("No MTP device found"));
 			return;
 		}
+
+		for(int i = 0; i < 3; ++i)
+		{
+			try
+			{
+				mtp::msg::DeviceInfo di = _device->GetDeviceInfo();
+				qDebug() << "device info" << QString::fromStdString(di.Manufacturer) << " " << QString::fromStdString(di.Model);
+				break;
+			}
+			catch(const mtp::usb::TimeoutException &ex)
+			{
+				qDebug() << "timed out getting device info: " << ex.what() << ", retrying...";
+				_device.reset();
+				_device = mtp::Device::Find();
+			}
+		}
+
 		_objectModel->setSession(_device->OpenSession(1));
 		_ui->listView->setModel(_objectModel);
 	}
