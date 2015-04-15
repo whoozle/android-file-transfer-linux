@@ -115,7 +115,7 @@ int main(int argc, char **argv)
 
 	msg::DeviceInfo gdi = mtp->GetDeviceInfo();
 	printf("%s\n", gdi.VendorExtensionDesc.c_str());
-	printf("%s ", gdi.Manufactorer.c_str());
+	printf("%s ", gdi.Manufacturer.c_str());
 	printf("%s ", gdi.Model.c_str());
 	printf("%s ", gdi.DeviceVersion.c_str());
 	printf("%s\n", gdi.SerialNumber.c_str());

@@ -37,7 +37,7 @@ namespace mtp { namespace msg
 		std::vector<u16>	DevicePropertiesSupported;
 		std::vector<u16>	CaptureFormats;
 		std::vector<u16>	ImageFormats;
-		std::string			Manufactorer;
+		std::string			Manufacturer;
 		std::string			Model;
 		std::string			DeviceVersion;
 		std::string			SerialNumber;
@@ -54,7 +54,7 @@ namespace mtp { namespace msg
 			stream >> DevicePropertiesSupported;
 			stream >> CaptureFormats;
 			stream >> ImageFormats;
-			stream >> Manufactorer;
+			stream >> Manufacturer;
 			stream >> Model;
 			stream >> DeviceVersion;
 			stream >> SerialNumber;
