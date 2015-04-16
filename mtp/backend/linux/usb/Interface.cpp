@@ -65,7 +65,12 @@ namespace mtp { namespace usb
 				break;
 
 			if (entry.compare(0, 3, "ep_") == 0)
-				_endpoints.push_back(std::make_shared<Endpoint>(path + "/" + entry));
+			{
+				try
+				{ _endpoints.push_back(std::make_shared<Endpoint>(path + "/" + entry)); }
+				catch(const std::exception &ex)
+				{ fprintf(stderr, "failed adding endpoint: %s\n", ex.what()); }
+			}
 		}
 	}
 
