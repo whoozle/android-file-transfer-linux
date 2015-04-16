@@ -32,7 +32,7 @@ namespace mtp { namespace usb
 			_type = EndpointType::Control;
 		else if (type == "Interrupt")
 			_type = EndpointType::Interrupt;
-		else if (type == "Isochronous")
+		else if (type == "Isoc")
 			_type = EndpointType::Isochronous;
 		else
 			throw std::runtime_error("invalid endpoint type " + type);
