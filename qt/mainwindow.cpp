@@ -87,7 +87,9 @@ void MainWindow::showEvent(QShowEvent *)
 			}
 		}
 
+		qDebug() << "device found, opening session...";
 		_objectModel->setSession(_device->OpenSession(1));
+		qDebug() << "session opened, starting";
 		_ui->listView->setModel(_objectModel);
 	}
 }
