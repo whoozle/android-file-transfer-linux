@@ -24,6 +24,7 @@
 #include <unistd.h>
 #include <sys/ioctl.h>
 #include <poll.h>
+#include <sys/time.h>
 
 #include "linux/usbdevice_fs.h"
 
@@ -63,15 +64,26 @@ namespace mtp { namespace usb
 
 	void * Device::Reap(int timeout)
 	{
+		timeval started = {};
+		if (gettimeofday(&started, NULL) == -1)
+			throw usb::Exception("gettimeofday");
 		pollfd fd = {};
 		fd.fd		= _fd;
 		fd.events	= POLLOUT;
 		int r = poll(&fd, 1, timeout);
 
+		timeval now = {};
+		if (gettimeofday(&now, NULL) == -1)
+			throw usb::Exception("gettimeofday");
+
 		if (r < 0)
 			throw Exception("poll");
 		if (r == 0)
+		{
+			int ms = (now.tv_sec - started.tv_sec) * 1000 + (now.tv_usec - started.tv_usec) / 1000;
+			fprintf(stderr, "%d ms since the last poll call\n", ms);
 			throw TimeoutException("timeout reaping usb urb");
+		}
 
 		usbdevfs_urb *urb;
 		r = ioctl(_fd, USBDEVFS_REAPURBNDELAY, &urb);
