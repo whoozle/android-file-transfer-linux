@@ -244,7 +244,15 @@ namespace
 					  struct fuse_file_info *fi)
 		{
 			mtp::scoped_mutex_lock l(_mutex);
-			return 0;
+			mtp::u32 id = Resolve(path);
+			if (!id)
+				return -ENOENT;
+
+			mtp::ByteArray data = _session->GetPartialObject(id, offset, size);
+			if (data.size() > size)
+				throw std::runtime_error("too much data");
+			std::copy(data.begin(), data.end(), buf);
+			return data.size();
 		}
 	};
 
