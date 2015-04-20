@@ -135,6 +135,19 @@ namespace mtp
 		CHECK_RESPONSE(responseCode);
 	}
 
+	ByteArray Session::GetPartialObject(u32 objectId, u64 offset, u32 size)
+	{
+		scoped_mutex_lock l(_mutex);
+		u32 transaction = _transactionId++;
+		Send(OperationRequest(OperationCode::GetPartialObject64, transaction, objectId, offset, offset >> 32, size));
+		ByteArray data, response;
+		ResponseType responseCode;
+		_packeter.Read(transaction, data, responseCode, response, 10000);
+		CHECK_RESPONSE(responseCode);
+		return data;
+	}
+
+
 	Session::NewObjectInfo Session::SendObjectInfo(const msg::ObjectInfo &objectInfo, u32 storageId, u32 parentObject)
 	{
 		scoped_mutex_lock l(_mutex);

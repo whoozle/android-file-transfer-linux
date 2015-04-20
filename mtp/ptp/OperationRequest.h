@@ -72,6 +72,15 @@ namespace mtp
 			stream << par2;
 			stream << par3;
 		}
+		OperationRequest(OperationCode opcode, u32 transaction, u32 par1, u32 par2, u32 par3, u32 par4):
+			RequestBase(opcode, transaction)
+		{
+			OutputStream stream(Data);
+			stream << par1;
+			stream << par2;
+			stream << par3;
+			stream << par4;
+		}
 	};
 
 	struct DataRequest : RequestBase
