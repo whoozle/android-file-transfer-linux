@@ -220,6 +220,15 @@ namespace mtp
 		}
 	}
 
+	std::string Session::GetObjectStringProperty(u32 objectId, ObjectProperty property)
+	{
+		ByteArray data = GetObjectProperty(objectId, property);
+		InputStream s(data);
+		std::string value;
+		s >> value;
+		return value;
+	}
+
 	void Session::SetObjectProperty(u32 objectId, ObjectProperty property, const std::string &value)
 	{
 		scoped_mutex_lock l(_mutex);
