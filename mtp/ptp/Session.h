@@ -75,6 +75,7 @@ namespace mtp
 		ByteArray GetDeviceProperty(DeviceProperty property);
 
 	private:
+		ByteArray Get(u32 transaction);
 		void Send(const OperationRequest &req);
 		void Close();
 	};

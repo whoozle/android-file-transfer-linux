@@ -47,15 +47,22 @@ namespace mtp
 		//HexDump("payload", data);
 	}
 
+	ByteArray Session::Get(u32 transaction)
+	{
+		ByteArray data, response;
+		ResponseType responseCode;
+		_packeter.Read(transaction, data, responseCode, response);
+		CHECK_RESPONSE(responseCode);
+		return data;
+	}
+
+
 	msg::ObjectHandles Session::GetObjectHandles(u32 storageId, u32 objectFormat, u32 parent)
 	{
 		scoped_mutex_lock l(_mutex);
 		u32 transaction = _transactionId++;
 		Send(OperationRequest(OperationCode::GetObjectHandles, transaction, storageId, objectFormat, parent));
-		ByteArray data, response;
-		ResponseType responseCode;
-		_packeter.Read(transaction, data, responseCode, response);
-		CHECK_RESPONSE(responseCode);
+		ByteArray data = Get(transaction);
 		InputStream stream(data);
 
 		msg::ObjectHandles goh;
@@ -68,10 +75,7 @@ namespace mtp
 		scoped_mutex_lock l(_mutex);
 		u32 transaction = _transactionId++;
 		Send(OperationRequest(OperationCode::GetStorageIDs, transaction, 0xffffffffu));
-		ByteArray data, response;
-		ResponseType responseCode;
-		_packeter.Read(transaction, data, responseCode, response);
-		CHECK_RESPONSE(responseCode);
+		ByteArray data = Get(transaction);
 		InputStream stream(data);
 
 		msg::StorageIDs gsi;
@@ -84,10 +88,7 @@ namespace mtp
 		scoped_mutex_lock l(_mutex);
 		u32 transaction = _transactionId++;
 		Send(OperationRequest(OperationCode::GetStorageInfo, transaction, storageId));
-		ByteArray data, response;
-		ResponseType responseCode;
-		_packeter.Read(transaction, data, responseCode, response);
-		CHECK_RESPONSE(responseCode);
+		ByteArray data = Get(transaction);
 		InputStream stream(data);
 		msg::StorageInfo gsi;
 		gsi.Read(stream);
@@ -99,10 +100,7 @@ namespace mtp
 		scoped_mutex_lock l(_mutex);
 		u32 transaction = _transactionId++;
 		Send(OperationRequest(OperationCode::GetObjectInfo, transaction, objectId));
-		ByteArray data, response;
-		ResponseType responseCode;
-		_packeter.Read(transaction, data, responseCode, response);
-		CHECK_RESPONSE(responseCode);
+		ByteArray data = Get(transaction);
 		InputStream stream(data);
 		msg::ObjectInfo goi;
 		goi.Read(stream);
@@ -114,10 +112,7 @@ namespace mtp
 		scoped_mutex_lock l(_mutex);
 		u32 transaction = _transactionId++;
 		Send(OperationRequest(OperationCode::GetObjectPropsSupported, transaction, objectId));
-		ByteArray data, response;
-		ResponseType responseCode;
-		_packeter.Read(transaction, data, responseCode, response);
-		CHECK_RESPONSE(responseCode);
+		ByteArray data = Get(transaction);
 		InputStream stream(data);
 		msg::ObjectPropsSupported ops;
 		ops.Read(stream);
@@ -140,11 +135,7 @@ namespace mtp
 		scoped_mutex_lock l(_mutex);
 		u32 transaction = _transactionId++;
 		Send(OperationRequest(OperationCode::GetPartialObject64, transaction, objectId, offset, offset >> 32, size));
-		ByteArray data, response;
-		ResponseType responseCode;
-		_packeter.Read(transaction, data, responseCode, response, 10000);
-		CHECK_RESPONSE(responseCode);
-		return data;
+		return Get(transaction);
 	}
 
 
@@ -183,10 +174,7 @@ namespace mtp
 			Container container(req, inputStream);
 			_packeter.Write(std::make_shared<JoinedObjectInputStream>(std::make_shared<ByteArrayObjectInputStream>(container.Data), inputStream), 6000);
 		}
-		ByteArray data, response;
-		ResponseType responseCode;
-		_packeter.Read(transaction, data, responseCode, response);
-		CHECK_RESPONSE(responseCode);
+		Get(transaction);
 	}
 
 	void Session::SetObjectProperty(u32 objectId, ObjectProperty property, const ByteArray &value)
@@ -200,10 +188,7 @@ namespace mtp
 			Container container(req);
 			_packeter.Write(container.Data, 0);
 		}
-		ByteArray data, response;
-		ResponseType responseCode;
-		_packeter.Read(transaction, data, responseCode, response);
-		CHECK_RESPONSE(responseCode);
+		Get(transaction);
 	}
 
 	ByteArray Session::GetObjectProperty(u32 objectId, ObjectProperty property)
@@ -211,11 +196,7 @@ namespace mtp
 		scoped_mutex_lock l(_mutex);
 		u32 transaction = _transactionId++;
 		Send(OperationRequest(OperationCode::GetObjectPropValue, transaction, objectId, (u16)property));
-		ByteArray data, response;
-		ResponseType responseCode;
-		_packeter.Read(transaction, data, responseCode, response);
-		CHECK_RESPONSE(responseCode);
-		return data;
+		return Get(transaction);
 	}
 
 	u64 Session::GetObjectIntegerProperty(u32 objectId, ObjectProperty property)
@@ -257,10 +238,7 @@ namespace mtp
 		scoped_mutex_lock l(_mutex);
 		u32 transaction = _transactionId++;
 		Send(OperationRequest(OperationCode::DeleteObject, transaction, objectId));
-		ByteArray data, response;
-		ResponseType responseCode;
-		_packeter.Read(transaction, data, responseCode, response);
-		CHECK_RESPONSE(responseCode);
+		Get(transaction);
 	}
 
 	ByteArray Session::GetDeviceProperty(DeviceProperty property)
@@ -268,11 +246,7 @@ namespace mtp
 		scoped_mutex_lock l(_mutex);
 		u32 transaction = _transactionId++;
 		Send(OperationRequest(OperationCode::GetDevicePropValue, transaction, (u16)property));
-		ByteArray data, response;
-		ResponseType responseCode;
-		_packeter.Read(transaction, data, responseCode, response);
-		CHECK_RESPONSE(responseCode);
-		return data;
+		return Get(transaction);
 	}
 
 }
