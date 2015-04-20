@@ -10,7 +10,7 @@ pkg_check_modules ( FUSE fuse )
 
 if (FUSE_FOUND)
 	message(STATUS "fuse found, building mount helper")
-	add_definitions(${FUSE_CFLAGS})
+	add_definitions(${FUSE_CFLAGS} -DFUSE_USE_VERSION=26)
 endif()
 
 option(BUILD_QT_UI "Build reference Qt application" ON)
@@ -90,7 +90,7 @@ target_link_libraries(mtp-test ${MTP_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
 if (FUSE_FOUND)
 	add_executable(aft-mtp-mount mtp/fuse.cpp)
-	target_link_libraries(aft-mtp-mount ${MTP_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+	target_link_libraries(aft-mtp-mount ${MTP_LIBRARIES} ${FUSE_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 endif()
 
 if (BUILD_QT_UI)
