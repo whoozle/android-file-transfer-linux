@@ -191,9 +191,44 @@ namespace
 			return 0;
 		}
 
-		int MakeDir (const char *path, mode_t mode)
+		int MakeDir (const char *path_, mode_t mode)
 		{
-			return -EIO;
+			std::string path(path_);
+			size_t parentPos = path.rfind('/');
+			if (parentPos == path.npos)
+				return -ENOENT;
+			if (parentPos == 0)
+				return -EACCES;
+
+			size_t storagePos = path.find('/', 1);
+			if (storagePos == path.npos)
+				return -EACCES;
+
+			mtp::u32 storageId;
+			std::string storage = path.substr(0, storagePos);
+			Storages::const_iterator i = _storages.find(storage);
+			if (i != _storages.end())
+			{
+				storageId = i->second;
+			}
+			else
+				return -ENOENT;
+
+			std::string parent = path.substr(0, parentPos);
+			mtp::u32 parentId = parent != storage? Resolve(parent): mtp::Session::Root;
+			//printf("mkdir %s -> %s %s %u %u\n", path.c_str(), storage.c_str(), parent.c_str(), storageId, parentId);
+
+			if (storageId == 0 || parentId == 0)
+				return -ENOENT;
+
+			if (parentId == storageId)
+				parentId = mtp::Session::Root;
+
+			mtp::msg::ObjectInfo oi;
+			oi.Filename = path.substr(parentPos + 1);
+			oi.ObjectFormat = mtp::ObjectFormat::Association;
+			_session->SendObjectInfo(oi, storageId, parentId);
+			return 0;
 		}
 
 		int RemoveDir (const char *path)
@@ -255,7 +290,7 @@ int main(int argc, char **argv)
 			throw std::runtime_error("no MTP device found");
 		g_wrapper.reset(new FuseWrapper(g_device));
 	} catch(const std::exception &ex)
-	{ fprintf(stderr, "%s\n", ex.what()); return 1; }
+	{ printf("%s\n", ex.what()); return 1; }
 
 	struct fuse_operations ops = {};
 
