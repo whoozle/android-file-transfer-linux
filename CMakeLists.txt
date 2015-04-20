@@ -5,7 +5,13 @@ set(CMAKE_USE_RELATIVE_PATHS TRUE)
 include(FindPkgConfig)
 include(CheckFunctionExists)
 
-find_package( Threads )
+find_package ( Threads )
+pkg_check_modules ( FUSE fuse )
+
+if (FUSE_FOUND)
+	message(STATUS "fuse found, building mount helper")
+	add_definitions(${FUSE_CFLAGS})
+endif()
 
 option(BUILD_QT_UI "Build reference Qt application" ON)
 option(BUILD_SHARED_LIB "Build shared library" OFF)
@@ -81,6 +87,11 @@ endif()
 
 add_executable(mtp-test mtp/main.cpp)
 target_link_libraries(mtp-test ${MTP_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+
+if (FUSE_FOUND)
+	add_executable(aft-mtp-mount mtp/fuse.cpp)
+	target_link_libraries(aft-mtp-mount ${MTP_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+endif()
 
 if (BUILD_QT_UI)
 	add_subdirectory(qt)
