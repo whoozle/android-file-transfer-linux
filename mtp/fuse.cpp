@@ -237,14 +237,14 @@ namespace
 		int Open(const char *path, struct fuse_file_info *fi)
 		{
 			mtp::scoped_mutex_lock l(_mutex);
-			return -ENOENT;
+			return Resolve(path)? 0: -ENOENT;
 		}
 
 		int Read(const char *path, char *buf, size_t size, off_t offset,
 					  struct fuse_file_info *fi)
 		{
 			mtp::scoped_mutex_lock l(_mutex);
-			return -ENOENT;
+			return 0;
 		}
 	};
 
