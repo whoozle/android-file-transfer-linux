@@ -86,7 +86,8 @@ namespace
 				{
 					std::string name = _session->GetObjectStringProperty(id, mtp::ObjectProperty::ObjectFilename);
 					_files[path + "/" + name] = id;
-					filler(buf, name.c_str(), NULL, 0);
+					if (filler)
+						filler(buf, name.c_str(), NULL, 0);
 				} catch(const std::exception &ex)
 				{ }
 			}
@@ -95,6 +96,41 @@ namespace
 		mtp::u32 Resolve(const std::string &path)
 		{
 			Files::const_iterator file = _files.find(path);
+			if (file != _files.end())
+				return file->second;
+
+			// /STORAGE/dir1/dir2/file
+
+			size_t idx = 0;
+			while(idx < path.size())
+			{
+				size_t next = path.find('/', idx + 1);
+				std::string subpath(path.substr(0, next));
+
+				Storages::const_iterator storage = _storages.find(subpath);
+				if (storage != _storages.end())
+				{
+					mtp::msg::ObjectHandles list = _session->GetObjectHandles(storage->second, mtp::Session::AllFormats, mtp::Session::Root);
+					Append(subpath, list, 0, 0);
+				}
+				else
+				{
+					Files::const_iterator file = _files.find(subpath);
+					if (file != _files.end())
+					{
+						mtp::msg::ObjectHandles list = _session->GetObjectHandles(mtp::Session::AllStorages, mtp::Session::AllFormats, file->second);
+						Append(subpath, list, 0, 0);
+					}
+					else
+						return 0;
+				}
+				if (next == path.npos)
+					break;
+				else
+					idx = next;
+			}
+
+			file = _files.find(path);
 			if (file != _files.end())
 				return file->second;
 
