@@ -254,6 +254,16 @@ namespace
 			std::copy(data.begin(), data.end(), buf);
 			return data.size();
 		}
+
+		int Truncate(const char *path, off_t offset)
+		{
+			return -EIO;
+		}
+
+		int StatFS (const char *path, struct statvfs *stat)
+		{
+			return 0;
+		}
 	};
 
 	mtp::DevicePtr					g_device;
@@ -287,6 +297,12 @@ namespace
 
 	int RemoveDir (const char *path)
 	{ WRAP_EX(g_wrapper->RemoveDir(path)); }
+
+	int Truncate(const char *path, off_t offset)
+	{ WRAP_EX(g_wrapper->Truncate(path, offset)); }
+
+	int StatFS (const char *path, struct statvfs *stat)
+	{ WRAP_EX(g_wrapper->StatFS(path, stat)); }
 }
 
 int main(int argc, char **argv)
@@ -302,13 +318,15 @@ int main(int argc, char **argv)
 
 	struct fuse_operations ops = {};
 
-	ops.getattr	= &GetAttr;
-	ops.readdir	= &ReadDir;
-	ops.open	= &Open;
-	ops.read	= &Read;
-	ops.mkdir	= &MakeDir;
-	ops.rmdir	= &RemoveDir;
-	ops.unlink	= &Unlink;
+	ops.getattr		= &GetAttr;
+	ops.readdir		= &ReadDir;
+	ops.open		= &Open;
+	ops.read		= &Read;
+	ops.mkdir		= &MakeDir;
+	ops.rmdir		= &RemoveDir;
+	ops.unlink		= &Unlink;
+	ops.truncate	= &Truncate;
+	ops.statfs		= &StatFS;
 
 	return fuse_main(argc, argv, &ops, NULL);
 }
