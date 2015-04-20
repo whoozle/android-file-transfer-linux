@@ -53,6 +53,13 @@ namespace mtp
 		CopyObject              = 0x101a,
 		GetPartialObject        = 0x101b,
 		InitiateOpenCapture     = 0x101c,
+
+		GetPartialObject64		= 0x95c1,
+		SendPartialObject		= 0x95c2,
+		TruncateObject			= 0x95c3,
+		BeginEditObject			= 0x95c4,
+		EndEditObject			= 0x95c5,
+
 		GetObjectPropsSupported = 0x9801,
 		GetObjectPropDesc		= 0x9802,
 		GetObjectPropValue		= 0x9803,
