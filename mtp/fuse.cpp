@@ -262,6 +262,7 @@ namespace
 
 		int StatFS (const char *path, struct statvfs *stat)
 		{
+			stat->f_namemax = 254;
 			return 0;
 		}
 	};
