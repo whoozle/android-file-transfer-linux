@@ -60,18 +60,19 @@ namespace
 				return 0;
 			}
 
-			Files::const_iterator file = _files.find(path);
-			if (file != _files.end())
+			mtp::u32 id = Resolve(path);
+			if (id)
 			{
 				stbuf->st_mode = 0755;
 
-				mtp::ObjectFormat format((mtp::ObjectFormat)_session->GetObjectIntegerProperty(file->second, mtp::ObjectProperty::ObjectFormat));
+				mtp::ObjectFormat format((mtp::ObjectFormat)_session->GetObjectIntegerProperty(id, mtp::ObjectProperty::ObjectFormat));
 				if (format == mtp::ObjectFormat::Association)
 					stbuf->st_mode |= S_IFDIR;
 				else
 					stbuf->st_mode |= S_IFREG;
+
 				stbuf->st_nlink = 1;
-				stbuf->st_size = _session->GetObjectIntegerProperty(file->second, mtp::ObjectProperty::ObjectSize);
+				stbuf->st_size = _session->GetObjectIntegerProperty(id, mtp::ObjectProperty::ObjectSize);
 				return 0;
 			}
 			return -ENOENT;
@@ -89,6 +90,15 @@ namespace
 				} catch(const std::exception &ex)
 				{ }
 			}
+		}
+
+		mtp::u32 Resolve(const std::string &path)
+		{
+			Files::const_iterator file = _files.find(path);
+			if (file != _files.end())
+				return file->second;
+
+			return 0;
 		}
 
 		int ReadDir(const char *path_, void *buf, fuse_fill_dir_t filler,
@@ -119,13 +129,14 @@ namespace
 				return 0;
 			}
 
-			Files::const_iterator file = _files.find(path);
-			if (file != _files.end())
+			mtp::u32 id = Resolve(path);
+
+			if (id)
 			{
 				filler(buf, ".", NULL, 0);
 				filler(buf, "..", NULL, 0);
 
-				mtp::msg::ObjectHandles list = _session->GetObjectHandles(mtp::Session::AllStorages, mtp::Session::AllFormats, file->second);
+				mtp::msg::ObjectHandles list = _session->GetObjectHandles(mtp::Session::AllStorages, mtp::Session::AllFormats, id);
 				Append(path, list, buf, filler);
 				return 0;
 			}
