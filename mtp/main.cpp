@@ -160,6 +160,15 @@ int main(int argc, char **argv)
 		}
 		//libusb_release_interface(device->GetHandle(), interface->GetIndex());
 	}
+	else if (command == "storages")
+	{
+		msg::StorageIDs list = session->GetStorageIDs();
+		for(size_t i = 0; i < list.StorageIDs.size(); ++i)
+		{
+			msg::StorageInfo si = session->GetStorageInfo(list.StorageIDs[i]);
+			printf("%08d volume: %s, description: %s\n", list.StorageIDs[i], si.VolumeLabel.c_str(), si.StorageDescription.c_str());
+		}
+	}
 	else if (command == "get")
 	{
 		if (argc < 3)
