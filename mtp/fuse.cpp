@@ -63,11 +63,11 @@ namespace
 			mtp::u32 id = Resolve(path);
 			if (id)
 			{
-				stbuf->st_mode = 0755;
+				stbuf->st_mode = 0644;
 
 				mtp::ObjectFormat format((mtp::ObjectFormat)_session->GetObjectIntegerProperty(id, mtp::ObjectProperty::ObjectFormat));
 				if (format == mtp::ObjectFormat::Association)
-					stbuf->st_mode |= S_IFDIR;
+					stbuf->st_mode |= S_IFDIR | 0111;
 				else
 					stbuf->st_mode |= S_IFREG;
 
