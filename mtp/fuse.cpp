@@ -180,6 +180,25 @@ namespace
 			return -ENOENT;
 		}
 
+		int Unlink (const char *path_)
+		{
+			std::string path(path_);
+			mtp::u32 id = Resolve(path);
+			if (!id)
+				return -ENOENT;
+			_session->DeleteObject(id);
+			_files.erase(path);
+			return 0;
+		}
+
+		int MakeDir (const char *path, mode_t mode)
+		{
+			return -EIO;
+		}
+
+		int RemoveDir (const char *path)
+		{ return Unlink(path); }
+
 		int Open(const char *path, struct fuse_file_info *fi)
 		{
 			mtp::scoped_mutex_lock l(_mutex);
@@ -217,6 +236,14 @@ namespace
 				  struct fuse_file_info *fi)
 	{ WRAP_EX(g_wrapper->Read(path, buf, size, offset, fi)); }
 
+	int Unlink (const char *path)
+	{ WRAP_EX(g_wrapper->Unlink(path)); }
+
+	int MakeDir (const char *path, mode_t mode)
+	{ WRAP_EX(g_wrapper->MakeDir(path, mode)); }
+
+	int RemoveDir (const char *path)
+	{ WRAP_EX(g_wrapper->RemoveDir(path)); }
 }
 
 int main(int argc, char **argv)
@@ -236,6 +263,9 @@ int main(int argc, char **argv)
 	ops.readdir	= &ReadDir;
 	ops.open	= &Open;
 	ops.read	= &Read;
+	ops.mkdir	= &MakeDir;
+	ops.rmdir	= &RemoveDir;
+	ops.unlink	= &Unlink;
 
 	return fuse_main(argc, argv, &ops, NULL);
 }
