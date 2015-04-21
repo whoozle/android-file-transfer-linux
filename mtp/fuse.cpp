@@ -183,6 +183,7 @@ namespace
 		int Unlink (const char *path_)
 		{
 			std::string path(path_);
+			mtp::scoped_mutex_lock l(_mutex);
 			mtp::u32 id = Resolve(path);
 			if (!id)
 				return -ENOENT;
@@ -191,9 +192,8 @@ namespace
 			return 0;
 		}
 
-		int MakeDir (const char *path_, mode_t mode)
+		int ResolveParent(const std::string &path, std::string &filename, mtp::u32 &storageId, mtp::u32 &parentId)
 		{
-			std::string path(path_);
 			size_t parentPos = path.rfind('/');
 			if (parentPos == path.npos)
 				return -ENOENT;
@@ -204,7 +204,6 @@ namespace
 			if (storagePos == path.npos)
 				return -EACCES;
 
-			mtp::u32 storageId;
 			std::string storage = path.substr(0, storagePos);
 			Storages::const_iterator i = _storages.find(storage);
 			if (i != _storages.end())
@@ -215,14 +214,29 @@ namespace
 				return -ENOENT;
 
 			std::string parent = path.substr(0, parentPos);
-			mtp::u32 parentId = parent != storage? Resolve(parent): mtp::Session::Root;
-			//printf("mkdir %s -> %s %s %u %u\n", path.c_str(), storage.c_str(), parent.c_str(), storageId, parentId);
+			parentId = parent != storage? Resolve(parent): mtp::Session::Root;
+			//printf("resolve parent %s -> %s %s %u %u\n", path.c_str(), storage.c_str(), parent.c_str(), storageId, parentId);
 
 			if (storageId == 0 || parentId == 0)
 				return -ENOENT;
 
+			filename = path.substr(parentPos + 1);
+			return 0;
+		}
+
+		int MakeDir (const char *path_, mode_t mode)
+		{
+			std::string path(path_);
+
+			mtp::scoped_mutex_lock l(_mutex);
+			mtp::u32 storageId, parentId;
+			std::string filename;
+			int r = ResolveParent(path, filename, storageId, parentId);
+			if (r)
+				return r;
+
 			mtp::msg::ObjectInfo oi;
-			oi.Filename = path.substr(parentPos + 1);
+			oi.Filename = filename;
 			oi.ObjectFormat = mtp::ObjectFormat::Association;
 			oi.AssociationType = 1;
 			_session->SendObjectInfo(oi, storageId, parentId);
@@ -232,8 +246,22 @@ namespace
 		int RemoveDir (const char *path)
 		{ return Unlink(path); }
 
-		int Create(const char *path, mode_t mode, struct fuse_file_info *fi)
-		{ return -EIO; }
+		int Create(const char *path_, mode_t mode, struct fuse_file_info *fi)
+		{
+			std::string path(path_);
+			mtp::scoped_mutex_lock l(_mutex);
+			mtp::u32 storageId, parentId;
+			std::string filename;
+			int r = ResolveParent(path, filename, storageId, parentId);
+			if (r)
+				return r;
+
+			mtp::msg::ObjectInfo oi;
+			oi.Filename = filename;
+			oi.ObjectFormat = mtp::ObjectFormatFromFilename(filename);
+			_session->SendObjectInfo(oi, storageId, parentId);
+			return 0;
+		}
 
 		int Open(const char *path, struct fuse_file_info *fi)
 		{
