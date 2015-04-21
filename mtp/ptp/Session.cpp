@@ -268,7 +268,6 @@ namespace mtp
 
 	void Session::SetObjectProperty(u32 objectId, ObjectProperty property, const std::string &value)
 	{
-		scoped_mutex_lock l(_mutex);
 		ByteArray data;
 		data.reserve(value.size() * 2 + 1);
 		OutputStream stream(data);
