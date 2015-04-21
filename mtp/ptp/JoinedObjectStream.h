@@ -93,7 +93,6 @@ namespace mtp
 	class JoinedObjectOutputStream : public JoinedObjectOutputStreamBase
 	{
 		IObjectOutputStreamPtr	_stream1, _stream2;
-		size_t					_offset;
 
 	private:
 		virtual IObjectOutputStreamPtr GetStream1() const
