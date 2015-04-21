@@ -179,6 +179,10 @@ namespace mtp
 
 	void Session::BeginEditObject(u32 objectId)
 	{
+		try
+		{ EndEditObject(objectId); }
+		catch(const std::exception &ex)
+		{ }
 		scoped_mutex_lock l(_mutex);
 		u32 transaction = _transactionId++;
 		Send(OperationRequest(OperationCode::BeginEditObject, transaction, objectId));
