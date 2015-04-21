@@ -80,7 +80,7 @@ namespace mtp
 		std::string FormatMessage(ResponseType r)
 		{
 			char buf[1024];
-			snprintf(buf, sizeof(buf), "invalid response code %s (0x%04x)", GetResponseName(r).c_str(), r);
+			snprintf(buf, sizeof(buf), "invalid response code %s (0x%04hx)", GetResponseName(r).c_str(), r);
 			return buf;
 		}
 	}

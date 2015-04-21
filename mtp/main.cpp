@@ -151,7 +151,7 @@ int main(int argc, char **argv)
 			try
 			{
 				msg::ObjectInfo info = session->GetObjectInfo(objectId);
-				printf("%-10u %04x %s %u %ux%u, %s\n", objectId, info.ObjectFormat, info.Filename.c_str(), info.ObjectCompressedSize, info.ImagePixWidth, info.ImagePixHeight, info.CaptureDate.c_str());
+				printf("%-10u %04hx %s %u %ux%u, %s\n", objectId, info.ObjectFormat, info.Filename.c_str(), info.ObjectCompressedSize, info.ImagePixWidth, info.ImagePixHeight, info.CaptureDate.c_str());
 			}
 			catch(const std::exception &ex)
 			{
