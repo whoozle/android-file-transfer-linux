@@ -101,7 +101,7 @@ namespace mtp
 				}
 				Write16(uni);
 			}
-			Write8(0);
+			Write16(0);
 		}
 
 		template<typename ElementType>
