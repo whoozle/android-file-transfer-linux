@@ -24,6 +24,10 @@ namespace
 		typedef std::map<std::string, mtp::u32> Files;
 		Files			_files;
 
+		typedef mtp::Session::ObjectEditSessionPtr ObjectEditSessionPtr;
+		typedef std::map<mtp::u32, ObjectEditSessionPtr> OpenedFiles;
+		OpenedFiles		_openedFiles;
+
 		typedef std::map<std::string, mtp::u32> Storages;
 		Storages		_storages;
 
@@ -284,16 +288,55 @@ namespace
 			return data.size();
 		}
 
+		ObjectEditSessionPtr GetSession(mtp::u32 id)
+		{
+			mtp::scoped_mutex_lock l(_mutex);
+			OpenedFiles::const_iterator i = _openedFiles.find(id);
+			if (i != _openedFiles.end())
+				return i->second;
+			else
+				return _openedFiles[id] = mtp::Session::EditObject(_session, id);
+		}
+
 		int Flush(const char *path, struct fuse_file_info *fi)
-		{ return -EIO; }
+		{
+			mtp::scoped_mutex_lock l(_mutex);
+			mtp::u32 id = Resolve(path);
+			if (!id)
+				return -ENOENT;
+			_openedFiles.erase(id);
+			return 0;
+		}
 
 		int Write(const char *path, const char *buf, size_t size, off_t offset,
 					  struct fuse_file_info *fi)
-		{ return -EIO; }
+		{
+			mtp::u32 id;
+			{
+				mtp::scoped_mutex_lock l(_mutex);
+				id = Resolve(path);
+				if (!id)
+					return -ENOENT;
+			}
+
+			ObjectEditSessionPtr edit = GetSession(id);
+			edit->Send(offset, mtp::ByteArray(buf, buf + size));
+			return size;
+		}
 
 		int Truncate(const char *path, off_t offset)
 		{
-			return -EIO;
+			mtp::u32 id;
+			{
+				mtp::scoped_mutex_lock l(_mutex);
+				id = Resolve(path);
+				if (!id)
+					return -ENOENT;
+			}
+
+			ObjectEditSessionPtr edit = GetSession(id);
+			edit->Truncate(offset);
+			return 0;
 		}
 
 		int StatFS (const char *path, struct statvfs *stat)
