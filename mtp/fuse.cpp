@@ -221,12 +221,10 @@ namespace
 			if (storageId == 0 || parentId == 0)
 				return -ENOENT;
 
-			if (parentId == storageId)
-				parentId = mtp::Session::Root;
-
 			mtp::msg::ObjectInfo oi;
 			oi.Filename = path.substr(parentPos + 1);
 			oi.ObjectFormat = mtp::ObjectFormat::Association;
+			oi.AssociationType = 1;
 			_session->SendObjectInfo(oi, storageId, parentId);
 			return 0;
 		}
