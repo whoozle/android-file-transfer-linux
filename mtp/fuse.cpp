@@ -69,14 +69,18 @@ namespace
 			{
 				stbuf->st_mode = 0644;
 
-				mtp::ObjectFormat format((mtp::ObjectFormat)_session->GetObjectIntegerProperty(id, mtp::ObjectProperty::ObjectFormat));
-				if (format == mtp::ObjectFormat::Association)
+				mtp::msg::ObjectInfo oi = _session->GetObjectInfo(id);
+				if (oi.ObjectFormat == mtp::ObjectFormat::Association)
 					stbuf->st_mode |= S_IFDIR | 0111;
 				else
 					stbuf->st_mode |= S_IFREG;
 
+				stbuf->st_ctim = timespec();
+				stbuf->st_ctim.tv_sec = mtp::ConvertDateTime(oi.CaptureDate);
+				stbuf->st_mtim = timespec();
+				stbuf->st_mtim.tv_sec = mtp::ConvertDateTime(oi.ModificationDate);
 				stbuf->st_nlink = 1;
-				stbuf->st_size = _session->GetObjectIntegerProperty(id, mtp::ObjectProperty::ObjectSize);
+				stbuf->st_size = oi.ObjectCompressedSize != mtp::MaxObjectSize? oi.ObjectCompressedSize: _session->GetObjectIntegerProperty(id, mtp::ObjectProperty::ObjectSize);
 				return 0;
 			}
 			return -ENOENT;

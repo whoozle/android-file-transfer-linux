@@ -21,6 +21,7 @@
 
 #include <mtp/types.h>
 #include <string>
+#include <time.h>
 
 namespace mtp
 {
@@ -93,6 +94,7 @@ namespace mtp
 	};
 
 	ObjectFormat ObjectFormatFromFilename(const std::string &filename);
+	time_t ConvertDateTime(const std::string &timespec);
 
 	DECLARE_ENUM(ObjectFormat, u16);
 

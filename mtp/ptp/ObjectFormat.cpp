@@ -65,4 +65,13 @@ namespace mtp
 		else
 			return ObjectFormat::Undefined;
 	}
+
+	time_t ConvertDateTime(const std::string &timespec)
+	{
+		struct tm time = {};
+		char *end = strptime(timespec.c_str(), "%Y%m%dT%H%M%S", &time);
+		if (!end)
+			return 0;
+		return mktime(&time);
+	}
 }
