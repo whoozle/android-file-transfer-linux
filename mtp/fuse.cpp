@@ -234,6 +234,9 @@ namespace
 		int RemoveDir (const char *path)
 		{ return Unlink(path); }
 
+		int Create(const char *path, mode_t mode, struct fuse_file_info *fi)
+		{ return -EIO; }
+
 		int Open(const char *path, struct fuse_file_info *fi)
 		{
 			mtp::scoped_mutex_lock l(_mutex);
@@ -293,6 +296,9 @@ namespace
 	int Open(const char *path, struct fuse_file_info *fi)
 	{ WRAP_EX(g_wrapper->Open(path, fi)); }
 
+	int Create(const char *path, mode_t mode, struct fuse_file_info *fi)
+	{ WRAP_EX(g_wrapper->Create(path, mode, fi)); }
+
 	int Read(const char *path, char *buf, size_t size, off_t offset,
 				  struct fuse_file_info *fi)
 	{ WRAP_EX(g_wrapper->Read(path, buf, size, offset, fi)); }
@@ -336,6 +342,7 @@ int main(int argc, char **argv)
 	ops.getattr		= &GetAttr;
 	ops.readdir		= &ReadDir;
 	ops.open		= &Open;
+	ops.create		= &Create;
 	ops.read		= &Read;
 	ops.write		= &Write;
 	ops.flush		= &Flush;
