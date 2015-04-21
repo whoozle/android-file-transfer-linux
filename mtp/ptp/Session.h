@@ -30,6 +30,9 @@ namespace mtp
 {
 	struct OperationRequest;
 
+	class Session;
+	DECLARE_PTR(Session);
+
 	class Session
 	{
 		std::mutex		_mutex;
@@ -50,6 +53,21 @@ namespace mtp
 			u32		ObjectId;
 		};
 
+		///handles partial writes and
+		class ObjectEditSession : Noncopyable
+		{
+			SessionPtr	_session;
+			u32			_objectId;
+
+		public:
+			ObjectEditSession(const SessionPtr & session, u32 objectId);
+			~ObjectEditSession();
+
+			void Truncate(u64 size);
+			void Send(u64 offset, const ByteArray &data);
+		};
+		DECLARE_PTR(ObjectEditSession);
+
 		Session(usb::BulkPipePtr pipe, u32 sessionId): _packeter(pipe), _sessionId(sessionId), _transactionId(1) { }
 		~Session() { try { Close(); } catch(const std::exception &ex) { } }
 
@@ -64,6 +82,9 @@ namespace mtp
 		void SendObject(const IObjectInputStreamPtr &inputStream);
 		void DeleteObject(u32 objectId);
 
+		static ObjectEditSessionPtr EditObject(const SessionPtr &session, u32 objectId)
+		{ return std::make_shared<ObjectEditSession>(session, objectId); }
+
 		msg::ObjectPropsSupported GetObjectPropsSupported(u32 objectId);
 
 		void SetObjectProperty(u32 objectId, ObjectProperty property, const ByteArray &value);
@@ -75,11 +96,15 @@ namespace mtp
 		ByteArray GetDeviceProperty(DeviceProperty property);
 
 	private:
+		void BeginEditObject(u32 objectId);
+		void SendPartialObject(u32 objectId, u64 offset, const ByteArray &data);
+		void TruncateObject(u32 objectId, u64 size);
+		void EndEditObject(u32 objectId);
+
 		ByteArray Get(u32 transaction);
 		void Send(const OperationRequest &req);
 		void Close();
 	};
-	DECLARE_PTR(Session);
 
 }
 

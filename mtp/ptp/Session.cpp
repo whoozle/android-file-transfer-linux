@@ -177,6 +177,45 @@ namespace mtp
 		Get(transaction);
 	}
 
+	void Session::BeginEditObject(u32 objectId)
+	{
+		scoped_mutex_lock l(_mutex);
+		u32 transaction = _transactionId++;
+		Send(OperationRequest(OperationCode::BeginEditObject, transaction, objectId));
+		Get(transaction);
+	}
+
+	void Session::SendPartialObject(u32 objectId, u64 offset, const ByteArray &data)
+	{
+		scoped_mutex_lock l(_mutex);
+		u32 transaction = _transactionId++;
+		Send(OperationRequest(OperationCode::SendPartialObject, transaction, objectId, offset, offset >> 32, data.size()));
+		{
+			DataRequest req(OperationCode::SendPartialObject, transaction);
+			IObjectInputStreamPtr inputStream = std::make_shared<ByteArrayObjectInputStream>(data);
+			Container container(req, inputStream);
+			_packeter.Write(std::make_shared<JoinedObjectInputStream>(std::make_shared<ByteArrayObjectInputStream>(container.Data), inputStream));
+		}
+		Get(transaction);
+	}
+
+	void Session::TruncateObject(u32 objectId, u64 size)
+	{
+		scoped_mutex_lock l(_mutex);
+		u32 transaction = _transactionId++;
+		//64 bit size?
+		Send(OperationRequest(OperationCode::TruncateObject, transaction, objectId, size, size >> 32));
+		Get(transaction);
+	}
+
+	void Session::EndEditObject(u32 objectId)
+	{
+		scoped_mutex_lock l(_mutex);
+		u32 transaction = _transactionId++;
+		Send(OperationRequest(OperationCode::EndEditObject, transaction, objectId));
+		Get(transaction);
+	}
+
 	void Session::SetObjectProperty(u32 objectId, ObjectProperty property, const ByteArray &value)
 	{
 		scoped_mutex_lock l(_mutex);
@@ -247,6 +286,26 @@ namespace mtp
 		u32 transaction = _transactionId++;
 		Send(OperationRequest(OperationCode::GetDevicePropValue, transaction, (u16)property));
 		return Get(transaction);
+	}
+
+	Session::ObjectEditSession::ObjectEditSession(const SessionPtr & session, u32 objectId): _session(session), _objectId(objectId)
+	{
+		session->BeginEditObject(objectId);
+	}
+
+	Session::ObjectEditSession::~ObjectEditSession()
+	{
+		_session->EndEditObject(_objectId);
+	}
+
+	void Session::ObjectEditSession::Truncate(u64 size)
+	{
+		_session->TruncateObject(_objectId, size);
+	}
+
+	void Session::ObjectEditSession::Send(u64 offset, const ByteArray &data)
+	{
+		_session->SendPartialObject(_objectId, offset, data);
 	}
 
 }
