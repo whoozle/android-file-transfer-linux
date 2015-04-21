@@ -255,6 +255,13 @@ namespace
 			return data.size();
 		}
 
+		int Flush(const char *path, struct fuse_file_info *fi)
+		{ return -EIO; }
+
+		int Write(const char *path, const char *buf, size_t size, off_t offset,
+					  struct fuse_file_info *fi)
+		{ return -EIO; }
+
 		int Truncate(const char *path, off_t offset)
 		{
 			return -EIO;
@@ -290,6 +297,13 @@ namespace
 				  struct fuse_file_info *fi)
 	{ WRAP_EX(g_wrapper->Read(path, buf, size, offset, fi)); }
 
+	int Write(const char *path, const char *buf, size_t size, off_t offset,
+				  struct fuse_file_info *fi)
+	{ WRAP_EX(g_wrapper->Write(path, buf, size, offset, fi)); }
+
+	int Flush (const char *path, struct fuse_file_info *fi)
+	{ WRAP_EX(g_wrapper->Flush(path, fi)); }
+
 	int Unlink (const char *path)
 	{ WRAP_EX(g_wrapper->Unlink(path)); }
 
@@ -323,6 +337,8 @@ int main(int argc, char **argv)
 	ops.readdir		= &ReadDir;
 	ops.open		= &Open;
 	ops.read		= &Read;
+	ops.write		= &Write;
+	ops.flush		= &Flush;
 	ops.mkdir		= &MakeDir;
 	ops.rmdir		= &RemoveDir;
 	ops.unlink		= &Unlink;
