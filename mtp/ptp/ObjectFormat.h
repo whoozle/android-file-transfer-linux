@@ -95,6 +95,7 @@ namespace mtp
 
 	ObjectFormat ObjectFormatFromFilename(const std::string &filename);
 	time_t ConvertDateTime(const std::string &timespec);
+	std::string ConvertDateTime(time_t);
 
 	DECLARE_ENUM(ObjectFormat, u16);
 

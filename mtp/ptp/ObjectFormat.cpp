@@ -74,4 +74,14 @@ namespace mtp
 			return 0;
 		return mktime(&time);
 	}
+
+	std::string ConvertDateTime(time_t time)
+	{
+		struct tm bdt = {};
+		if (!gmtime_r(&time, &bdt))
+			throw std::runtime_error("gmtime_r failed");
+		char buf[64];
+		size_t r = strftime(buf, sizeof(buf), "%Y%m%dT%H%M%SZ", &bdt);
+		return std::string(buf, r);
+	}
 }
