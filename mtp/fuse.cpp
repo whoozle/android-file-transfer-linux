@@ -4,6 +4,7 @@
 #include <fcntl.h>
 
 #include <mtp/ptp/Device.h>
+#include <mtp/ptp/ByteArrayObjectStream.h>
 
 #include <map>
 #include <string>
@@ -268,6 +269,7 @@ namespace
 			oi.Filename = filename;
 			oi.ObjectFormat = mtp::ObjectFormatFromFilename(filename);
 			_session->SendObjectInfo(oi, storageId, parentId);
+			_session->SendObject(std::make_shared<mtp::ByteArrayObjectInputStream>(mtp::ByteArray()));
 			return 0;
 		}
 
