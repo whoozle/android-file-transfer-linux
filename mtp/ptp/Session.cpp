@@ -229,7 +229,7 @@ namespace mtp
 			DataRequest req(OperationCode::SetObjectPropValue, transaction);
 			req.Append(value);
 			Container container(req);
-			_packeter.Write(container.Data, 0);
+			_packeter.Write(container.Data);
 		}
 		Get(transaction);
 	}
