@@ -91,6 +91,7 @@ target_link_libraries(aft-mtp-cli ${MTP_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 if (FUSE_FOUND)
 	add_executable(aft-mtp-mount mtp/fuse.cpp)
 	target_link_libraries(aft-mtp-mount ${MTP_LIBRARIES} ${FUSE_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+	install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/aft-mtp-mount DESTINATION bin)
 endif()
 
 if (BUILD_QT_UI)
