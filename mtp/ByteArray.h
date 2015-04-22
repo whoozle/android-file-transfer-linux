@@ -30,7 +30,8 @@ namespace mtp
 	inline void HexDump(const std::string &prefix, const ByteArray &data)
 	{
 		fprintf(stderr, "%s:\n", prefix.c_str());
-		for(size_t i = 0; i < data.size(); ++i)
+		size_t i;
+		for(i = 0; i < data.size(); ++i)
 		{
 			bool first = ((i & 0xf) == 0);
 			bool last = ((i & 0xf) == 0x0f);
@@ -41,7 +42,8 @@ namespace mtp
 			if (last)
 				fprintf(stderr, "\n");
 		}
-		fprintf(stderr, "\n");
+		if (i & 0xf)
+			fprintf(stderr, "\n");
 	}
 }
 
