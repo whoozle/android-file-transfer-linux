@@ -374,6 +374,16 @@ namespace
 			}
 			return 0;
 		}
+
+		int ChangeMode(const char *path, mode_t mode)
+		{
+			mtp::scoped_mutex_lock l(_mutex);
+			mtp::u32 id = Resolve(path);
+			if (!id)
+				return -ENOENT;
+
+			return 0;
+		}
 	};
 
 	mtp::DevicePtr					g_device;
@@ -426,6 +436,9 @@ namespace
 
 	int SetTimes(const char *path, const struct timespec tv[2])
 	{ WRAP_EX(g_wrapper->SetTimes(path, tv)); }
+
+	int ChangeMode (const char *path, mode_t mode)
+	{ WRAP_EX(g_wrapper->ChangeMode(path, mode)); }
 }
 
 int main(int argc, char **argv)
@@ -454,6 +467,7 @@ int main(int argc, char **argv)
 	ops.truncate	= &Truncate;
 	ops.statfs		= &StatFS;
 	ops.utimens		= &SetTimes;
+	ops.chmod		= &ChangeMode;
 
 	return fuse_main(argc, argv, &ops, NULL);
 }
