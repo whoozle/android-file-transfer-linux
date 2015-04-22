@@ -85,8 +85,8 @@ if (USE_STAT64)
 	add_definitions(-DMTP_USES_STAT64=1)
 endif()
 
-add_executable(mtp-test mtp/main.cpp)
-target_link_libraries(mtp-test ${MTP_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+add_executable(aft-mtp-cli mtp/cli.cpp)
+target_link_libraries(aft-mtp-cli ${MTP_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
 if (FUSE_FOUND)
 	add_executable(aft-mtp-mount mtp/fuse.cpp)
