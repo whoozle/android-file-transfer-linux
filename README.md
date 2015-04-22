@@ -28,7 +28,7 @@ ninja
 ./qt/android-file-transfer
 ```
 
-### Building with make (not-recommended)
+### Building with make
 ```
 mkdir build
 cd build
