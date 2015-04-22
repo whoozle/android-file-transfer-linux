@@ -74,7 +74,7 @@ namespace mtp
 	{
 		scoped_mutex_lock l(_mutex);
 		u32 transaction = _transactionId++;
-		Send(OperationRequest(OperationCode::GetStorageIDs, transaction, 0xffffffffu));
+		Send(OperationRequest(OperationCode::GetStorageIDs, transaction));
 		ByteArray data = Get(transaction);
 		InputStream stream(data);
 
