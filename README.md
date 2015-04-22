@@ -81,6 +81,11 @@ Also, note that fuse could be 7-8 times slower than ui/cli file transfer.
 2. The options available there are: `Upload Album`, `Upload Directory` and `Upload Files`.
    The latter two are self-explanatory. `Upload album` tries searching source directory for album cover and sets best available cover.
 
+### Known problems
+
+* Sometimes downloading fails with usb timeout, then phone becomes unresponsive. [Android bug #75259](https://code.google.com/p/android/issues/detail?id=75259)
+* Objects created in UI will not show up in FUSE filesystem. [Android bug #169547](https://code.google.com/p/android/issues/detail?id=169547)
+
 ## License
 
 Android File Transfer for Linux is released under [GNU GPLv2 License](https://github.com/whoozle/android-file-transfer-linux/blob/master/LICENSE).
