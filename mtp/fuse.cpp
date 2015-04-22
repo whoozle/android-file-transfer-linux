@@ -358,8 +358,20 @@ namespace
 			if (!id)
 				return -ENOENT;
 
+			std::string ctime = mtp::ConvertDateTime(tv[1].tv_sec);
 			std::string mtime = mtp::ConvertDateTime(tv[1].tv_sec);
-			_session->SetObjectProperty(id, mtp::ObjectProperty::DateModified, mtime);
+			try { _session->SetObjectProperty(id, mtp::ObjectProperty::DateCreated, mtime); }
+			catch(const mtp::InvalidResponseException &ex)
+			{
+				if (ex.Type != mtp::ResponseType::ObjectPropNotSupported)
+					throw;
+			}
+			try { _session->SetObjectProperty(id, mtp::ObjectProperty::DateModified, mtime); }
+			catch(const mtp::InvalidResponseException &ex)
+			{
+				if (ex.Type != mtp::ResponseType::ObjectPropNotSupported)
+					throw;
+			}
 			return 0;
 		}
 	};
