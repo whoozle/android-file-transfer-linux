@@ -1,9 +1,7 @@
 project(mtp-qt)
 
-find_package(Qt5Widgets)
-if (NOT Qt5Widgets_FOUND)
-    find_package(Qt4)
-endif()
+find_package(Qt5Widgets QUIET)
+find_package(Qt4 QUIET)
 
 set(SOURCES main.cpp
     mainwindow.cpp
