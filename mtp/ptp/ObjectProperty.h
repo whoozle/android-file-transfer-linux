@@ -41,9 +41,18 @@ namespace mtp
 
 		PersistentUniqueObjectId	= 0xdc41,
 		SyncId						= 0xdc42,
+		Name						= 0xdc44,
+		Artist						= 0xdc46,
+		DateAuthored				= 0xdc47,
+		DateAdded					= 0xdc4e,
 
 		RepresentativeSampleFormat	= 0xdc81,
 		RepresentativeSampleData	= 0xdc86,
+
+		DisplayName					= 0xdce0,
+		BodyText					= 0xdce1,
+		Subject						= 0xdce2,
+		Priority					= 0xdce3,
 
 		MediaGUID					= 0xdd72
 	};
