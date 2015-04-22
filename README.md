@@ -46,5 +46,6 @@ mkdir ~/my-device
 ./aft-mtp-mount ~/my-device
 ```
 Remember, if you want album art to be displayed, it must be named 'albumart.xxx' and placed *first* in the destination folder. Then copy other files.
+Also, note that fuse could be 7-8 times slower than ui/cli file transfer.
 ###UI
 Start application, choose destination folder and click any button on toolbar. There's several options there: «Upload Album», «Upload Directory» and «Upload Files». The latter two are self-explanatory. Uploading album tries searching source directory for album cover and sets best available cover.
