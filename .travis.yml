@@ -8,6 +8,6 @@ os:
 
 before_install:
   - sudo apt-get update -qq
-  - sudo apt-get install -qq cmake qtbase5-dev ninja-build libfuse-dev
+  - sudo apt-get install -qq cmake libqt4-dev ninja-build libfuse-dev
 
 script: cmake -GNinja . && ninja
