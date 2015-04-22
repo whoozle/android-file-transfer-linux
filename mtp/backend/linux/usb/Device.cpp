@@ -45,10 +45,14 @@ namespace mtp { namespace usb
 	Device::Device(int fd): _fd(fd)
 	{
 		IOCTL(_fd, USBDEVFS_GET_CAPABILITIES, &_capabilities);
+		int r = lockf(_fd, F_TLOCK, 0);
+		if (r == -1)
+			throw Exception("device is used by another process");
 	}
 
 	Device::~Device()
 	{
+		lockf(_fd, F_ULOCK, 0);
 		close(_fd);
 	}
 
