@@ -234,6 +234,15 @@ namespace mtp
 		Get(transaction);
 	}
 
+	void Session::SetObjectProperty(u32 objectId, ObjectProperty property, const std::string &value)
+	{
+		ByteArray data;
+		data.reserve(value.size() * 2 + 1);
+		OutputStream stream(data);
+		stream << value;
+		SetObjectProperty(objectId, property, data);
+	}
+
 	ByteArray Session::GetObjectProperty(u32 objectId, ObjectProperty property)
 	{
 		scoped_mutex_lock l(_mutex);
@@ -264,15 +273,6 @@ namespace mtp
 		std::string value;
 		s >> value;
 		return value;
-	}
-
-	void Session::SetObjectProperty(u32 objectId, ObjectProperty property, const std::string &value)
-	{
-		ByteArray data;
-		data.reserve(value.size() * 2 + 1);
-		OutputStream stream(data);
-		stream << value;
-		SetObjectProperty(objectId, property, data);
 	}
 
 	void Session::DeleteObject(u32 objectId)
