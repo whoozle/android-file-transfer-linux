@@ -363,9 +363,25 @@ namespace
 			return 0;
 		}
 
-		int StatFS (const char *path, struct statvfs *stat)
+		int StatFS (const char *path_, struct statvfs *stat)
 		{
 			stat->f_namemax = 254;
+
+			std::string path(path_);
+			if (path != "/")
+				return -ENOENT;
+
+			mtp::u64 freeSpace = 0, capacity = 0;
+			mtp::scoped_mutex_lock l(_mutex);
+			for(auto storage = _storages.begin(); storage != _storages.end(); ++storage)
+			{
+				mtp::msg::StorageInfo si = _session->GetStorageInfo(storage->second);
+				freeSpace += si.FreeSpaceInBytes;
+				capacity += si.MaxCapacity;
+			}
+			stat->f_frsize = 1024;
+			stat->f_blocks = capacity / stat->f_frsize;
+			stat->f_bfree = stat->f_bavail = freeSpace / stat->f_frsize;
 			return 0;
 		}
 
