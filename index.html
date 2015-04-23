@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>Android-file-transfer-linux by whoozle</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>Android-file-transfer-linux</h1>
+        <h2>Android File Transfer for Linux</h2>
+        <a href="https://github.com/whoozle/android-file-transfer-linux" class="button"><small>View project on</small> GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <h1>
+<a id="android-file-transfer-for-linux" class="anchor" href="#android-file-transfer-for-linux" aria-hidden="true"><span class="octicon octicon-link"></span></a>Android File Transfer For Linux</h1>
+
+<p><a href="https://github.com/whoozle/android-file-transfer-linux/blob/master/LICENSE"><img src="http://img.shields.io/:license-GPLv2-blue.svg" alt="License"></a>
+<a href="https://github.com/whoozle/android-file-transfer-linux/blob/master"><img src="http://img.shields.io/:version-1.1-green.svg" alt="Version"></a>
+<a href="https://travis-ci.org/whoozle/android-file-transfer-linux"><img src="https://travis-ci.org/whoozle/android-file-transfer-linux.svg?branch=master" alt="Build Status"></a></p>
+
+<p>Android File Transfer for Linux — reliable MTP client with minimalistic UI similar to <a href="https://www.android.com/intl/en_us/filetransfer/">Android File Transfer for Mac</a>.</p>
+
+<p>It just works™.</p>
+
+<h2>
+<a id="do-i-need-it" class="anchor" href="#do-i-need-it" aria-hidden="true"><span class="octicon octicon-link"></span></a>Do I need it?</h2>
+
+<p>If you're happy with <code>gmtp</code>/<code>gvfs</code>/<code>mtpfs</code> or any other mtp software, you might not need this software (but give it a try!).</p>
+
+<p>If you suffered from crashes, missing tags and album covers, usb freezes and corrupted files, this software is right for you.</p>
+
+<h2>
+<a id="features" class="anchor" href="#features" aria-hidden="true"><span class="octicon octicon-link"></span></a>Features</h2>
+
+<ul>
+<li>Simple Qt UI with progress dialogs.</li>
+<li>FUSE wrapper (If you'd prefer mounting your device), supporting partial read/writes, allowing instant access to your files.</li>
+<li>No file size limits.</li>
+<li>Automatically renames album cover to make it visible from media player.</li>
+<li>No extra dependencies (e.g. <code>libptp</code>/<code>libmtp</code>).</li>
+<li>Available as static/shared library.</li>
+<li>Simple CLI tool.</li>
+</ul>
+
+<h2>
+<a id="building-instructions" class="anchor" href="#building-instructions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Building instructions</h2>
+
+<h3>
+<a id="prerequisites" class="anchor" href="#prerequisites" aria-hidden="true"><span class="octicon octicon-link"></span></a>Prerequisites</h3>
+
+<ul>
+<li>You will need qt libraries for building ui program. If you're want to use only library (<em>Qt is not needed</em>), you could turn the option <code>BUILD_QT_UI</code> off.</li>
+<li>
+<p>For debian based distros use the following command:</p>
+
+<div class="highlight highlight-shell"><pre>sudo apt-get install build-essential cmake libqt4-dev ninja-build libfuse-dev</pre></div>
+</li>
+<li>Basically, you need <code>libqtX-dev</code> for UI, <code>libfuse-dev</code> for FUSE interface, <code>cmake</code>, <code>ninja</code> or <code>make</code> for building the project.</li>
+</ul>
+
+<h3>
+<a id="building-with-ninja" class="anchor" href="#building-with-ninja" aria-hidden="true"><span class="octicon octicon-link"></span></a>Building with ninja</h3>
+
+<div class="highlight highlight-shell"><pre>mkdir build
+<span class="pl-c1">cd</span> build
+cmake -G Ninja ..
+ninja
+
+./qt/android-file-transfer</pre></div>
+
+<h3>
+<a id="building-with-make" class="anchor" href="#building-with-make" aria-hidden="true"><span class="octicon octicon-link"></span></a>Building with make</h3>
+
+<div class="highlight highlight-shell"><pre>mkdir build
+<span class="pl-c1">cd</span> build
+cmake ..
+make
+
+./qt/android-file-transfer</pre></div>
+
+<h3>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h3>
+
+<p><code>sudo ninja install</code> or <code>sudo make install</code> will install program into cmake prefix/bin directory (usually /usr/local/bin)</p>
+
+<h2>
+<a id="how-to-use" class="anchor" href="#how-to-use" aria-hidden="true"><span class="octicon octicon-link"></span></a>How to use</h2>
+
+<h3>
+<a id="fuse-interface" class="anchor" href="#fuse-interface" aria-hidden="true"><span class="octicon octicon-link"></span></a>FUSE interface</h3>
+
+<div class="highlight highlight-shell"><pre>mkdir <span class="pl-k">~</span>/my-device
+./aft-mtp-mount <span class="pl-k">~</span>/my-device</pre></div>
+
+<p>Remember, if you want album art to be displayed, it must be named 'albumart.xxx' and placed <em>first</em> in the destination folder. Then copy other files.
+Also, note that fuse could be 7-8 times slower than ui/cli file transfer.</p>
+
+<h3>
+<a id="qt-user-interface" class="anchor" href="#qt-user-interface" aria-hidden="true"><span class="octicon octicon-link"></span></a>QT user interface</h3>
+
+<ol>
+<li><p>Start application, choose destination folder and click any button on toolbar.</p></li>
+<li><p>The options available there are: <code>Upload Album</code>, <code>Upload Directory</code> and <code>Upload Files</code>.
+The latter two are self-explanatory. <code>Upload album</code> tries searching source directory for album cover and sets best available cover.</p></li>
+</ol>
+
+<h3>
+<a id="known-problems" class="anchor" href="#known-problems" aria-hidden="true"><span class="octicon octicon-link"></span></a>Known problems</h3>
+
+<ul>
+<li>Sometimes downloading fails with usb timeout, then phone becomes unresponsive. <a href="https://code.google.com/p/android/issues/detail?id=75259">Android bug #75259</a>
+</li>
+<li>Objects created in UI will not show up in FUSE filesystem. <a href="https://code.google.com/p/android/issues/detail?id=169547">Android bug #169547</a>
+</li>
+</ul>
+
+<h2>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h2>
+
+<p>Android File Transfer for Linux is released under <a href="https://github.com/whoozle/android-file-transfer-linux/blob/master/LICENSE">GNU GPLv2 License</a>.</p>
+
+<p>Copyright © 2015 Vladimir Menshakov</p>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/whoozle/android-file-transfer-linux/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/whoozle/android-file-transfer-linux/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/whoozle/android-file-transfer-linux"></a> is maintained by <a href="https://github.com/whoozle">whoozle</a>.</p>
+
+          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+  
+  </body>
+</html>
