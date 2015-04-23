@@ -75,7 +75,7 @@ namespace
 			}
 
 			mtp::scoped_mutex_lock l(_mutex);
-			Storages::const_iterator i = _storages.find(path);
+			auto i = _storages.find(path);
 			if (i != _storages.end())
 			{
 				stbuf->st_mode = S_IFDIR | 0755;
@@ -122,7 +122,7 @@ namespace
 
 		mtp::u32 Resolve(const std::string &path)
 		{
-			Files::const_iterator file = _files.find(path);
+			auto file = _files.find(path);
 			if (file != _files.end())
 				return file->second;
 
@@ -134,7 +134,7 @@ namespace
 				size_t next = path.find('/', idx + 1);
 				std::string subpath(path.substr(0, next));
 
-				Storages::const_iterator storage = _storages.find(subpath);
+				auto storage = _storages.find(subpath);
 				if (storage != _storages.end())
 				{
 					mtp::msg::ObjectHandles list = _session->GetObjectHandles(storage->second, mtp::Session::AllFormats, mtp::Session::Root);
@@ -142,7 +142,7 @@ namespace
 				}
 				else
 				{
-					Files::const_iterator file = _files.find(subpath);
+					auto file = _files.find(subpath);
 					if (file != _files.end())
 					{
 						mtp::msg::ObjectHandles list = _session->GetObjectHandles(mtp::Session::AllStorages, mtp::Session::AllFormats, file->second);
@@ -181,7 +181,7 @@ namespace
 				return 0;
 			}
 
-			Storages::const_iterator storage = _storages.find(path);
+			auto storage = _storages.find(path);
 			if (storage != _storages.end())
 			{
 				filler(buf, ".", NULL, 0);
@@ -232,7 +232,7 @@ namespace
 				return -EACCES;
 
 			std::string storage = path.substr(0, storagePos);
-			Storages::const_iterator i = _storages.find(storage);
+			auto i = _storages.find(storage);
 			if (i != _storages.end())
 			{
 				storageId = i->second;
@@ -315,9 +315,9 @@ namespace
 		ObjectEditSessionPtr GetSession(mtp::u32 id)
 		{
 			mtp::scoped_mutex_lock l(_mutex);
-			OpenedFiles::const_iterator i = _openedFiles.find(id);
-			if (i != _openedFiles.end())
-				return i->second;
+			auto openedFileSession = _openedFiles.find(id);
+			if (openedFileSession != _openedFiles.end())
+				return openedFileSession->second;
 			else
 				return _openedFiles[id] = mtp::Session::EditObject(_session, id);
 		}
