@@ -112,6 +112,9 @@ FileUploader::~FileUploader()
 void FileUploader::onProgress(qint64 current)
 {
 	//qDebug() << "progress " << current << " of " << _total;
+	qint64 secs = _startedAt.secsTo(QDateTime::currentDateTime());
+	if (secs)
+		emit uploadSpeed(current / secs);
 	emit uploadProgress(1.0 * current / _total);
 }
 
@@ -136,6 +139,7 @@ void FileUploader::upload(const QStringList &files)
 		QFileInfo fi(file);
 		_total += fi.size();
 	}
+	_startedAt = QDateTime::currentDateTime();
 
 	for(QString file : files)
 	{
@@ -157,6 +161,7 @@ void FileUploader::download(const QString &path, const QList<quint32> &objectIds
 		files.push_back(QPair<QString, mtp::u32>(oi.Filename, id));
 	}
 	qDebug() << "downloading " << files.size() << " file(s), " << _total << " bytes";
+	_startedAt = QDateTime::currentDateTime();
 
 	for(const auto & file : files)
 	{

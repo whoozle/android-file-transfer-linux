@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>337</width>
-    <height>119</height>
+    <width>334</width>
+    <height>138</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -30,7 +30,14 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
-       <widget class="QLabel" name="label">
+       <widget class="QLabel" name="fileLabel">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="speedLabel">
         <property name="text">
          <string/>
         </property>

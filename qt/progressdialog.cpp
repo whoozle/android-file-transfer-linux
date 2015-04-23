@@ -73,9 +73,22 @@ void ProgressDialog::setValue(float current)
 	_animation->start();
 }
 
+void ProgressDialog::setSpeed(qint64 speed)
+{
+	static const double Kb = 1000;
+	static const double Mb = 1000 * Kb; //haha
+	static const double Gb = 1000 * Mb;
+	if (speed < 2 * Mb)
+		ui->speedLabel->setText(tr("Speed: ") + QString().sprintf("%.1f", speed / Kb) + tr(" Kb/s"));
+	else if (speed < 2 * Gb)
+		ui->speedLabel->setText(tr("Speed: ") + QString().sprintf("%.1f", speed / Mb) + tr(" Mb/s"));
+	else
+		ui->speedLabel->setText(tr("Speed: ") + QString().sprintf("%.1f", speed / Gb) + tr(" Gb/s"));
+}
+
 void ProgressDialog::setFilename(const QString &filename)
 {
-	ui->label->setText(filename);
+	ui->fileLabel->setText(filename);
 }
 
 void ProgressDialog::closeEvent(QCloseEvent *event)

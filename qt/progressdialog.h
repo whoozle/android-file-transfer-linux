@@ -42,6 +42,7 @@ public:
 	void setProgress(float value);
 
 public slots:
+	void setSpeed(qint64 speed);
 	void setFilename(const QString &filename);
 	void setValue(float current);
 	virtual void reject();

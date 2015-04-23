@@ -21,6 +21,7 @@
 
 #include <QObject>
 #include <QThread>
+#include <QDateTime>
 
 class MtpObjectsModel;
 
@@ -55,6 +56,7 @@ private:
 	MtpObjectsModel	*	_model;
 	QThread				_workerThread;
 	qint64				_total;
+	QDateTime			_startedAt;
 
 private slots:
 	void onProgress(qint64 current);
@@ -76,6 +78,7 @@ signals:
 	//incoming signals (from worker)
 	void uploadStarted(QString file);
 	void uploadProgress(float);
+	void uploadSpeed(qint64);
 	void finished();
 };
 

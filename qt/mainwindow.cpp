@@ -179,6 +179,7 @@ void MainWindow::uploadFiles(const QStringList &files)
 	progressDialog.setValue(0);
 
 	connect(_uploader, SIGNAL(uploadProgress(float)), &progressDialog, SLOT(setValue(float)));
+	connect(_uploader, SIGNAL(uploadSpeed(qint64)), &progressDialog, SLOT(setSpeed(qint64)));
 	connect(_uploader, SIGNAL(uploadStarted(QString)), &progressDialog, SLOT(setFilename(QString)));
 	connect(_uploader, SIGNAL(finished()), &progressDialog, SLOT(accept()));
 	_uploader->upload(files);
@@ -204,6 +205,7 @@ void MainWindow::downloadFiles(const QList<quint32> &objects)
 	progressDialog.show();
 
 	connect(_uploader, SIGNAL(uploadProgress(float)), &progressDialog, SLOT(setValue(float)));
+	connect(_uploader, SIGNAL(uploadSpeed(qint64)), &progressDialog, SLOT(setSpeed(qint64)));
 	connect(_uploader, SIGNAL(uploadStarted(QString)), &progressDialog, SLOT(setFilename(QString)));
 	connect(_uploader, SIGNAL(finished()), &progressDialog, SLOT(accept()));
 	_uploader->download(path, objects);
@@ -278,8 +280,8 @@ void MainWindow::uploadAlbum()
 	if (!dirPath.isEmpty()) {
 		settings.setValue("the-latest-directory", dirPath);
 		uploadAlbum(dirPath);
+		back();
 	}
-	back();
 }
 
 namespace
