@@ -120,7 +120,7 @@ int main(int argc, char **argv)
 	printf("%s ", gdi.DeviceVersion.c_str());
 	printf("%s\n", gdi.SerialNumber.c_str());
 	printf("supported op codes: ");
-	for(u16 code : gdi.OperationsSupported)
+	for(OperationCode code : gdi.OperationsSupported)
 	{
 		printf("%04x ", (unsigned)code);
 	}

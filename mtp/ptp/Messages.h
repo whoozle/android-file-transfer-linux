@@ -22,25 +22,27 @@
 #include <mtp/ptp/InputStream.h>
 #include <mtp/ptp/OutputStream.h>
 #include <mtp/ptp/ObjectFormat.h>
+#include <mtp/ptp/OperationCode.h>
+#include <algorithm>
 
 namespace mtp { namespace msg
 {
 	struct DeviceInfo
 	{
-		u16					StandardVersion;
-		u32					VendorExtensionId;
-		u16					VendorExtensionVersion;
-		std::string			VendorExtensionDesc;
-		u16					FunctionalMode;
-		std::vector<u16>	OperationsSupported;
-		std::vector<u16>	EventsSupported;
-		std::vector<u16>	DevicePropertiesSupported;
-		std::vector<u16>	CaptureFormats;
-		std::vector<u16>	ImageFormats;
-		std::string			Manufacturer;
-		std::string			Model;
-		std::string			DeviceVersion;
-		std::string			SerialNumber;
+		u16							StandardVersion;
+		u32							VendorExtensionId;
+		u16							VendorExtensionVersion;
+		std::string					VendorExtensionDesc;
+		u16							FunctionalMode;
+		std::vector<OperationCode>	OperationsSupported;
+		std::vector<u16>			EventsSupported;
+		std::vector<u16>			DevicePropertiesSupported;
+		std::vector<u16>			CaptureFormats;
+		std::vector<u16>			ImageFormats;
+		std::string					Manufacturer;
+		std::string					Model;
+		std::string					DeviceVersion;
+		std::string					SerialNumber;
 
 		void Read(InputStream &stream)
 		{
@@ -58,6 +60,12 @@ namespace mtp { namespace msg
 			stream >> Model;
 			stream >> DeviceVersion;
 			stream >> SerialNumber;
+		}
+
+		bool Supports(OperationCode opcode) const
+		{
+			auto i = std::find(OperationsSupported.begin(), OperationsSupported.end(), opcode);
+			return i != OperationsSupported.end();
 		}
 	};
 

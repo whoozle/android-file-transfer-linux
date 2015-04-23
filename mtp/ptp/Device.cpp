@@ -27,7 +27,10 @@
 namespace mtp
 {
 
-	msg::DeviceInfo Device::GetDeviceInfo()
+	Device::Device(usb::BulkPipePtr pipe): _packeter(pipe), _deviceInfo(GetDeviceInfoImpl())
+	{ }
+
+	msg::DeviceInfo Device::GetDeviceInfoImpl()
 	{
 		OperationRequest req(OperationCode::GetDeviceInfo, 0);
 		Container container(req);
@@ -53,7 +56,7 @@ namespace mtp
 		_packeter.Read(0, data, code, response);
 		//HexDump("payload", data);
 
-		return std::make_shared<Session>(_packeter.GetPipe(), sessionId);
+		return std::make_shared<Session>(_packeter.GetPipe(), sessionId, _deviceInfo);
 	}
 
 	DevicePtr Device::Find()

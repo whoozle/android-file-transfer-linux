@@ -38,6 +38,7 @@ namespace mtp
 		std::mutex		_mutex;
 		PipePacketer	_packeter;
 		u32				_sessionId;
+		msg::DeviceInfo	_deviceInfo;
 		u32				_transactionId;
 
 	public:
@@ -68,7 +69,8 @@ namespace mtp
 		};
 		DECLARE_PTR(ObjectEditSession);
 
-		Session(usb::BulkPipePtr pipe, u32 sessionId): _packeter(pipe), _sessionId(sessionId), _transactionId(1) { }
+		Session(usb::BulkPipePtr pipe, u32 sessionId, const msg::DeviceInfo &deviceInfo):
+			_packeter(pipe), _sessionId(sessionId), _deviceInfo(deviceInfo), _transactionId(1) { }
 		~Session() { try { Close(); } catch(const std::exception &ex) { } }
 
 		msg::ObjectHandles GetObjectHandles(u32 storageId = AllStorages, u32 objectFormat = AllFormats, u32 parent = Device);
