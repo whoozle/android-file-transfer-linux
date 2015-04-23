@@ -38,8 +38,9 @@ namespace mtp
 		std::mutex		_mutex;
 		PipePacketer	_packeter;
 		u32				_sessionId;
-		msg::DeviceInfo	_deviceInfo;
 		u32				_transactionId;
+
+		bool			_supportedGetPartialObject64;
 
 	public:
 		static const u32 AllStorages = 0xffffffffu;
@@ -69,9 +70,8 @@ namespace mtp
 		};
 		DECLARE_PTR(ObjectEditSession);
 
-		Session(usb::BulkPipePtr pipe, u32 sessionId, const msg::DeviceInfo &deviceInfo):
-			_packeter(pipe), _sessionId(sessionId), _deviceInfo(deviceInfo), _transactionId(1) { }
-		~Session() { try { Close(); } catch(const std::exception &ex) { } }
+		Session(usb::BulkPipePtr pipe, u32 sessionId, const msg::DeviceInfo &deviceInfo);
+		~Session();
 
 		msg::ObjectHandles GetObjectHandles(u32 storageId = AllStorages, u32 objectFormat = AllFormats, u32 parent = Device);
 		msg::StorageIDs GetStorageIDs();

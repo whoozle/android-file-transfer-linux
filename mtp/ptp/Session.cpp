@@ -31,6 +31,15 @@ namespace mtp
 		throw InvalidResponseException(__func__, (RCODE)); \
 } while(false)
 
+	Session::Session(usb::BulkPipePtr pipe, u32 sessionId, const msg::DeviceInfo &deviceInfo):
+		_packeter(pipe), _sessionId(sessionId), _transactionId(1)
+	{
+		_supportedGetPartialObject64 = deviceInfo.Supports(OperationCode::GetPartialObject64);
+	}
+
+	Session::~Session()
+	{ try { Close(); } catch(const std::exception &ex) { } }
+
 	void Session::Send(const OperationRequest &req)
 	{
 		Container container(req);
@@ -134,7 +143,10 @@ namespace mtp
 	{
 		scoped_mutex_lock l(_mutex);
 		u32 transaction = _transactionId++;
-		Send(OperationRequest(OperationCode::GetPartialObject64, transaction, objectId, offset, offset >> 32, size));
+		if (_supportedGetPartialObject64)
+			Send(OperationRequest(OperationCode::GetPartialObject64, transaction, objectId, offset, offset >> 32, size));
+		else
+			Send(OperationRequest(OperationCode::GetPartialObject, transaction, objectId, offset, size));
 		return Get(transaction);
 	}
 
