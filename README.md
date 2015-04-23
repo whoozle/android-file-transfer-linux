@@ -29,7 +29,7 @@ If you suffered from crashes, missing tags and album covers, usb freezes and cor
 ### Prerequisites
 
 * You will need qt libraries for building ui program. If you're want to use only library (*Qt is not needed*), you could turn the option ```BUILD_QT_UI``` off.
-* For debian based distros use the following command:
+* For ubuntu and other debian-based distros use the following command:
 
   ```shell
   sudo apt-get install build-essential cmake libqt4-dev ninja-build libfuse-dev
