@@ -363,13 +363,9 @@ namespace
 			return 0;
 		}
 
-		int StatFS (const char *path_, struct statvfs *stat)
+		int StatFS (const char *path, struct statvfs *stat)
 		{
 			stat->f_namemax = 254;
-
-			std::string path(path_);
-			if (path != "/")
-				return -ENOENT;
 
 			mtp::u64 freeSpace = 0, capacity = 0;
 			mtp::scoped_mutex_lock l(_mutex);
