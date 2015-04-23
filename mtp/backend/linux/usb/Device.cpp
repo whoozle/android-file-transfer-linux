@@ -52,7 +52,8 @@ namespace mtp { namespace usb
 
 	Device::~Device()
 	{
-		lockf(_fd, F_ULOCK, 0);
+		if (lockf(_fd, F_ULOCK, 0) != 0)
+			perror("lockf(F_ULOCK, 0)");
 		close(_fd);
 	}
 
