@@ -22,6 +22,7 @@
 #include <mtp/ptp/OperationRequest.h>
 #include <mtp/ptp/ByteArrayObjectStream.h>
 #include <mtp/ptp/JoinedObjectStream.h>
+#include <limits>
 
 namespace mtp
 {
@@ -146,7 +147,11 @@ namespace mtp
 		if (_supportedGetPartialObject64)
 			Send(OperationRequest(OperationCode::GetPartialObject64, transaction, objectId, offset, offset >> 32, size));
 		else
+		{
+			if (offset + size > std::numeric_limits<u32>::max())
+				throw std::runtime_error("32 bit overflow for GetPartialObject");
 			Send(OperationRequest(OperationCode::GetPartialObject, transaction, objectId, offset, size));
+		}
 		return Get(transaction);
 	}
 
