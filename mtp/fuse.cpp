@@ -75,6 +75,9 @@ namespace
 		void * Init (struct fuse_conn_info *conn)
 		{
 			conn->want |= conn->capable & FUSE_CAP_BIG_WRITES; //big writes
+			static const size_t MaxWriteSize = 1024 * 1024;
+			if (conn->max_write < MaxWriteSize)
+				conn->max_write = MaxWriteSize;
 			return NULL;
 		}
 
