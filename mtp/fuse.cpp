@@ -53,6 +53,8 @@ namespace
 	public:
 		FuseWrapper(mtp::DevicePtr device): _device(device), _session(device->OpenSession(1))
 		{
+			if (!_session->EditObjectSupported())
+				fprintf(stderr, "your device does not have android EditObject extension, mounting read-only\n");
 			mtp::msg::StorageIDs ids = _session->GetStorageIDs();
 			for(size_t i = 0; i < ids.StorageIDs.size(); ++i)
 			{
