@@ -42,12 +42,15 @@ namespace mtp { namespace usb
 		ioctl(_fd, USBDEVFS_RELEASEINTERFACE, &_interfaceNumber);
 	}
 
-	Device::Device(int fd): _fd(fd)
+	Device::Device(int fd): _fd(fd), _capabilities(0)
 	{
-		IOCTL(_fd, USBDEVFS_GET_CAPABILITIES, &_capabilities);
 		int r = lockf(_fd, F_TLOCK, 0);
 		if (r == -1)
 			throw Exception("device is used by another process");
+
+		try { IOCTL(_fd, USBDEVFS_GET_CAPABILITIES, &_capabilities); }
+		catch(const std::exception &ex)
+		{ fprintf(stderr, "get usbfs capabilities failed: %s\n", ex.what()); }
 	}
 
 	Device::~Device()
