@@ -414,7 +414,7 @@ namespace
 					capacity += si.MaxCapacity;
 				}
 			}
-			stat->f_frsize = stat->f_bsize = 1024;
+			stat->f_frsize = stat->f_bsize = 1024 * 1024;
 			stat->f_blocks = capacity / stat->f_frsize;
 			stat->f_bfree = stat->f_bavail = freeSpace / stat->f_frsize;
 			if (!_editObjectSupported)
