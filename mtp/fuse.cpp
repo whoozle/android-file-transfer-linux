@@ -372,16 +372,16 @@ namespace
 			return 0;
 		}
 
-		int StatFS (const char *path, struct statvfs *stat)
+		int StatFS (const char *path_, struct statvfs *stat)
 		{
 			stat->f_namemax = 254;
 
 			mtp::u64 freeSpace = 0, capacity = 0;
-			std::string path_(path);
+			std::string path(path_);
 			mtp::scoped_mutex_lock l(_mutex);
-			if (path_ != "/")
+			if (path != "/")
 			{
-				std::string storage = path_.substr(0, path_.find('/', 1));
+				std::string storage = path.substr(0, path.find('/', 1));
 				auto i = _storages.find(storage);
 				if (i == _storages.end())
 					return -ENOENT;
