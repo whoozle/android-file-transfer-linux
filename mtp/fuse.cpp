@@ -71,6 +71,12 @@ namespace
 			}
 		}
 
+		void * Init (struct fuse_conn_info *conn)
+		{
+			conn->want |= conn->capable & FUSE_CAP_BIG_WRITES; //big writes
+			return NULL;
+		}
+
 		int GetAttr(const char *path_, struct stat *stbuf)
 		{
 			std::string path(path_);
@@ -454,6 +460,9 @@ namespace
 		{ fprintf(stderr, #__VA_ARGS__ " failed: %s", ex.what()); return -EIO; } \
 	} while(false)
 
+	void * Init (struct fuse_conn_info *conn)
+	{ try { return g_wrapper->Init(conn); } catch (const std::exception &ex) { return NULL; } }
+
 	int GetAttr(const char *path, struct stat *stbuf)
 	{ WRAP_EX(g_wrapper->GetAttr(path, stbuf)); }
 
@@ -513,6 +522,7 @@ int main(int argc, char **argv)
 
 	struct fuse_operations ops = {};
 
+	ops.init		= &Init;
 	ops.getattr		= &GetAttr;
 	ops.readdir		= &ReadDir;
 	ops.open		= &Open;
