@@ -368,14 +368,29 @@ namespace
 			stat->f_namemax = 254;
 
 			mtp::u64 freeSpace = 0, capacity = 0;
+			std::string path_(path);
 			mtp::scoped_mutex_lock l(_mutex);
-			for(auto storage = _storages.begin(); storage != _storages.end(); ++storage)
+			if (path_ != "/")
 			{
-				mtp::msg::StorageInfo si = _session->GetStorageInfo(storage->second);
-				freeSpace += si.FreeSpaceInBytes;
-				capacity += si.MaxCapacity;
+				std::string storage = path_.substr(0, path_.find('/', 1));
+				auto i = _storages.find(storage);
+				if (i == _storages.end())
+					return -ENOENT;
+
+				mtp::msg::StorageInfo si = _session->GetStorageInfo(i->second);
+				freeSpace = si.FreeSpaceInBytes;
+				capacity = si.MaxCapacity;
 			}
-			stat->f_frsize = 1024;
+			else
+			{
+				for(auto storage = _storages.begin(); storage != _storages.end(); ++storage)
+				{
+					mtp::msg::StorageInfo si = _session->GetStorageInfo(storage->second);
+					freeSpace += si.FreeSpaceInBytes;
+					capacity += si.MaxCapacity;
+				}
+			}
+			stat->f_frsize = stat->f_bsize = 1024;
 			stat->f_blocks = capacity / stat->f_frsize;
 			stat->f_bfree = stat->f_bavail = freeSpace / stat->f_frsize;
 			return 0;
