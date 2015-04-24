@@ -53,7 +53,7 @@ namespace
 	public:
 		FuseWrapper(mtp::DevicePtr device): _device(device), _session(device->OpenSession(1))
 		{
-                        mtp::msg::StorageIDs ids = _session->GetStorageIDs();
+			mtp::msg::StorageIDs ids = _session->GetStorageIDs();
 			for(size_t i = 0; i < ids.StorageIDs.size(); ++i)
 			{
 				mtp::u32 id = ids.StorageIDs[i];
@@ -368,35 +368,29 @@ namespace
 			stat->f_namemax = 254;
 
 			mtp::u64 freeSpace = 0, capacity = 0;
-                        std::string path_(path);
-                        mtp::scoped_mutex_lock l(_mutex);
-                        if (path_ != "/")
-                        {
-                            mtp::u32 storageId;
-                            std::string storage = path_.substr(0, path_.find('/', 1));
+			std::string path_(path);
+			mtp::scoped_mutex_lock l(_mutex);
+			if (path_ != "/")
+			{
+				std::string storage = path_.substr(0, path_.find('/', 1));
+				auto i = _storages.find(storage);
+				if (i == _storages.end())
+					return -ENOENT;
 
-                            auto i = _storages.find(storage);
-                            if (i != _storages.end())
-                            {
-                                    storageId = i->second;
-                            }
-                            else
-                                    return -ENOENT;
-
-                            mtp::msg::StorageInfo si = _session->GetStorageInfo(storageId);
-                            freeSpace = si.FreeSpaceInBytes;
-                            capacity = si.MaxCapacity;
-
-                        }
-                        else {
-                            for(auto storage = _storages.begin(); storage != _storages.end(); ++storage)
-                            {
-                                    mtp::msg::StorageInfo si = _session->GetStorageInfo(storage->second);
-                                    freeSpace += si.FreeSpaceInBytes;
-                                    capacity += si.MaxCapacity;
-                            }
-                        }
-                        stat->f_frsize = stat->f_bsize = 1024;
+				mtp::msg::StorageInfo si = _session->GetStorageInfo(i->second);
+				freeSpace = si.FreeSpaceInBytes;
+				capacity = si.MaxCapacity;
+			}
+			else
+			{
+				for(auto storage = _storages.begin(); storage != _storages.end(); ++storage)
+				{
+					mtp::msg::StorageInfo si = _session->GetStorageInfo(storage->second);
+					freeSpace += si.FreeSpaceInBytes;
+					capacity += si.MaxCapacity;
+				}
+			}
+			stat->f_frsize = stat->f_bsize = 1024;
 			stat->f_blocks = capacity / stat->f_frsize;
 			stat->f_bfree = stat->f_bavail = freeSpace / stat->f_frsize;
 			return 0;
