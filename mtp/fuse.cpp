@@ -343,6 +343,8 @@ namespace
 			mtp::u32 id;
 			{
 				mtp::scoped_mutex_lock l(_mutex);
+				if (!_session->EditObjectSupported())
+					return -EROFS;
 				id = Resolve(path);
 				if (!id)
 					return -ENOENT;
@@ -358,6 +360,8 @@ namespace
 			mtp::u32 id;
 			{
 				mtp::scoped_mutex_lock l(_mutex);
+				if (!_session->EditObjectSupported())
+					return -EROFS;
 				id = Resolve(path);
 				if (!id)
 					return -ENOENT;
