@@ -282,8 +282,11 @@ namespace
 
 		int Create(const char *path_, mode_t mode, struct fuse_file_info *fi)
 		{
-			std::string path(path_);
 			mtp::scoped_mutex_lock l(_mutex);
+			if (!_session->EditObjectSupported())
+				return -EROFS;
+
+			std::string path(path_);
 			mtp::u32 storageId, parentId;
 			std::string filename;
 			int r = ResolveParent(path, filename, storageId, parentId);
