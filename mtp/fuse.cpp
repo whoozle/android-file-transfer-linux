@@ -39,6 +39,7 @@ namespace
 		std::mutex		_mutex;
 		mtp::DevicePtr	_device;
 		mtp::SessionPtr	_session;
+		bool			_editObjectSupported;
 
 		typedef std::map<std::string, mtp::u32> Files;
 		Files			_files;
@@ -51,9 +52,9 @@ namespace
 		Storages		_storages;
 
 	public:
-		FuseWrapper(mtp::DevicePtr device): _device(device), _session(device->OpenSession(1))
+		FuseWrapper(mtp::DevicePtr device): _device(device), _session(device->OpenSession(1)), _editObjectSupported(_session->EditObjectSupported())
 		{
-			if (!_session->EditObjectSupported())
+			if (!_editObjectSupported)
 				fprintf(stderr, "your device does not have android EditObject extension, mounting read-only\n");
 			mtp::msg::StorageIDs ids = _session->GetStorageIDs();
 			for(size_t i = 0; i < ids.StorageIDs.size(); ++i)
@@ -289,7 +290,7 @@ namespace
 		int Create(const char *path_, mode_t mode, struct fuse_file_info *fi)
 		{
 			mtp::scoped_mutex_lock l(_mutex);
-			if (!_session->EditObjectSupported())
+			if (!_editObjectSupported)
 				return -EROFS;
 
 			std::string path(path_);
@@ -354,7 +355,7 @@ namespace
 			mtp::u32 id;
 			{
 				mtp::scoped_mutex_lock l(_mutex);
-				if (!_session->EditObjectSupported())
+				if (!_editObjectSupported)
 					return -EROFS;
 				id = Resolve(path);
 				if (!id)
@@ -371,7 +372,7 @@ namespace
 			mtp::u32 id;
 			{
 				mtp::scoped_mutex_lock l(_mutex);
-				if (!_session->EditObjectSupported())
+				if (!_editObjectSupported)
 					return -EROFS;
 				id = Resolve(path);
 				if (!id)
@@ -413,6 +414,8 @@ namespace
 			stat->f_frsize = stat->f_bsize = 1024;
 			stat->f_blocks = capacity / stat->f_frsize;
 			stat->f_bfree = stat->f_bavail = freeSpace / stat->f_frsize;
+			if (!_editObjectSupported)
+				stat->f_flag |= ST_RDONLY;
 			return 0;
 		}
 
