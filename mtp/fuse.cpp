@@ -58,7 +58,7 @@ namespace
 			{
 				mtp::u32 id = ids.StorageIDs[i];
 				mtp::msg::StorageInfo si = _session->GetStorageInfo(id);
-				std::string path = "/" + (!si.VolumeLabel.empty()? si.VolumeLabel: si.StorageDescription);
+				std::string path = "/" + (!si.StorageDescription.empty()? si.StorageDescription:  si.VolumeLabel);
 				if (path.empty())
 				{
 					char buf[64];
