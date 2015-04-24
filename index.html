@@ -35,7 +35,7 @@
 <a id="android-file-transfer-for-linux" class="anchor" href="#android-file-transfer-for-linux" aria-hidden="true"><span class="octicon octicon-link"></span></a>Android File Transfer For Linux</h1>
 
 <p><a href="https://github.com/whoozle/android-file-transfer-linux/blob/master/LICENSE"><img src="http://img.shields.io/:license-GPLv2-blue.svg" alt="License"></a>
-<a href="https://github.com/whoozle/android-file-transfer-linux/blob/master"><img src="http://img.shields.io/:version-2.0-green.svg" alt="Version"></a>
+<a href="https://github.com/whoozle/android-file-transfer-linux/blob/master"><img src="http://img.shields.io/:version-2.1-green.svg" alt="Version"></a>
 <a href="https://travis-ci.org/whoozle/android-file-transfer-linux"><img src="https://travis-ci.org/whoozle/android-file-transfer-linux.svg?branch=master" alt="Build Status"></a></p>
 
 <p>Android File Transfer for Linux — reliable MTP client with minimalistic UI similar to <a href="https://www.android.com/intl/en_us/filetransfer/">Android File Transfer for Mac</a>.</p>
@@ -128,6 +128,8 @@ The latter two are self-explanatory. <code>Upload album</code> tries searching s
 <a id="known-problems" class="anchor" href="#known-problems" aria-hidden="true"><span class="octicon octicon-link"></span></a>Known problems</h3>
 
 <ul>
+<li>Samsung removed android extensions from MTP, so fuse will be available readonly, sorry. Feel free to post your complaints to <a href="http://developer.samsung.com/forum/en">http://developer.samsung.com/forum/en</a>
+</li>
 <li>Sometimes downloading fails with usb timeout, then phone becomes unresponsive. <a href="https://code.google.com/p/android/issues/detail?id=75259">Android bug #75259</a>
 </li>
 <li>Objects created in UI will not show up in FUSE filesystem. <a href="https://code.google.com/p/android/issues/detail?id=169547">Android bug #169547</a>
