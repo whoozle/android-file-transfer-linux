@@ -296,7 +296,7 @@ namespace mtp
 	{
 		scoped_mutex_lock l(_mutex);
 		u32 transaction = _transactionId++;
-		Send(OperationRequest(OperationCode::DeleteObject, transaction, objectId));
+		Send(OperationRequest(OperationCode::DeleteObject, transaction, objectId, 0));
 		Get(transaction);
 	}
 
