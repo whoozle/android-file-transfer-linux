@@ -59,8 +59,13 @@ namespace
 				mtp::u32 id = ids.StorageIDs[i];
 				mtp::msg::StorageInfo si = _session->GetStorageInfo(id);
 				std::string path = "/" + (!si.VolumeLabel.empty()? si.VolumeLabel: si.StorageDescription);
-				if (!path.empty())
-					_storages[path] = id;
+				if (path.empty())
+				{
+					char buf[64];
+					snprintf(buf, sizeof(buf), "sdcard%u", (unsigned)i);
+					path = buf;
+				}
+				_storages[path] = id;
 			}
 		}
 
