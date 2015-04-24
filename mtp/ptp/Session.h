@@ -40,7 +40,8 @@ namespace mtp
 		u32				_sessionId;
 		u32				_transactionId;
 
-		bool			_supportedGetPartialObject64;
+		bool			_getPartialObject64Supported;
+		bool			_editObjectSupported;
 
 	public:
 		static const u32 AllStorages = 0xffffffffu;
@@ -84,6 +85,8 @@ namespace mtp
 		void SendObject(const IObjectInputStreamPtr &inputStream);
 		void DeleteObject(u32 objectId);
 
+		bool EditObjectSupported() const
+		{ return _editObjectSupported; }
 		static ObjectEditSessionPtr EditObject(const SessionPtr &session, u32 objectId)
 		{ return std::make_shared<ObjectEditSession>(session, objectId); }
 

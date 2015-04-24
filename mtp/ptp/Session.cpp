@@ -35,7 +35,11 @@ namespace mtp
 	Session::Session(usb::BulkPipePtr pipe, u32 sessionId, const msg::DeviceInfo &deviceInfo):
 		_packeter(pipe), _sessionId(sessionId), _transactionId(1)
 	{
-		_supportedGetPartialObject64 = deviceInfo.Supports(OperationCode::GetPartialObject64);
+		_getPartialObject64Supported = deviceInfo.Supports(OperationCode::GetPartialObject64);
+		_editObjectSupported = deviceInfo.Supports(OperationCode::BeginEditObject) &&
+			deviceInfo.Supports(OperationCode::EndEditObject) &&
+			deviceInfo.Supports(OperationCode::TruncateObject) &&
+			deviceInfo.Supports(OperationCode::SendPartialObject);
 	}
 
 	Session::~Session()
@@ -144,7 +148,7 @@ namespace mtp
 	{
 		scoped_mutex_lock l(_mutex);
 		u32 transaction = _transactionId++;
-		if (_supportedGetPartialObject64)
+		if (_getPartialObject64Supported)
 			Send(OperationRequest(OperationCode::GetPartialObject64, transaction, objectId, offset, offset >> 32, size));
 		else
 		{
