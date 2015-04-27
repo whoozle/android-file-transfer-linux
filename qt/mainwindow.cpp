@@ -38,6 +38,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	_uploader(new FileUploader(_objectModel, this))
 {
 	_ui->setupUi(this);
+	setWindowIcon(QIcon(":/icons/android-file-transfer.png"));
 	_objectModel->moveToThread(QApplication::instance()->thread());
 	connect(_ui->listView, SIGNAL(doubleClicked(QModelIndex)), SLOT(onActivated(QModelIndex)));
 	connect(_ui->listView, SIGNAL(customContextMenuRequested(QPoint)), SLOT(showContextMenu(QPoint)));
