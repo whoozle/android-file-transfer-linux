@@ -50,4 +50,7 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 add_executable(android-file-transfer ${SOURCES} ${HEADERS_MOC} ${FORMS_HEADERS} ${RESOURCES})
 target_link_libraries(android-file-transfer ${EXTRA_QT_LINK} ${MTP_LIBRARIES})
+
 install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/android-file-transfer DESTINATION bin)
+install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/android-file-transfer.desktop DESTINATION /usr/share/applications)
+install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/android-file-transfer.png DESTINATION share/icons/hicolor/128x128/apps)

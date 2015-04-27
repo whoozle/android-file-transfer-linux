@@ -1,5 +1,5 @@
 [Desktop Entry]
-Name=Android File Transfer
+Name=Android File Transfer (MTP)
 Comment=Transfer files from/to MTP devices
 Exec=android-file-transfer
 Icon=android-file-transfer
