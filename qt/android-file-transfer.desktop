@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Android File Transfer
+Comment=Transfer files from/to MTP devices
+Exec=android-file-transfer
+Icon=android-file-transfer
+StartupNotify=false
+Terminal=false
+Type=Application
+Categories=Utility;FileTools;Filesystem;Qt;
