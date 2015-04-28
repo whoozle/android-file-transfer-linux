@@ -97,7 +97,7 @@ FileUploader::FileUploader(MtpObjectsModel * model, QObject *parent) :
 	connect(&_workerThread, SIGNAL(finished()), SLOT(deleteLater()));
 	connect(this, SIGNAL(uploadFile(QString)), worker, SLOT(uploadFile(QString)));
 	connect(this, SIGNAL(downloadFile(QString,quint32)), worker, SLOT(downloadFile(QString,quint32)));
-	connect(worker, SIGNAL(progress(qlonglong)), SLOT(onProgress(qlonglong)));
+	connect(worker, SIGNAL(progress(qlonglong)), SLOT(onProgress(qint64)));
 	connect(worker, SIGNAL(started(QString)), SLOT(onStarted(QString)));
 	connect(worker, SIGNAL(finished()), SLOT(onFinished()));
 	_workerThread.start();
