@@ -119,7 +119,8 @@ int main(int argc, char **argv)
 	printf("%s ", gdi.Manufacturer.c_str());
 	printf("%s ", gdi.Model.c_str());
 	printf("%s ", gdi.DeviceVersion.c_str());
-	printf("%s\n", gdi.SerialNumber.c_str());
+	//printf("%s", gdi.SerialNumber.c_str());
+	printf("\n");
 	printf("supported op codes: ");
 	for(OperationCode code : gdi.OperationsSupported)
 	{
