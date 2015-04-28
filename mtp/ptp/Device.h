@@ -28,19 +28,13 @@ namespace mtp
 	class Device
 	{
 		PipePacketer	_packeter;
-		msg::DeviceInfo	_deviceInfo;
 
 	public:
 		Device(usb::BulkPipePtr pipe);
 
-		msg::DeviceInfo GetDeviceInfo() const
-		{ return _deviceInfo; }
 		SessionPtr OpenSession(u32 sessionId);
 
 		static DevicePtr Find(); //fixme: returns first device only
-
-	private:
-		msg::DeviceInfo GetDeviceInfoImpl();
 	};
 }
 

@@ -32,14 +32,15 @@ namespace mtp
 		throw InvalidResponseException(__func__, (RCODE)); \
 } while(false)
 
-	Session::Session(usb::BulkPipePtr pipe, u32 sessionId, const msg::DeviceInfo &deviceInfo):
+	Session::Session(usb::BulkPipePtr pipe, u32 sessionId):
 		_packeter(pipe), _sessionId(sessionId), _transactionId(1)
 	{
-		_getPartialObject64Supported = deviceInfo.Supports(OperationCode::GetPartialObject64);
-		_editObjectSupported = deviceInfo.Supports(OperationCode::BeginEditObject) &&
-			deviceInfo.Supports(OperationCode::EndEditObject) &&
-			deviceInfo.Supports(OperationCode::TruncateObject) &&
-			deviceInfo.Supports(OperationCode::SendPartialObject);
+		_deviceInfo = GetDeviceInfoImpl();
+		_getPartialObject64Supported = _deviceInfo.Supports(OperationCode::GetPartialObject64);
+		_editObjectSupported = _deviceInfo.Supports(OperationCode::BeginEditObject) &&
+			_deviceInfo.Supports(OperationCode::EndEditObject) &&
+			_deviceInfo.Supports(OperationCode::TruncateObject) &&
+			_deviceInfo.Supports(OperationCode::SendPartialObject);
 	}
 
 	Session::~Session()
@@ -68,6 +69,19 @@ namespace mtp
 		_packeter.Read(transaction, data, responseCode, response);
 		CHECK_RESPONSE(responseCode);
 		return data;
+	}
+
+	msg::DeviceInfo Session::GetDeviceInfoImpl()
+	{
+		scoped_mutex_lock l(_mutex);
+		u32 transaction = _transactionId++;
+
+		Send(OperationRequest(OperationCode::GetDeviceInfo, transaction));
+		ByteArray data = Get(transaction);
+		InputStream stream(data); //operation code + session id
+		msg::DeviceInfo gdi;
+		gdi.Read(stream);
+		return gdi;
 	}
 
 

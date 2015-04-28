@@ -66,30 +66,30 @@ void MainWindow::showEvent(QShowEvent *)
 			return;
 		}
 
+		qDebug() << "device found, opening session...";
+		mtp::SessionPtr session;
 		static const int MaxAttempts = 3;
 		for(int attempt = 0; attempt < MaxAttempts; ++attempt)
 		{
 			try
 			{
-				mtp::msg::DeviceInfo di = _device->GetDeviceInfo();
+				session = _device->OpenSession(1);
+				mtp::msg::DeviceInfo di = session->GetDeviceInfo();
 				qDebug() << "device info" << QString::fromStdString(di.Manufacturer) << " " << QString::fromStdString(di.Model);
 				break;
 			}
 			catch(const mtp::usb::TimeoutException &ex)
 			{
 				qDebug() << "timed out getting device info: " << ex.what() << ", retrying...";
-				_device.reset();
 				if (attempt + 1 == MaxAttempts)
 				{
 					QMessageBox::critical(this, tr("MTP"), tr("MTP device does not respond"));
 					return;
 				}
-				_device = mtp::Device::Find();
 			}
 		}
 
-		qDebug() << "device found, opening session...";
-		_objectModel->setSession(_device->OpenSession(1));
+		_objectModel->setSession(session);
 		qDebug() << "session opened, starting";
 		_ui->listView->setModel(_objectModel);
 	}

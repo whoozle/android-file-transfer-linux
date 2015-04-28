@@ -113,7 +113,8 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	msg::DeviceInfo gdi = mtp->GetDeviceInfo();
+	SessionPtr session = mtp->OpenSession(1);
+	msg::DeviceInfo gdi = session->GetDeviceInfo();
 	printf("%s\n", gdi.VendorExtensionDesc.c_str());
 	printf("%s ", gdi.Manufacturer.c_str());
 	printf("%s ", gdi.Model.c_str());
@@ -135,7 +136,6 @@ int main(int argc, char **argv)
 	if (argc < 2)
 		return 0;
 
-	SessionPtr session = mtp->OpenSession(1);
 	std::string command = argv[1];
 	if (command == "list")
 	{

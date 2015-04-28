@@ -40,6 +40,7 @@ namespace mtp
 		u32				_sessionId;
 		u32				_transactionId;
 
+		msg::DeviceInfo	_deviceInfo;
 		bool			_getPartialObject64Supported;
 		bool			_editObjectSupported;
 
@@ -71,8 +72,11 @@ namespace mtp
 		};
 		DECLARE_PTR(ObjectEditSession);
 
-		Session(usb::BulkPipePtr pipe, u32 sessionId, const msg::DeviceInfo &deviceInfo);
+		Session(usb::BulkPipePtr pipe, u32 sessionId);
 		~Session();
+
+		const msg::DeviceInfo & GetDeviceInfo() const
+		{ return _deviceInfo; }
 
 		msg::ObjectHandles GetObjectHandles(u32 storageId = AllStorages, u32 objectFormat = AllFormats, u32 parent = Device);
 		msg::StorageIDs GetStorageIDs();
@@ -101,6 +105,8 @@ namespace mtp
 		ByteArray GetDeviceProperty(DeviceProperty property);
 
 	private:
+		msg::DeviceInfo GetDeviceInfoImpl();
+
 		void BeginEditObject(u32 objectId);
 		void SendPartialObject(u32 objectId, u64 offset, const ByteArray &data);
 		void TruncateObject(u32 objectId, u64 size);

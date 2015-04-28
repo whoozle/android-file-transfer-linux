@@ -27,24 +27,8 @@
 namespace mtp
 {
 
-	Device::Device(usb::BulkPipePtr pipe): _packeter(pipe), _deviceInfo(GetDeviceInfoImpl())
+	Device::Device(usb::BulkPipePtr pipe): _packeter(pipe)
 	{ }
-
-	msg::DeviceInfo Device::GetDeviceInfoImpl()
-	{
-		OperationRequest req(OperationCode::GetDeviceInfo, 0);
-		Container container(req);
-		_packeter.Write(container.Data);
-		ByteArray data, response;
-		ResponseType code;
-		_packeter.Read(0, data, code, response);
-		//HexDump("payload", data);
-
-		InputStream stream(data); //operation code + session id
-		msg::DeviceInfo gdi;
-		gdi.Read(stream);
-		return gdi;
-	}
 
 	SessionPtr Device::OpenSession(u32 sessionId)
 	{
@@ -56,7 +40,7 @@ namespace mtp
 		_packeter.Read(0, data, code, response);
 		//HexDump("payload", data);
 
-		return std::make_shared<Session>(_packeter.GetPipe(), sessionId, _deviceInfo);
+		return std::make_shared<Session>(_packeter.GetPipe(), sessionId);
 	}
 
 	DevicePtr Device::Find()
