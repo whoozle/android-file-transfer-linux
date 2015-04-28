@@ -44,8 +44,8 @@ namespace
 int main(int argc, char *argv[])
 {
 	QCoreApplication::setApplicationName("mtp-ng-qt");
-	QCoreApplication::setOrganizationDomain("svalko.org");
-	QCoreApplication::setOrganizationName("svalko");
+	QCoreApplication::setOrganizationDomain("whoozle.github.io");
+	QCoreApplication::setOrganizationName("whoozle.github.io");
 
 	Application a(argc, argv);
 	MainWindow w;
