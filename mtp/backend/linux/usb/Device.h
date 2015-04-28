@@ -28,11 +28,23 @@ namespace mtp { namespace usb
 	class Context;
 	DECLARE_PTR(Context);
 
+	class FileHandler : Noncopyable
+	{
+		int _fd;
+
+	public:
+		FileHandler(int fd): _fd(fd) { }
+		~FileHandler();
+
+		int Get() const
+		{ return _fd; }
+	};
+
 	class Device : Noncopyable
 	{
 	private:
-		int		_fd;
-		u32		_capabilities;
+		FileHandler		_fd;
+		u32				_capabilities;
 
 	public:
 		Device(int fd);
@@ -49,7 +61,7 @@ namespace mtp { namespace usb
 		DECLARE_PTR(InterfaceToken);
 
 		InterfaceTokenPtr ClaimInterface(int interfaceNumber)
-		{ return std::make_shared<InterfaceToken>(_fd, interfaceNumber); }
+		{ return std::make_shared<InterfaceToken>(_fd.Get(), interfaceNumber); }
 
 		int GetConfiguration() const;
 		void SetConfiguration(int idx);

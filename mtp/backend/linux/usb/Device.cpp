@@ -32,6 +32,10 @@
 
 namespace mtp { namespace usb
 {
+
+	FileHandler::~FileHandler()
+	{ close(_fd); }
+
 	Device::InterfaceToken::InterfaceToken(int fd, unsigned interfaceNumber): _fd(fd), _interfaceNumber(interfaceNumber)
 	{
 		IOCTL(_fd, USBDEVFS_CLAIMINTERFACE, &interfaceNumber);
@@ -44,20 +48,19 @@ namespace mtp { namespace usb
 
 	Device::Device(int fd): _fd(fd), _capabilities(0)
 	{
-		int r = lockf(_fd, F_TLOCK, 0);
+		int r = lockf(_fd.Get(), F_TLOCK, 0);
 		if (r == -1)
 			throw Exception("device is used by another process");
 
-		try { IOCTL(_fd, USBDEVFS_GET_CAPABILITIES, &_capabilities); }
+		try { IOCTL(_fd.Get(), USBDEVFS_GET_CAPABILITIES, &_capabilities); }
 		catch(const std::exception &ex)
 		{ fprintf(stderr, "get usbfs capabilities failed: %s\n", ex.what()); }
 	}
 
 	Device::~Device()
 	{
-		if (lockf(_fd, F_ULOCK, 0) != 0)
+		if (lockf(_fd.Get(), F_ULOCK, 0) != 0)
 			perror("lockf(F_ULOCK, 0)");
-		close(_fd);
 	}
 
 	int Device::GetConfiguration() const
@@ -76,7 +79,7 @@ namespace mtp { namespace usb
 		if (gettimeofday(&started, NULL) == -1)
 			throw usb::Exception("gettimeofday");
 		pollfd fd = {};
-		fd.fd		= _fd;
+		fd.fd		= _fd.Get();
 		fd.events	= POLLOUT;
 		int r = poll(&fd, 1, timeout);
 
@@ -94,7 +97,7 @@ namespace mtp { namespace usb
 		}
 
 		usbdevfs_urb *urb;
-		r = ioctl(_fd, USBDEVFS_REAPURBNDELAY, &urb);
+		r = ioctl(_fd.Get(), USBDEVFS_REAPURBNDELAY, &urb);
 		if (r == 0)
 			return urb;
 		else
@@ -132,14 +135,14 @@ namespace mtp { namespace usb
 				urb.flags |= USBDEVFS_URB_BULK_CONTINUATION;
 			else
 				continuation = true;
-			IOCTL(_fd, USBDEVFS_SUBMITURB, &urb);
+			IOCTL(_fd.Get(), USBDEVFS_SUBMITURB, &urb);
 			try
 			{
 				ReapSingleUrb(&urb, timeout);
 			}
 			catch(const std::exception &ex)
 			{
-				int r = ioctl(_fd, USBDEVFS_DISCARDURB, &urb);
+				int r = ioctl(_fd.Get(), USBDEVFS_DISCARDURB, &urb);
 				if (r != 0)
 					std::terminate();
 				fprintf(stderr, "exception %s: discard = %d\n", ex.what(), r);
@@ -164,7 +167,7 @@ namespace mtp { namespace usb
 				urb.flags |= USBDEVFS_URB_BULK_CONTINUATION;
 			else
 				continuation = true;
-			IOCTL(_fd, USBDEVFS_SUBMITURB, &urb);
+			IOCTL(_fd.Get(), USBDEVFS_SUBMITURB, &urb);
 
 			try
 			{
@@ -172,7 +175,7 @@ namespace mtp { namespace usb
 			}
 			catch(const std::exception &ex)
 			{
-				int r = ioctl(_fd, USBDEVFS_DISCARDURB, &urb);
+				int r = ioctl(_fd.Get(), USBDEVFS_DISCARDURB, &urb);
 				if (r != 0)
 					std::terminate();
 				fprintf(stderr, "exception %s: discard = %d\n", ex.what(), r);
