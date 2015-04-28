@@ -29,6 +29,7 @@ class MainWindow;
 
 class MtpObjectsModel;
 class FileUploader;
+class QSortFilterProxyModel;
 
 class MainWindow : public QMainWindow
 {
@@ -43,6 +44,7 @@ public:
 
 private:
 	void showEvent(QShowEvent *e);
+	QModelIndex mapIndex(const QModelIndex &index);
 
 private slots:
 	void back();
@@ -58,12 +60,13 @@ private:
 	void downloadFiles(const QList<quint32> &objects);
 	void uploadFiles(const QStringList &files);
 
-	Ui::MainWindow *	_ui;
-	MtpObjectsModel *	_objectModel;
-	FileUploader *		_uploader;
-	QVector<mtp::u32>	_history;
+	Ui::MainWindow *			_ui;
+	QSortFilterProxyModel *		_proxyModel;
+	MtpObjectsModel *			_objectModel;
+	FileUploader *				_uploader;
+	QVector<mtp::u32>			_history;
 
-	mtp::DevicePtr		_device;
+	mtp::DevicePtr				_device;
 };
 
 #endif // MAINWINDOW_H

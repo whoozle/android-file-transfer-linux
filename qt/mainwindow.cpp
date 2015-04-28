@@ -25,6 +25,7 @@
 #include "fileuploader.h"
 #include <mtp/usb/TimeoutException.h>
 #include <QDebug>
+#include <QSortFilterProxyModel>
 #include <QMessageBox>
 #include <QKeyEvent>
 #include <QFileDialog>
@@ -34,12 +35,21 @@
 MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
 	_ui(new Ui::MainWindow),
+	_proxyModel(new QSortFilterProxyModel),
 	_objectModel(new MtpObjectsModel()),
 	_uploader(new FileUploader(_objectModel, this))
 {
 	_ui->setupUi(this);
 	setWindowIcon(QIcon(":/icons/android-file-transfer.png"));
+
+	_ui->listView->setModel(_proxyModel);
+
+	_proxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
+	_proxyModel->sort(0);
+	_proxyModel->setDynamicSortFilter(true);
+
 	_objectModel->moveToThread(QApplication::instance()->thread());
+
 	connect(_ui->listView, SIGNAL(doubleClicked(QModelIndex)), SLOT(onActivated(QModelIndex)));
 	connect(_ui->listView, SIGNAL(customContextMenuRequested(QPoint)), SLOT(showContextMenu(QPoint)));
 	connect(_ui->actionBack, SIGNAL(triggered()), SLOT(back()));
@@ -91,13 +101,18 @@ void MainWindow::showEvent(QShowEvent *)
 
 		_objectModel->setSession(session);
 		qDebug() << "session opened, starting";
-		_ui->listView->setModel(_objectModel);
+		_proxyModel->setSourceModel(_objectModel);
 	}
+}
+
+QModelIndex MainWindow::mapIndex(const QModelIndex &index)
+{
+	return _proxyModel->mapToSource(index);
 }
 
 void MainWindow::onActivated ( const QModelIndex & index )
 {
-	if (_objectModel->enter(index.row()))
+	if (_objectModel->enter(mapIndex(index).row()))
 		_history.push_back(_objectModel->parentObjectId());
 }
 
@@ -121,7 +136,7 @@ void MainWindow::showContextMenu ( const QPoint & pos )
 		QList<quint32> objects;
 		for(int i = 0; i < rows.size(); ++i)
 		{
-			QModelIndex row = rows[i];
+			QModelIndex row = mapIndex(rows[i]);
 			objects.push_back(_objectModel->objectIdAt(row.row()));
 		}
 		downloadFiles(objects);
@@ -130,7 +145,7 @@ void MainWindow::showContextMenu ( const QPoint & pos )
 	{
 		for(int i = rows.size() - 1; i >= 0; --i)
 		{
-			QModelIndex row = rows[i];
+			QModelIndex row = mapIndex(rows[i]);
 			if (action == delete_objects)
 				_objectModel->removeRow(row.row());
 			else if (action == rename_object)
@@ -157,7 +172,7 @@ void MainWindow::back()
 
 void MainWindow::down()
 {
-	if (_objectModel->enter(_ui->listView->currentIndex().row()))
+	if (_objectModel->enter(mapIndex(_ui->listView->currentIndex()).row()))
 		_history.push_back(_objectModel->parentObjectId());
 }
 
@@ -174,7 +189,7 @@ void MainWindow::uploadFiles(const QStringList &files)
 		return;
 
 	qDebug() << "uploadFiles " << files;
-	_ui->listView->setModel(NULL);
+	_proxyModel->setSourceModel(NULL);
 	ProgressDialog progressDialog(this);
 	progressDialog.setModal(true);
 	progressDialog.setValue(0);
@@ -188,7 +203,7 @@ void MainWindow::uploadFiles(const QStringList &files)
 	progressDialog.exec();
 
 	_objectModel->moveToThread(QApplication::instance()->thread());
-	_ui->listView->setModel(_objectModel);
+	_proxyModel->setSourceModel(_objectModel);
 }
 
 
