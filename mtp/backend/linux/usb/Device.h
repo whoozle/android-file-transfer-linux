@@ -22,6 +22,7 @@
 #include <mtp/types.h>
 #include <usb/Interface.h>
 #include <mtp/ptp/IObjectStream.h>
+#include <map>
 
 namespace mtp { namespace usb
 {
@@ -43,8 +44,12 @@ namespace mtp { namespace usb
 	class Device : Noncopyable
 	{
 	private:
-		FileHandler		_fd;
-		u32				_capabilities;
+		FileHandler					_fd;
+		u32							_capabilities;
+
+		struct Urb;
+		DECLARE_PTR(Urb);
+		std::map<void *, UrbPtr>	_urbs;
 
 	public:
 		Device(int fd);
@@ -71,7 +76,7 @@ namespace mtp { namespace usb
 
 	private:
 		void * Reap(int timeout);
-		void ReapSingleUrb(void *urb, int timeout);
+		void Submit(const UrbPtr &urb, int timeout);
 	};
 	DECLARE_PTR(Device);
 }}

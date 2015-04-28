@@ -73,11 +73,67 @@ namespace mtp { namespace usb
 		fprintf(stderr, "SetConfiguration(%d): not implemented", idx);
 	}
 
+	struct Device::Urb
+	{
+		static const unsigned	PacketsPerBuffer = 1024;
+
+		int						Fd;
+		ByteArray				Buffer;
+		usbdevfs_urb			KernelUrb;
+
+		Urb(int fd, u8 type, const EndpointPtr & ep): Fd(fd), Buffer(PacketsPerBuffer * ep->GetMaxPacketSize()), KernelUrb()
+		{
+			usbdevfs_urb &urb = KernelUrb;
+			urb.type			= type;
+			urb.endpoint		= ep->GetAddress();
+			urb.buffer			= Buffer.data();
+			urb.buffer_length	= Buffer.size();
+		}
+
+		void Submit()
+		{
+			IOCTL(Fd, USBDEVFS_SUBMITURB, &KernelUrb);
+		}
+
+		void Discard()
+		{
+			int r = ioctl(Fd, USBDEVFS_DISCARDURB, &KernelUrb);
+			if (r != 0)
+			{
+				perror("ioctl(USBDEVFS_DISCARDURB)");
+				std::terminate();
+			}
+		}
+
+		size_t Send(const IObjectInputStreamPtr &inputStream)
+		{
+			size_t r = inputStream->Read(Buffer.data(), Buffer.size());
+			//HexDump("write", ByteArray(Buffer.data(), Buffer.data() + r));
+			KernelUrb.buffer_length = r;
+			return r;
+		}
+
+		size_t Recv(const IObjectOutputStreamPtr &outputStream)
+		{
+			//HexDump("read", ByteArray(Buffer.data(), Buffer.data() + KernelUrb.actual_length));
+			return outputStream->Write(Buffer.data(), KernelUrb.actual_length);
+		}
+
+		void SetContinuationFlag(bool continuation)
+		{
+			if (continuation)
+				KernelUrb.flags |= USBDEVFS_URB_BULK_CONTINUATION;
+			else
+				KernelUrb.flags &= ~USBDEVFS_URB_BULK_CONTINUATION;
+		}
+	};
+
 	void * Device::Reap(int timeout)
 	{
 		timeval started = {};
 		if (gettimeofday(&started, NULL) == -1)
 			throw usb::Exception("gettimeofday");
+
 		pollfd fd = {};
 		fd.fd		= _fd.Get();
 		fd.events	= POLLOUT;
@@ -104,87 +160,70 @@ namespace mtp { namespace usb
 			throw Exception("ioctl");
 	}
 
-	void Device::ReapSingleUrb(void *urb, int timeout)
+	void Device::Submit(const UrbPtr &urb, int timeout)
 	{
-		void * reapUrb = Reap(timeout);
-		if (urb != reapUrb)
+		urb->Submit();
+		_urbs.insert(std::make_pair(&urb->KernelUrb, urb));
+		try
 		{
-			fprintf(stderr, "reaping unknown urb, usb bus conflict: %p %p\n", urb, reapUrb);
-			std::terminate();
+			while(true)
+			{
+				UrbPtr completedUrb;
+				{
+					void *completedKernelUrb = Reap(timeout);
+					auto urbIt = _urbs.find(completedKernelUrb);
+					if (urbIt == _urbs.end())
+					{
+						fprintf(stderr, "got unknown urb: %p\n", completedKernelUrb);
+						continue;
+					}
+					completedUrb = urbIt->second;
+					_urbs.erase(urbIt);
+				}
+				if (completedUrb == urb)
+					break;
+			}
+		}
+		catch(const std::exception &ex)
+		{
+			urb->Discard();
+			fprintf(stderr, "error while submitting urb: %s\n", ex.what());
+			throw;
 		}
 	}
 
-
 	void Device::WriteBulk(const EndpointPtr & ep, const IObjectInputStreamPtr &inputStream, int timeout)
 	{
-		size_t transferSize = ep->GetMaxPacketSize() * 1024;
-		ByteArray data(transferSize);
+		UrbPtr urb = std::make_shared<Urb>(_fd.Get(), USBDEVFS_URB_TYPE_BULK, ep);
+		size_t transferSize = urb->Buffer.size();
 
 		size_t r;
 		bool continuation = false;
 		do
 		{
-			r = inputStream->Read(data.data(), data.size());
-			//HexDump("write", ByteArray(data.data(), data.data() + r));
-			usbdevfs_urb urb = {};
-			urb.type = USBDEVFS_URB_TYPE_BULK;
-			urb.endpoint = ep->GetAddress();
-			urb.buffer = const_cast<u8 *>(data.data());
-			urb.buffer_length = r;
-			if (continuation)
-				urb.flags |= USBDEVFS_URB_BULK_CONTINUATION;
-			else
-				continuation = true;
-			IOCTL(_fd.Get(), USBDEVFS_SUBMITURB, &urb);
-			try
-			{
-				ReapSingleUrb(&urb, timeout);
-			}
-			catch(const std::exception &ex)
-			{
-				int r = ioctl(_fd.Get(), USBDEVFS_DISCARDURB, &urb);
-				if (r != 0)
-					std::terminate();
-				fprintf(stderr, "exception %s: discard = %d\n", ex.what(), r);
-				throw;
-			}
+			r = urb->Send(inputStream);
+			urb->SetContinuationFlag(continuation);
+			continuation = true;
+			Submit(urb, timeout);
 		}
 		while(r == transferSize);
 	}
 
 	void Device::ReadBulk(const EndpointPtr & ep, const IObjectOutputStreamPtr &outputStream, int timeout)
 	{
-		ByteArray data(ep->GetMaxPacketSize() * 1024);
-		usbdevfs_urb urb = {};
+		UrbPtr urb = std::make_shared<Urb>(_fd.Get(), USBDEVFS_URB_TYPE_BULK, ep);
+		size_t transferSize = urb->Buffer.size();
+
+		size_t r;
 		bool continuation = false;
 		do
 		{
-			urb.type = USBDEVFS_URB_TYPE_BULK;
-			urb.endpoint = ep->GetAddress();
-			urb.buffer = data.data();
-			urb.buffer_length = data.size();
-			if (continuation)
-				urb.flags |= USBDEVFS_URB_BULK_CONTINUATION;
-			else
-				continuation = true;
-			IOCTL(_fd.Get(), USBDEVFS_SUBMITURB, &urb);
-
-			try
-			{
-				ReapSingleUrb(&urb, timeout);
-			}
-			catch(const std::exception &ex)
-			{
-				int r = ioctl(_fd.Get(), USBDEVFS_DISCARDURB, &urb);
-				if (r != 0)
-					std::terminate();
-				fprintf(stderr, "exception %s: discard = %d\n", ex.what(), r);
-				throw;
-			}
-			//HexDump("read", ByteArray(data.data(), data.data() + urb.actual_length));
-			outputStream->Write(data.data(), urb.actual_length);
+			urb->SetContinuationFlag(continuation);
+			continuation = true;
+			Submit(urb, timeout);
+			r = urb->Recv(outputStream);
 		}
-		while(urb.actual_length == (int)data.size());
+		while(r == transferSize);
 	}
 
 }}
