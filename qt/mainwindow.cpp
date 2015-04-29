@@ -169,7 +169,7 @@ void MainWindow::deleteFiles()
 	QModelIndexList rows = selection->selectedRows();
 	int r = QMessageBox::question(this,
 		tr("Deleting file(s)"),
-		tr("Are you sure?").arg(rows.size()),
+		tr("Are you sure?"),
 		QMessageBox::Yes | QMessageBox::No,
 		QMessageBox::No
 	);
