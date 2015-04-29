@@ -72,6 +72,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+	_proxyModel->setSourceModel(NULL);
+	delete _objectModel;
 	delete _ui;
 }
 
