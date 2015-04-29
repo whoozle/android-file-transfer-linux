@@ -50,12 +50,16 @@ private slots:
 	void back();
 	void down();
 	void onActivated ( const QModelIndex & index );
+	void onSelectionChanged();
 	void showContextMenu ( const QPoint & pos );
 	void createDirectory();
 	void uploadFiles();
 	void uploadDirectories();
 	void uploadAlbum();
 	void uploadAlbum(QString path);
+	void downloadFiles();
+	void renameFile();
+	void deleteFiles();
 private:
 	void downloadFiles(const QList<quint32> &objects);
 	void uploadFiles(const QStringList &files);

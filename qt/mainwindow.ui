@@ -48,7 +48,7 @@
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
-     <string>Fi&amp;le</string>
+     <string>&amp;File</string>
     </property>
     <addaction name="actionRename"/>
     <addaction name="actionDownload"/>
@@ -56,7 +56,15 @@
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
+   <widget class="QMenu" name="menuNavigate">
+    <property name="title">
+     <string>&amp;Navigate</string>
+    </property>
+    <addaction name="actionBack"/>
+    <addaction name="actionGo_Down"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuNavigate"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -136,7 +144,7 @@
     </iconset>
    </property>
    <property name="text">
-    <string>Rename</string>
+    <string>&amp;Rename</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+R, F3</string>
@@ -149,7 +157,7 @@
     </iconset>
    </property>
    <property name="text">
-    <string>Delete</string>
+    <string>D&amp;elete</string>
    </property>
    <property name="shortcut">
     <string>Del</string>
@@ -162,7 +170,7 @@
     </iconset>
    </property>
    <property name="text">
-    <string>Download</string>
+    <string>&amp;Download</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+D</string>

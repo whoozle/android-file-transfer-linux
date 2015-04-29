@@ -50,6 +50,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	_objectModel->moveToThread(QApplication::instance()->thread());
 
+	connect(_ui->listView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), SLOT(onSelectionChanged()));
 	connect(_ui->listView, SIGNAL(doubleClicked(QModelIndex)), SLOT(onActivated(QModelIndex)));
 	connect(_ui->listView, SIGNAL(customContextMenuRequested(QPoint)), SLOT(showContextMenu(QPoint)));
 	connect(_ui->actionBack, SIGNAL(triggered()), SLOT(back()));
@@ -58,6 +59,9 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(_ui->actionUploadDirectory, SIGNAL(triggered()), SLOT(uploadDirectories()));
 	connect(_ui->actionUpload_Album, SIGNAL(triggered()), SLOT(uploadAlbum()));
 	connect(_ui->actionUpload, SIGNAL(triggered()), SLOT(uploadFiles()));
+	connect(_ui->actionRename, SIGNAL(triggered()), SLOT(renameFile()));
+	connect(_ui->actionDownload, SIGNAL(triggered()), SLOT(downloadFiles()));
+	connect(_ui->actionDelete, SIGNAL(triggered()), SLOT(deleteFiles()));
 }
 
 MainWindow::~MainWindow()
@@ -116,52 +120,66 @@ void MainWindow::onActivated ( const QModelIndex & index )
 		_history.push_back(_objectModel->parentObjectId());
 }
 
+void MainWindow::onSelectionChanged()
+{
+	QModelIndexList rows = _ui->listView->selectionModel()->selectedRows();
+	_ui->actionDelete->setEnabled(!rows.empty());
+	_ui->actionDownload->setEnabled(!rows.empty());
+	_ui->actionRename->setEnabled(rows.size() == 1);
+	_ui->actionGo_Down->setEnabled(rows.size() == 1);
+}
+
+void MainWindow::downloadFiles()
+{
+	QItemSelectionModel *selection =_ui->listView->selectionModel();
+	QModelIndexList rows = selection->selectedRows();
+
+	QList<quint32> objects;
+	for(int i = 0; i < rows.size(); ++i)
+	{
+		QModelIndex row = mapIndex(rows[i]);
+		objects.push_back(_objectModel->objectIdAt(row.row()));
+	}
+	downloadFiles(objects);
+}
+
+void MainWindow::renameFile()
+{
+	QItemSelectionModel *selection =_ui->listView->selectionModel();
+	QModelIndexList rows = selection->selectedRows();
+	if (rows.empty())
+		return;
+
+	QModelIndex row = mapIndex(rows.at(0));
+	RenameDialog d(_objectModel->data(row).toString(), this);
+	int r = d.exec();
+	if (r)
+		_objectModel->rename(row.row(), d.name());
+}
+
+void MainWindow::deleteFiles()
+{
+	QItemSelectionModel *selection =_ui->listView->selectionModel();
+	QModelIndexList rows = selection->selectedRows();
+	for(int i = rows.size() - 1; i >= 0; --i)
+	{
+		QModelIndex row = mapIndex(rows[i]);
+		_objectModel->removeRow(row.row());
+	}
+}
+
+
 void MainWindow::showContextMenu ( const QPoint & pos )
 {
 	QItemSelectionModel *selection =_ui->listView->selectionModel();
 	QModelIndexList rows = selection->selectedRows();
 
 	QMenu menu(this);
-
-	_ui->actionDelete->setEnabled(!rows.empty());
-	_ui->actionDownload->setEnabled(!rows.empty());
-	_ui->actionRename->setEnabled(rows.size() == 1);
-
+	menu.addAction(_ui->actionCreateDirectory);
 	menu.addAction(_ui->actionRename);
 	menu.addAction(_ui->actionDownload);
 	menu.addAction(_ui->actionDelete);
-	QAction * action = menu.exec(_ui->listView->mapToGlobal(pos));
-	if (!action)
-		return;
-
-	if (action == _ui->actionDownload)
-	{
-		QList<quint32> objects;
-		for(int i = 0; i < rows.size(); ++i)
-		{
-			QModelIndex row = mapIndex(rows[i]);
-			objects.push_back(_objectModel->objectIdAt(row.row()));
-		}
-		downloadFiles(objects);
-	}
-	else
-	{
-		for(int i = rows.size() - 1; i >= 0; --i)
-		{
-			QModelIndex row = mapIndex(rows[i]);
-			if (action == _ui->actionDelete)
-				_objectModel->removeRow(row.row());
-			else if (action == _ui->actionRename)
-			{
-				RenameDialog d(_objectModel->data(row).toString(), this);
-				int r = d.exec();
-				if (r)
-					_objectModel->rename(row.row(), d.name());
-			}
-			else
-				qDebug() << "unknown action!";
-		}
-	}
+	menu.exec(_ui->listView->mapToGlobal(pos));
 }
 
 void MainWindow::back()
