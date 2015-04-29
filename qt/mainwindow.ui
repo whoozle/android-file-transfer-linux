@@ -113,10 +113,10 @@
     </iconset>
    </property>
    <property name="text">
-    <string>Back</string>
+    <string>&amp;Back</string>
    </property>
    <property name="shortcut">
-    <string>Esc, Backspace, Alt+Up</string>
+    <string>Backspace</string>
    </property>
   </action>
   <action name="actionGo_Down">
@@ -126,10 +126,10 @@
     </iconset>
    </property>
    <property name="text">
-    <string>Go Down</string>
+    <string>&amp;Go Down</string>
    </property>
    <property name="shortcut">
-    <string>Return, Enter</string>
+    <string>Return</string>
    </property>
   </action>
   <action name="actionUpload_Album">
@@ -147,7 +147,7 @@
     <string>&amp;Rename</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+R, F3</string>
+    <string>F3</string>
    </property>
   </action>
   <action name="actionDelete">
