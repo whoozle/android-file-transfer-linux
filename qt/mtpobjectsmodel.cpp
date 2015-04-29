@@ -99,7 +99,7 @@ bool MtpObjectsModel::Row::IsAssociation(mtp::SessionPtr session)
 void MtpObjectsModel::rename(int idx, const QString &fileName)
 {
 	qDebug() << "renaming row " << idx << " to " << fileName;
-	_session->SetObjectProperty(objectIdAt(idx), mtp::ObjectProperty::ObjectFilename, fileName.toStdString());
+	_session->SetObjectProperty(objectIdAt(idx), mtp::ObjectProperty::ObjectFilename, toUtf8(fileName));
 	_rows[idx].ResetInfo();
 	emit dataChanged(createIndex(idx, 0), createIndex(idx, 0));
 }
@@ -144,8 +144,7 @@ QVariant MtpObjectsModel::data(const QModelIndex &index, int role) const
 mtp::u32 MtpObjectsModel::createDirectory(const QString &name, bool album)
 {
 	mtp::msg::ObjectInfo oi;
-	QByteArray filename = name.toUtf8();
-	oi.Filename = filename.data();
+	oi.Filename = toUtf8(name);
 	oi.ObjectFormat = mtp::ObjectFormat::Association;
 	oi.AssociationType = album? 2: 1; //fixme: move into enum
 	mtp::Session::NewObjectInfo noi = _session->SendObjectInfo(oi, 0, _parentObjectId);
@@ -158,7 +157,7 @@ mtp::u32 MtpObjectsModel::createDirectory(const QString &name, bool album)
 bool MtpObjectsModel::uploadFile(const QString &filePath, QString filename)
 {
 	QFileInfo fileInfo(filePath);
-	mtp::ObjectFormat objectFormat = mtp::ObjectFormatFromFilename(filePath.toStdString());
+	mtp::ObjectFormat objectFormat = mtp::ObjectFormatFromFilename(toUtf8(filePath));
 
 	if (filename.isEmpty())
 		filename = fileInfo.fileName();
@@ -174,8 +173,7 @@ bool MtpObjectsModel::uploadFile(const QString &filePath, QString filename)
 	connect(object.get(), SIGNAL(positionChanged(qint64,qint64)), this, SIGNAL(filePositionChanged(qint64,qint64)));
 
 	mtp::msg::ObjectInfo oi;
-	QByteArray filename_utf = filename.toUtf8();
-	oi.Filename = filename_utf.data();
+	oi.Filename = toUtf8(filename);
 	oi.ObjectFormat = objectFormat;
 	oi.SetSize(fileInfo.size());
 	mtp::Session::NewObjectInfo noi = _session->SendObjectInfo(oi, 0, _parentObjectId);
