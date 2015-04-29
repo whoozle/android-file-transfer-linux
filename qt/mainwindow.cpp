@@ -161,6 +161,16 @@ void MainWindow::deleteFiles()
 {
 	QItemSelectionModel *selection =_ui->listView->selectionModel();
 	QModelIndexList rows = selection->selectedRows();
+	int r = QMessageBox::question(this,
+		tr("Deleting file(s)"),
+		tr("Are you sure?").arg(rows.size()),
+		QMessageBox::Yes | QMessageBox::No,
+		QMessageBox::No
+	);
+	if (r != QMessageBox::Yes)
+		return;
+
+	//fixme: change to object id list
 	for(int i = rows.size() - 1; i >= 0; --i)
 	{
 		QModelIndex row = mapIndex(rows[i]);
