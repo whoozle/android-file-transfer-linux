@@ -122,16 +122,19 @@ void MainWindow::showContextMenu ( const QPoint & pos )
 	QModelIndexList rows = selection->selectedRows();
 
 	QMenu menu(this);
-	//http://standards.freedesktop.org/icon-naming-spec/icon-naming-spec-latest.html
-	QAction * download_objects = menu.addAction("Download");
-	QAction * rename_object = menu.addAction("Rename");
-	rename_object->setEnabled(rows.size() == 1);
-	QAction * delete_objects = menu.addAction(QIcon::fromTheme("edit-delete"), "Delete");
+
+	_ui->actionDelete->setEnabled(!rows.empty());
+	_ui->actionDownload->setEnabled(!rows.empty());
+	_ui->actionRename->setEnabled(rows.size() == 1);
+
+	menu.addAction(_ui->actionRename);
+	menu.addAction(_ui->actionDownload);
+	menu.addAction(_ui->actionDelete);
 	QAction * action = menu.exec(_ui->listView->mapToGlobal(pos));
 	if (!action)
 		return;
 
-	if (action == download_objects)
+	if (action == _ui->actionDownload)
 	{
 		QList<quint32> objects;
 		for(int i = 0; i < rows.size(); ++i)
@@ -146,9 +149,9 @@ void MainWindow::showContextMenu ( const QPoint & pos )
 		for(int i = rows.size() - 1; i >= 0; --i)
 		{
 			QModelIndex row = mapIndex(rows[i]);
-			if (action == delete_objects)
+			if (action == _ui->actionDelete)
 				_objectModel->removeRow(row.row());
-			else if (action == rename_object)
+			else if (action == _ui->actionRename)
 			{
 				RenameDialog d(_objectModel->data(row).toString(), this);
 				int r = d.exec();

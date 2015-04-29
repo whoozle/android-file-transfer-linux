@@ -43,9 +43,20 @@
      <x>0</x>
      <y>0</y>
      <width>671</width>
-     <height>32</height>
+     <height>26</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>Fi&amp;le</string>
+    </property>
+    <addaction name="actionRename"/>
+    <addaction name="actionDownload"/>
+    <addaction name="actionDelete"/>
+    <addaction name="separator"/>
+    <addaction name="actionExit"/>
+   </widget>
+   <addaction name="menuFile"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -97,7 +108,7 @@
     <string>Back</string>
    </property>
    <property name="shortcut">
-    <string>Esc</string>
+    <string>Esc, Backspace, Alt+Up</string>
    </property>
   </action>
   <action name="actionGo_Down">
@@ -110,7 +121,7 @@
     <string>Go Down</string>
    </property>
    <property name="shortcut">
-    <string>Return</string>
+    <string>Return, Enter</string>
    </property>
   </action>
   <action name="actionUpload_Album">
@@ -118,8 +129,72 @@
     <string>Upload Album</string>
    </property>
   </action>
+  <action name="actionRename">
+   <property name="icon">
+    <iconset theme="edit-rename">
+     <normaloff/>
+    </iconset>
+   </property>
+   <property name="text">
+    <string>Rename</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+R, F3</string>
+   </property>
+  </action>
+  <action name="actionDelete">
+   <property name="icon">
+    <iconset theme="edit-delete">
+     <normaloff/>
+    </iconset>
+   </property>
+   <property name="text">
+    <string>Delete</string>
+   </property>
+   <property name="shortcut">
+    <string>Del</string>
+   </property>
+  </action>
+  <action name="actionDownload">
+   <property name="icon">
+    <iconset theme="download">
+     <normaloff/>
+    </iconset>
+   </property>
+   <property name="text">
+    <string>Download</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+D</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>E&amp;xit</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>actionExit</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>335</x>
+     <y>293</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>
