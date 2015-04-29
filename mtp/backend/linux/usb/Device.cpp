@@ -145,17 +145,19 @@ namespace mtp { namespace usb
 
 		if (r < 0)
 			throw Exception("poll");
+
 		if (r == 0)
 		{
 			int ms = (now.tv_sec - started.tv_sec) * 1000 + (now.tv_usec - started.tv_usec) / 1000;
 			fprintf(stderr, "%d ms since the last poll call\n", ms);
-			throw TimeoutException("timeout reaping usb urb");
 		}
 
 		usbdevfs_urb *urb;
 		r = ioctl(_fd.Get(), USBDEVFS_REAPURBNDELAY, &urb);
 		if (r == 0)
 			return urb;
+		else if (errno == EAGAIN)
+			throw TimeoutException("timeout reaping usb urb");
 		else
 			throw Exception("ioctl");
 	}
