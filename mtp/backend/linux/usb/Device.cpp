@@ -101,7 +101,6 @@ namespace mtp { namespace usb
 			if (r != 0)
 			{
 				perror("ioctl(USBDEVFS_DISCARDURB)");
-				std::terminate();
 			}
 		}
 
