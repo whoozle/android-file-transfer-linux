@@ -23,6 +23,8 @@
 #include <mtp/ptp/Device.h>
 #include <QVector>
 
+typedef QVector<mtp::u32> MtpObjectList;
+
 class MtpObjectsModel : public QAbstractListModel
 {
 	Q_OBJECT
@@ -62,6 +64,8 @@ public:
 
 	void setSession(mtp::SessionPtr session);
 	void setParent(mtp::u32 parentObjectId);
+	void refresh()
+	{ setParent(_parentObjectId); }
 
 	bool enter(int idx);
 	mtp::u32 objectIdAt(int idx);
@@ -74,12 +78,10 @@ public:
 	bool downloadFile(const QString &filePath, mtp::u32 objectId);
 	void rename(int idx, const QString &fileName);
 	ObjectInfo getInfo(mtp::u32 objectId);
+	void deleteObjects(const MtpObjectList &objects);
 
 	virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
 	virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
-
-protected:
-	bool removeRows ( int row, int count, const QModelIndex & parent = QModelIndex() );
 };
 
 #endif // MTPOBJECTSMODEL_H

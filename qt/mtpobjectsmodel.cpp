@@ -104,21 +104,14 @@ void MtpObjectsModel::rename(int idx, const QString &fileName)
 	emit dataChanged(createIndex(idx, 0), createIndex(idx, 0));
 }
 
-bool MtpObjectsModel::removeRows (int row, int count, const QModelIndex & parent )
+void MtpObjectsModel::deleteObjects(const MtpObjectList &objects)
 {
-	qDebug() << "remove rows " << row << " " << count;
-	beginRemoveRows(parent, row, row + count - 1);
-	for(int i = 0; i < count; ++i)
+	for(mtp::u32 objectId: objects)
 	{
-		mtp::u32 oid = objectIdAt(row + i);
-		if (oid == 0)
-			continue;
-		_session->DeleteObject(oid);
+		qDebug() << "deleting object " << objectId;
+		_session->DeleteObject(objectId);
 	}
-	_rows.remove(row, count);
-
-	endRemoveRows();
-	return false;
+	refresh();
 }
 
 

@@ -141,9 +141,9 @@ void MainWindow::downloadFiles()
 	QModelIndexList rows = selection->selectedRows();
 
 	QList<quint32> objects;
-	for(int i = 0; i < rows.size(); ++i)
+	for(QModelIndex row : rows)
 	{
-		QModelIndex row = mapIndex(rows[i]);
+		row = mapIndex(row);
 		objects.push_back(_objectModel->objectIdAt(row.row()));
 	}
 	downloadFiles(objects);
@@ -176,12 +176,13 @@ void MainWindow::deleteFiles()
 	if (r != QMessageBox::Yes)
 		return;
 
-	//fixme: change to object id list
-	for(int i = rows.size() - 1; i >= 0; --i)
+	MtpObjectList objects;
+	for(QModelIndex row : rows)
 	{
-		QModelIndex row = mapIndex(rows[i]);
-		_objectModel->removeRow(row.row());
+		row = mapIndex(row);
+		objects.push_back(_objectModel->objectIdAt(row.row()));
 	}
+	_objectModel->deleteObjects(objects);
 }
 
 
