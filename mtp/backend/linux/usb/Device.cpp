@@ -187,8 +187,8 @@ namespace mtp { namespace usb
 		}
 		catch(const std::exception &ex)
 		{
-			urb->Discard();
 			fprintf(stderr, "error while submitting urb: %s\n", ex.what());
+			urb->Discard();
 			throw;
 		}
 	}
