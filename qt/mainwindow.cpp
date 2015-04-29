@@ -23,6 +23,7 @@
 #include "renamedialog.h"
 #include "mtpobjectsmodel.h"
 #include "fileuploader.h"
+#include "utils.h"
 #include <mtp/usb/TimeoutException.h>
 #include <QDebug>
 #include <QSortFilterProxyModel>
@@ -94,7 +95,7 @@ void MainWindow::showEvent(QShowEvent *)
 			{
 				session = _device->OpenSession(1);
 				mtp::msg::DeviceInfo di = session->GetDeviceInfo();
-				qDebug() << "device info" << QString::fromStdString(di.Manufacturer) << " " << QString::fromStdString(di.Model);
+				qDebug() << "device info" << fromUtf8(di.Manufacturer) << " " << fromUtf8(di.Model);
 				break;
 			}
 			catch(const mtp::usb::TimeoutException &ex)

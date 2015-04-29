@@ -18,6 +18,7 @@
  */
 #include "mtpobjectsmodel.h"
 #include "qtobjectstream.h"
+#include "utils.h"
 #include <QDebug>
 #include <QBrush>
 #include <QColor>
@@ -81,7 +82,7 @@ mtp::msg::ObjectInfoPtr MtpObjectsModel::Row::GetInfo(mtp::SessionPtr session)
 		try
 		{
 			*_info = session->GetObjectInfo(ObjectId);
-			//qDebug() << QString::fromUtf8(row.Info->Filename.c_str());
+			//qDebug() << fromUtf8(row.Info->Filename);
 		}
 		catch(const std::exception &ex)
 		{ qDebug() << "failed to get object info " << ex.what(); }
@@ -137,7 +138,7 @@ QVariant MtpObjectsModel::data(const QModelIndex &index, int role) const
 	switch(role)
 	{
 	case Qt::DisplayRole:
-		return QString::fromStdString(row.GetInfo(_session)->Filename);
+		return fromUtf8(row.GetInfo(_session)->Filename);
 
 	case Qt::ForegroundRole:
 		return row.IsAssociation(_session)? QBrush(QColor(0, 0, 128)): QBrush(Qt::black);
@@ -213,5 +214,5 @@ MtpObjectsModel::ObjectInfo MtpObjectsModel::getInfo(mtp::u32 objectId)
 	qint64 size = oi.ObjectCompressedSize;
 	if (size == mtp::MaxObjectSize)
 		size = _session->GetObjectIntegerProperty(objectId, mtp::ObjectProperty::ObjectSize);
-	return ObjectInfo(QString::fromStdString(oi.Filename), size);
+	return ObjectInfo(fromUtf8(oi.Filename), size);
 }
