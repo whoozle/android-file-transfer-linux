@@ -147,7 +147,7 @@
     <string>&amp;Rename</string>
    </property>
    <property name="shortcut">
-    <string>F3</string>
+    <string>Ctrl+R</string>
    </property>
   </action>
   <action name="actionDelete">

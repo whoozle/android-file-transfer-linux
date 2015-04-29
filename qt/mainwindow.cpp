@@ -62,6 +62,11 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(_ui->actionRename, SIGNAL(triggered()), SLOT(renameFile()));
 	connect(_ui->actionDownload, SIGNAL(triggered()), SLOT(downloadFiles()));
 	connect(_ui->actionDelete, SIGNAL(triggered()), SLOT(deleteFiles()));
+
+	//fixme: find out how to specify alternative in designer
+	_ui->actionBack->setShortcuts(_ui->actionBack->shortcuts() << QKeySequence("Alt+Up") << QKeySequence("Esc"));
+	_ui->actionGo_Down->setShortcuts(_ui->actionGo_Down->shortcuts() << QKeySequence("Alt+Down") << QKeySequence("Enter"));
+	_ui->actionRename->setShortcuts(_ui->actionRename->shortcuts() << QKeySequence("F3"));
 }
 
 MainWindow::~MainWindow()
