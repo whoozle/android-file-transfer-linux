@@ -106,6 +106,7 @@ void MainWindow::showEvent(QShowEvent *)
 				if (attempt + 1 == MaxAttempts)
 				{
 					QMessageBox::critical(this, tr("MTP"), tr("MTP device does not respond"));
+					_device.reset();
 					return;
 				}
 			}
