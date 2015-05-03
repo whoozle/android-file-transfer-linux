@@ -279,11 +279,7 @@ namespace
 			if (r)
 				return r;
 
-			mtp::msg::ObjectInfo oi;
-			oi.Filename = filename;
-			oi.ObjectFormat = mtp::ObjectFormat::Association;
-			oi.AssociationType = mtp::AssociationType::GenericFolder;
-			_session->SendObjectInfo(oi, storageId, parentId);
+			_session->CreateDirectory(filename, parentId, storageId);
 			return 0;
 		}
 

@@ -123,6 +123,20 @@ namespace mtp
 		return gsi;
 	}
 
+	Session::NewObjectInfo Session::CreateDirectory(const std::string &name, mtp::u32 parentId, mtp::u32 storageId, AssociationType type)
+	{
+		mtp::msg::ObjectInfo oi;
+		oi.Filename = name;
+		oi.ParentObject = parentId;
+		oi.StorageId = storageId;
+		oi.ObjectFormat = mtp::ObjectFormat::Association;
+		oi.AssociationType = type;
+		mtp::Session::NewObjectInfo noi = SendObjectInfo(oi, 0, parentId);
+
+		//SendObject(std::make_shared<ByteArrayObjectInputStream>(ByteArray()));
+		return noi;
+	}
+
 	msg::ObjectInfo Session::GetObjectInfo(u32 objectId)
 	{
 		scoped_mutex_lock l(_mutex);

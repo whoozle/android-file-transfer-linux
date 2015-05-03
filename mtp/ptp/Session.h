@@ -82,6 +82,7 @@ namespace mtp
 		msg::StorageIDs GetStorageIDs();
 		msg::StorageInfo GetStorageInfo(u32 storageId);
 
+		NewObjectInfo CreateDirectory(const std::string &name, mtp::u32 parentId, mtp::u32 storageId = Device, AssociationType type = AssociationType::GenericFolder);
 		msg::ObjectInfo GetObjectInfo(u32 objectId);
 		void GetObject(u32 objectId, const IObjectOutputStreamPtr &outputStream);
 		ByteArray GetPartialObject(u32 objectId, u64 offset, u32 size);
