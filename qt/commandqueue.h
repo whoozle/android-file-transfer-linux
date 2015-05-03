@@ -23,8 +23,6 @@ struct FileCommand : public Command
 	QString		Filename;
 
 	FileCommand(const QString &filename) : Filename(filename) { }
-
-	void execute(CommandQueue &queue);
 };
 
 struct UploadFile : public FileCommand

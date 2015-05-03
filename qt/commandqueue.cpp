@@ -5,12 +5,6 @@
 #include <QApplication>
 
 
-void FileCommand::execute(CommandQueue &queue)
-{
-	QFileInfo fi(Filename);
-	emit queue.started(fi.fileName());
-}
-
 void FinishQueue::execute(CommandQueue &queue)
 {
 	queue.finish();
@@ -19,7 +13,7 @@ void FinishQueue::execute(CommandQueue &queue)
 void UploadFile::execute(CommandQueue &queue)
 {
 	qDebug() << "uploading file " << Filename;
-	FileCommand::execute(queue);
+
 	QFileInfo fi(Filename);
 	queue.start(fi.fileName());
 	try
@@ -33,8 +27,6 @@ void UploadFile::execute(CommandQueue &queue)
 
 void DownloadFile::execute(CommandQueue &queue)
 {
-	FileCommand::execute(queue);
-
 	qDebug() << "downloading " << ObjectId << "to" << Filename;
 
 	QFileInfo fi(Filename);
