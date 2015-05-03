@@ -221,7 +221,7 @@ void MainWindow::createDirectory()
 {
 	CreateDirectoryDialog d(this);
 	if (d.exec() && !d.name().isEmpty())
-		_objectModel->createDirectory(d.name(), false);
+		_objectModel->createDirectory(d.name(), mtp::AssociationType::GenericFolder);
 }
 
 void MainWindow::uploadFiles(const QStringList &files)
@@ -310,7 +310,7 @@ void MainWindow::uploadDirectories()
 
 	QDir dir(dirPath);
 	qDebug() << "adding directory " << dir.dirName();
-	mtp::u32 dirId = _objectModel->createDirectory(dir.dirName(), false);
+	mtp::u32 dirId = _objectModel->createDirectory(dir.dirName(), mtp::AssociationType::GenericFolder);
 	_objectModel->setParent(dirId);
 	_history.push_back(dirId);
 
@@ -371,7 +371,7 @@ void MainWindow::uploadAlbum(QString dirPath)
 	QDir dir(dirPath);
 	qDebug() << "adding directory " << dir.dirName();
 
-	mtp::u32 dirId = _objectModel->createDirectory(dir.dirName(), true);
+	mtp::u32 dirId = _objectModel->createDirectory(dir.dirName(), mtp::AssociationType::Album);
 	_objectModel->setParent(dirId);
 	_history.push_back(dirId);
 

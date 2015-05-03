@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QQueue>
+#include <mtp/ptp/ObjectFormat.h>
 
 class MtpObjectsModel;
 class CommandQueue;
@@ -23,6 +24,15 @@ struct FileCommand : public Command
 	QString		Filename;
 
 	FileCommand(const QString &filename) : Filename(filename) { }
+};
+
+struct MakeDirectory : public FileCommand
+{
+	quint32					ParentId;
+	quint32					StorageId;
+	mtp::AssociationType	Type;
+	MakeDirectory(const QString &filename, quint32 parentId, quint32 storageId, mtp::AssociationType type) : FileCommand(filename), ParentId(parentId), StorageId(storageId), Type(type) { }
+	void execute(CommandQueue &queue);
 };
 
 struct UploadFile : public FileCommand

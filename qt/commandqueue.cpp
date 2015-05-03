@@ -40,6 +40,12 @@ void DownloadFile::execute(CommandQueue &queue)
 	queue.addProgress(fi.size());
 }
 
+void MakeDirectory::execute(CommandQueue &queue)
+{
+	qDebug() << "making directory" << Filename;
+	queue.model()->createDirectory(Filename, Type); //fixme: add storageId here
+}
+
 CommandQueue::CommandQueue(MtpObjectsModel *model): _model(model), _completedFilesSize(0)
 {
 	connect(_model, SIGNAL(filePositionChanged(qint64,qint64)), this, SLOT(onFileProgress(qint64,qint64)));

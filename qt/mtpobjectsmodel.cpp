@@ -141,9 +141,9 @@ QVariant MtpObjectsModel::data(const QModelIndex &index, int role) const
 	}
 }
 
-mtp::u32 MtpObjectsModel::createDirectory(const QString &name, bool album)
+mtp::u32 MtpObjectsModel::createDirectory(const QString &name, mtp::AssociationType type)
 {
-	mtp::Session::NewObjectInfo noi = _session->CreateDirectory(toUtf8(name), _parentObjectId, mtp::Session::Device, album? mtp::AssociationType::Album: mtp::AssociationType::GenericFolder);
+	mtp::Session::NewObjectInfo noi = _session->CreateDirectory(toUtf8(name), _parentObjectId, mtp::Session::Device, type);
 	beginInsertRows(QModelIndex(), _rows.size(), _rows.size());
 	_rows.push_back(Row(noi.ObjectId));
 	endInsertRows();
