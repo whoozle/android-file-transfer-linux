@@ -31,8 +31,7 @@ FileUploader::FileUploader(MtpObjectsModel * model, QObject *parent) :
 	worker->moveToThread(&_workerThread);
 
 	connect(&_workerThread, SIGNAL(finished()), SLOT(deleteLater()));
-	connect(this, SIGNAL(uploadFile(QString)), worker, SLOT(uploadFile(QString)));
-	connect(this, SIGNAL(downloadFile(QString,quint32)), worker, SLOT(downloadFile(QString,quint32)));
+	connect(this, SIGNAL(executeCommand(Command*)), worker, SLOT(execute(Command*)));
 	connect(worker, SIGNAL(progress(qint64)), SLOT(onProgress(qint64)));
 	connect(worker, SIGNAL(started(QString)), SLOT(onStarted(QString)));
 	connect(worker, SIGNAL(finished()), SLOT(onFinished()));
@@ -79,9 +78,9 @@ void FileUploader::upload(const QStringList &files)
 
 	for(QString file : files)
 	{
-		emit uploadFile(file);
+		emit executeCommand(new UploadFile(file));
 	}
-	emit uploadFile(QString());
+	emit executeCommand(new FinishQueue());
 }
 
 void FileUploader::download(const QString &path, const QList<quint32> &objectIds)
@@ -101,7 +100,7 @@ void FileUploader::download(const QString &path, const QList<quint32> &objectIds
 
 	for(const auto & file : files)
 	{
-		emit downloadFile(path + "/" + file.first, file.second);
+		emit executeCommand(new DownloadFile(path + "/" + file.first, file.second));
 	}
-	emit downloadFile(QString(), 0);
+	emit executeCommand(new FinishQueue());
 }

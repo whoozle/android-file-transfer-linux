@@ -24,6 +24,7 @@
 #include <QDateTime>
 
 class MtpObjectsModel;
+struct Command;
 
 class FileUploader : public QObject
 {
@@ -48,9 +49,7 @@ public:
 	void download(const QString &path, const QList<quint32> & objectIds);
 
 signals:
-	//outgoing signals (to worker)
-	void uploadFile(QString file);
-	void downloadFile(QString file, quint32 objectId);
+	void executeCommand(Command *cmd);
 
 	//incoming signals (from worker)
 	void uploadStarted(QString file);

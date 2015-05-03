@@ -5,6 +5,49 @@
 #include <QApplication>
 
 
+void FileCommand::execute(CommandQueue &queue)
+{
+	QFileInfo fi(Filename);
+	emit queue.started(fi.fileName());
+}
+
+void FinishQueue::execute(CommandQueue &queue)
+{
+	queue.finish();
+}
+
+void UploadFile::execute(CommandQueue &queue)
+{
+	qDebug() << "uploading file " << Filename;
+	FileCommand::execute(queue);
+	QFileInfo fi(Filename);
+	queue.start(fi.fileName());
+	try
+	{
+		queue.model()->uploadFile(fi.fileName());
+	} catch(const std::exception &ex)
+	{ qDebug() << "uploading file " << Filename << " failed: " << ex.what(); }
+
+	queue.addProgress(fi.size());
+}
+
+void DownloadFile::execute(CommandQueue &queue)
+{
+	FileCommand::execute(queue);
+
+	qDebug() << "downloading " << ObjectId << "to" << Filename;
+
+	QFileInfo fi(Filename);
+	queue.start(fi.fileName());
+	try
+	{
+		queue.model()->downloadFile(Filename, ObjectId);
+	} catch(const std::exception &ex)
+	{ qDebug() << "downloading file " << Filename << " failed: " << ex.what(); }
+
+	queue.addProgress(fi.size());
+}
+
 CommandQueue::CommandQueue(MtpObjectsModel *model): _model(model), _completedFilesSize(0)
 {
 	connect(_model, SIGNAL(filePositionChanged(qint64,qint64)), this, SLOT(onFileProgress(qint64,qint64)));
@@ -16,48 +59,27 @@ CommandQueue::~CommandQueue()
 	qDebug() << "upload worker stopped";
 }
 
-void CommandQueue::uploadFile(const QString &file)
+void CommandQueue::execute(Command *ptr)
 {
-	if (file.isEmpty())
-	{
-		_model->moveToThread(QApplication::instance()->thread());
-		emit finished();
-		_completedFilesSize = 0;
-		return;
-	}
-	qDebug() << "uploading file " << file;
-	QFileInfo fi(file);
-	emit started(fi.fileName());
-	try
-	{
-		_model->uploadFile(file);
-	} catch(const std::exception &ex)
-	{ qDebug() << "uploading file " << file << " failed: " << ex.what(); }
-
-	_completedFilesSize += fi.size();
-	emit progress(_completedFilesSize);
+	std::unique_ptr<Command> cmd(ptr);
+	cmd->execute(*this);
 }
 
-void CommandQueue::downloadFile(const QString &file, quint32 objectId)
+void CommandQueue::start(const QString &filename)
 {
-	if (objectId == 0 || file.isEmpty())
-	{
-		_model->moveToThread(QApplication::instance()->thread());
-		emit finished();
-		_completedFilesSize = 0;
-		return;
-	}
-	qDebug() << "downloading " << objectId << "to" << file;
+	emit started(filename);
+}
 
-	QFileInfo fi(file);
-	emit started(fi.fileName());
-	try
-	{
-		_model->downloadFile(file, objectId);
-	} catch(const std::exception &ex)
-	{ qDebug() << "downloading file " << file << " failed: " << ex.what(); }
+void CommandQueue::finish()
+{
+	_model->moveToThread(QApplication::instance()->thread());
+	emit finished();
+	_completedFilesSize = 0;
+}
 
-	_completedFilesSize += fi.size();
+void CommandQueue::addProgress(qint64 fileSize)
+{
+	_completedFilesSize += fileSize;
 	emit progress(_completedFilesSize);
 }
 
