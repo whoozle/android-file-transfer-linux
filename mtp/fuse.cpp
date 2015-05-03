@@ -282,7 +282,7 @@ namespace
 			mtp::msg::ObjectInfo oi;
 			oi.Filename = filename;
 			oi.ObjectFormat = mtp::ObjectFormat::Association;
-			oi.AssociationType = 1;
+			oi.AssociationType = mtp::AssociationType::GenericFolder;
 			_session->SendObjectInfo(oi, storageId, parentId);
 			return 0;
 		}

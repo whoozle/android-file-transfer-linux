@@ -128,7 +128,7 @@ namespace mtp { namespace msg
 		u32					ImagePixHeight;
 		u32					ImageBitDepth;
 		u32					ParentObject;
-		u16					AssociationType;
+		mtp::AssociationType AssociationType;
 		u32					AssociationDesc;
 		u32					SequenceNumber;
 		std::string			Filename;

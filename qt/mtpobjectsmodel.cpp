@@ -146,7 +146,7 @@ mtp::u32 MtpObjectsModel::createDirectory(const QString &name, bool album)
 	mtp::msg::ObjectInfo oi;
 	oi.Filename = toUtf8(name);
 	oi.ObjectFormat = mtp::ObjectFormat::Association;
-	oi.AssociationType = album? 2: 1; //fixme: move into enum
+	oi.AssociationType = album? mtp::AssociationType::Album: mtp::AssociationType::GenericFolder; //fixme: move into enum
 	mtp::Session::NewObjectInfo noi = _session->SendObjectInfo(oi, 0, _parentObjectId);
 	beginInsertRows(QModelIndex(), _rows.size(), _rows.size());
 	_rows.push_back(Row(noi.ObjectId));
