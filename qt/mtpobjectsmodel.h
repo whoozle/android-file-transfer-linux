@@ -52,11 +52,12 @@ signals:
 public:
 	struct ObjectInfo
 	{
-		QString Filename;
-		qint64	Size;
+		QString				Filename;
+		mtp::ObjectFormat	Format;
+		qint64				Size;
 
-		ObjectInfo(): Filename(), Size(0) { }
-		ObjectInfo(const QString &fname, qint64 size): Filename(fname), Size(size) { }
+		ObjectInfo(): Filename(), Format(), Size(0) { }
+		ObjectInfo(const QString &fname, mtp::ObjectFormat format, qint64 size): Filename(fname), Format(format), Size(size) { }
 	};
 
 	MtpObjectsModel(QObject *parent = 0);
