@@ -19,7 +19,7 @@ void UploadFile::execute(CommandQueue &queue)
 	queue.start(fi.fileName());
 	try
 	{
-		queue.model()->uploadFile(fi.fileName());
+		queue.model()->uploadFile(Filename);
 	} catch(const std::exception &ex)
 	{ qDebug() << "uploading file " << Filename << " failed: " << fromUtf8(ex.what()); }
 
