@@ -27,10 +27,13 @@ void CommandQueue::uploadFile(const QString &filename)
 	qDebug() << "uploading file " << filename;
 
 	QFileInfo fi(filename);
+	if (_directories.empty())
+		_directories[fi.dir().path()] = _model->parentObjectId();
 	start(fi.fileName());
-	auto directory = _directories.find(fi.dir().path());
-	Q_ASSERT(directory != _directories.end());
-	_model->setParent(directory.value());
+	auto parent = _directories.find(fi.dir().path());
+	Q_ASSERT(parent != _directories.end());
+	if (_model->parentObjectId() != parent.value())
+		_model->setParent(parent.value());
 	try
 	{
 		_model->uploadFile(filename);
@@ -59,11 +62,14 @@ void CommandQueue::createDirectory(const QString &path, bool root)
 {
 	qDebug() << "making directory" << path;
 	QFileInfo fi(path);
+	if (_directories.empty())
+		_directories[fi.dir().path()] = _model->parentObjectId();
 	if (!root)
 	{
 		auto parent = _directories.find(fi.dir().path());
 		Q_ASSERT(parent != _directories.end());
-		_model->setParent(parent.value());
+		if (_model->parentObjectId() != parent.value())
+			_model->setParent(parent.value());
 	}
 	try
 	{

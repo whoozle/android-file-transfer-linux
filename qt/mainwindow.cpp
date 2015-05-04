@@ -387,7 +387,7 @@ void MainWindow::uploadAlbum(QString dirPath)
 	_objectModel->uploadFile(dir.canonicalPath() + "/" + cover, coverTarget);
 
 	QStringList files;
-	for(QString file : dir.entryList(QDir::Files))
+	for(QString file : dir.entryList(QDir::Dirs | QDir::Files | QDir::NoDot | QDir::NoDotDot))
 	{
 		if (!covers.contains(file))
 			files.push_back(dir.canonicalPath() + "/" + file);
