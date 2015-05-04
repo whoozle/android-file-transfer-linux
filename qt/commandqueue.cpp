@@ -27,6 +27,7 @@ void CommandQueue::uploadFile(const QString &filename)
 	qDebug() << "uploading file " << filename;
 
 	QFileInfo fi(filename);
+	start(fi.fileName());
 	auto directory = _directories.find(fi.dir().path());
 	Q_ASSERT(directory != _directories.end());
 	_model->setParent(directory.value());
