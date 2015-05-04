@@ -128,7 +128,7 @@ void FileUploader::download(const QString &path, const QList<quint32> &objectIds
 	for(quint32 id : objectIds)
 	{
 		MtpObjectsModel::ObjectInfo oi = _model->getInfo(id);
-		_total += oi.Size; //fixme: invalid for > 4Gb
+		_total += oi.Size;
 		files.push_back(QPair<QString, mtp::u32>(oi.Filename, id));
 	}
 	qDebug() << "downloading " << files.size() << " file(s), " << _total << " bytes";
