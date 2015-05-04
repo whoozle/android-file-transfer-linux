@@ -161,8 +161,7 @@ void MainWindow::renameFile()
 
 	QModelIndex row = mapIndex(rows.at(0));
 	RenameDialog d(_objectModel->data(row).toString(), this);
-	int r = d.exec();
-	if (r)
+	if (d.exec())
 		_objectModel->rename(row.row(), d.name());
 }
 
@@ -285,7 +284,8 @@ void MainWindow::uploadFiles()
 	d.setAcceptMode(QFileDialog::AcceptOpen);
 	d.setFileMode(QFileDialog::ExistingFiles);
 	d.setOption(QFileDialog::ShowDirsOnly, false);
-	d.exec();
+	if (!d.exec())
+		return;
 
 	settings.setValue("the-latest-directory", d.directory().absolutePath());
 
