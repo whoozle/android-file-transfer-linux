@@ -45,7 +45,7 @@ public:
 	explicit FileUploader(MtpObjectsModel * model, QObject *parent = 0);
 	~FileUploader();
 
-	void upload(const QStringList &files);
+	void upload(QStringList files);
 	void download(const QString &path, const QList<quint32> & objectIds);
 
 signals:

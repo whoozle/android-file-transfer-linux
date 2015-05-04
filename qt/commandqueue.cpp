@@ -3,8 +3,9 @@
 #include "utils.h"
 #include <QFileInfo>
 #include <QDebug>
+#include <QDir>
+#include <QDirIterator>
 #include <QApplication>
-
 
 void FinishQueue::execute(CommandQueue &queue)
 {
@@ -13,17 +14,29 @@ void FinishQueue::execute(CommandQueue &queue)
 
 void UploadFile::execute(CommandQueue &queue)
 {
-	qDebug() << "uploading file " << Filename;
+	queue.uploadFile(Filename);
+}
 
-	QFileInfo fi(Filename);
-	queue.start(fi.fileName());
+void MakeDirectory::execute(CommandQueue &queue)
+{
+	queue.createDirectory(Filename, Root);
+}
+
+void CommandQueue::uploadFile(const QString &filename)
+{
+	qDebug() << "uploading file " << filename;
+
+	QFileInfo fi(filename);
+	auto directory = _directories.find(fi.dir().path());
+	Q_ASSERT(directory != _directories.end());
+	_model->setParent(directory.value());
 	try
 	{
-		queue.model()->uploadFile(Filename);
+		_model->uploadFile(filename);
 	} catch(const std::exception &ex)
-	{ qDebug() << "uploading file " << Filename << " failed: " << fromUtf8(ex.what()); }
+	{ qDebug() << "uploading file " << filename << " failed: " << fromUtf8(ex.what()); }
 
-	queue.addProgress(fi.size());
+	addProgress(fi.size());
 }
 
 void DownloadFile::execute(CommandQueue &queue)
@@ -41,10 +54,22 @@ void DownloadFile::execute(CommandQueue &queue)
 	queue.addProgress(fi.size());
 }
 
-void MakeDirectory::execute(CommandQueue &queue)
+void CommandQueue::createDirectory(const QString &path, bool root)
 {
-	qDebug() << "making directory" << Filename;
-	queue.model()->createDirectory(Filename, Type); //fixme: add storageId here
+	qDebug() << "making directory" << path;
+	QFileInfo fi(path);
+	if (!root)
+	{
+		auto parent = _directories.find(fi.dir().path());
+		Q_ASSERT(parent != _directories.end());
+		_model->setParent(parent.value());
+	}
+	try
+	{
+		mtp::u32 dirId = _model->createDirectory(fi.fileName());
+		_directories[path] = dirId;
+	} catch(const std::exception &ex)
+	{ qDebug() << "creating directory" << path << "failed: " << fromUtf8(ex.what()); return; }
 }
 
 CommandQueue::CommandQueue(MtpObjectsModel *model): _model(model), _completedFilesSize(0)
@@ -74,6 +99,7 @@ void CommandQueue::finish()
 	_model->moveToThread(QApplication::instance()->thread());
 	emit finished();
 	_completedFilesSize = 0;
+	_directories.clear();
 }
 
 void CommandQueue::addProgress(qint64 fileSize)

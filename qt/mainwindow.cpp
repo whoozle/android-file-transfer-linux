@@ -308,17 +308,8 @@ void MainWindow::uploadDirectories()
 
 	settings.setValue("the-latest-directory", dirPath);
 
-	QDir dir(dirPath);
-	qDebug() << "adding directory " << dir.dirName();
-	mtp::u32 dirId = _objectModel->createDirectory(dir.dirName(), mtp::AssociationType::GenericFolder);
-	_objectModel->setParent(dirId);
-	_history.push_back(dirId);
-
 	QStringList files;
-	for(QString file : dir.entryList(QDir::Files))
-	{
-		files.push_back(dir.canonicalPath() + "/" + file);
-	}
+	files.push_back(dirPath);
 	uploadFiles(files);
 	back();
 }

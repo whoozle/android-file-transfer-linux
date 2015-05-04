@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QQueue>
+#include <QMap>
 #include <mtp/ptp/ObjectFormat.h>
 
 class MtpObjectsModel;
@@ -28,10 +29,9 @@ struct FileCommand : public Command
 
 struct MakeDirectory : public FileCommand
 {
-	quint32					ParentId;
-	quint32					StorageId;
-	mtp::AssociationType	Type;
-	MakeDirectory(const QString &filename, quint32 parentId, quint32 storageId, mtp::AssociationType type) : FileCommand(filename), ParentId(parentId), StorageId(storageId), Type(type) { }
+	bool					Root;
+	MakeDirectory(const QString &filename, bool root = false) :
+		FileCommand(filename), Root(root) { }
 	void execute(CommandQueue &queue);
 };
 
@@ -54,8 +54,10 @@ class CommandQueue: public QObject
 	Q_OBJECT
 
 private:
-	MtpObjectsModel *	_model;
-	qint64				_completedFilesSize;
+	MtpObjectsModel *			_model;
+	qint64						_completedFilesSize;
+	QString						_root;
+	QMap<QString, quint32>		_directories;
 
 public:
 	CommandQueue(MtpObjectsModel *model);
@@ -63,6 +65,9 @@ public:
 
 	MtpObjectsModel *model() const
 	{ return _model; }
+
+	void createDirectory(const QString &path, bool root);
+	void uploadFile(const QString &file);
 
 public slots:
 	void onFileProgress(qint64, qint64);

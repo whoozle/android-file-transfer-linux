@@ -21,6 +21,8 @@
 #include "mtpobjectsmodel.h"
 #include <QStringList>
 #include <QFileInfo>
+#include <QDir>
+#include <QDirIterator>
 #include <QDebug>
 
 FileUploader::FileUploader(MtpObjectsModel * model, QObject *parent) :
@@ -64,21 +66,55 @@ void FileUploader::onFinished()
 	emit finished();
 }
 
-void FileUploader::upload(const QStringList &files)
+void FileUploader::upload(QStringList files)
 {
 	_model->moveToThread(&_workerThread);
-
-	_total = 1;
-	for(QString file : files)
+	_total = 0;
+	QList<Command *> commands;
+	while(!files.empty())
 	{
-		QFileInfo fi(file);
-		_total += fi.size();
+		QString currentFile = files.front();
+		files.pop_front();
+		QFileInfo currentFileInfo(currentFile);
+		if (currentFileInfo.isDir())
+		{
+			qDebug() << "adding subdirectory" << currentFile;
+			commands.push_back(new MakeDirectory(currentFile, true));
+			QDirIterator it(currentFile, QDirIterator::Subdirectories);
+			while(it.hasNext())
+			{
+				QString next = it.next();
+				QFileInfo fi(next);
+				QString filename = fi.fileName();
+				if (filename == "." || filename == "..")
+					continue;
+
+				if (fi.isFile())
+				{
+					commands.push_back(new UploadFile(next));
+					_total += fi.size();
+				}
+				else if (fi.isDir())
+				{
+					commands.push_back(new MakeDirectory(next));
+				}
+			}
+		}
+		else if (currentFileInfo.isFile())
+		{
+			commands.push_back(new UploadFile(currentFile));
+			_total += currentFileInfo.size();
+		}
 	}
+	qDebug() << "uploading" << _total << "bytes";
+	if (_total < 1)
+		_total = 1;
+
 	_startedAt = QDateTime::currentDateTime();
 
-	for(QString file : files)
+	for(auto command: commands)
 	{
-		emit executeCommand(new UploadFile(file));
+		emit executeCommand(command);
 	}
 	emit executeCommand(new FinishQueue());
 }
