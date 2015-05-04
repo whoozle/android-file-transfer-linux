@@ -1,5 +1,6 @@
 #include "commandqueue.h"
 #include "mtpobjectsmodel.h"
+#include "utils.h"
 #include <QFileInfo>
 #include <QDebug>
 #include <QApplication>
@@ -20,7 +21,7 @@ void UploadFile::execute(CommandQueue &queue)
 	{
 		queue.model()->uploadFile(fi.fileName());
 	} catch(const std::exception &ex)
-	{ qDebug() << "uploading file " << Filename << " failed: " << ex.what(); }
+	{ qDebug() << "uploading file " << Filename << " failed: " << fromUtf8(ex.what()); }
 
 	queue.addProgress(fi.size());
 }
@@ -35,7 +36,7 @@ void DownloadFile::execute(CommandQueue &queue)
 	{
 		queue.model()->downloadFile(Filename, ObjectId);
 	} catch(const std::exception &ex)
-	{ qDebug() << "downloading file " << Filename << " failed: " << ex.what(); }
+	{ qDebug() << "downloading file " << Filename << " failed: " << fromUtf8(ex.what()); }
 
 	queue.addProgress(fi.size());
 }

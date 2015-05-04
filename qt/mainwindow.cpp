@@ -102,7 +102,7 @@ void MainWindow::showEvent(QShowEvent *)
 			}
 			catch(const mtp::usb::TimeoutException &ex)
 			{
-				qDebug() << "timed out getting device info: " << ex.what() << ", retrying...";
+				qDebug() << "timed out getting device info: " << fromUtf8(ex.what()) << ", retrying...";
 				if (attempt + 1 == MaxAttempts)
 				{
 					QMessageBox::critical(this, tr("MTP"), tr("MTP device does not respond"));

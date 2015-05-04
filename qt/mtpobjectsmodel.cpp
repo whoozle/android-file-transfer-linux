@@ -85,7 +85,7 @@ mtp::msg::ObjectInfoPtr MtpObjectsModel::Row::GetInfo(mtp::SessionPtr session)
 			//qDebug() << fromUtf8(row.Info->Filename);
 		}
 		catch(const std::exception &ex)
-		{ qDebug() << "failed to get object info " << ex.what(); }
+		{ qDebug() << "failed to get object info " << fromUtf8(ex.what()); }
 	}
 	return _info;
 }

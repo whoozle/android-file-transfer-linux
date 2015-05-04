@@ -17,6 +17,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 #include "mainwindow.h"
+#include "utils.h"
 #include <QApplication>
 #include <QMessageBox>
 
@@ -34,7 +35,7 @@ namespace
 			try {
 				return QApplication::notify( receiver, e );
 			} catch ( const std::exception& e ) {
-				QMessageBox::warning(0, "Error", e.what());
+				QMessageBox::warning(0, "Error", fromUtf8(e.what()));
 				return false;
 			}
 		}
