@@ -256,9 +256,19 @@ void MainWindow::downloadFiles(const QList<quint32> &objects)
 	if (objects.isEmpty())
 		return;
 
-	QString path = QFileDialog::getExistingDirectory(this, tr("Enter destination directory"));
+	QSettings settings;
+	QString dirPath;
+	{
+		QVariant ld = settings.value("the-latest-download-directory");
+		if (ld.isValid())
+			dirPath = ld.toString();
+	}
+
+	QString path = QFileDialog::getExistingDirectory(this, tr("Enter destination directory"), dirPath);
 	if (path.isEmpty())
 		return;
+
+	settings.setValue("the-latest-download-directory", path);
 
 	qDebug() << "downloading to " << path;
 	ProgressDialog progressDialog(this);
