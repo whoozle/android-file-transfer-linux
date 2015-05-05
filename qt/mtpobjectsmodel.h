@@ -64,6 +64,9 @@ public:
 	~MtpObjectsModel();
 
 	void setSession(mtp::SessionPtr session);
+	mtp::SessionPtr session() const
+	{ return _session; }
+
 	void setParent(mtp::u32 parentObjectId);
 	void refresh()
 	{ setParent(_parentObjectId); }

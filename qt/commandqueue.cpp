@@ -48,6 +48,7 @@ void DownloadFile::execute(CommandQueue &queue)
 	qDebug() << "downloading " << ObjectId << "to" << Filename;
 
 	QFileInfo fi(Filename);
+	QDir().mkpath(fi.dir().path());
 	queue.start(fi.fileName());
 	try
 	{

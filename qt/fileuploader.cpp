@@ -119,32 +119,49 @@ void FileUploader::upload(QStringList files)
 	emit executeCommand(new FinishQueue());
 }
 
-void FileUploader::download(const QString &path, const QList<quint32> &objectIds)
+void FileUploader::download(const QString &rootPath, const QList<quint32> &objectIds)
 {
 	_model->moveToThread(&_workerThread);
 
-	_total = 1;
+	_total = 0;
+
+	QVector<QPair<QString, mtp::u32> > input;
+	for(auto id : objectIds)
+		input.push_back(qMakePair(rootPath, id));
+
 	QVector<QPair<QString, mtp::u32> > files;
-	for(quint32 id : objectIds)
+	while(!input.empty())
 	{
+		QString prefix = input.front().first;
+		mtp::u32 id = input.front().second;
+		input.pop_front();
+
 		MtpObjectsModel::ObjectInfo oi = _model->getInfo(id);
 		if (oi.Format == mtp::ObjectFormat::Association)
 		{
 			//enumerate here
-			qWarning() << "skipping directory " << oi.Filename;
+			QString dirPath = prefix + "/" + oi.Filename;
+			mtp::SessionPtr session = _model->session();
+			mtp::msg::ObjectHandles handles = session->GetObjectHandles(mtp::Session::AllStorages, mtp::Session::AllFormats, id);
+			qDebug() << "found " << handles.ObjectHandles.size() << " objects in " << dirPath;
+			for(mtp::u32 id : handles.ObjectHandles)
+				input.push_back(qMakePair(dirPath, id));
 		}
 		else
 		{
 			_total += oi.Size;
-			files.push_back(QPair<QString, mtp::u32>(oi.Filename, id));
+			files.push_back(qMakePair(prefix + "/" + oi.Filename, id));
 		}
 	}
+
 	qDebug() << "downloading " << files.size() << " file(s), " << _total << " bytes";
 	_startedAt = QDateTime::currentDateTime();
+	if (_total < 1)
+		_total = 1;
 
 	for(const auto & file : files)
 	{
-		emit executeCommand(new DownloadFile(path + "/" + file.first, file.second));
+		emit executeCommand(new DownloadFile(file.first, file.second));
 	}
 	emit executeCommand(new FinishQueue());
 }
