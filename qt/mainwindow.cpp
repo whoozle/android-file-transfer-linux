@@ -205,9 +205,13 @@ void MainWindow::back()
 {
 	if (_history.empty())
 		return;
+	mtp::u32 oldParent = _objectModel->parentObjectId();
 	_history.pop_back();
 	mtp::u32 oid = _history.empty()? mtp::Session::Root: _history.back();
 	_objectModel->setParent(oid);
+	QModelIndex prevIndex = _objectModel->findObject(oldParent);
+	if (prevIndex.isValid())
+		_ui->listView->setCurrentIndex(_proxyModel->mapFromSource(prevIndex));
 }
 
 void MainWindow::down()

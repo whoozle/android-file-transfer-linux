@@ -70,6 +70,7 @@ public:
 
 	bool enter(int idx);
 	mtp::u32 objectIdAt(int idx);
+	QModelIndex findObject(mtp::u32 objectId) const;
 
 	mtp::u32 parentObjectId() const
 	{ return _parentObjectId; }

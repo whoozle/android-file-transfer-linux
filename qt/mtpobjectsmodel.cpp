@@ -63,6 +63,12 @@ bool MtpObjectsModel::enter(int idx)
 		return false;
 }
 
+QModelIndex MtpObjectsModel::findObject(mtp::u32 objectId) const
+{
+	auto idx = std::find_if(_rows.begin(), _rows.end(), [objectId](const Row & row) { return row.ObjectId == objectId; } );
+	return idx != _rows.end()? createIndex(std::distance(_rows.begin(), idx), 0): QModelIndex();
+}
+
 void MtpObjectsModel::setSession(mtp::SessionPtr session)
 {
 	beginResetModel();
