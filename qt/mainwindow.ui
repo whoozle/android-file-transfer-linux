@@ -54,6 +54,8 @@
     <addaction name="actionDownload"/>
     <addaction name="actionDelete"/>
     <addaction name="separator"/>
+    <addaction name="actionCreateDirectory"/>
+    <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuNavigate">
