@@ -24,6 +24,8 @@
 #include <QColor>
 #include <QFile>
 #include <QFileInfo>
+#include <QMimeData>
+#include <QUrl>
 
 MtpObjectsModel::MtpObjectsModel(QObject *parent): QAbstractListModel(parent), _parentObjectId(mtp::Session::Root)
 { }
@@ -208,4 +210,32 @@ MtpObjectsModel::ObjectInfo MtpObjectsModel::getInfo(mtp::u32 objectId)
 	if (size == mtp::MaxObjectSize)
 		size = _session->GetObjectIntegerProperty(objectId, mtp::ObjectProperty::ObjectSize);
 	return ObjectInfo(fromUtf8(oi.Filename), oi.ObjectFormat, size);
+}
+
+bool MtpObjectsModel::dropMimeData(const QMimeData *data,
+	 Qt::DropAction action, int row, int column, const QModelIndex &parent)
+{
+	qDebug() << "data: " << data << action << row << column;
+	if (action != Qt::CopyAction || !data)
+		return false;
+
+	QList<QUrl> urls = data->urls();
+	QStringList files;
+	for (auto url : urls)
+	{
+		qDebug() << "url " << url;
+		if (url.isLocalFile())
+			files.push_back(url.toLocalFile());
+	}
+	qDebug() << "files" << files;
+	return true;
+}
+
+QStringList MtpObjectsModel::mimeTypes () const
+{ return QStringList("text/uri-list"); }
+
+Qt::ItemFlags MtpObjectsModel::flags(const QModelIndex &index) const
+{
+	Qt::ItemFlags defaultFlags = QAbstractListModel::flags(index);
+	return defaultFlags | Qt::ItemIsDropEnabled;
 }

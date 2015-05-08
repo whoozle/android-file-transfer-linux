@@ -27,6 +27,15 @@
       <property name="contextMenuPolicy">
        <enum>Qt::CustomContextMenu</enum>
       </property>
+      <property name="acceptDrops">
+       <bool>true</bool>
+      </property>
+      <property name="dragDropMode">
+       <enum>QAbstractItemView::DropOnly</enum>
+      </property>
+      <property name="defaultDropAction">
+       <enum>Qt::CopyAction</enum>
+      </property>
       <property name="selectionMode">
        <enum>QAbstractItemView::ExtendedSelection</enum>
       </property>
