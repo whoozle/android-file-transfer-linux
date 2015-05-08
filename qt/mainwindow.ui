@@ -109,7 +109,7 @@
     </iconset>
    </property>
    <property name="text">
-    <string>CreateDirectory</string>
+    <string>&amp;CreateDirectory</string>
    </property>
   </action>
   <action name="actionUploadDirectory">
