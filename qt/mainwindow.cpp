@@ -68,6 +68,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	_ui->actionBack->setShortcuts(_ui->actionBack->shortcuts() << QKeySequence("Alt+Up") << QKeySequence("Esc"));
 	_ui->actionGo_Down->setShortcuts(_ui->actionGo_Down->shortcuts() << QKeySequence("Alt+Down") << QKeySequence("Enter"));
 	_ui->actionRename->setShortcuts(_ui->actionRename->shortcuts() << QKeySequence("F3"));
+	_ui->actionCreateDirectory->setShortcuts(_ui->actionRename->shortcuts() << QKeySequence("F7"));
 }
 
 MainWindow::~MainWindow()
