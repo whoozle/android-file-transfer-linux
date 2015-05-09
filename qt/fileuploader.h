@@ -46,7 +46,7 @@ public:
 	~FileUploader();
 
 	void upload(QStringList files);
-	void download(const QString &path, const QList<quint32> & objectIds);
+	void download(const QString &path, const QVector<quint32> & objectIds);
 
 signals:
 	void executeCommand(Command *cmd);

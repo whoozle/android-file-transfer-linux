@@ -145,7 +145,7 @@ void MainWindow::downloadFiles()
 	QItemSelectionModel *selection =_ui->listView->selectionModel();
 	QModelIndexList rows = selection->selectedRows();
 
-	QList<quint32> objects;
+	QVector<quint32> objects;
 	for(QModelIndex row : rows)
 	{
 		row = mapIndex(row);
@@ -253,7 +253,7 @@ void MainWindow::uploadFiles(const QStringList &files)
 }
 
 
-void MainWindow::downloadFiles(const QList<quint32> &objects)
+void MainWindow::downloadFiles(const QVector<quint32> &objects)
 {
 	if (objects.isEmpty())
 		return;

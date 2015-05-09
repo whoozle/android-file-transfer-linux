@@ -119,7 +119,7 @@ void FileUploader::upload(QStringList files)
 	emit executeCommand(new FinishQueue());
 }
 
-void FileUploader::download(const QString &rootPath, const QList<quint32> &objectIds)
+void FileUploader::download(const QString &rootPath, const QVector<quint32> &objectIds)
 {
 	_model->moveToThread(&_workerThread);
 

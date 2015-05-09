@@ -19,9 +19,10 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <mtp/ptp/Device.h>
 #include <QMainWindow>
 #include <QModelIndex>
-#include <mtp/ptp/Device.h>
+#include <QVector>
 
 namespace Ui {
 class MainWindow;
@@ -60,7 +61,7 @@ private slots:
 	void downloadFiles();
 	void renameFile();
 	void deleteFiles();
-	void downloadFiles(const QList<quint32> &objects);
+	void downloadFiles(const QVector<quint32> &objects);
 	void uploadFiles(const QStringList &files);
 
 private:
