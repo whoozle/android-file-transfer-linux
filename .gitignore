@@ -3,7 +3,6 @@ cmake_*
 CMakeFiles*
 CMakeCache*
 nbproject
-mtp-test
 build
 *.user
 aft-*
