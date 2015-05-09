@@ -203,7 +203,7 @@ bool MtpObjectsModel::downloadFile(const QString &filePath, mtp::u32 objectId)
 	return true;
 }
 
-MtpObjectsModel::ObjectInfo MtpObjectsModel::getInfo(mtp::u32 objectId)
+MtpObjectsModel::ObjectInfo MtpObjectsModel::getInfo(mtp::u32 objectId) const
 {
 	mtp::msg::ObjectInfo oi(_session->GetObjectInfo(objectId));
 	qint64 size = oi.ObjectCompressedSize;

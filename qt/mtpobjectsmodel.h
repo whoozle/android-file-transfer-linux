@@ -83,7 +83,7 @@ public:
 	bool uploadFile(const QString &filePath, QString filename = QString());
 	bool downloadFile(const QString &filePath, mtp::u32 objectId);
 	void rename(int idx, const QString &fileName);
-	ObjectInfo getInfo(mtp::u32 objectId);
+	ObjectInfo getInfo(mtp::u32 objectId) const;
 	void deleteObjects(const MtpObjectList &objects);
 
 	virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
