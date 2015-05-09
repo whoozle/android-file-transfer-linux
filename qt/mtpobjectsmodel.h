@@ -48,6 +48,7 @@ private:
 
 signals:
 	void filePositionChanged(qint64, qint64);
+	void onFilesDropped(QStringList);
 
 public:
 	struct ObjectInfo

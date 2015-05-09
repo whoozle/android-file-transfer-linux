@@ -223,11 +223,14 @@ bool MtpObjectsModel::dropMimeData(const QMimeData *data,
 	QStringList files;
 	for (auto url : urls)
 	{
-		qDebug() << "url " << url;
+		//qDebug() << "url " << url;
 		if (url.isLocalFile())
 			files.push_back(url.toLocalFile());
+		else
+			qWarning() << "skipping non-local url" << url;
 	}
-	qDebug() << "files" << files;
+	qDebug() << "files dropped: " << files;
+	emit onFilesDropped(files);
 	return true;
 }
 
