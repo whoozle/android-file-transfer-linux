@@ -30,6 +30,9 @@
       <property name="acceptDrops">
        <bool>true</bool>
       </property>
+      <property name="showDropIndicator" stdset="0">
+       <bool>false</bool>
+      </property>
       <property name="dragDropMode">
        <enum>QAbstractItemView::DropOnly</enum>
       </property>
