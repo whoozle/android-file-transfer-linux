@@ -362,6 +362,8 @@ namespace
 			score += 1;
 		if (str.contains("album"))
 			score += 1;
+		if (str.contains("cover"))
+			score += 2;
 		if (str.contains("large"))
 			score += 2;
 		if (str.contains("small"))
