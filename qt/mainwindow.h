@@ -60,10 +60,10 @@ private slots:
 	void downloadFiles();
 	void renameFile();
 	void deleteFiles();
-private:
 	void downloadFiles(const QList<quint32> &objects);
 	void uploadFiles(const QStringList &files);
 
+private:
 	Ui::MainWindow *			_ui;
 	QSortFilterProxyModel *		_proxyModel;
 	MtpObjectsModel *			_objectModel;
