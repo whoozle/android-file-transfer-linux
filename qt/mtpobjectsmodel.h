@@ -22,6 +22,7 @@
 #include <qabstractitemmodel.h>
 #include <mtp/ptp/Device.h>
 #include <QVector>
+#include <QStringList>
 
 typedef QVector<mtp::u32> MtpObjectList;
 
