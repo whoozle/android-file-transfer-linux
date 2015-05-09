@@ -64,6 +64,9 @@ private slots:
 	void downloadFiles(const QVector<quint32> &objects);
 	void uploadFiles(const QStringList &files);
 
+public slots:
+	void downloadFiles(const QString & path, const QVector<quint32> &objects);
+
 private:
 	Ui::MainWindow *			_ui;
 	QSortFilterProxyModel *		_proxyModel;

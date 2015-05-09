@@ -271,7 +271,11 @@ void MainWindow::downloadFiles(const QVector<quint32> &objects)
 		return;
 
 	settings.setValue("the-latest-download-directory", path);
+	downloadFiles(path, objects);
+}
 
+void MainWindow::downloadFiles(const QString & path, const QVector<quint32> &objects)
+{
 	qDebug() << "downloading to " << path;
 	ProgressDialog progressDialog(this);
 	progressDialog.show();
