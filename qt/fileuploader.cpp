@@ -136,7 +136,7 @@ void FileUploader::download(const QString &rootPath, const QVector<quint32> &obj
 		mtp::u32 id = input.front().second;
 		input.pop_front();
 
-		MtpObjectsModel::ObjectInfo oi = _model->getInfo(id);
+		MtpObjectsModel::ObjectInfo oi = _model->getInfoById(id);
 		if (oi.Format == mtp::ObjectFormat::Association)
 		{
 			//enumerate here
