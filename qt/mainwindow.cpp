@@ -85,6 +85,28 @@ MainWindow::~MainWindow()
 	delete _ui;
 }
 
+void MainWindow::saveGeometry(const QString &name, const QWidget &widget)
+{
+	QSettings settings;
+	settings.setValue("geometry/" + name, widget.saveGeometry());
+}
+
+void MainWindow::restoreGeometry(const QString &name, QWidget &widget)
+{
+	QSettings settings;
+	QVariant geometry = settings.value("geometry/" + name);
+	if (geometry.isValid())
+		widget.restoreGeometry(geometry.toByteArray());
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+	QSettings settings;
+	saveGeometry("main-window", *this);
+	settings.setValue("state/main-window", saveState());
+	QMainWindow::closeEvent(event);
+}
+
 void MainWindow::showEvent(QShowEvent *)
 {
 	if (!_device)
@@ -95,6 +117,9 @@ void MainWindow::showEvent(QShowEvent *)
 			QMessageBox::critical(this, tr("No MTP device found"), tr("No MTP device found"));
 			return;
 		}
+		QSettings settings;
+		restoreGeometry("main-window", *this);
+		restoreState(settings.value("state/main-window").toByteArray());
 
 		qDebug() << "device found, opening session...";
 		mtp::SessionPtr session;
@@ -187,8 +212,10 @@ void MainWindow::renameFile()
 
 	QModelIndex row = mapIndex(rows.at(0));
 	RenameDialog d(_objectModel->data(row).toString(), this);
+	restoreGeometry("rename-dialog", d);
 	if (d.exec())
 		_objectModel->rename(row.row(), d.name());
+	saveGeometry("rename-dialog", d);
 }
 
 void MainWindow::deleteFiles()
@@ -251,8 +278,10 @@ void MainWindow::down()
 void MainWindow::createDirectory()
 {
 	CreateDirectoryDialog d(this);
+	restoreGeometry("create-directory-dialog", d);
 	if (d.exec() && !d.name().isEmpty())
 		_objectModel->createDirectory(d.name(), mtp::AssociationType::GenericFolder);
+	saveGeometry("create-directory-dialog", d);
 }
 
 void MainWindow::uploadFiles(const QStringList &files)
@@ -320,6 +349,7 @@ void MainWindow::downloadFiles(const QString & path, const QVector<quint32> &obj
 void MainWindow::uploadFiles()
 {
 	QFileDialog d(this);
+	restoreGeometry("upload-files", d);
 
 	QSettings settings;
 	{
@@ -331,6 +361,7 @@ void MainWindow::uploadFiles()
 	d.setAcceptMode(QFileDialog::AcceptOpen);
 	d.setFileMode(QFileDialog::ExistingFiles);
 	d.setOption(QFileDialog::ShowDirsOnly, false);
+	saveGeometry("upload-files", d);
 	if (!d.exec())
 		return;
 

@@ -46,7 +46,10 @@ public:
 
 private:
 	void showEvent(QShowEvent *e);
+	void closeEvent(QCloseEvent *event);
 	QModelIndex mapIndex(const QModelIndex &index);
+	void saveGeometry(const QString &name, const QWidget &widget);
+	void restoreGeometry(const QString &name, QWidget &widget);
 
 private slots:
 	void back();
