@@ -186,7 +186,7 @@ bool MtpObjectsModel::uploadFile(const QString &filePath, QString filename)
 	oi.Filename = toUtf8(filename);
 	oi.ObjectFormat = objectFormat;
 	oi.SetSize(fileInfo.size());
-	mtp::Session::NewObjectInfo noi = _session->SendObjectInfo(oi, _storageId, _parentObjectId);
+	mtp::Session::NewObjectInfo noi = _session->SendObjectInfo(oi, _storageId != mtp::Session::AllStorages? _storageId: mtp::Session::Device, _parentObjectId);
 	qDebug() << "new object id: " << noi.ObjectId << ", sending...";
 	_session->SendObject(object);
 	qDebug() << "ok";
