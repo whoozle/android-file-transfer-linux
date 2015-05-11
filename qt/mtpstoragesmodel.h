@@ -2,6 +2,8 @@
 #define MTPSTORAGESMODEL_H
 
 #include <QAbstractListModel>
+#include <QPair>
+#include <QVector>
 #include <mtp/ptp/Session.h>
 
 class MtpStoragesModel : public QAbstractListModel
