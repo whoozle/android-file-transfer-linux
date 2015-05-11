@@ -43,8 +43,8 @@ namespace mtp { namespace usb
 
 		ByteArray ReadInterrupt();
 
-		void Read(const IObjectOutputStreamPtr &outputStream, int timeout = 3000);
-		void Write(const IObjectInputStreamPtr &inputStream, int timeout = 3000);
+		void Read(const IObjectOutputStreamPtr &outputStream, int timeout = 10000);
+		void Write(const IObjectInputStreamPtr &inputStream, int timeout = 10000);
 
 		static BulkPipePtr Create(usb::DevicePtr device, ConfigurationPtr conf, usb::InterfacePtr owner);
 	};

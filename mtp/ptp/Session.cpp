@@ -168,7 +168,7 @@ namespace mtp
 		Send(OperationRequest(OperationCode::GetObject, transaction, objectId));
 		ByteArray response;
 		ResponseType responseCode;
-		_packeter.Read(transaction, outputStream, responseCode, response, 10000);
+		_packeter.Read(transaction, outputStream, responseCode, response);
 		CHECK_RESPONSE(responseCode);
 	}
 
