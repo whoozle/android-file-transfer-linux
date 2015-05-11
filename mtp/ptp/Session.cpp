@@ -131,7 +131,7 @@ namespace mtp
 		oi.StorageId = storageId;
 		oi.ObjectFormat = mtp::ObjectFormat::Association;
 		oi.AssociationType = type;
-		mtp::Session::NewObjectInfo noi = SendObjectInfo(oi, 0, parentId);
+		mtp::Session::NewObjectInfo noi = SendObjectInfo(oi, storageId, parentId);
 
 		//SendObject(std::make_shared<ByteArrayObjectInputStream>(ByteArray()));
 		return noi;
