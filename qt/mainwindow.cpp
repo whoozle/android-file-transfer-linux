@@ -329,10 +329,7 @@ void MainWindow::downloadFiles(const QVector<quint32> &objects)
 	if (!d.exec())
 		return;
 
-	if (d.selectedFiles().empty())
-		return;
-
-	QString path = d.selectedFiles().at(0);
+	QString path = d.directory().path();
 	if (path.isEmpty())
 		return;
 
@@ -383,14 +380,13 @@ void MainWindow::uploadFiles()
 void MainWindow::uploadDirectories()
 {
 	QSettings settings;
-	QString dirPath;
+	QFileDialog d(this);
 	{
 		QVariant ld = settings.value("the-latest-directory");
 		if (ld.isValid())
-			dirPath = ld.toString();
+			d.setDirectory(ld.toString());
 	}
 
-	QFileDialog d(this);
 	d.setAcceptMode(QFileDialog::AcceptOpen);
 	d.setFileMode(QFileDialog::Directory);
 	d.setOption(QFileDialog::ShowDirsOnly, true);
@@ -399,23 +395,25 @@ void MainWindow::uploadDirectories()
 		return;
 
 	saveGeometry("upload-directories", d);
-	//settings.setValue("the-latest-directory", dirPath); //fixme: port me
+	settings.setValue("the-latest-directory", d.directory().absolutePath());
 
-	uploadFiles(d.selectedFiles());
-	back();
+	QStringList dirs(d.selectedFiles());
+	if (dirs.isEmpty())
+		return;
+
+	uploadFiles(dirs);
 }
 
 void MainWindow::uploadAlbum()
 {
-	QString dirPath;
+	QFileDialog d(this);
 	QSettings settings;
 	{
 		QVariant ld = settings.value("the-latest-directory");
 		if (ld.isValid())
-			dirPath = ld.toString();
+			d.setDirectory(ld.toString());
 	}
 
-	QFileDialog d(this);
 	d.setAcceptMode(QFileDialog::AcceptOpen);
 	d.setFileMode(QFileDialog::Directory);
 	d.setOption(QFileDialog::ShowDirsOnly, true);
@@ -423,10 +421,9 @@ void MainWindow::uploadAlbum()
 	if (!d.exec())
 		return;
 
-	//settings.setValue("the-latest-directory", dirPath); //fixme: port me
 	saveGeometry("upload-albums", d);
-	for(const auto & dir : d.selectedFiles())
-		uploadAlbum(dir);
+	settings.setValue("the-latest-directory", d.directory().absolutePath());
+	uploadAlbum(d.directory().absolutePath());
 	back();
 }
 
