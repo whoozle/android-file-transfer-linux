@@ -27,18 +27,24 @@
 #include <QMimeData>
 #include <QUrl>
 
-MtpObjectsModel::MtpObjectsModel(QObject *parent): QAbstractListModel(parent), _parentObjectId(mtp::Session::Root)
+MtpObjectsModel::MtpObjectsModel(QObject *parent): QAbstractListModel(parent), _storageId(mtp::Session::AllStorages), _parentObjectId(mtp::Session::Root)
 { }
 
 MtpObjectsModel::~MtpObjectsModel()
 { }
+
+void MtpObjectsModel::setStorageId(mtp::u32 storageId)
+{
+	_storageId = storageId;
+	setParent(mtp::Session::Root);
+}
 
 void MtpObjectsModel::setParent(mtp::u32 parentObjectId)
 {
 	beginResetModel();
 
 	_parentObjectId = parentObjectId;
-	mtp::msg::ObjectHandles handles = _session->GetObjectHandles(mtp::Session::AllStorages, mtp::Session::AllFormats, parentObjectId);
+	mtp::msg::ObjectHandles handles = _session->GetObjectHandles(_storageId, mtp::Session::AllFormats, parentObjectId);
 	_rows.clear();
 	_rows.reserve(handles.ObjectHandles.size());
 	for(size_t i = 0; i < handles.ObjectHandles.size(); ++i)

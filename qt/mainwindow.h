@@ -52,7 +52,7 @@ private slots:
 	void back();
 	void down();
 	void onActivated ( const QModelIndex & index );
-	void onSelectionChanged();
+	void updateActionsState();
 	void showContextMenu ( const QPoint & pos );
 	void createDirectory();
 	void uploadFiles();
@@ -64,6 +64,7 @@ private slots:
 	void deleteFiles();
 	void downloadFiles(const QVector<quint32> &objects);
 	void uploadFiles(const QStringList &files);
+	void onStorageChanged(int idx);
 
 public slots:
 	void downloadFiles(const QString & path, const QVector<quint32> &objects);

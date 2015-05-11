@@ -32,6 +32,7 @@ class MtpObjectsModel : public QAbstractListModel
 
 private:
 	mtp::SessionPtr		_session;
+	mtp::u32			_storageId;
 	mtp::u32			_parentObjectId;
 
 	class Row
@@ -69,6 +70,7 @@ public:
 	mtp::SessionPtr session() const
 	{ return _session; }
 
+	void setStorageId(mtp::u32 storageId);
 	void setParent(mtp::u32 parentObjectId);
 	void refresh()
 	{ setParent(_parentObjectId); }

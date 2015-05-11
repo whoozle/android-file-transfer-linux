@@ -53,7 +53,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	_objectModel->moveToThread(QApplication::instance()->thread());
 
-	connect(_ui->listView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), SLOT(onSelectionChanged()));
+	connect(_ui->listView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), SLOT(updateActionsState()));
 	connect(_ui->listView, SIGNAL(doubleClicked(QModelIndex)), SLOT(onActivated(QModelIndex)));
 	connect(_ui->listView, SIGNAL(customContextMenuRequested(QPoint)), SLOT(showContextMenu(QPoint)));
 	connect(_ui->actionBack, SIGNAL(triggered()), SLOT(back()));
@@ -65,8 +65,10 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(_ui->actionRename, SIGNAL(triggered()), SLOT(renameFile()));
 	connect(_ui->actionDownload, SIGNAL(triggered()), SLOT(downloadFiles()));
 	connect(_ui->actionDelete, SIGNAL(triggered()), SLOT(deleteFiles()));
+	connect(_ui->storageList, SIGNAL(activated(int)), SLOT(onStorageChanged(int)));
 
 	connect(_objectModel, SIGNAL(onFilesDropped(QStringList)), SLOT(uploadFiles(QStringList)));
+	connect(_objectModel, SIGNAL(existingFileOverwrite(QString)), SLOT(confirmOverwrite(QString)), Qt::BlockingQueuedConnection);
 
 	//fixme: find out how to specify alternative in designer
 	_ui->actionBack->setShortcuts(_ui->actionBack->shortcuts() << QKeySequence("Alt+Up") << QKeySequence("Esc"));
@@ -122,6 +124,7 @@ void MainWindow::showEvent(QShowEvent *)
 		_storageModel->update(session);
 		_ui->storageList->setModel(_storageModel);
 		_objectModel->setSession(session);
+		onStorageChanged(_storageModel->getStorageId(_ui->storageList->currentIndex()));
 		qDebug() << "session opened, starting";
 		_proxyModel->setSourceModel(_objectModel);
 	}
@@ -132,19 +135,33 @@ QModelIndex MainWindow::mapIndex(const QModelIndex &index)
 	return _proxyModel->mapToSource(index);
 }
 
+void MainWindow::onStorageChanged(int idx)
+{
+	if (!_storageModel)
+		return;
+	mtp::u32 storageId;
+	storageId = _storageModel->getStorageId(idx);
+	qDebug() << "switching to storage id " << storageId;
+	_objectModel->setStorageId(storageId);
+	_history.clear();
+	updateActionsState();
+}
+
 void MainWindow::onActivated ( const QModelIndex & index )
 {
 	if (_objectModel->enter(mapIndex(index).row()))
 		_history.push_back(_objectModel->parentObjectId());
+	updateActionsState();
 }
 
-void MainWindow::onSelectionChanged()
+void MainWindow::updateActionsState()
 {
 	QModelIndexList rows = _ui->listView->selectionModel()->selectedRows();
 	_ui->actionDelete->setEnabled(!rows.empty());
 	_ui->actionDownload->setEnabled(!rows.empty());
 	_ui->actionRename->setEnabled(rows.size() == 1);
 	_ui->actionGo_Down->setEnabled(rows.size() == 1);
+	_ui->actionBack->setEnabled(!_history.empty());
 }
 
 void MainWindow::downloadFiles()
@@ -221,12 +238,14 @@ void MainWindow::back()
 	QModelIndex prevIndex = _objectModel->findObject(oldParent);
 	if (prevIndex.isValid())
 		_ui->listView->setCurrentIndex(_proxyModel->mapFromSource(prevIndex));
+	updateActionsState();
 }
 
 void MainWindow::down()
 {
 	if (_objectModel->enter(mapIndex(_ui->listView->currentIndex()).row()))
 		_history.push_back(_objectModel->parentObjectId());
+	updateActionsState();
 }
 
 void MainWindow::createDirectory()
