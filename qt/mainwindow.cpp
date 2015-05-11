@@ -124,7 +124,7 @@ void MainWindow::showEvent(QShowEvent *)
 		_storageModel->update(session);
 		_ui->storageList->setModel(_storageModel);
 		_objectModel->setSession(session);
-		onStorageChanged(_storageModel->getStorageId(_ui->storageList->currentIndex()));
+		onStorageChanged(_ui->storageList->currentIndex());
 		qDebug() << "session opened, starting";
 		_proxyModel->setSourceModel(_objectModel);
 	}
