@@ -314,18 +314,29 @@ void MainWindow::downloadFiles(const QVector<quint32> &objects)
 	if (objects.isEmpty())
 		return;
 
+	QFileDialog d(this);
 	QSettings settings;
-	QString dirPath;
 	{
 		QVariant ld = settings.value("the-latest-download-directory");
 		if (ld.isValid())
-			dirPath = ld.toString();
+			d.setDirectory(ld.toString());
 	}
 
-	QString path = QFileDialog::getExistingDirectory(this, tr("Enter destination directory"), dirPath);
+	d.setAcceptMode(QFileDialog::AcceptSave);
+	d.setFileMode(QFileDialog::Directory);
+	d.setOption(QFileDialog::ShowDirsOnly, true);
+	restoreGeometry("download-files", d);
+	if (!d.exec())
+		return;
+
+	if (d.selectedFiles().empty())
+		return;
+
+	QString path = d.selectedFiles().at(0);
 	if (path.isEmpty())
 		return;
 
+	saveGeometry("download-files", d);
 	settings.setValue("the-latest-download-directory", path);
 	downloadFiles(path, objects);
 }
