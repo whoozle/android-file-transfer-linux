@@ -261,6 +261,7 @@ void MainWindow::uploadFiles(const QStringList &files)
 		return;
 
 	qDebug() << "uploadFiles " << files;
+	_uploadAnswer = 0;
 	_proxyModel->setSourceModel(NULL);
 	ProgressDialog progressDialog(this);
 	progressDialog.setModal(true);
@@ -441,4 +442,22 @@ void MainWindow::uploadAlbum(QString dirPath)
 			files.push_back(dir.canonicalPath() + "/" + file);
 	}
 	uploadFiles(files);
+}
+
+bool MainWindow::confirmOverwrite(const QString &file)
+{
+	int b = _uploadAnswer? _uploadAnswer: QMessageBox::question(this, tr("Overwrite confirmation"), tr("You are about to overwrite file ") + file, QMessageBox::Yes | QMessageBox::YesToAll | QMessageBox::No | QMessageBox::NoToAll);
+	switch(b)
+	{
+	case QMessageBox::YesToAll:
+		_uploadAnswer = QMessageBox::Yes;
+	case QMessageBox::Yes:
+		return true;
+	case QMessageBox::NoToAll:
+		_uploadAnswer = QMessageBox::No;
+	case QMessageBox::No:
+		return false;
+	default:
+		return false;
+	}
 }

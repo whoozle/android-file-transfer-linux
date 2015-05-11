@@ -51,6 +51,7 @@ private:
 signals:
 	void filePositionChanged(qint64, qint64);
 	void onFilesDropped(QStringList);
+	bool existingFileOverwrite(QString);
 
 public:
 	struct ObjectInfo

@@ -171,7 +171,24 @@ bool MtpObjectsModel::uploadFile(const QString &filePath, QString filename)
 
 	if (filename.isEmpty())
 		filename = fileInfo.fileName();
+
 	qDebug() << "uploadFile " << fileInfo.fileName() << " as " << filename;
+
+	bool needReset = false;
+	for(auto & row : _rows)
+	{
+		mtp::msg::ObjectInfoPtr oi = row.GetInfo(_session);
+		if (fromUtf8(oi->Filename) == filename)
+		{
+			if (!emit existingFileOverwrite(filename))
+			{
+				qDebug() << "skipping, overwrite not confirmed";
+				return false;
+			}
+			_session->DeleteObject(row.ObjectId);
+			needReset = true;
+		}
+	}
 
 	std::shared_ptr<QtObjectInputStream> object(new QtObjectInputStream(filePath));
 	if (!object->Valid())
@@ -193,6 +210,8 @@ bool MtpObjectsModel::uploadFile(const QString &filePath, QString filename)
 	beginInsertRows(QModelIndex(), _rows.size(), _rows.size());
 	_rows.push_back(Row(noi.ObjectId));
 	endInsertRows();
+	if (needReset)
+		refresh();
 	return true;
 }
 
