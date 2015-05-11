@@ -349,7 +349,6 @@ void MainWindow::downloadFiles(const QString & path, const QVector<quint32> &obj
 void MainWindow::uploadFiles()
 {
 	QFileDialog d(this);
-	restoreGeometry("upload-files", d);
 
 	QSettings settings;
 	{
@@ -361,12 +360,12 @@ void MainWindow::uploadFiles()
 	d.setAcceptMode(QFileDialog::AcceptOpen);
 	d.setFileMode(QFileDialog::ExistingFiles);
 	d.setOption(QFileDialog::ShowDirsOnly, false);
-	saveGeometry("upload-files", d);
+	restoreGeometry("upload-files", d);
 	if (!d.exec())
 		return;
 
+	saveGeometry("upload-files", d);
 	settings.setValue("the-latest-directory", d.directory().absolutePath());
-
 	uploadFiles(d.selectedFiles());
 }
 
@@ -380,15 +379,18 @@ void MainWindow::uploadDirectories()
 			dirPath = ld.toString();
 	}
 
-	dirPath = QFileDialog::getExistingDirectory(this, "Upload Directories", dirPath);
-	if (dirPath.isEmpty())
+	QFileDialog d(this);
+	d.setAcceptMode(QFileDialog::AcceptOpen);
+	d.setFileMode(QFileDialog::Directory);
+	d.setOption(QFileDialog::ShowDirsOnly, true);
+	restoreGeometry("upload-directories", d);
+	if (!d.exec())
 		return;
 
-	settings.setValue("the-latest-directory", dirPath);
+	saveGeometry("upload-directories", d);
+	//settings.setValue("the-latest-directory", dirPath); //fixme: port me
 
-	QStringList files;
-	files.push_back(dirPath);
-	uploadFiles(files);
+	uploadFiles(d.selectedFiles());
 	back();
 }
 
@@ -402,12 +404,19 @@ void MainWindow::uploadAlbum()
 			dirPath = ld.toString();
 	}
 
-	dirPath = QFileDialog::getExistingDirectory(this, "Upload Album", dirPath);
-	if (!dirPath.isEmpty()) {
-		settings.setValue("the-latest-directory", dirPath);
-		uploadAlbum(dirPath);
-		back();
-	}
+	QFileDialog d(this);
+	d.setAcceptMode(QFileDialog::AcceptOpen);
+	d.setFileMode(QFileDialog::Directory);
+	d.setOption(QFileDialog::ShowDirsOnly, true);
+	restoreGeometry("upload-albums", d);
+	if (!d.exec())
+		return;
+
+	//settings.setValue("the-latest-directory", dirPath); //fixme: port me
+	saveGeometry("upload-albums", d);
+	for(const auto & dir : d.selectedFiles())
+		uploadAlbum(dir);
+	back();
 }
 
 namespace
