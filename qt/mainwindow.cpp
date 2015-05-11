@@ -22,6 +22,7 @@
 #include "progressdialog.h"
 #include "renamedialog.h"
 #include "mtpobjectsmodel.h"
+#include "mtpstoragesmodel.h"
 #include "fileuploader.h"
 #include "utils.h"
 #include <mtp/usb/TimeoutException.h>
@@ -37,6 +38,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
 	_ui(new Ui::MainWindow),
 	_proxyModel(new QSortFilterProxyModel),
+	_storageModel(),
 	_objectModel(new MtpObjectsModel()),
 	_uploader(new FileUploader(_objectModel, this))
 {
@@ -63,6 +65,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(_ui->actionRename, SIGNAL(triggered()), SLOT(renameFile()));
 	connect(_ui->actionDownload, SIGNAL(triggered()), SLOT(downloadFiles()));
 	connect(_ui->actionDelete, SIGNAL(triggered()), SLOT(deleteFiles()));
+
 	connect(_objectModel, SIGNAL(onFilesDropped(QStringList)), SLOT(uploadFiles(QStringList)));
 
 	//fixme: find out how to specify alternative in designer
@@ -70,6 +73,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	_ui->actionGo_Down->setShortcuts(_ui->actionGo_Down->shortcuts() << QKeySequence("Alt+Down") << QKeySequence("Enter"));
 	_ui->actionRename->setShortcuts(_ui->actionRename->shortcuts() << QKeySequence("F3"));
 	_ui->actionCreateDirectory->setShortcuts(_ui->actionRename->shortcuts() << QKeySequence("F7"));
+	_ui->listView->setFocus();
 }
 
 MainWindow::~MainWindow()
@@ -114,6 +118,9 @@ void MainWindow::showEvent(QShowEvent *)
 			}
 		}
 
+		_storageModel = new MtpStoragesModel(this);
+		_storageModel->update(session);
+		_ui->storageList->setModel(_storageModel);
 		_objectModel->setSession(session);
 		qDebug() << "session opened, starting";
 		_proxyModel->setSourceModel(_objectModel);

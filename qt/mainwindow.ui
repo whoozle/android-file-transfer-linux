@@ -16,6 +16,9 @@
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
+     <widget class="QComboBox" name="storageList"/>
+    </item>
+    <item>
      <widget class="QListView" name="listView">
       <property name="font">
        <font>

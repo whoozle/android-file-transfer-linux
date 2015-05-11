@@ -29,6 +29,7 @@ class MainWindow;
 }
 
 class MtpObjectsModel;
+class MtpStoragesModel;
 class FileUploader;
 class QSortFilterProxyModel;
 
@@ -70,6 +71,7 @@ public slots:
 private:
 	Ui::MainWindow *			_ui;
 	QSortFilterProxyModel *		_proxyModel;
+	MtpStoragesModel *			_storageModel;
 	MtpObjectsModel *			_objectModel;
 	FileUploader *				_uploader;
 	QVector<mtp::u32>			_history;
