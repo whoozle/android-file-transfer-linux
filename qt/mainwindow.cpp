@@ -329,10 +329,11 @@ void MainWindow::downloadFiles(const QVector<quint32> &objects)
 	if (!d.exec())
 		return;
 
-	QString path = d.directory().path();
-	if (path.isEmpty())
+	QStringList selected = d.selectedFiles();
+	if (selected.isEmpty())
 		return;
 
+	QString path = selected.at(0);
 	saveGeometry("download-files", d);
 	settings.setValue("the-latest-download-directory", path);
 	downloadFiles(path, objects);
@@ -426,8 +427,15 @@ void MainWindow::uploadAlbum()
 
 	saveGeometry("upload-albums", d);
 	settings.setValue("the-latest-directory", d.directory().absolutePath());
-	uploadAlbum(d.directory().absolutePath());
-	back();
+	QStringList selected = d.selectedFiles();
+	if (selected.isEmpty())
+		return;
+
+	for(const auto &path : selected)
+	{
+		uploadAlbum(d.directory().absolutePath());
+		back();
+	}
 }
 
 namespace
