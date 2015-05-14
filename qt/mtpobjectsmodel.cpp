@@ -190,7 +190,7 @@ bool MtpObjectsModel::uploadFile(const QString &filePath, QString filename)
 			qDebug() << "skipping, overwrite not confirmed";
 			return false;
 		}
-		_session->DeleteObject(_rows[existingObject.row()].ObjectId);
+		_session->DeleteObject(_rows.at(existingObject.row()).ObjectId);
 		needReset = true;
 	}
 
