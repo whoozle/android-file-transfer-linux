@@ -81,11 +81,12 @@ void CommandQueue::createDirectory(const QString &path, bool root)
 {
 	qDebug() << "making directory" << path;
 	QFileInfo fi(path);
+	QString parentPath = fi.dir().path();
 	if (_directories.empty())
-		_directories[fi.dir().path()] = _model->parentObjectId();
+		_directories[parentPath] = _model->parentObjectId();
 	if (!root)
 	{
-		auto parent = _directories.find(fi.dir().path());
+		auto parent = _directories.find(parentPath);
 		Q_ASSERT(parent != _directories.end());
 		if (_model->parentObjectId() != parent.value())
 			_model->setParent(parent.value());
