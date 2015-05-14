@@ -70,6 +70,8 @@ void FileUploader::upload(QStringList files)
 {
 	_model->moveToThread(&_workerThread);
 	_total = 0;
+
+	mtp::u32 currentParentId = _model->parentObjectId();
 	QList<Command *> commands;
 	while(!files.empty())
 	{
@@ -116,14 +118,15 @@ void FileUploader::upload(QStringList files)
 	{
 		emit executeCommand(command);
 	}
-	emit executeCommand(new FinishQueue());
+	emit executeCommand(new FinishQueue(currentParentId));
 }
 
 void FileUploader::download(const QString &rootPath, const QVector<quint32> &objectIds)
 {
 	_model->moveToThread(&_workerThread);
-
 	_total = 0;
+
+	mtp::u32 currentParentId = _model->parentObjectId();
 
 	QVector<QPair<QString, mtp::u32> > input;
 	for(auto id : objectIds)
@@ -163,5 +166,5 @@ void FileUploader::download(const QString &rootPath, const QVector<quint32> &obj
 	{
 		emit executeCommand(new DownloadFile(file.first, file.second));
 	}
-	emit executeCommand(new FinishQueue());
+	emit executeCommand(new FinishQueue(currentParentId));
 }

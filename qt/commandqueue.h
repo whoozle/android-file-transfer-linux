@@ -35,6 +35,8 @@ struct Command
 
 struct FinishQueue : public Command
 {
+	quint32 DirectoryId; //return id
+	FinishQueue(quint32 id): DirectoryId(id) { }
 	virtual void execute(CommandQueue &queue);
 };
 

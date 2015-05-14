@@ -27,6 +27,7 @@
 
 void FinishQueue::execute(CommandQueue &queue)
 {
+	queue.model()->setParent(DirectoryId);
 	queue.finish();
 }
 
