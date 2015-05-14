@@ -95,6 +95,7 @@ void CommandQueue::createDirectory(const QString &path, bool root)
 	{
 		mtp::u32 dirId = _model->createDirectory(fi.fileName());
 		_directories[path] = dirId;
+		_model->setParent(dirId);
 	} catch(const std::exception &ex)
 	{ qDebug() << "creating directory" << path << "failed: " << fromUtf8(ex.what()); return; }
 }
