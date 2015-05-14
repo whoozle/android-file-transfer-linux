@@ -77,16 +77,16 @@ void DownloadFile::execute(CommandQueue &queue)
 	queue.addProgress(fi.size());
 }
 
-void CommandQueue::createDirectory(const QString &path, bool root)
+void CommandQueue::createDirectory(const QString &srcPath, bool root)
 {
+	QDir dir(srcPath);
+	QString path = dir.path();
 	qDebug() << "making directory" << path;
-	QDir dir(path);
 	QDir parentDir(path);
 	Q_ASSERT(parentDir.cdUp());
 	QString parentPath = parentDir.path();
 	qDebug() << "parent: " << parentPath << ", dir: " << dir.dirName();
-	if (_directories.empty())
-		_directories[parentPath] = _model->parentObjectId();
+
 	if (!root)
 	{
 		auto parent = _directories.find(parentPath);
@@ -94,6 +94,9 @@ void CommandQueue::createDirectory(const QString &path, bool root)
 		if (_model->parentObjectId() != parent.value())
 			_model->setParent(parent.value());
 	}
+	else
+		_directories[parentPath] = _model->parentObjectId();
+
 	try
 	{
 		mtp::u32 dirId = _model->createDirectory(dir.dirName());
