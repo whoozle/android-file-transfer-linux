@@ -163,6 +163,10 @@ QVariant MtpObjectsModel::data(const QModelIndex &index, int role) const
 
 mtp::u32 MtpObjectsModel::createDirectory(const QString &name, mtp::AssociationType type)
 {
+	QModelIndex existingDir = findObject(name);
+	if (existingDir.isValid())
+		return _rows.at(existingDir.row()).ObjectId;
+
 	mtp::u32 storageId = _storageId != mtp::Session::AllStorages? _storageId: mtp::Session::Device;
 	mtp::Session::NewObjectInfo noi = _session->CreateDirectory(toUtf8(name), _parentObjectId, storageId, type);
 	beginInsertRows(QModelIndex(), _rows.size(), _rows.size());
