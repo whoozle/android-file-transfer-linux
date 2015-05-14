@@ -80,8 +80,11 @@ void DownloadFile::execute(CommandQueue &queue)
 void CommandQueue::createDirectory(const QString &path, bool root)
 {
 	qDebug() << "making directory" << path;
-	QFileInfo fi(path);
-	QString parentPath = fi.dir().path();
+	QDir dir(path);
+	QDir parentDir(path);
+	Q_ASSERT(parentDir.cdUp());
+	QString parentPath = parentDir.path();
+	qDebug() << "parent: " << parentPath << ", dir: " << dir.dirName();
 	if (_directories.empty())
 		_directories[parentPath] = _model->parentObjectId();
 	if (!root)
@@ -93,7 +96,7 @@ void CommandQueue::createDirectory(const QString &path, bool root)
 	}
 	try
 	{
-		mtp::u32 dirId = _model->createDirectory(fi.fileName());
+		mtp::u32 dirId = _model->createDirectory(dir.dirName());
 		_directories[path] = dirId;
 		_model->setParent(dirId);
 	} catch(const std::exception &ex)

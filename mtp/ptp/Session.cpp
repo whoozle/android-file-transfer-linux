@@ -190,6 +190,8 @@ namespace mtp
 
 	Session::NewObjectInfo Session::SendObjectInfo(const msg::ObjectInfo &objectInfo, u32 storageId, u32 parentObject)
 	{
+		if (objectInfo.Filename.empty())
+			throw std::runtime_error("object filename must not be empty");
 		scoped_mutex_lock l(_mutex);
 		u32 transaction = _transactionId++;
 		Send(OperationRequest(OperationCode::SendObjectInfo, transaction, storageId, parentObject));
