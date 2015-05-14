@@ -77,6 +77,12 @@ QModelIndex MtpObjectsModel::findObject(mtp::u32 objectId) const
 	return idx != _rows.end()? createIndex(std::distance(_rows.begin(), idx), 0): QModelIndex();
 }
 
+QModelIndex MtpObjectsModel::findObject(const QString &filename) const
+{
+	auto idx = std::find_if(_rows.begin(), _rows.end(), [filename, this](Row & row) { return fromUtf8(row.GetInfo(_session)->Filename) == filename; } );
+	return idx != _rows.end()? createIndex(std::distance(_rows.begin(), idx), 0): QModelIndex();
+}
+
 void MtpObjectsModel::setSession(mtp::SessionPtr session)
 {
 	beginResetModel();
@@ -176,19 +182,16 @@ bool MtpObjectsModel::uploadFile(const QString &filePath, QString filename)
 	qDebug() << "uploadFile " << fileInfo.fileName() << " as " << filename;
 
 	bool needReset = false;
-	for(auto & row : _rows)
+	QModelIndex existingObject = findObject(filename);
+	if (existingObject.isValid())
 	{
-		mtp::msg::ObjectInfoPtr oi = row.GetInfo(_session);
-		if (fromUtf8(oi->Filename) == filename)
+		if (!emit existingFileOverwrite(filename))
 		{
-			if (!emit existingFileOverwrite(filename))
-			{
-				qDebug() << "skipping, overwrite not confirmed";
-				return false;
-			}
-			_session->DeleteObject(row.ObjectId);
-			needReset = true;
+			qDebug() << "skipping, overwrite not confirmed";
+			return false;
 		}
+		_session->DeleteObject(_rows[existingObject.row()].ObjectId);
+		needReset = true;
 	}
 
 	std::shared_ptr<QtObjectInputStream> object(new QtObjectInputStream(filePath));
