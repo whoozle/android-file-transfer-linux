@@ -27,7 +27,11 @@
 
 void FinishQueue::execute(CommandQueue &queue)
 {
-	queue.model()->setParent(DirectoryId);
+	try
+	{
+		queue.model()->setParent(DirectoryId);
+	} catch(const std::exception &ex)
+	{ qDebug() << "finalizing commands failed: " << fromUtf8(ex.what()); }
 	queue.finish();
 }
 
@@ -51,10 +55,10 @@ void CommandQueue::uploadFile(const QString &filename)
 	start(fi.fileName());
 	auto parent = _directories.find(fi.dir().path());
 	Q_ASSERT(parent != _directories.end());
-	if (_model->parentObjectId() != parent.value())
-		_model->setParent(parent.value());
 	try
 	{
+		if (_model->parentObjectId() != parent.value())
+			_model->setParent(parent.value());
 		_model->uploadFile(filename);
 	} catch(const std::exception &ex)
 	{ qDebug() << "uploading file " << filename << " failed: " << fromUtf8(ex.what()); }
