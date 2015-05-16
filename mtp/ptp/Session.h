@@ -87,7 +87,7 @@ namespace mtp
 		void GetObject(u32 objectId, const IObjectOutputStreamPtr &outputStream);
 		ByteArray GetPartialObject(u32 objectId, u64 offset, u32 size);
 		NewObjectInfo SendObjectInfo(const msg::ObjectInfo &objectInfo, u32 storageId = 0, u32 parentObject = 0);
-		void SendObject(const IObjectInputStreamPtr &inputStream);
+		void SendObject(const IObjectInputStreamPtr &inputStream, int timeout = 10000);
 		void DeleteObject(u32 objectId);
 
 		bool EditObjectSupported() const

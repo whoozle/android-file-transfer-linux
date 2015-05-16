@@ -215,7 +215,7 @@ namespace mtp
 		return noi;
 	}
 
-	void Session::SendObject(const IObjectInputStreamPtr &inputStream)
+	void Session::SendObject(const IObjectInputStreamPtr &inputStream, int timeout)
 	{
 		scoped_mutex_lock l(_mutex);
 		u32 transaction = _transactionId++;
@@ -223,7 +223,7 @@ namespace mtp
 		{
 			DataRequest req(OperationCode::SendObject, transaction);
 			Container container(req, inputStream);
-			_packeter.Write(std::make_shared<JoinedObjectInputStream>(std::make_shared<ByteArrayObjectInputStream>(container.Data), inputStream), 6000);
+			_packeter.Write(std::make_shared<JoinedObjectInputStream>(std::make_shared<ByteArrayObjectInputStream>(container.Data), inputStream), timeout);
 		}
 		Get(transaction);
 	}
