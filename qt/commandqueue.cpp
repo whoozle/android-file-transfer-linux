@@ -135,10 +135,11 @@ void CommandQueue::start(const QString &filename)
 
 void CommandQueue::finish()
 {
+	qDebug() << "finishing queue";
 	_model->moveToThread(QApplication::instance()->thread());
-	emit finished();
 	_completedFilesSize = 0;
 	_directories.clear();
+	emit finished();
 }
 
 void CommandQueue::addProgress(qint64 fileSize)
