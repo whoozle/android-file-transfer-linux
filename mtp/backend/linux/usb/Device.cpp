@@ -157,7 +157,7 @@ namespace mtp { namespace usb
 		if (r < 0)
 			throw Exception("poll");
 
-		if (r == 0)
+		if (r == 0 && timeout > 0)
 		{
 			int ms = (now.tv_sec - started.tv_sec) * 1000 + (now.tv_usec - started.tv_usec) / 1000;
 			fprintf(stderr, "%d ms since the last poll call\n", ms);
@@ -201,6 +201,8 @@ namespace mtp { namespace usb
 					break;
 			}
 		}
+		catch(const TimeoutException &ex)
+		{ throw; }
 		catch(const std::exception &ex)
 		{
 			fprintf(stderr, "error while submitting urb: %s\n", ex.what());
