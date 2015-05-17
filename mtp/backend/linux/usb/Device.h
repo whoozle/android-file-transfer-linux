@@ -23,6 +23,7 @@
 #include <mtp/ByteArray.h>
 #include <usb/Interface.h>
 #include <mtp/ptp/IObjectStream.h>
+#include <mtp/Token.h>
 #include <map>
 
 namespace mtp { namespace usb
@@ -56,7 +57,7 @@ namespace mtp { namespace usb
 		Device(int fd);
 		~Device();
 
-		class InterfaceToken : Noncopyable
+		class InterfaceToken : public IToken
 		{
 			int			_fd;
 			unsigned	_interfaceNumber;

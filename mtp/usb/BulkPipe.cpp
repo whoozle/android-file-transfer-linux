@@ -50,7 +50,7 @@ namespace mtp { namespace usb
 		_device->WriteBulk(_out, inputStream, timeout);
 	}
 
-	BulkPipePtr BulkPipe::Create(usb::DevicePtr device, ConfigurationPtr conf, usb::InterfacePtr interface)
+	BulkPipePtr BulkPipe::Create(const usb::DevicePtr & device, const ConfigurationPtr & conf, const usb::InterfacePtr & interface)
 	{
 		int epn = interface->GetEndpointsCount();
 

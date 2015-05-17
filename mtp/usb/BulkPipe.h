@@ -19,23 +19,30 @@
 #ifndef BULKPIPE_H
 #define	BULKPIPE_H
 
-#include <usb/Device.h>
-#include <usb/Interface.h>
+#include <mtp/Token.h>
 #include <mtp/ByteArray.h>
 #include <mtp/ptp/IObjectStream.h>
 
 namespace mtp { namespace usb
 {
+	class Device;
+	DECLARE_PTR(Device);
+	class Configuration;
+	DECLARE_PTR(Configuration);
+	class Interface;
+	DECLARE_PTR(Interface);
+	class Endpoint;
+	DECLARE_PTR(Endpoint);
 	class BulkPipe;
 	DECLARE_PTR(BulkPipe);
 
 	class BulkPipe
 	{
-		DevicePtr					_device;
-		ConfigurationPtr			_conf;
-		InterfacePtr				_interface;
-		EndpointPtr					_in, _out, _interrupt;
-		Device::InterfaceTokenPtr	_claimToken;
+		DevicePtr				_device;
+		ConfigurationPtr		_conf;
+		InterfacePtr			_interface;
+		EndpointPtr				_in, _out, _interrupt;
+		ITokenPtr				_claimToken;
 
 	public:
 		BulkPipe(DevicePtr device, ConfigurationPtr conf, InterfacePtr interface, EndpointPtr in, EndpointPtr out, EndpointPtr interrupt);
@@ -46,7 +53,7 @@ namespace mtp { namespace usb
 		void Read(const IObjectOutputStreamPtr &outputStream, int timeout = 10000);
 		void Write(const IObjectInputStreamPtr &inputStream, int timeout = 10000);
 
-		static BulkPipePtr Create(usb::DevicePtr device, ConfigurationPtr conf, usb::InterfacePtr owner);
+		static BulkPipePtr Create(const usb::DevicePtr & device, const ConfigurationPtr & conf, const usb::InterfacePtr & owner);
 	};
 
 }}
