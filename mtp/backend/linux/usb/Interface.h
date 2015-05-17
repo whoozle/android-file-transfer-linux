@@ -31,7 +31,7 @@ namespace mtp { namespace usb
 
 	enum struct EndpointDirection
 	{
-		In, Out
+		In, Out, Both
 	};
 
 

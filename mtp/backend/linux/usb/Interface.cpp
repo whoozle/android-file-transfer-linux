@@ -42,6 +42,8 @@ namespace mtp { namespace usb
 			_direction = EndpointDirection::Out;
 		else if (dir == "in")
 			_direction = EndpointDirection::In;
+		else if (dir == "both")
+			_direction = EndpointDirection::Both;
 		else
 			throw std::runtime_error("invalid endpoint direction " + dir);
 
