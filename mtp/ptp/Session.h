@@ -35,10 +35,13 @@ namespace mtp
 
 	class Session
 	{
-		std::mutex		_mutex;
+		class Transaction;
+
+		std::mutex		_mutex, _transactionMutex;
 		PipePacketer	_packeter;
 		u32				_sessionId;
 		u32				_nextTransactionId;
+		Transaction *	_transaction;
 
 		msg::DeviceInfo	_deviceInfo;
 		bool			_getPartialObject64Supported;
@@ -106,6 +109,8 @@ namespace mtp
 		ByteArray GetDeviceProperty(DeviceProperty property);
 
 	private:
+		void SetCurrentTransaction(Transaction *);
+
 		msg::DeviceInfo GetDeviceInfoImpl();
 
 		void BeginEditObject(u32 objectId);
