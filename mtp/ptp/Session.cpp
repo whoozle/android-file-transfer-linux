@@ -383,7 +383,7 @@ namespace mtp
 		_session->SendPartialObject(_objectId, offset, data);
 	}
 
-	void Session::AbortCurrentTransaction()
+	void Session::AbortCurrentTransaction(int timeout)
 	{
 		u32 transactionId;
 		{
@@ -397,7 +397,7 @@ namespace mtp
 		s.Write16(0x4001);
 		s.Write32(transactionId);
 		HexDump("abort control message", data);
-		_packeter.GetPipe()->GetDevice()->WriteControl(0x21, 0x64, 0, 0, data, true, 5000);
+		_packeter.GetPipe()->GetDevice()->WriteControl(0x21, 0x64, 0, 0, data, true, timeout);
 		/* 0x21: host-to-device, class specific, recipient - interface, 0x64: cancel request */
 	}
 

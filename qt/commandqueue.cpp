@@ -153,7 +153,7 @@ void CommandQueue::abort()
 {
 	qDebug() << "aborting...";
 	_aborted = true;
-	_model->session()->AbortCurrentTransaction();
+	_model->session()->AbortCurrentTransaction(6000);
 	qDebug() << "sent abort request";
 }
 

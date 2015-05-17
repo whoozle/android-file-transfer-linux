@@ -108,7 +108,7 @@ namespace mtp
 
 		ByteArray GetDeviceProperty(DeviceProperty property);
 
-		void AbortCurrentTransaction();
+		void AbortCurrentTransaction(int timeout);
 
 	private:
 		void SetCurrentTransaction(Transaction *);
