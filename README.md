@@ -28,7 +28,7 @@ If you're suffering from crashes, missing tags and album covers, usb freezes and
 
 ### Prerequisites
 
-* You will need qt libraries for building ui program. If you're want to use only library (*Qt is not needed*), you could turn the option ```BUILD_QT_UI``` off.
+* You will need qt libraries for building ui program. If you want to use only library (*Qt is not needed*), you could turn the option ```BUILD_QT_UI``` off.
 * For ubuntu and other debian-based distros use the following command:
 
   ```shell
