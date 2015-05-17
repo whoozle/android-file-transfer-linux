@@ -59,6 +59,7 @@ namespace mtp { namespace usb
 		int								_deviceNumber;
 		std::map<int, ConfigurationPtr>	_configurationMap;
 		std::vector<ConfigurationPtr>	_configuration;
+		EndpointPtr						_controlEp;
 
 	public:
 		DeviceDescriptor(int busId, const std::string &path);

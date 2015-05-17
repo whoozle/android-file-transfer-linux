@@ -48,13 +48,14 @@ namespace mtp { namespace usb
 	private:
 		FileHandler					_fd;
 		u32							_capabilities;
+		EndpointPtr					_controlEp;
 
 		struct Urb;
 		DECLARE_PTR(Urb);
 		std::map<void *, UrbPtr>	_urbs;
 
 	public:
-		Device(int fd);
+		Device(int fd, const EndpointPtr &controlEp);
 		~Device();
 
 		class InterfaceToken : public IToken
@@ -76,10 +77,13 @@ namespace mtp { namespace usb
 		void WriteBulk(const EndpointPtr & ep, const IObjectInputStreamPtr &inputStream, int timeout);
 		void ReadBulk(const EndpointPtr & ep, const IObjectOutputStreamPtr &outputStream, int timeout);
 
+		void WriteControl(const ByteArray &data, int timeout);
+		ByteArray ReadControl(int timeout);
+
+	private:
 		void Write(const EndpointPtr & ep, const ByteArray &data, int timeout);
 		ByteArray Read(const EndpointPtr & ep, int timeout);
 
-	private:
 		static u8 TransactionType(const EndpointPtr &ep);
 		void * Reap(int timeout);
 		void Submit(const UrbPtr &urb, int timeout);

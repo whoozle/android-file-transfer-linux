@@ -46,7 +46,7 @@ namespace mtp { namespace usb
 		ioctl(_fd, USBDEVFS_RELEASEINTERFACE, &_interfaceNumber);
 	}
 
-	Device::Device(int fd): _fd(fd), _capabilities(0)
+	Device::Device(int fd, const EndpointPtr &controlEp): _fd(fd), _capabilities(0), _controlEp(controlEp)
 	{
 		int r = lockf(_fd.Get(), F_TLOCK, 0);
 		if (r == -1)
@@ -270,6 +270,13 @@ namespace mtp { namespace usb
 		Submit(urb, timeout);
 		return urb->Recv();
 	}
+
+	void Device::WriteControl(const ByteArray &data, int timeout)
+	{ Write(_controlEp, data, timeout); }
+
+	ByteArray Device::ReadControl(int timeout)
+	{ return Read(_controlEp, timeout); }
+
 
 
 }}

@@ -30,6 +30,7 @@ namespace mtp { namespace usb
 		_vendor			= Directory::ReadInt(path + "/idVendor");
 		_product		= Directory::ReadInt(path + "/idProduct");
 		_deviceNumber	= Directory::ReadInt(path + "/devnum", 10);
+		_controlEp		= std::make_shared<Endpoint>(path + "/ep_00");
 	}
 
 	DevicePtr DeviceDescriptor::Open(ContextPtr context)
@@ -45,7 +46,7 @@ namespace mtp { namespace usb
 		char fname[256];
 		snprintf(fname, sizeof(fname), "/dev/bus/usb/%03d/%03u", _busId, _deviceNumber);
 		int fd = open(fname, O_RDWR);
-		return fd != -1? std::make_shared<Device>(fd): nullptr;
+		return fd != -1? std::make_shared<Device>(fd, _controlEp): nullptr;
 	}
 
 	DeviceDescriptor::~DeviceDescriptor()
