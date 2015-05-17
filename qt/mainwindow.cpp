@@ -452,7 +452,7 @@ void MainWindow::uploadAlbum()
 
 	for(const auto &path : selected)
 	{
-		uploadAlbum(d.directory().absolutePath());
+		uploadAlbum(path);
 		back();
 	}
 }
