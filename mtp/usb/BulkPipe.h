@@ -48,6 +48,8 @@ namespace mtp { namespace usb
 		BulkPipe(DevicePtr device, ConfigurationPtr conf, InterfacePtr interface, EndpointPtr in, EndpointPtr out, EndpointPtr interrupt);
 		~BulkPipe();
 
+		DevicePtr GetDevice() const;
+
 		ByteArray ReadInterrupt();
 
 		void Read(const IObjectOutputStreamPtr &outputStream, int timeout = 10000);

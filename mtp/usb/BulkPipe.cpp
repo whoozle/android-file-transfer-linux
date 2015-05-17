@@ -34,6 +34,9 @@ namespace mtp { namespace usb
 	BulkPipe::~BulkPipe()
 	{ }
 
+	DevicePtr BulkPipe::GetDevice() const
+	{ return _device; }
+
 	ByteArray BulkPipe::ReadInterrupt()
 	{
 		ByteArray data;//_interrupt->GetMaxPacketSize());
