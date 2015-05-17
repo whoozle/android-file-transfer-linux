@@ -25,6 +25,7 @@
 #include <mtp/ptp/IObjectStream.h>
 #include <mtp/Token.h>
 #include <map>
+#include <queue>
 
 namespace mtp { namespace usb
 {
@@ -53,7 +54,8 @@ namespace mtp { namespace usb
 
 		struct Urb;
 		DECLARE_PTR(Urb);
-		std::map<void *, UrbPtr>	_urbs;
+		std::map<void *, UrbPtr>			_urbs;
+		std::queue<std::function<void ()>>	_controls;
 
 	public:
 		Device(int fd, const EndpointPtr &controlEp);
@@ -78,12 +80,13 @@ namespace mtp { namespace usb
 		void WriteBulk(const EndpointPtr & ep, const IObjectInputStreamPtr &inputStream, int timeout);
 		void ReadBulk(const EndpointPtr & ep, const IObjectOutputStreamPtr &outputStream, int timeout);
 
-		void WriteControl(u8 type, u8 req, u16 value, u16 index, const ByteArray &data, int timeout);
+		void WriteControl(u8 type, u8 req, u16 value, u16 index, const ByteArray &data, bool interruptCurrentTransaction, int timeout);
 
 	private:
 		static u8 TransactionType(const EndpointPtr &ep);
 		void * Reap(int timeout);
 		void Submit(const UrbPtr &urb, int timeout);
+		void ProcessControl();
 	};
 	DECLARE_PTR(Device);
 }}

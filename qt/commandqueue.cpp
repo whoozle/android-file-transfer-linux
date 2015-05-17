@@ -153,6 +153,8 @@ void CommandQueue::abort()
 {
 	qDebug() << "aborting...";
 	_aborted = true;
+	_model->session()->AbortCurrentTransaction();
+	qDebug() << "sent abort request";
 }
 
 void CommandQueue::addProgress(qint64 fileSize)

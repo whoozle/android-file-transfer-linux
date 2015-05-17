@@ -222,6 +222,8 @@ namespace mtp { namespace usb
 			urb->SetContinuationFlag(continuation);
 			continuation = true;
 			Submit(urb, timeout);
+
+			ProcessControl();
 		}
 		while(r == transferSize);
 	}
@@ -238,6 +240,8 @@ namespace mtp { namespace usb
 			urb->SetContinuationFlag(continuation);
 			continuation = true;
 			Submit(urb, timeout);
+
+			ProcessControl();
 			r = urb->Recv(outputStream);
 		}
 		while(r == transferSize);
@@ -261,7 +265,7 @@ namespace mtp { namespace usb
 		}
 	}
 
-	void Device::WriteControl(u8 type, u8 req, u16 value, u16 index, const ByteArray &data, int timeout)
+	void Device::WriteControl(u8 type, u8 req, u16 value, u16 index, const ByteArray &data, bool interruptCurrentTransaction, int timeout)
 	{
 		usbdevfs_ctrltransfer ctrl = { };
 		ctrl.bRequestType = type;
@@ -271,13 +275,35 @@ namespace mtp { namespace usb
 		ctrl.wLength = data.size();
 		ctrl.data = const_cast<u8 *>(data.data());
 		ctrl.timeout = timeout;
-		int r = ioctl(_fd.Get(), USBDEVFS_CONTROL, &ctrl);
-		if (r == 0)
-			return;
-		else if (errno == EAGAIN)
-			throw TimeoutException("timeout sending control transfer");
-		else
-			throw Exception("ioctl");
+
+		int fd = _fd.Get();
+
+		_controls.push(
+		[fd, ctrl, interruptCurrentTransaction]()
+		{
+			int r = ioctl(fd, USBDEVFS_CONTROL, &ctrl);
+			if (r >= 0)
+			{
+				if (interruptCurrentTransaction)
+					throw std::runtime_error("transaction aborted");
+				else
+					return;
+			}
+			else if (errno == EAGAIN)
+				throw TimeoutException("timeout sending control transfer");
+			else
+				throw Exception("ioctl");
+		});
+	}
+
+	void Device::ProcessControl()
+	{
+		scoped_mutex_lock l(_mutex);
+		while(!_controls.empty())
+		{
+			try { _controls.front()(); } catch(const std::exception &ex) { _controls.pop(); throw; }
+			_controls.pop();
+		}
 	}
 
 }}
