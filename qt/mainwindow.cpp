@@ -183,10 +183,12 @@ void MainWindow::onStorageChanged(int idx)
 	updateActionsState();
 }
 
-void MainWindow::onActivated ( const QModelIndex & index )
+void MainWindow::onActivated ( const QModelIndex & proxyIndex )
 {
-	if (_objectModel->enter(mapIndex(index).row()))
-		_history.push_back(_objectModel->parentObjectId());
+	QModelIndex index = mapIndex(proxyIndex);
+	QString name = _objectModel->data(index).toString();
+	if (_objectModel->enter(index.row()))
+		_history.push_back(qMakePair(name, _objectModel->parentObjectId()));
 	updateActionsState();
 }
 
@@ -198,6 +200,11 @@ void MainWindow::updateActionsState()
 	_ui->actionRename->setEnabled(rows.size() == 1);
 	_ui->actionGo_Down->setEnabled(rows.size() == 1);
 	_ui->actionBack->setEnabled(!_history.empty());
+
+	QStringList statusList;
+	for(const auto & h : _history)
+		statusList.push_back(h.first);
+	_ui->statusBar->showMessage(statusList.join(QString::fromUtf8(" » ")));
 }
 
 void MainWindow::refresh()
@@ -277,7 +284,7 @@ void MainWindow::back()
 		return;
 	mtp::u32 oldParent = _objectModel->parentObjectId();
 	_history.pop_back();
-	mtp::u32 oid = _history.empty()? mtp::Session::Root: _history.back();
+	mtp::u32 oid = _history.empty()? mtp::Session::Root: _history.back().second;
 	_objectModel->setParent(oid);
 	QModelIndex prevIndex = _objectModel->findObject(oldParent);
 	if (prevIndex.isValid())
@@ -287,8 +294,10 @@ void MainWindow::back()
 
 void MainWindow::down()
 {
-	if (_objectModel->enter(mapIndex(_ui->listView->currentIndex()).row()))
-		_history.push_back(_objectModel->parentObjectId());
+	QModelIndex index = mapIndex(_ui->listView->currentIndex());
+	QString name = _objectModel->data(index).toString();
+	if (_objectModel->enter(index.row()))
+		_history.push_back(qMakePair(name, _objectModel->parentObjectId()));
 	updateActionsState();
 }
 
@@ -491,7 +500,7 @@ void MainWindow::uploadAlbum(QString dirPath)
 
 	mtp::u32 dirId = _objectModel->createDirectory(dir.dirName(), mtp::AssociationType::Album);
 	_objectModel->setParent(dirId);
-	_history.push_back(dirId);
+	_history.push_back(qMakePair(dir.dirName(), dirId));
 
 	QString cover, coverTarget;
 	QStringList covers;

@@ -80,7 +80,8 @@ private:
 	MtpStoragesModel *			_storageModel;
 	MtpObjectsModel *			_objectModel;
 	FileUploader *				_uploader;
-	QVector<mtp::u32>			_history;
+	typedef QVector<QPair<QString, mtp::u32>> History;
+	History						_history;
 	int							_uploadAnswer;
 
 	mtp::DevicePtr				_device;
