@@ -41,9 +41,14 @@ namespace mtp { namespace usb
 
 	ByteArray BulkPipe::ReadInterrupt()
 	{
+#if 0
+#warning causes out of memory errors in some time
 		ByteArrayObjectOutputStreamPtr s(new ByteArrayObjectOutputStream());
 		try { _device->ReadBulk(_interrupt, s, 0); } catch(const TimeoutException &ex) { return ByteArray(); }
 		return std::move(s->GetData());
+#else
+		return ByteArray();
+#endif
 	}
 
 	void BulkPipe::Read(const IObjectOutputStreamPtr &outputStream, int timeout)
