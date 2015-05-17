@@ -202,7 +202,10 @@ namespace mtp { namespace usb
 			}
 		}
 		catch(const TimeoutException &ex)
-		{ throw; }
+		{
+			urb->Discard();
+			throw;
+		}
 		catch(const std::exception &ex)
 		{
 			fprintf(stderr, "error while submitting urb: %s\n", ex.what());
