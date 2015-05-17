@@ -146,7 +146,17 @@ void MainWindow::showEvent(QShowEvent *)
 		}
 
 		_storageModel = new MtpStoragesModel(this);
-		_storageModel->update(session);
+		while (!_storageModel->update(session))
+		{
+			int r = QMessageBox::warning(this, tr("No MTP Storages"),
+				tr("No MTP storage found, your device might be locked.\nPlease unlock and press Retry to continue or Abort to exit."),
+				QMessageBox::Retry | QMessageBox::Abort);
+			if (r & QMessageBox::Abort)
+			{
+				_device.reset();
+				return;
+			}
+		}
 		_ui->storageList->setModel(_storageModel);
 		_objectModel->setSession(session);
 		onStorageChanged(_ui->storageList->currentIndex());

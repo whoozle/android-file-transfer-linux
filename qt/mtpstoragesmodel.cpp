@@ -5,7 +5,7 @@
 MtpStoragesModel::MtpStoragesModel(QObject *parent): QAbstractListModel(parent)
 { }
 
-void MtpStoragesModel::update(const mtp::SessionPtr &session)
+bool MtpStoragesModel::update(const mtp::SessionPtr &session)
 {
 	beginResetModel();
 	_storages.clear();
@@ -19,6 +19,7 @@ void MtpStoragesModel::update(const mtp::SessionPtr &session)
 	anyStorage.StorageDescription = toUtf8(tr("All storages (BUGS, BEWARE)"));
 	_storages.append(qMakePair((mtp::u32)mtp::Session::AllStorages, anyStorage));
 	endResetModel();
+	return !storages.StorageIDs.empty();
 }
 
 mtp::u32 MtpStoragesModel::getStorageId(int idx) const

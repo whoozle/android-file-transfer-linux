@@ -12,7 +12,7 @@ class MtpStoragesModel : public QAbstractListModel
 
 public:
 	MtpStoragesModel(QObject *parent = 0);
-	void update(const mtp::SessionPtr &session);
+	bool update(const mtp::SessionPtr &session);
 
 	mtp::u32 getStorageId(int idx) const;
 	virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
