@@ -74,8 +74,8 @@ MainWindow::MainWindow(QWidget *parent) :
 	//fixme: find out how to specify alternative in designer
 	_ui->actionBack->setShortcuts(_ui->actionBack->shortcuts() << QKeySequence("Alt+Up") << QKeySequence("Esc"));
 	_ui->actionGo_Down->setShortcuts(_ui->actionGo_Down->shortcuts() << QKeySequence("Alt+Down") << QKeySequence("Enter"));
-	_ui->actionRename->setShortcuts(_ui->actionRename->shortcuts() << QKeySequence("F3"));
-	_ui->actionCreateDirectory->setShortcuts(_ui->actionRename->shortcuts() << QKeySequence("F7"));
+	_ui->actionCreateDirectory->setShortcuts(_ui->actionCreateDirectory->shortcuts() << QKeySequence("F7"));
+	_ui->actionRefresh->setShortcuts(_ui->actionRefresh->shortcuts() << QKeySequence("Ctrl+R"));
 	_ui->listView->setFocus();
 }
 

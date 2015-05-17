@@ -108,6 +108,9 @@
    <property name="text">
     <string>Upload</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+U</string>
+   </property>
   </action>
   <action name="actionCreateDirectory">
    <property name="icon">
@@ -117,6 +120,9 @@
    </property>
    <property name="text">
     <string>&amp;CreateDirectory</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
    </property>
   </action>
   <action name="actionUploadDirectory">
@@ -165,7 +171,7 @@
     <string>&amp;Rename</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+R</string>
+    <string>F2</string>
    </property>
   </action>
   <action name="actionDelete">
@@ -204,10 +210,12 @@
   </action>
   <action name="actionRefresh">
    <property name="icon">
-    <iconset theme="view-refresh"/>
+    <iconset theme="view-refresh">
+     <normaloff/>
+    </iconset>
    </property>
    <property name="text">
-    <string>Refresh</string>
+    <string>Re&amp;fresh</string>
    </property>
    <property name="shortcut">
     <string>F5</string>
