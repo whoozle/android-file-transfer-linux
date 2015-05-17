@@ -22,6 +22,7 @@
 #include <mtp/ptp/OperationRequest.h>
 #include <mtp/ptp/ByteArrayObjectStream.h>
 #include <mtp/ptp/JoinedObjectStream.h>
+#include <usb/Device.h>
 #include <limits>
 
 namespace mtp
@@ -380,6 +381,27 @@ namespace mtp
 	void Session::ObjectEditSession::Send(u64 offset, const ByteArray &data)
 	{
 		_session->SendPartialObject(_objectId, offset, data);
+	}
+
+	void Session::AbortCurrentTransaction()
+	{
+		u32 transactionId;
+		{
+			scoped_mutex_lock l(_transactionMutex);
+			if (!_transaction)
+				throw std::runtime_error("no transaction in progress");
+			transactionId = _transaction->Id;
+		}
+		ByteArray data;
+		OutputStream s(data);
+		s.Write8(0x21); //00100001 Host-to-Device, Class-Specific, Recipient-Interface
+		s.Write8(0x64); //Cancel_Request (0x64 request)
+		s.Write16(0);
+		s.Write16(0);
+		s.Write16(6); //length
+		s.Write16(0x4001);
+		s.Write32(transactionId);
+		_packeter.GetPipe()->GetDevice()->WriteControl(data, 5000);
 	}
 
 }

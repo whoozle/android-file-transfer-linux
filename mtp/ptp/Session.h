@@ -108,6 +108,8 @@ namespace mtp
 
 		ByteArray GetDeviceProperty(DeviceProperty property);
 
+		void AbortCurrentTransaction();
+
 	private:
 		void SetCurrentTransaction(Transaction *);
 
