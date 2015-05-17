@@ -20,6 +20,7 @@
 #define	DEVICE_H
 
 #include <mtp/types.h>
+#include <mtp/ByteArray.h>
 #include <usb/Interface.h>
 #include <mtp/ptp/IObjectStream.h>
 #include <map>
@@ -74,7 +75,11 @@ namespace mtp { namespace usb
 		void WriteBulk(const EndpointPtr & ep, const IObjectInputStreamPtr &inputStream, int timeout);
 		void ReadBulk(const EndpointPtr & ep, const IObjectOutputStreamPtr &outputStream, int timeout);
 
+		void Write(const EndpointPtr & ep, const ByteArray &data, int timeout);
+		ByteArray Read(const EndpointPtr & ep, int timeout);
+
 	private:
+		static u8 TransactionType(const EndpointPtr &ep);
 		void * Reap(int timeout);
 		void Submit(const UrbPtr &urb, int timeout);
 	};

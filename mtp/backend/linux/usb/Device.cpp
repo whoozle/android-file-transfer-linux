@@ -75,13 +75,14 @@ namespace mtp { namespace usb
 
 	struct Device::Urb
 	{
-		static const unsigned	PacketsPerBuffer = 1024;
-
 		int						Fd;
 		ByteArray				Buffer;
 		usbdevfs_urb			KernelUrb;
 
-		Urb(int fd, u8 type, const EndpointPtr & ep): Fd(fd), Buffer(PacketsPerBuffer * ep->GetMaxPacketSize()), KernelUrb()
+		static size_t PacketsPerBuffer(u8 type)
+		{ return type == USBDEVFS_URB_TYPE_BULK? 1024: 1; }
+
+		Urb(int fd, u8 type, const EndpointPtr & ep): Fd(fd), Buffer(PacketsPerBuffer(type) * ep->GetMaxPacketSize()), KernelUrb()
 		{
 			usbdevfs_urb &urb = KernelUrb;
 			urb.type			= type;
@@ -112,11 +113,22 @@ namespace mtp { namespace usb
 			return r;
 		}
 
+		size_t Send(const ByteArray &inputData)
+		{
+			size_t r = std::min(Buffer.size(), inputData.size());
+			std::copy(inputData.data(), inputData.data() + r, Buffer.data());
+			KernelUrb.buffer_length = r;
+			return r;
+		}
+
 		size_t Recv(const IObjectOutputStreamPtr &outputStream)
 		{
 			//HexDump("read", ByteArray(Buffer.data(), Buffer.data() + KernelUrb.actual_length));
 			return outputStream->Write(Buffer.data(), KernelUrb.actual_length);
 		}
+
+		ByteArray Recv()
+		{ return ByteArray(Buffer.begin(), Buffer.begin() + KernelUrb.actual_length); }
 
 		void SetContinuationFlag(bool continuation)
 		{
@@ -226,5 +238,38 @@ namespace mtp { namespace usb
 		}
 		while(r == transferSize);
 	}
+
+	u8 Device::TransactionType(const EndpointPtr &ep)
+	{
+		EndpointType type = ep->GetType();
+		switch(type)
+		{
+		case EndpointType::Control:
+			return USBDEVFS_URB_TYPE_CONTROL;
+		case EndpointType::Isochronous:
+			return USBDEVFS_URB_TYPE_ISO;
+		case EndpointType::Bulk:
+			return USBDEVFS_URB_TYPE_BULK;
+		case EndpointType::Interrupt:
+			return USBDEVFS_URB_TYPE_INTERRUPT;
+		default:
+			throw std::runtime_error("invalid endpoint type");
+		}
+	}
+
+	void Device::Write(const EndpointPtr & ep, const ByteArray &data, int timeout)
+	{
+		UrbPtr urb = std::make_shared<Urb>(_fd.Get(), TransactionType(ep), ep);
+		urb->Send(data);
+		Submit(urb, timeout);
+	}
+
+	ByteArray Device::Read(const EndpointPtr & ep, int timeout)
+	{
+		UrbPtr urb = std::make_shared<Urb>(_fd.Get(), TransactionType(ep), ep);
+		Submit(urb, timeout);
+		return urb->Recv();
+	}
+
 
 }}
