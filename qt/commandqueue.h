@@ -78,6 +78,7 @@ private:
 	qint64						_completedFilesSize;
 	QString						_root;
 	QMap<QString, quint32>		_directories;
+	volatile bool				_aborted;
 
 public:
 	CommandQueue(MtpObjectsModel *model);
@@ -88,13 +89,15 @@ public:
 
 	void createDirectory(const QString &path, bool root);
 	void uploadFile(const QString &file);
+	void downloadFile(const QString &filename, quint32 objectId);
 
 public slots:
 	void onFileProgress(qint64, qint64);
 	void execute(Command *cmd);
 	void start(const QString &filename);
-	void finish();
+	void finish(quint32 directoryId);
 	void addProgress(qint64);
+	void abort();
 
 signals:
 	void started(QString);

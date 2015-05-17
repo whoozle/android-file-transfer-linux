@@ -25,6 +25,7 @@
 
 class MtpObjectsModel;
 struct Command;
+class CommandQueue;
 
 class FileUploader : public QObject
 {
@@ -33,8 +34,10 @@ class FileUploader : public QObject
 private:
 	MtpObjectsModel	*	_model;
 	QThread				_workerThread;
+	CommandQueue *		_worker;
 	qint64				_total;
 	QDateTime			_startedAt;
+	bool				_aborted;
 
 private slots:
 	void onProgress(qint64 current);

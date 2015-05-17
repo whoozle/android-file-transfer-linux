@@ -27,16 +27,17 @@
 
 FileUploader::FileUploader(MtpObjectsModel * model, QObject *parent) :
 	QObject(parent),
-	_model(model)
+	_model(model),
+	_aborted(false)
 {
-	CommandQueue * worker = new CommandQueue(_model);
-	worker->moveToThread(&_workerThread);
+	_worker = new CommandQueue(_model);
+	_worker->moveToThread(&_workerThread);
 
 	connect(&_workerThread, SIGNAL(finished()), SLOT(deleteLater()));
-	connect(this, SIGNAL(executeCommand(Command*)), worker, SLOT(execute(Command*)));
-	connect(worker, SIGNAL(progress(qint64)), SLOT(onProgress(qint64)));
-	connect(worker, SIGNAL(started(QString)), SLOT(onStarted(QString)));
-	connect(worker, SIGNAL(finished()), SLOT(onFinished()));
+	connect(this, SIGNAL(executeCommand(Command*)), _worker, SLOT(execute(Command*)));
+	connect(_worker, SIGNAL(progress(qint64)), SLOT(onProgress(qint64)));
+	connect(_worker, SIGNAL(started(QString)), SLOT(onStarted(QString)));
+	connect(_worker, SIGNAL(finished()), SLOT(onFinished()));
 	_workerThread.start();
 }
 
@@ -113,9 +114,12 @@ void FileUploader::upload(QStringList files)
 		_total = 1;
 
 	_startedAt = QDateTime::currentDateTime();
+	_aborted = false;
 
 	for(auto command: commands)
 	{
+		if (_aborted)
+			break;
 		emit executeCommand(command);
 	}
 	emit executeCommand(new FinishQueue(currentParentId));
@@ -159,11 +163,14 @@ void FileUploader::download(const QString &rootPath, const QVector<quint32> &obj
 
 	qDebug() << "downloading " << files.size() << " file(s), " << _total << " bytes";
 	_startedAt = QDateTime::currentDateTime();
+	_aborted = false;
 	if (_total < 1)
 		_total = 1;
 
 	for(const auto & file : files)
 	{
+		if (_aborted)
+			break;
 		emit executeCommand(new DownloadFile(file.first, file.second));
 	}
 	emit executeCommand(new FinishQueue(currentParentId));
@@ -172,4 +179,6 @@ void FileUploader::download(const QString &rootPath, const QVector<quint32> &obj
 void FileUploader::abort()
 {
 	qDebug() << "abort request";
+	_aborted = true;
+	_worker->abort();
 }

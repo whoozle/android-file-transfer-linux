@@ -26,27 +26,40 @@
 #include <QApplication>
 
 void FinishQueue::execute(CommandQueue &queue)
-{
-	try
-	{
-		queue.model()->setParent(DirectoryId);
-	} catch(const std::exception &ex)
-	{ qDebug() << "finalizing commands failed: " << fromUtf8(ex.what()); }
-	queue.finish();
-}
+{ queue.finish(DirectoryId); }
 
 void UploadFile::execute(CommandQueue &queue)
-{
-	queue.uploadFile(Filename);
-}
+{ queue.uploadFile(Filename); }
 
 void MakeDirectory::execute(CommandQueue &queue)
+{ queue.createDirectory(Filename, Root); }
+
+void DownloadFile::execute(CommandQueue &queue)
+{ queue.downloadFile(Filename, ObjectId); }
+
+void CommandQueue::downloadFile(const QString &filename, quint32 objectId)
 {
-	queue.createDirectory(Filename, Root);
+	if (_aborted)
+		return;
+	qDebug() << "downloading " << objectId << "to" << filename;
+
+	QFileInfo fi(filename);
+	QDir().mkpath(fi.dir().path());
+	start(fi.fileName());
+	try
+	{
+		model()->downloadFile(filename, objectId);
+	} catch(const std::exception &ex)
+	{ qDebug() << "downloading file " << filename << " failed: " << fromUtf8(ex.what()); }
+
+	addProgress(fi.size());
 }
 
 void CommandQueue::uploadFile(const QString &filename)
 {
+	if (_aborted)
+		return;
+
 	qDebug() << "uploading file " << filename;
 
 	QFileInfo fi(filename);
@@ -66,24 +79,11 @@ void CommandQueue::uploadFile(const QString &filename)
 	addProgress(fi.size());
 }
 
-void DownloadFile::execute(CommandQueue &queue)
-{
-	qDebug() << "downloading " << ObjectId << "to" << Filename;
-
-	QFileInfo fi(Filename);
-	QDir().mkpath(fi.dir().path());
-	queue.start(fi.fileName());
-	try
-	{
-		queue.model()->downloadFile(Filename, ObjectId);
-	} catch(const std::exception &ex)
-	{ qDebug() << "downloading file " << Filename << " failed: " << fromUtf8(ex.what()); }
-
-	queue.addProgress(fi.size());
-}
-
 void CommandQueue::createDirectory(const QString &srcPath, bool root)
 {
+	if (_aborted)
+		return;
+
 	QDir dir(srcPath);
 	QString path = dir.path();
 	qDebug() << "making directory" << path;
@@ -111,7 +111,7 @@ void CommandQueue::createDirectory(const QString &srcPath, bool root)
 	{ qDebug() << "creating directory" << path << "failed: " << fromUtf8(ex.what()); return; }
 }
 
-CommandQueue::CommandQueue(MtpObjectsModel *model): _model(model), _completedFilesSize(0)
+CommandQueue::CommandQueue(MtpObjectsModel *model): _model(model), _completedFilesSize(0), _aborted(false)
 {
 	connect(_model, SIGNAL(filePositionChanged(qint64,qint64)), this, SLOT(onFileProgress(qint64,qint64)));
 	qDebug() << "upload worker started";
@@ -133,13 +133,26 @@ void CommandQueue::start(const QString &filename)
 	emit started(filename);
 }
 
-void CommandQueue::finish()
+void CommandQueue::finish(quint32 directoryId)
 {
 	qDebug() << "finishing queue";
+	try
+	{
+		model()->setParent(directoryId);
+	} catch(const std::exception &ex)
+	{ qDebug() << "finalizing commands failed: " << fromUtf8(ex.what()); }
+
 	_model->moveToThread(QApplication::instance()->thread());
 	_completedFilesSize = 0;
 	_directories.clear();
+	_aborted = false;
 	emit finished();
+}
+
+void CommandQueue::abort()
+{
+	qDebug() << "aborting...";
+	_aborted = true;
 }
 
 void CommandQueue::addProgress(qint64 fileSize)
