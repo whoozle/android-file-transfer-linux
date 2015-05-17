@@ -35,6 +35,9 @@ namespace mtp { namespace usb
 	};
 
 
+	class Endpoint;
+	DECLARE_PTR(Endpoint);
+
 	class Endpoint
 	{
 		EndpointDirection	_direction;
@@ -56,6 +59,8 @@ namespace mtp { namespace usb
 
 		EndpointType GetType() const
 		{ return _type; }
+
+		static EndpointPtr TryOpen(const std::string &path);
 	};
 	DECLARE_PTR(Endpoint);
 

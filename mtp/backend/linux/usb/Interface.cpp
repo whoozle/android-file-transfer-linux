@@ -50,6 +50,15 @@ namespace mtp { namespace usb
 		_maxPacketSize		= Directory::ReadInt(path + "/wMaxPacketSize");
 	}
 
+	EndpointPtr Endpoint::TryOpen(const std::string &path)
+	{
+		try
+		{ return std::make_shared<Endpoint>(path); }
+		catch(const std::exception &ex)
+		{ fprintf(stderr, "failed adding endpoint: %s\n", ex.what()); }
+		return nullptr;
+	}
+
 	Interface::Interface(int index, const std::string &path): _path(path)
 	{
 		_class		= Directory::ReadInt(path + "/bInterfaceClass");
@@ -68,10 +77,9 @@ namespace mtp { namespace usb
 
 			if (entry.compare(0, 3, "ep_") == 0)
 			{
-				try
-				{ _endpoints.push_back(std::make_shared<Endpoint>(path + "/" + entry)); }
-				catch(const std::exception &ex)
-				{ fprintf(stderr, "failed adding endpoint: %s\n", ex.what()); }
+				EndpointPtr ep = Endpoint::TryOpen(path + "/" + entry);
+				if (ep)
+					_endpoints.push_back(ep);
 			}
 		}
 	}
