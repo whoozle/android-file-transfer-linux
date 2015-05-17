@@ -176,7 +176,10 @@ namespace mtp { namespace usb
 	void Device::Submit(const UrbPtr &urb, int timeout)
 	{
 		urb->Submit();
-		_urbs.insert(std::make_pair(&urb->KernelUrb, urb));
+		{
+			scoped_mutex_lock l(_mutex);
+			_urbs.insert(std::make_pair(&urb->KernelUrb, urb));
+		}
 		try
 		{
 			while(true)
@@ -184,6 +187,7 @@ namespace mtp { namespace usb
 				UrbPtr completedUrb;
 				{
 					void *completedKernelUrb = Reap(timeout);
+					scoped_mutex_lock l(_mutex);
 					auto urbIt = _urbs.find(completedKernelUrb);
 					if (urbIt == _urbs.end())
 					{

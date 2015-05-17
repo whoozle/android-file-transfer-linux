@@ -46,6 +46,7 @@ namespace mtp { namespace usb
 	class Device : Noncopyable
 	{
 	private:
+		std::mutex					_mutex;
 		FileHandler					_fd;
 		u32							_capabilities;
 		EndpointPtr					_controlEp;
