@@ -394,14 +394,11 @@ namespace mtp
 		}
 		ByteArray data;
 		OutputStream s(data);
-		s.Write8(0x21); //00100001 Host-to-Device, Class-Specific, Recipient-Interface
-		s.Write8(0x64); //Cancel_Request (0x64 request)
-		s.Write16(0);
-		s.Write16(0);
-		s.Write16(6); //length
 		s.Write16(0x4001);
 		s.Write32(transactionId);
-		_packeter.GetPipe()->GetDevice()->WriteControl(data, 5000);
+		HexDump("abort control message", data);
+		_packeter.GetPipe()->GetDevice()->WriteControl(0x21, 0x64, 0, 0, data, 5000);
+		/* 0x21: host-to-device, class specific, recipient - interface, 0x64: cancel request */
 	}
 
 }

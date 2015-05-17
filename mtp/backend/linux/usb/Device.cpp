@@ -261,26 +261,23 @@ namespace mtp { namespace usb
 		}
 	}
 
-	void Device::Write(const EndpointPtr & ep, const ByteArray &data, int timeout)
+	void Device::WriteControl(u8 type, u8 req, u16 value, u16 index, const ByteArray &data, int timeout)
 	{
-		UrbPtr urb = std::make_shared<Urb>(_fd.Get(), TransactionType(ep), ep);
-		urb->Send(data);
-		Submit(urb, timeout);
+		usbdevfs_ctrltransfer ctrl = { };
+		ctrl.bRequestType = type;
+		ctrl.bRequest = req;
+		ctrl.wValue = value;
+		ctrl.wIndex = index;
+		ctrl.wLength = data.size();
+		ctrl.data = const_cast<u8 *>(data.data());
+		ctrl.timeout = timeout;
+		int r = ioctl(_fd.Get(), USBDEVFS_CONTROL, &ctrl);
+		if (r == 0)
+			return;
+		else if (errno == EAGAIN)
+			throw TimeoutException("timeout sending control transfer");
+		else
+			throw Exception("ioctl");
 	}
-
-	ByteArray Device::Read(const EndpointPtr & ep, int timeout)
-	{
-		UrbPtr urb = std::make_shared<Urb>(_fd.Get(), TransactionType(ep), ep);
-		Submit(urb, timeout);
-		return urb->Recv();
-	}
-
-	void Device::WriteControl(const ByteArray &data, int timeout)
-	{ Write(_controlEp, data, timeout); }
-
-	ByteArray Device::ReadControl(int timeout)
-	{ return Read(_controlEp, timeout); }
-
-
 
 }}

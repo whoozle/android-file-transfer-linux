@@ -78,13 +78,9 @@ namespace mtp { namespace usb
 		void WriteBulk(const EndpointPtr & ep, const IObjectInputStreamPtr &inputStream, int timeout);
 		void ReadBulk(const EndpointPtr & ep, const IObjectOutputStreamPtr &outputStream, int timeout);
 
-		void WriteControl(const ByteArray &data, int timeout);
-		ByteArray ReadControl(int timeout);
+		void WriteControl(u8 type, u8 req, u16 value, u16 index, const ByteArray &data, int timeout);
 
 	private:
-		void Write(const EndpointPtr & ep, const ByteArray &data, int timeout);
-		ByteArray Read(const EndpointPtr & ep, int timeout);
-
 		static u8 TransactionType(const EndpointPtr &ep);
 		void * Reap(int timeout);
 		void Submit(const UrbPtr &urb, int timeout);
