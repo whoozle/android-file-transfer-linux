@@ -1,41 +1,46 @@
-<!DOCTYPE html>
+<!doctype html>
+<!-- The Time Machine GitHub pages theme was designed and developed by Jon Rohan, on Feb 7, 2012. -->
+<!-- Follow him for fun. http://twitter.com/jonrohan. Tail his code on https://github.com/jonrohan -->
 <html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-  <head>
-    <meta charset='utf-8'>
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <meta name="description" content="Android-file-transfer-linux : Android File Transfer for Linux">
+  <link rel="stylesheet" href="stylesheets/stylesheet.css" media="screen">
+  <link rel="stylesheet" href="stylesheets/github-dark.css">
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+  <script type="text/javascript" src="javascripts/script.js"></script>
 
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+  <title>Android-file-transfer-linux</title>
+  <meta name="description" content="Android File Transfer for Linux">
 
-    <title>Android-file-transfer-linux</title>
-  </head>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
 
-  <body>
+</head>
 
-    <!-- HEADER -->
-    <div id="header_wrap" class="outer">
-        <header class="inner">
-          <a id="forkme_banner" href="https://github.com/whoozle/android-file-transfer-linux">View on GitHub</a>
+<body>
 
-          <h1 id="project_title">Android-file-transfer-linux</h1>
-          <h2 id="project_tagline">Android File Transfer for Linux</h2>
-
-            <section id="downloads">
-              <a class="zip_download_link" href="https://github.com/whoozle/android-file-transfer-linux/zipball/master">Download this project as a .zip file</a>
-              <a class="tar_download_link" href="https://github.com/whoozle/android-file-transfer-linux/tarball/master">Download this project as a tar.gz file</a>
-            </section>
-        </header>
-    </div>
-
-    <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">
-      <section id="main_content" class="inner">
-        <h1>
+  <div class="wrapper">
+    <header>
+      <h1 class="title">Android-file-transfer-linux</h1>
+    </header>
+    <div id="container">
+      <p class="tagline">Android File Transfer for Linux</p>
+      <div id="main" role="main">
+        <div class="download-bar">
+        <div class="inner">
+          <a href="https://github.com/whoozle/android-file-transfer-linux/tarball/master" class="download-button tar"><span>Download</span></a>
+          <a href="https://github.com/whoozle/android-file-transfer-linux/zipball/master" class="download-button zip"><span>Download</span></a>
+          <a href="https://github.com/whoozle/android-file-transfer-linux" class="code">View Android-file-transfer-linux on GitHub</a>
+        </div>
+        <span class="blc"></span><span class="trc"></span>
+        </div>
+        <article class="markdown-body">
+          <h1>
 <a id="android-file-transfer-for-linux" class="anchor" href="#android-file-transfer-for-linux" aria-hidden="true"><span class="octicon octicon-link"></span></a>Android File Transfer For Linux</h1>
 
 <p><a href="https://github.com/whoozle/android-file-transfer-linux/blob/master/LICENSE"><img src="http://img.shields.io/:license-GPLv2-blue.svg" alt="License"></a>
-<a href="https://github.com/whoozle/android-file-transfer-linux/blob/master"><img src="http://img.shields.io/:version-2.1-green.svg" alt="Version"></a>
+<a href="https://github.com/whoozle/android-file-transfer-linux/blob/master"><img src="http://img.shields.io/:version-2.2-green.svg" alt="Version"></a>
 <a href="https://travis-ci.org/whoozle/android-file-transfer-linux"><img src="https://travis-ci.org/whoozle/android-file-transfer-linux.svg?branch=master" alt="Build Status"></a></p>
 
 <p>Android File Transfer for Linux — reliable MTP client with minimalistic UI similar to <a href="https://www.android.com/intl/en_us/filetransfer/">Android File Transfer for Mac</a>.</p>
@@ -47,7 +52,7 @@
 
 <p>If you're happy with <code>gmtp</code>/<code>gvfs</code>/<code>mtpfs</code> or any other mtp software, you might not need this software (but give it a try!).</p>
 
-<p>If you suffered from crashes, missing tags and album covers, usb freezes and corrupted files, this software is right for you.</p>
+<p>If you're suffering from crashes, missing tags and album covers, usb freezes and corrupted files, this software is right for you.</p>
 
 <h2>
 <a id="features" class="anchor" href="#features" aria-hidden="true"><span class="octicon octicon-link"></span></a>Features</h2>
@@ -69,13 +74,13 @@
 <a id="prerequisites" class="anchor" href="#prerequisites" aria-hidden="true"><span class="octicon octicon-link"></span></a>Prerequisites</h3>
 
 <ul>
-<li>You will need qt libraries for building ui program. If you're want to use only library (<em>Qt is not needed</em>), you could turn the option <code>BUILD_QT_UI</code> off.</li>
+<li>You will need qt libraries for building ui program. If you want to use only library (<em>Qt is not needed</em>), you could turn the option <code>BUILD_QT_UI</code> off.</li>
 <li>
 <p>For ubuntu and other debian-based distros use the following command:</p>
 
 <div class="highlight highlight-shell"><pre>sudo apt-get install build-essential cmake libqt4-dev ninja-build libfuse-dev</pre></div>
 </li>
-<li>Basically, you need <code>libqtX-dev</code> for UI, <code>libfuse-dev</code> for FUSE interface, <code>cmake</code>, <code>ninja</code> or <code>make</code> for building the project.</li>
+<li>Basically, you need <code>libqtX-dev</code> for UI, <code>libfuse-dev</code> for FUSE interface, <code>cmake</code>, <code>ninja</code> or <code>make</code> for building the project. You could use libqt5-dev as well.</li>
 </ul>
 
 <h3>
@@ -136,24 +141,34 @@ The latter two are self-explanatory. <code>Upload album</code> tries searching s
 </li>
 </ul>
 
+<p>The actual list of all known problems and bugs available <a href="https://github.com/whoozle/android-file-transfer-linux/issues">here</a></p>
+
 <h2>
 <a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h2>
 
 <p>Android File Transfer for Linux is released under <a href="https://github.com/whoozle/android-file-transfer-linux/blob/master/LICENSE">GNU GPLv2 License</a>.</p>
 
 <p>Copyright © 2015 Vladimir Menshakov</p>
-      </section>
+        </article>
+      </div>
     </div>
+    <footer>
+      <div class="owner">
+      <p><a href="https://github.com/whoozle" class="avatar"><img src="https://avatars0.githubusercontent.com/u/480115?v=3&amp;s=60" width="48" height="48"></a> <a href="https://github.com/whoozle">whoozle</a> maintains <a href="https://github.com/whoozle/android-file-transfer-linux">Android-file-transfer-linux</a></p>
 
-    <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
-      <footer class="inner">
-        <p class="copyright">Android-file-transfer-linux maintained by <a href="https://github.com/whoozle">whoozle</a></p>
-        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
-      </footer>
-    </div>
 
-    
+      </div>
+      <div class="creds">
+        <small>This page generated using <a href="https://pages.github.com/">GitHub Pages</a><br>theme by <a href="https://twitter.com/jonrohan/">Jon Rohan</a></small>
+      </div>
+    </footer>
+  </div>
+  <div class="current-section">
+    <a href="#top">Scroll to top</a>
+    <a href="https://github.com/whoozle/android-file-transfer-linux/tarball/master" class="tar">tar</a><a href="https://github.com/whoozle/android-file-transfer-linux/zipball/master" class="zip">zip</a><a href="" class="code">source code</a>
+    <p class="name"></p>
+  </div>
 
-  </body>
+  
+</body>
 </html>
