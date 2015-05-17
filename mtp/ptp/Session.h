@@ -38,7 +38,7 @@ namespace mtp
 		std::mutex		_mutex;
 		PipePacketer	_packeter;
 		u32				_sessionId;
-		u32				_transactionId;
+		u32				_nextTransactionId;
 
 		msg::DeviceInfo	_deviceInfo;
 		bool			_getPartialObject64Supported;
