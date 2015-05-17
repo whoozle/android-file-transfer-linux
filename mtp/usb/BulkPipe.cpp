@@ -18,6 +18,8 @@
  */
 #include <mtp/usb/BulkPipe.h>
 #include <usb/DeviceDescriptor.h>
+#include <mtp/usb/TimeoutException.h>
+#include <mtp/ptp/ByteArrayObjectStream.h>
 
 namespace mtp { namespace usb
 {
@@ -39,8 +41,9 @@ namespace mtp { namespace usb
 
 	ByteArray BulkPipe::ReadInterrupt()
 	{
-		ByteArray data;//_interrupt->GetMaxPacketSize());
-		return data;
+		ByteArrayObjectOutputStreamPtr s(new ByteArrayObjectOutputStream());
+		try { _device->ReadBulk(_interrupt, s, 0); } catch(const TimeoutException &ex) { return ByteArray(); }
+		return std::move(s->GetData());
 	}
 
 	void BulkPipe::Read(const IObjectOutputStreamPtr &outputStream, int timeout)
