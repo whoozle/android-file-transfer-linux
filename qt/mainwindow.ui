@@ -68,6 +68,7 @@
     <addaction name="actionRename"/>
     <addaction name="actionDownload"/>
     <addaction name="actionDelete"/>
+    <addaction name="actionRefresh"/>
     <addaction name="separator"/>
     <addaction name="actionCreateDirectory"/>
     <addaction name="separator"/>
@@ -199,6 +200,17 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Q</string>
+   </property>
+  </action>
+  <action name="actionRefresh">
+   <property name="icon">
+    <iconset theme="view-refresh"/>
+   </property>
+   <property name="text">
+    <string>Refresh</string>
+   </property>
+   <property name="shortcut">
+    <string>F5</string>
    </property>
   </action>
  </widget>

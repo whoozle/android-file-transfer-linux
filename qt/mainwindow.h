@@ -58,6 +58,7 @@ private slots:
 	void updateActionsState();
 	void showContextMenu ( const QPoint & pos );
 	void createDirectory();
+	void refresh();
 	void uploadFiles();
 	void uploadDirectories();
 	void uploadAlbum();

@@ -66,6 +66,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(_ui->actionDownload, SIGNAL(triggered()), SLOT(downloadFiles()));
 	connect(_ui->actionDelete, SIGNAL(triggered()), SLOT(deleteFiles()));
 	connect(_ui->storageList, SIGNAL(activated(int)), SLOT(onStorageChanged(int)));
+	connect(_ui->actionRefresh, SIGNAL(triggered()), SLOT(refresh()));
 
 	connect(_objectModel, SIGNAL(onFilesDropped(QStringList)), SLOT(uploadFiles(QStringList)));
 	connect(_objectModel, SIGNAL(existingFileOverwrite(QString)), SLOT(confirmOverwrite(QString)), Qt::BlockingQueuedConnection);
@@ -197,6 +198,12 @@ void MainWindow::updateActionsState()
 	_ui->actionRename->setEnabled(rows.size() == 1);
 	_ui->actionGo_Down->setEnabled(rows.size() == 1);
 	_ui->actionBack->setEnabled(!_history.empty());
+}
+
+void MainWindow::refresh()
+{
+	qDebug() << "refreshing object list";
+	_objectModel->refresh();
 }
 
 void MainWindow::downloadFiles()
