@@ -89,6 +89,10 @@ namespace mtp { namespace usb
 		while(tr == (int)data.size());
 	}
 
+	void Device::WriteControl(u8 type, u8 req, u16 value, u16 index, const ByteArray &data, bool interruptCurrentTransaction, int timeout)
+	{
+		USB_CALL(libusb_control_transfer(_handle, type, req, value, index, const_cast<u8 *>(data.data()), data.size(), timeout));
+	}
 
 	std::string Device::GetString(int idx) const
 	{

@@ -20,6 +20,8 @@
 #define	DEVICE_H
 
 #include <mtp/ptp/IObjectStream.h>
+#include <mtp/ByteArray.h>
+#include <mtp/Token.h>
 #include <mtp/types.h>
 #include <libusb.h>
 
@@ -75,7 +77,7 @@ namespace mtp { namespace usb
 		libusb_device_handle *	_handle;
 
 	public:
-		class InterfaceToken
+		class InterfaceToken : public IToken
 		{
 			libusb_device_handle *	_handle;
 			int						_index;
@@ -100,6 +102,8 @@ namespace mtp { namespace usb
 
 		void WriteBulk(const EndpointPtr & ep, const IObjectInputStreamPtr &inputStream, int timeout);
 		void ReadBulk(const EndpointPtr & ep, const IObjectOutputStreamPtr &outputStream, int timeout);
+
+		void WriteControl(u8 type, u8 req, u16 value, u16 index, const ByteArray &data, bool interruptCurrentTransaction, int timeout);
 
 		std::string GetString(int idx) const;
 	};
