@@ -48,6 +48,9 @@ public:
 	void upload(QStringList files);
 	void download(const QString &path, const QVector<quint32> & objectIds);
 
+public slots:
+	void abort();
+
 signals:
 	void executeCommand(Command *cmd);
 

@@ -20,6 +20,7 @@
 #include "ui_progressdialog.h"
 #include <QCloseEvent>
 #include <QPropertyAnimation>
+#include <QPushButton>
 #include <QDebug>
 
 ProgressDialog::ProgressDialog(QWidget *parent) :
@@ -28,13 +29,16 @@ ProgressDialog::ProgressDialog(QWidget *parent) :
 {
 	ui->setupUi(this);
 	ui->progressBar->setMaximum(10000);
-	ui->buttonBox->setEnabled(false);
 
 	_animation = new QPropertyAnimation(this, "progress", this);
 	_animation->setDuration(30000);
 	_animation->setStartValue(0);
 	_animation->setEndValue(1);
 	_animation->start();
+
+	QPushButton *b = ui->buttonBox->button(QDialogButtonBox::Abort);
+	Q_ASSERT(b);
+	connect(b, SIGNAL(clicked(bool)), SLOT(onAbortButtonPressed()));
 }
 
 ProgressDialog::~ProgressDialog()
@@ -44,6 +48,14 @@ ProgressDialog::~ProgressDialog()
 
 void ProgressDialog::reject()
 { }
+
+void ProgressDialog::onAbortButtonPressed()
+{
+	QPushButton *b = ui->buttonBox->button(QDialogButtonBox::Abort);
+	Q_ASSERT(b);
+	b->setEnabled(false);
+	emit abort();
+}
 
 void ProgressDialog::setProgress(float current)
 {

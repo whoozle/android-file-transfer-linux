@@ -310,6 +310,7 @@ void MainWindow::uploadFiles(const QStringList &files)
 	connect(_uploader, SIGNAL(uploadSpeed(qint64)), &progressDialog, SLOT(setSpeed(qint64)));
 	connect(_uploader, SIGNAL(uploadStarted(QString)), &progressDialog, SLOT(setFilename(QString)));
 	connect(_uploader, SIGNAL(finished()), &progressDialog, SLOT(accept()));
+	connect(&progressDialog, SIGNAL(abort()), _uploader, SLOT(abort()));
 	_uploader->upload(files);
 
 	progressDialog.exec();
@@ -359,6 +360,7 @@ void MainWindow::downloadFiles(const QString & path, const QVector<quint32> &obj
 	connect(_uploader, SIGNAL(uploadSpeed(qint64)), &progressDialog, SLOT(setSpeed(qint64)));
 	connect(_uploader, SIGNAL(uploadStarted(QString)), &progressDialog, SLOT(setFilename(QString)));
 	connect(_uploader, SIGNAL(finished()), &progressDialog, SLOT(accept()));
+	connect(&progressDialog, SIGNAL(abort()), _uploader, SLOT(abort()));
 	_uploader->download(path, objects);
 
 	progressDialog.exec();

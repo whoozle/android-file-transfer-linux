@@ -168,3 +168,8 @@ void FileUploader::download(const QString &rootPath, const QVector<quint32> &obj
 	}
 	emit executeCommand(new FinishQueue(currentParentId));
 }
+
+void FileUploader::abort()
+{
+	qDebug() << "abort request";
+}
