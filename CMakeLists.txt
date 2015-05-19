@@ -87,6 +87,7 @@ endif()
 
 add_executable(aft-mtp-cli mtp/cli.cpp)
 target_link_libraries(aft-mtp-cli ${MTP_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/aft-mtp-cli DESTINATION bin)
 
 if (FUSE_FOUND)
 	add_executable(aft-mtp-mount mtp/fuse.cpp)
