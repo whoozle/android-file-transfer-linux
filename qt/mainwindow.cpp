@@ -26,6 +26,7 @@
 #include "fileuploader.h"
 #include "utils.h"
 #include <mtp/usb/TimeoutException.h>
+#include <mtp/usb/DeviceBusyException.h>
 #include <QDebug>
 #include <QSortFilterProxyModel>
 #include <QMessageBox>
@@ -112,7 +113,16 @@ void MainWindow::showEvent(QShowEvent *)
 {
 	if (!_device)
 	{
-		_device = mtp::Device::Find();
+		try
+		{
+			_device = mtp::Device::Find();
+		}
+		catch(const mtp::usb::DeviceBusyException &ex)
+		{
+			QMessageBox::critical(this, tr("Device is busy"), tr("Device is busy, maybe another process is using it. Close other MTP applications and restart the application."));
+			return;
+		}
+
 		if (!_device)
 		{
 			QMessageBox::critical(this, tr("No MTP device found"), tr("No MTP device found"));
