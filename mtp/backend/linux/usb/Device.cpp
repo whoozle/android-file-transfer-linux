@@ -48,20 +48,13 @@ namespace mtp { namespace usb
 
 	Device::Device(int fd, const EndpointPtr &controlEp): _fd(fd), _capabilities(0), _controlEp(controlEp)
 	{
-		int r = lockf(_fd.Get(), F_TLOCK, 0);
-		if (r == -1)
-			throw Exception("device is used by another process");
-
 		try { IOCTL(_fd.Get(), USBDEVFS_GET_CAPABILITIES, &_capabilities); }
 		catch(const std::exception &ex)
 		{ fprintf(stderr, "get usbfs capabilities failed: %s\n", ex.what()); }
 	}
 
 	Device::~Device()
-	{
-		if (lockf(_fd.Get(), F_ULOCK, 0) != 0)
-			perror("lockf(F_ULOCK, 0)");
-	}
+	{ }
 
 	int Device::GetConfiguration() const
 	{
