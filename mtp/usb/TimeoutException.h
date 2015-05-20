@@ -16,8 +16,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-#ifndef USB_EXCEPTION_H
-#define USB_EXCEPTION_H
+#ifndef USB_TIMEOUTEXCEPTION_H
+#define USB_TIMEOUTEXCEPTION_H
 
 #include <stdexcept>
 
