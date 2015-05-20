@@ -81,6 +81,8 @@ Also, note that fuse could be 7-8 times slower than ui/cli file transfer.
 2. The options available there are: `Upload Album`, `Upload Directory` and `Upload Files`.
    The latter two are self-explanatory. `Upload album` tries searching source directory for album cover and sets best available cover.
 
+3. You could drop any files or folders right into application window, the transfer will start automatically.
+
 ### Known problems
 
 * Samsung removed android extensions from MTP, so fuse will be available readonly, sorry. Feel free to post your complaints to http://developer.samsung.com/forum/en
