@@ -119,7 +119,7 @@ void MainWindow::showEvent(QShowEvent *)
 		}
 		catch(const mtp::usb::DeviceBusyException &ex)
 		{
-			QMessageBox::critical(this, tr("Device is busy"), tr("Device is busy, maybe another process is using it. Close other MTP applications and restart the application."));
+			QMessageBox::critical(this, tr("Device is busy"), tr("Device is busy, maybe another process is using it. Close other MTP applications and restart Android File Transfer."));
 			return;
 		}
 
