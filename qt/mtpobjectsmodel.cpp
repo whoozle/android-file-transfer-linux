@@ -245,15 +245,10 @@ MtpObjectsModel::ObjectInfo MtpObjectsModel::getInfoById(mtp::u32 objectId) cons
 	return ObjectInfo(fromUtf8(oi.Filename), oi.ObjectFormat, size);
 }
 
-bool MtpObjectsModel::dropMimeData(const QMimeData *data,
-	 Qt::DropAction action, int row, int column, const QModelIndex &parent)
+QStringList MtpObjectsModel::extractMimeData(const QMimeData *data)
 {
-	qDebug() << "data: " << data << action << row << column;
-	if (action != Qt::CopyAction || !data)
-		return false;
-
-	QList<QUrl> urls = data->urls();
 	QStringList files;
+	QList<QUrl> urls = data->urls();
 	for (auto url : urls)
 	{
 		//qDebug() << "url " << url;
@@ -262,6 +257,17 @@ bool MtpObjectsModel::dropMimeData(const QMimeData *data,
 		else
 			qWarning() << "skipping non-local url" << url;
 	}
+	return files;
+}
+
+bool MtpObjectsModel::dropMimeData(const QMimeData *data,
+	 Qt::DropAction action, int row, int column, const QModelIndex &parent)
+{
+	qDebug() << "data: " << data << action << row << column;
+	if (action != Qt::CopyAction || !data)
+		return false;
+
+	QStringList files = extractMimeData(data);
 	qDebug() << "files dropped: " << files;
 	emit onFilesDropped(files);
 	return true;

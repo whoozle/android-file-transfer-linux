@@ -91,10 +91,13 @@ public:
 	ObjectInfo getInfoById(mtp::u32 objectId) const;
 	void deleteObjects(const MtpObjectList &objects);
 
+	QStringList extractMimeData(const QMimeData *data);
+
 	virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
 	virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
 	virtual Qt::ItemFlags flags(const QModelIndex &index) const;
 
+protected:
 	virtual QStringList mimeTypes () const;
 	virtual bool dropMimeData(const QMimeData *data,
 		 Qt::DropAction action, int row, int column, const QModelIndex &parent);

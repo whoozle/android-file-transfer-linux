@@ -27,6 +27,7 @@
 #include "utils.h"
 #include <mtp/usb/TimeoutException.h>
 #include <mtp/usb/DeviceBusyException.h>
+#include <QClipboard>
 #include <QDebug>
 #include <QSortFilterProxyModel>
 #include <QMessageBox>
@@ -38,6 +39,7 @@
 MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
 	_ui(new Ui::MainWindow),
+	_clipboard(QApplication::clipboard()),
 	_proxyModel(new QSortFilterProxyModel),
 	_storageModel(),
 	_objectModel(new MtpObjectsModel()),
@@ -68,9 +70,13 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(_ui->actionDelete, SIGNAL(triggered()), SLOT(deleteFiles()));
 	connect(_ui->storageList, SIGNAL(activated(int)), SLOT(onStorageChanged(int)));
 	connect(_ui->actionRefresh, SIGNAL(triggered()), SLOT(refresh()));
+	connect(_ui->actionPaste, SIGNAL(triggered()), SLOT(pasteFromClipboard()));
 
 	connect(_objectModel, SIGNAL(onFilesDropped(QStringList)), SLOT(uploadFiles(QStringList)));
 	connect(_objectModel, SIGNAL(existingFileOverwrite(QString)), SLOT(confirmOverwrite(QString)), Qt::BlockingQueuedConnection);
+
+	connect(_clipboard, SIGNAL(dataChanged()), SLOT(validateClipboard()));
+	validateClipboard();
 
 	//fixme: find out how to specify alternative in designer
 	_ui->actionBack->setShortcuts(_ui->actionBack->shortcuts() << QKeySequence("Alt+Up") << QKeySequence("Esc"));
@@ -539,6 +545,18 @@ void MainWindow::uploadAlbum(QString dirPath)
 			files.push_back(dir.canonicalPath() + "/" + file);
 	}
 	uploadFiles(files);
+}
+
+void MainWindow::validateClipboard()
+{
+	QStringList files = _objectModel->extractMimeData(_clipboard->mimeData());
+	_ui->actionPaste->setEnabled(!files.isEmpty());
+}
+
+void MainWindow::pasteFromClipboard()
+{
+	//fixme: CHECK THAT THE MODEL IS NOT IN UPLOADER NOW
+	uploadFiles(_objectModel->extractMimeData(_clipboard->mimeData()));
 }
 
 bool MainWindow::confirmOverwrite(const QString &file)

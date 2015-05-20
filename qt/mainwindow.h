@@ -31,7 +31,9 @@ class MainWindow;
 class MtpObjectsModel;
 class MtpStoragesModel;
 class FileUploader;
+
 class QSortFilterProxyModel;
+class QClipboard;
 
 class MainWindow : public QMainWindow
 {
@@ -69,6 +71,8 @@ private slots:
 	void downloadFiles(const QVector<quint32> &objects);
 	void uploadFiles(const QStringList &files);
 	void onStorageChanged(int idx);
+	void validateClipboard();
+	void pasteFromClipboard();
 	bool confirmOverwrite(const QString &file);
 
 public slots:
@@ -76,6 +80,7 @@ public slots:
 
 private:
 	Ui::MainWindow *			_ui;
+	QClipboard *				_clipboard;
 	QSortFilterProxyModel *		_proxyModel;
 	MtpStoragesModel *			_storageModel;
 	MtpObjectsModel *			_objectModel;
