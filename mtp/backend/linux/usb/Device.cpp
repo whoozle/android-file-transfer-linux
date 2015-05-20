@@ -19,6 +19,7 @@
 #include <usb/Device.h>
 #include <usb/Exception.h>
 #include <mtp/usb/TimeoutException.h>
+#include <mtp/usb/DeviceBusyException.h>
 #include <mtp/ByteArray.h>
 
 #include <unistd.h>
@@ -38,7 +39,14 @@ namespace mtp { namespace usb
 
 	Device::InterfaceToken::InterfaceToken(int fd, unsigned interfaceNumber): _fd(fd), _interfaceNumber(interfaceNumber)
 	{
-		IOCTL(_fd, USBDEVFS_CLAIMINTERFACE, &interfaceNumber);
+		int r = ioctl(_fd, USBDEVFS_CLAIMINTERFACE, &interfaceNumber);
+		if (r < 0)
+		{
+			if (errno == EBUSY)
+				throw DeviceBusyException("Device is already used by another process");
+			else
+				throw Exception("ioctl(_fd, USBDEVFS_CLAIMINTERFACE, &interfaceNumber)");
+		}
 	}
 
 	Device::InterfaceToken::~InterfaceToken()
