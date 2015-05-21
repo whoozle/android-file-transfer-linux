@@ -43,7 +43,7 @@ namespace mtp { namespace usb
 		if (r < 0)
 		{
 			if (errno == EBUSY)
-				throw DeviceBusyException("Device is already used by another process");
+				throw DeviceBusyException();
 			else
 				throw Exception("ioctl(_fd, USBDEVFS_CLAIMINTERFACE, &interfaceNumber)");
 		}
