@@ -25,7 +25,7 @@ If you're suffering from crashes, missing tags and album covers, usb freezes and
 * Simple CLI tool.
 
 ## FAQ
-##### You're getting «ioctl(_fd, USBDEVFS_CLAIMINTERFACE, &interfaceNumber): Device or resource busy» or «Device is already used by another process» exception/message box right after you started the application. This clearly indicates that some other process is accessing MTP device right now.
+### You're getting «ioctl(_fd, USBDEVFS_CLAIMINTERFACE, &interfaceNumber): Device or resource busy» or «Device is already used by another process» exception/message box right after you started the application. This clearly indicates that some other process is accessing MTP device right now.
 You could do the following steps to find it:
 * Open you console emulator (gnome-terminal, konsole, whatever) and type: ```lsusb``` (sudo apt-get install usbutils if it did not start) and find your device in its output, for example
 ```
