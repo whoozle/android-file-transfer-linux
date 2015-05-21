@@ -39,7 +39,8 @@ ps -x -q 23253
 ps -x -q 24377
 24377 ?        Sl    21:14 adb -P 5037 fork-server server
 ```
-Usually, adb is not offending process, because it uses another interface, so the /usr/local/bin/android-file-transfer is the offender
+Usually, adb is not offending process, because it uses another interface, so the /usr/local/bin/android-file-transfer is the one
+
 
 ## Building instructions
 
