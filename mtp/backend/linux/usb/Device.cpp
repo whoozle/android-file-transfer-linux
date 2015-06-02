@@ -235,6 +235,7 @@ namespace mtp { namespace usb
 		do
 		{
 			r = urb->Send(inputStream);
+			urb->SetZeroPacketFlag(r != transferSize);
 			urb->SetContinuationFlag(continuation);
 			continuation = true;
 			Submit(urb, timeout);
