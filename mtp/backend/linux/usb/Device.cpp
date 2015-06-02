@@ -131,13 +131,20 @@ namespace mtp { namespace usb
 		ByteArray Recv()
 		{ return ByteArray(Buffer.begin(), Buffer.begin() + KernelUrb.actual_length); }
 
-		void SetContinuationFlag(bool continuation)
+		template<int Flag>
+		void SetFlag(bool value)
 		{
-			if (continuation)
-				KernelUrb.flags |= USBDEVFS_URB_BULK_CONTINUATION;
+			if (value)
+				KernelUrb.flags |= Flag;
 			else
-				KernelUrb.flags &= ~USBDEVFS_URB_BULK_CONTINUATION;
+				KernelUrb.flags &= ~Flag;
 		}
+
+		void SetContinuationFlag(bool continuation)
+		{ SetFlag<USBDEVFS_URB_BULK_CONTINUATION>(continuation); }
+
+		void SetZeroPacketFlag(bool zero)
+		{ SetFlag<USBDEVFS_URB_ZERO_PACKET>(zero); }
 	};
 
 	void * Device::Reap(int timeout)
