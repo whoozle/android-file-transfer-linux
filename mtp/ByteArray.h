@@ -29,7 +29,7 @@ namespace mtp
 
 	inline void HexDump(const std::string &prefix, const ByteArray &data)
 	{
-		fprintf(stderr, "%s:\n", prefix.c_str());
+		fprintf(stderr, "%s[%lu]:\n", prefix.c_str(), (unsigned long)data.size());
 		size_t i;
 		for(i = 0; i < data.size(); ++i)
 		{
