@@ -1,46 +1,38 @@
 <!doctype html>
-<!-- The Time Machine GitHub pages theme was designed and developed by Jon Rohan, on Feb 7, 2012. -->
-<!-- Follow him for fun. http://twitter.com/jonrohan. Tail his code on https://github.com/jonrohan -->
 <html>
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Android-file-transfer-linux by whoozle</title>
 
-  <link rel="stylesheet" href="stylesheets/stylesheet.css" media="screen">
-  <link rel="stylesheet" href="stylesheets/github-dark.css">
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-  <script type="text/javascript" src="javascripts/script.js"></script>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/github-light.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Android-file-transfer-linux</h1>
+        <p>Android File Transfer for Linux</p>
 
-  <title>Android-file-transfer-linux</title>
-  <meta name="description" content="Android File Transfer for Linux">
+        <p class="view"><a href="https://github.com/whoozle/android-file-transfer-linux">View the Project on GitHub <small>whoozle/android-file-transfer-linux</small></a></p>
 
-  <meta name="viewport" content="width=device-width,initial-scale=1">
 
-</head>
-
-<body>
-
-  <div class="wrapper">
-    <header>
-      <h1 class="title">Android-file-transfer-linux</h1>
-    </header>
-    <div id="container">
-      <p class="tagline">Android File Transfer for Linux</p>
-      <div id="main" role="main">
-        <div class="download-bar">
-        <div class="inner">
-          <a href="https://github.com/whoozle/android-file-transfer-linux/tarball/master" class="download-button tar"><span>Download</span></a>
-          <a href="https://github.com/whoozle/android-file-transfer-linux/zipball/master" class="download-button zip"><span>Download</span></a>
-          <a href="https://github.com/whoozle/android-file-transfer-linux" class="code">View Android-file-transfer-linux on GitHub</a>
-        </div>
-        <span class="blc"></span><span class="trc"></span>
-        </div>
-        <article class="markdown-body">
-          <h1>
+        <ul>
+          <li><a href="https://github.com/whoozle/android-file-transfer-linux/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/whoozle/android-file-transfer-linux/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/whoozle/android-file-transfer-linux">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
 <a id="android-file-transfer-for-linux" class="anchor" href="#android-file-transfer-for-linux" aria-hidden="true"><span class="octicon octicon-link"></span></a>Android File Transfer For Linux</h1>
 
 <p><a href="https://github.com/whoozle/android-file-transfer-linux/blob/master/LICENSE"><img src="http://img.shields.io/:license-GPLv2-blue.svg" alt="License"></a>
-<a href="https://github.com/whoozle/android-file-transfer-linux/blob/master"><img src="http://img.shields.io/:version-2.2-green.svg" alt="Version"></a>
+<a href="https://github.com/whoozle/android-file-transfer-linux/blob/master"><img src="http://img.shields.io/:version-2.3-green.svg" alt="Version"></a>
 <a href="https://travis-ci.org/whoozle/android-file-transfer-linux"><img src="https://travis-ci.org/whoozle/android-file-transfer-linux.svg?branch=master" alt="Build Status"></a></p>
 
 <p>Android File Transfer for Linux — reliable MTP client with minimalistic UI similar to <a href="https://www.android.com/intl/en_us/filetransfer/">Android File Transfer for Mac</a>.</p>
@@ -66,6 +58,35 @@
 <li>Available as static/shared library.</li>
 <li>Simple CLI tool.</li>
 </ul>
+
+<h2>
+<a id="faq" class="anchor" href="#faq" aria-hidden="true"><span class="octicon octicon-link"></span></a>FAQ</h2>
+
+<h5>
+<a id="youre-getting-ioctl_fd-usbdevfs_claiminterface-interfacenumber-device-or-resource-busy-or-device-is-already-used-by-another-process-exceptionmessage-box-right-after-you-started-the-application-this-clearly-indicates-that-some-other-process-is-accessing-mtp-device-right-now" class="anchor" href="#youre-getting-ioctl_fd-usbdevfs_claiminterface-interfacenumber-device-or-resource-busy-or-device-is-already-used-by-another-process-exceptionmessage-box-right-after-you-started-the-application-this-clearly-indicates-that-some-other-process-is-accessing-mtp-device-right-now" aria-hidden="true"><span class="octicon octicon-link"></span></a>You're getting «ioctl(_fd, USBDEVFS_CLAIMINTERFACE, &amp;interfaceNumber): Device or resource busy» or «Device is already used by another process» exception/message box right after you started the application. This clearly indicates that some other process is accessing MTP device right now.</h5>
+
+<p>You could do the following steps to find it:</p>
+
+<ul>
+<li>Open you console emulator (gnome-terminal, konsole, whatever) and type: <code>lsusb</code> (sudo apt-get install usbutils if it did not start) and find your device in its output, for example</li>
+</ul>
+
+<pre><code>Bus 006 Device 070: ID 18d1:4ee2 Google Inc. Nexus 4 (debug)
+</code></pre>
+
+<ul>
+<li>Start fuser <code>sudo fuser /dev/bus/usb/&lt;BUS&gt;/&lt;DEVICE&gt;</code> (sudo apt-get install psmisc if it did not start)</li>
+<li>It should output something like this: <code>/dev/bus/usb/006/070: 23253 24377</code> (actually, there could be more of them after semicolon, like : 24377, 24378, …) so, 23253 and 24377 are the pids of the processes which opened your device.</li>
+<li>So, finally run:</li>
+</ul>
+
+<pre><code>ps -x -q 23253
+23253 ?        Sl     0:00 /usr/local/bin/android-file-transfer
+ps -x -q 24377
+24377 ?        Sl    21:14 adb -P 5037 fork-server server
+</code></pre>
+
+<p>Usually, adb is not offending process, because it uses another interface, so the /usr/local/bin/android-file-transfer is the one</p>
 
 <h2>
 <a id="building-instructions" class="anchor" href="#building-instructions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Building instructions</h2>
@@ -127,6 +148,7 @@ Also, note that fuse could be 7-8 times slower than ui/cli file transfer.</p>
 <li><p>Start application, choose destination folder and click any button on toolbar.</p></li>
 <li><p>The options available there are: <code>Upload Album</code>, <code>Upload Directory</code> and <code>Upload Files</code>.
 The latter two are self-explanatory. <code>Upload album</code> tries searching source directory for album cover and sets best available cover.</p></li>
+<li><p>You could drop any files or folders right into application window, the transfer will start automatically.</p></li>
 </ol>
 
 <h3>
@@ -149,26 +171,23 @@ The latter two are self-explanatory. <code>Upload album</code> tries searching s
 <p>Android File Transfer for Linux is released under <a href="https://github.com/whoozle/android-file-transfer-linux/blob/master/LICENSE">GNU GPLv2 License</a>.</p>
 
 <p>Copyright © 2015 Vladimir Menshakov</p>
-        </article>
-      </div>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/whoozle">whoozle</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
     </div>
-    <footer>
-      <div class="owner">
-      <p><a href="https://github.com/whoozle" class="avatar"><img src="https://avatars0.githubusercontent.com/u/480115?v=3&amp;s=60" width="48" height="48"></a> <a href="https://github.com/whoozle">whoozle</a> maintains <a href="https://github.com/whoozle/android-file-transfer-linux">Android-file-transfer-linux</a></p>
+    <script src="javascripts/scale.fix.js"></script>
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-15578013-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
 
-
-      </div>
-      <div class="creds">
-        <small>This page generated using <a href="https://pages.github.com/">GitHub Pages</a><br>theme by <a href="https://twitter.com/jonrohan/">Jon Rohan</a></small>
-      </div>
-    </footer>
-  </div>
-  <div class="current-section">
-    <a href="#top">Scroll to top</a>
-    <a href="https://github.com/whoozle/android-file-transfer-linux/tarball/master" class="tar">tar</a><a href="https://github.com/whoozle/android-file-transfer-linux/zipball/master" class="zip">zip</a><a href="" class="code">source code</a>
-    <p class="name"></p>
-  </div>
-
-  
-</body>
+  </body>
 </html>
