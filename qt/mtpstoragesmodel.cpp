@@ -12,7 +12,15 @@ bool MtpStoragesModel::update(const mtp::SessionPtr &session)
 	mtp::msg::StorageIDs storages = session->GetStorageIDs();
 	for(auto id : storages.StorageIDs)
 	{
-		mtp::msg::StorageInfo info = session->GetStorageInfo(id);
+		mtp::msg::StorageInfo info;
+		try { info = session->GetStorageInfo(id); }
+		catch (const mtp::InvalidResponseException &ex)
+		{
+			if (ex.Type == mtp::ResponseType::InvalidStorageID)
+				return false;
+			else
+				throw;
+		}
 		_storages.append(qMakePair(id, info));
 	}
 	mtp::msg::StorageInfo anyStorage;
