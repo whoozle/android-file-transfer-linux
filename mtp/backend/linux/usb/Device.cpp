@@ -92,6 +92,9 @@ namespace mtp { namespace usb
 			urb.buffer_length	= Buffer.size();
 		}
 
+		size_t GetTransferSize() const
+		{ return Buffer.size(); }
+
 		void Submit()
 		{
 			IOCTL(Fd, USBDEVFS_SUBMITURB, &KernelUrb);
@@ -225,7 +228,7 @@ namespace mtp { namespace usb
 	void Device::WriteBulk(const EndpointPtr & ep, const IObjectInputStreamPtr &inputStream, int timeout)
 	{
 		UrbPtr urb = std::make_shared<Urb>(_fd.Get(), USBDEVFS_URB_TYPE_BULK, ep);
-		size_t transferSize = urb->Buffer.size();
+		size_t transferSize = urb->GetTransferSize();
 
 		size_t r;
 		bool continuation = false;
@@ -244,7 +247,7 @@ namespace mtp { namespace usb
 	void Device::ReadBulk(const EndpointPtr & ep, const IObjectOutputStreamPtr &outputStream, int timeout)
 	{
 		UrbPtr urb = std::make_shared<Urb>(_fd.Get(), USBDEVFS_URB_TYPE_BULK, ep);
-		size_t transferSize = urb->Buffer.size();
+		size_t transferSize = urb->GetTransferSize();
 
 		size_t r;
 		bool continuation = false;
