@@ -110,6 +110,9 @@ Also, note that fuse could be 7-8 times slower than ui/cli file transfer.
 
 The actual list of all known problems and bugs available [here](https://github.com/whoozle/android-file-transfer-linux/issues)
 
+### Contacts
+Please do not hesitate to contact me if you have any further questions, my email address is <vladimir.menshakov@gmail.com>.
+
 ## License
 
 Android File Transfer for Linux is released under [GNU GPLv2 License](https://github.com/whoozle/android-file-transfer-linux/blob/master/LICENSE).
