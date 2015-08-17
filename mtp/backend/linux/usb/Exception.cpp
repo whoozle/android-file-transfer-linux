@@ -17,7 +17,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 #include <usb/Exception.h>
+#include <string>
+
 #include <string.h>
+#include <errno.h>
 
 namespace mtp { namespace usb
 {

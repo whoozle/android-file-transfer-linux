@@ -20,11 +20,13 @@
 #define	TYPES_H
 
 #include <stdint.h>
+#include <errno.h>
+#include <string.h>
+
 #include <memory>
 #include <mutex>
 #include <exception>
-#include <errno.h>
-#include <string.h>
+#include <string>
 
 namespace mtp
 {
