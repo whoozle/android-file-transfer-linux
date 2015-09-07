@@ -1,6 +1,8 @@
 find_package(Readline)
 
-set(CLI_SOURCES cli.cpp)
+set(CLI_SOURCES
+	Session.cpp
+	cli.cpp)
 
 if (READLINE_FOUND)
 	list(APPEND CLI_SOURCES CommandLine.cpp)

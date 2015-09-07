@@ -6,6 +6,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+#include <mtp/ptp/IObjectStream.h>
+
 namespace
 {
 
