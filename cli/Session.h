@@ -18,6 +18,12 @@ namespace cli
 		Session(const mtp::DevicePtr &device);
 
 		void InteractiveInput();
+
+		void List(mtp::u32 parent = mtp::Session::Root);
+
+		template<typename FunctionType>
+		void AddCommand(const std::string &name, FunctionType && callback)
+		{ }
 	};
 }
 

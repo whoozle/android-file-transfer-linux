@@ -13,6 +13,7 @@ namespace cli
 		_cd(mtp::Session::Root)
 	{
 		using namespace mtp;
+		using namespace std::placeholders;
 
 		printf("%s\n", _gdi.VendorExtensionDesc.c_str());
 		printf("%s ", _gdi.Manufacturer.c_str());
@@ -32,6 +33,9 @@ namespace cli
 			printf("%04x ", (unsigned)code);
 		}
 		printf("\n");
+
+		AddCommand("ls", std::bind(&Session::List, this));
+		AddCommand("ls", std::bind(&Session::List, this, _1));
 	}
 
 
@@ -45,23 +49,16 @@ namespace cli
 		printf("\n");
 	}
 
-
-#if 0
-	std::string command = argv[1];
-	if (command == "list")
+	void Session::List(mtp::u32 parent)
 	{
-		mtp::u32 parent = mtp::Session::Root;
-		if (argc > 2)
-			if (sscanf(argv[2], "%u", &parent) != 1)
-				return 1;
-
-		msg::ObjectHandles handles = session->GetObjectHandles(mtp::Session::AllStorages, mtp::Session::AllFormats, parent);
+		using namespace mtp;
+		msg::ObjectHandles handles = _session->GetObjectHandles(mtp::Session::AllStorages, mtp::Session::AllFormats, parent);
 
 		for(u32 objectId : handles.ObjectHandles)
 		{
 			try
 			{
-				msg::ObjectInfo info = session->GetObjectInfo(objectId);
+				msg::ObjectInfo info = _session->GetObjectInfo(objectId);
 				printf("%-10u %04hx %s %u %ux%u, %s\n", objectId, info.ObjectFormat, info.Filename.c_str(), info.ObjectCompressedSize, info.ImagePixWidth, info.ImagePixHeight, info.CaptureDate.c_str());
 			}
 			catch(const std::exception &ex)
@@ -69,8 +66,10 @@ namespace cli
 				printf("error: %s\n", ex.what());
 			}
 		}
-		//libusb_release_interface(device->GetHandle(), interface->GetIndex());
+
 	}
+
+#if 0
 	else if (command == "storages")
 	{
 		msg::StorageIDs list = session->GetStorageIDs();
