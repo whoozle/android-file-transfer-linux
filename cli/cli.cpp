@@ -26,10 +26,12 @@
 #include <mtp/ptp/IObjectStream.h>
 
 #include <cli/PosixStreams.h>
+#include <cli/CommandLine.h>
 
 int main(int argc, char **argv)
 {
 	using namespace mtp;
+	using namespace cli;
 
 	DevicePtr mtp(Device::Find());
 	if (!mtp)
@@ -60,7 +62,16 @@ int main(int argc, char **argv)
 	printf("\n");
 
 	if (argc < 2)
+	{
+		std::string prompt("mtp>"), input;
+
+		while(cli::CommandLine::Get().ReadLine(prompt, input))
+		{
+		}
+		printf("\n");
+
 		return 0;
+	}
 
 	std::string command = argv[1];
 	if (command == "list")
