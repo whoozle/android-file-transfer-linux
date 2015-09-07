@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2015 Vladimir Menshakov <vladimir.menshakov@gmail.com> -->
+<application>
+  <id type="desktop">android-file-transfer.desktop</id>
+  <project_license>GPLv2+</project_license>
+  <name>Android File Transfer for Linux</name>
+  <summary>Interactive MTP client with Qt4/Qt5 GUI</summary>
+  <description>
+    <p>
+      -Simple Qt UI with progress dialogs.
+      -FUSE wrapper (If you'd prefer mounting your device), 
+       supporting partial read/writes, allowing instant access to your files.
+      -No file size limits.
+      -Automatically renames album cover to make it visible from media player.
+      -No extra dependencies (e.g. libptp/libmtp).
+      -Available as static/shared library.
+      -Simple CLI tool.
+    </p>
+  </description>
+  <url type="homepage">http://whoozle.github.io/android-file-transfer-linux/</url>
+  <updatecontact>vladimir.menshakov@gmail.com</updatecontact>
+</application>
