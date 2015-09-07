@@ -2,10 +2,13 @@
 #include <cli/CommandLine.h>
 #include <cli/PosixStreams.h>
 
+#include <mtp/make_function.h>
+
 #include <stdio.h>
 
 namespace cli
 {
+
 	Session::Session(const mtp::DevicePtr &device):
 		_device(device),
 		_session(_device->OpenSession(1)),
@@ -34,8 +37,8 @@ namespace cli
 		}
 		printf("\n");
 
-		AddCommand("ls", std::bind(&Session::List, this));
-		AddCommand("ls", std::bind(&Session::List, this, _1));
+		AddCommand("ls", make_function([this]() -> void { ListCurrent(); }));
+		AddCommand("ls", make_function([this](mtp::u32 parent) -> void { List(parent); }));
 	}
 
 
@@ -48,6 +51,9 @@ namespace cli
 		}
 		printf("\n");
 	}
+
+	void Session::ListCurrent()
+	{ List(_cd); }
 
 	void Session::List(mtp::u32 parent)
 	{

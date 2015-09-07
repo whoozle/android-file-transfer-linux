@@ -5,6 +5,8 @@
 #include <mtp/ptp/Session.h>
 #include <mtp/ptp/Messages.h>
 
+#include <functional>
+
 namespace cli
 {
 	class Session
@@ -19,10 +21,11 @@ namespace cli
 
 		void InteractiveInput();
 
-		void List(mtp::u32 parent = mtp::Session::Root);
+		void ListCurrent();
+		void List(mtp::u32 parent);
 
-		template<typename FunctionType>
-		void AddCommand(const std::string &name, FunctionType && callback)
+		template <typename ...Args >
+		void AddCommand(const std::string &name, std::function<void(Args...)> && callback)
 		{ }
 	};
 }
