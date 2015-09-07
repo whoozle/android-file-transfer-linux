@@ -63,7 +63,7 @@ int main(int argc, char **argv)
 
 	if (argc < 2)
 	{
-		std::string prompt("mtp>"), input;
+		std::string prompt(gdi.Manufacturer + " " + gdi.Model + ">"), input;
 
 		while(cli::CommandLine::Get().ReadLine(prompt, input))
 		{
