@@ -7,8 +7,15 @@ namespace cli
 {
 	class CommandLine
 	{
-	public:
+	protected:
 		CommandLine();
+
+	private:
+		static char ** CompletionCallback(const char *text, int start, int end);
+		static char * CompletionGenerator(const char *text, int state);
+
+	public:
+		static CommandLine & Get();
 
 		bool ReadLine(const std::string &prompt, std::string &input);
 	};

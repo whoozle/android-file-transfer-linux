@@ -4,10 +4,44 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 
+extern "C" char *xmalloc (size_t size);
+
 namespace cli
 {
+	namespace
+	{
+		char * dupstr (const char * s)
+		{
+			char *r = xmalloc (strlen (s) + 1);
+			strcpy (r, s);
+			return r;
+		}
+	}
+
 	CommandLine::CommandLine()
-	{ }
+	{
+		rl_readline_name = "AFT";
+		rl_attempted_completion_function = &CommandLine::CompletionCallback;
+	}
+
+	CommandLine & CommandLine::Get()
+	{
+		static CommandLine cmd;
+		return cmd;
+	}
+
+	char * CommandLine::CompletionGenerator(const char *text, int state)
+	{
+		return state == 0? dupstr("dummy"): NULL;
+	}
+
+	char ** CommandLine::CompletionCallback(const char *text, int start, int end)
+	{
+		if (start == 0)
+			return rl_completion_matches(text, &CompletionGenerator);
+		else
+			return NULL;
+	}
 
 	bool CommandLine::ReadLine(const std::string &prompt, std::string &input)
 	{
