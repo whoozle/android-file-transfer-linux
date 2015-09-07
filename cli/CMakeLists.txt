@@ -1,9 +1,14 @@
 find_package(Readline)
 
+set(CLI_SOURCES cli.cpp)
+
 if (READLINE_FOUND)
+	list(APPEND CLI_SOURCES CommandLine.cpp)
+	list(APPEND CLI_LIBRARIES ${Readline_LIBRARY})
+else()
+	message(FATAL_ERROR "no readline library found")
+endif()
 
-endif (READLINE_FOUND)
-
-add_executable(aft-mtp-cli cli.cpp)
-target_link_libraries(aft-mtp-cli ${MTP_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+add_executable(aft-mtp-cli ${CLI_SOURCES})
+target_link_libraries(aft-mtp-cli ${MTP_LIBRARIES} ${CLI_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/aft-mtp-cli DESTINATION bin)
