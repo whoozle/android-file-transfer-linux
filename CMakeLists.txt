@@ -1,6 +1,7 @@
 project(mtp)
 cmake_minimum_required(VERSION 2.8)
 set(CMAKE_USE_RELATIVE_PATHS TRUE)
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 
 include(FindPkgConfig)
 include(CheckFunctionExists)
