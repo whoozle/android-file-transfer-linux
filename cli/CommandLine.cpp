@@ -4,16 +4,15 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 
-extern "C" char *xmalloc (size_t size);
-
 namespace cli
 {
 	namespace
 	{
 		char * dupstr (const char * s)
 		{
-			char *r = xmalloc (strlen (s) + 1);
-			strcpy (r, s);
+			char *r = strdup(s);
+			if (!r)
+				std::terminate();
 			return r;
 		}
 	}
