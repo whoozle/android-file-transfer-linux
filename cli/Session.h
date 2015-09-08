@@ -15,13 +15,6 @@ namespace cli
 	struct Path : public std::string		{ Path(const std::string &path = std::string()): std::string(path) { } };
 	struct LocalPath : public std::string	{ LocalPath(const std::string &path = std::string()): std::string(path) { } };
 
-	template<typename StreamType>
-	StreamType & operator >> (StreamType &stream, Path &path)
-	{ return stream; }
-
-	template<typename StreamType>
-	StreamType & operator >> (StreamType &stream, LocalPath &path)
-	{ return stream; }
 
 	class Session
 	{
