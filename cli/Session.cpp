@@ -14,7 +14,8 @@ namespace cli
 		_device(device),
 		_session(_device->OpenSession(1)),
 		_gdi(_session->GetDeviceInfo()),
-		_cd(mtp::Session::Root)
+		_cd(mtp::Session::Root),
+		_running(true)
 	{
 		using namespace mtp;
 		using namespace std::placeholders;
@@ -38,8 +39,11 @@ namespace cli
 		}
 		printf("\n");
 
-		AddCommand("list", make_function([this]() -> void { ListCurrent(); }));
-		AddCommand("list", make_function([this](mtp::u32 parent) -> void { List(parent); }));
+		AddCommand("ls",			make_function([this]() -> void { ListCurrent(); }));
+		AddCommand("list",			make_function([this]() -> void { ListCurrent(); }));
+		AddCommand("list", 			make_function([this](mtp::u32 parent) -> void { List(parent); }));
+		AddCommand("quit", 			make_function([this]() -> void { Quit(); }));
+		AddCommand("exit", 			make_function([this]() -> void { Quit(); }));
 		AddCommand("storages", make_function([this]() -> void { ListStorages(); }));
 	}
 
@@ -73,7 +77,7 @@ namespace cli
 		std::string prompt(_gdi.Manufacturer + " " + _gdi.Model + ">"), input;
 		cli::CommandLine::Get().SetCallback([this](const char *text, int start, int end) -> char ** { return CompletionCallback(text, start, end); });
 
-		while(cli::CommandLine::Get().ReadLine(prompt, input))
+		while (_running && cli::CommandLine::Get().ReadLine(prompt, input))
 		{
 			try
 			{

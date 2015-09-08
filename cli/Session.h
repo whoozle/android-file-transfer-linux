@@ -30,6 +30,7 @@ namespace cli
 		mtp::SessionPtr				_session;
 		mtp::msg::DeviceInfo		_gdi;
 		mtp::u32					_cd;
+		bool						_running;
 
 		struct ICommand { virtual ~ICommand() { } };
 		DECLARE_PTR(ICommand);
@@ -51,6 +52,8 @@ namespace cli
 		void InteractiveInput();
 
 		mtp::u32 Resolve(const Path &path);
+
+		void Quit() { _running = false; }
 
 		void ListCurrent();
 		void List(mtp::u32 parent);
