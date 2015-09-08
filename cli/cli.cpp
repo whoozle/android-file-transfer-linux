@@ -35,13 +35,24 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	cli::Session session(mtp);
-
-	if (argc >= 2)
+	try
 	{
-		//process interactive args here
+		cli::Session session(mtp);
+
+		if (argc >= 2)
+		{
+			cli::Tokens tokens;
+			for(int i = 1; i < argc; ++i)
+			{
+				tokens.push_back(argv[i]);
+			}
+			session.ProcessCommand(std::move(tokens));
+		}
+		else
+			session.InteractiveInput();
+
+		return 0;
 	}
-	else
-		session.InteractiveInput();
-	return 0;
+	catch (const std::exception &ex)
+	{ fprintf(stderr, "%s\n", ex.what()); return 1; }
 }
