@@ -1,6 +1,7 @@
 #include <cli/Session.h>
 #include <cli/CommandLine.h>
 #include <cli/PosixStreams.h>
+#include <cli/Tokenizer.h>
 
 #include <mtp/make_function.h>
 
@@ -74,6 +75,22 @@ namespace cli
 
 		while(cli::CommandLine::Get().ReadLine(prompt, input))
 		{
+			try
+			{
+				Tokens tokens;
+				Tokenizer(input, tokens);
+				printf("%lu\n", tokens.size());
+				if (tokens.empty())
+					continue;
+
+				std::string cmdName = tokens.front();
+				tokens.pop_front();
+				auto cmd = _commands.find(cmdName);
+				if (cmd == _commands.end())
+					throw std::runtime_error("invalid command " + cmdName);
+			}
+			catch(const std::exception &ex)
+			{ printf("error: %s\n", ex.what()); }
 		}
 		printf("\n");
 	}
