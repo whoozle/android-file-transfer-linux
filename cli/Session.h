@@ -71,10 +71,7 @@ namespace cli
 
 		template <typename ...Args>
 		void AddCommand(const std::string &name, std::function<void(Args...)> && callback)
-		{
-			//typedef std::function<void(Args...)> FuncType;
-			_commands.insert(std::make_pair(name, ICommandPtr(new Command<Args...>(std::move(callback)))));
-		}
+		{ _commands.insert(std::make_pair(name, ICommandPtr(new Command<Args...>(std::move(callback))))); }
 	};
 }
 
