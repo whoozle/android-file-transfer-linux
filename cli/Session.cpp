@@ -80,6 +80,26 @@ namespace cli
 		return NULL;
 	}
 
+	void Session::ProcessCommand(const std::string &input)
+	{
+		Tokens tokens;
+		Tokenizer(input, tokens);
+		if (!tokens.empty())
+			ProcessCommand(std::move(tokens));
+	}
+
+	void Session::ProcessCommand(Tokens && tokens_)
+	{
+		Tokens tokens(tokens_);
+		std::string cmdName = tokens.front();
+		tokens.pop_front();
+		auto cmd = _commands.find(cmdName);
+		if (cmd == _commands.end())
+			throw std::runtime_error("invalid command " + cmdName);
+
+		cmd->second->Execute(tokens);
+	}
+
 	void Session::InteractiveInput()
 	{
 		using namespace mtp;
@@ -90,18 +110,7 @@ namespace cli
 		{
 			try
 			{
-				Tokens tokens;
-				Tokenizer(input, tokens);
-				if (tokens.empty())
-					continue;
-
-				std::string cmdName = tokens.front();
-				tokens.pop_front();
-				auto cmd = _commands.find(cmdName);
-				if (cmd == _commands.end())
-					throw std::runtime_error("invalid command " + cmdName);
-
-				cmd->second->Execute(tokens);
+				ProcessCommand(input);
 				if (!_running) //do not put newline
 					return;
 			}

@@ -32,6 +32,8 @@ namespace cli
 		Session(const mtp::DevicePtr &device);
 
 		void InteractiveInput();
+		void ProcessCommand(const std::string &input);
+		void ProcessCommand(Tokens &&tokens);
 
 		mtp::u32 Resolve(const Path &path);
 
