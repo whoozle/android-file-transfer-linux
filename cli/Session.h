@@ -49,6 +49,9 @@ namespace cli
 		void ListProperties(mtp::u32 id);
 		void ListDeviceProperties();
 
+		void ChangeDirectory(const Path &path)
+		{ _cd = Resolve(path); }
+
 		void List()
 		{ return List(_cd); }
 

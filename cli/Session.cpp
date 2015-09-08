@@ -48,7 +48,8 @@ namespace cli
 		AddCommand("quit", 			make_function([this]() -> void { Quit(); }));
 		AddCommand("exit", 			make_function([this]() -> void { Quit(); }));
 
-		//AddCommand("rm", 			make_function([this](const LocalPath &path) -> void { Delete(path); }));
+		AddCommand("cd", 			make_function([this](const Path &path) -> void { ChangeDirectory(path); }));
+		AddCommand("rm", 			make_function([this](const LocalPath &path) -> void { Delete(path); }));
 		AddCommand("get", 			make_function([this](const LocalPath &path) -> void { Get(path); }));
 
 		AddCommand("storages", make_function([this]() -> void { ListStorages(); }));
