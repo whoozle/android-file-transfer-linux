@@ -37,8 +37,9 @@ namespace cli
 		}
 		printf("\n");
 
-		AddCommand("ls", make_function([this]() -> void { ListCurrent(); }));
-		AddCommand("ls", make_function([this](mtp::u32 parent) -> void { List(parent); }));
+		AddCommand("list", make_function([this]() -> void { ListCurrent(); }));
+		AddCommand("list", make_function([this](mtp::u32 parent) -> void { List(parent); }));
+		AddCommand("storages", make_function([this]() -> void { ListStorages(); }));
 	}
 
 
@@ -54,6 +55,11 @@ namespace cli
 
 	void Session::ListCurrent()
 	{ List(_cd); }
+
+	mtp::u32 Session::Resolve(const Path &path)
+	{
+		return mtp::Session::Root;
+	}
 
 	void Session::List(mtp::u32 parent)
 	{
@@ -75,16 +81,18 @@ namespace cli
 
 	}
 
-#if 0
-	else if (command == "storages")
+	void Session::ListStorages()
 	{
-		msg::StorageIDs list = session->GetStorageIDs();
+		using namespace mtp;
+		msg::StorageIDs list = _session->GetStorageIDs();
 		for(size_t i = 0; i < list.StorageIDs.size(); ++i)
 		{
-			msg::StorageInfo si = session->GetStorageInfo(list.StorageIDs[i]);
+			msg::StorageInfo si = _session->GetStorageInfo(list.StorageIDs[i]);
 			printf("%08d volume: %s, description: %s\n", list.StorageIDs[i], si.VolumeLabel.c_str(), si.StorageDescription.c_str());
 		}
 	}
+
+#if 0
 	else if (command == "get")
 	{
 		if (argc < 3)
