@@ -5,6 +5,8 @@
 #include <mtp/ptp/Session.h>
 #include <mtp/ptp/Messages.h>
 
+#include <cli/Command.h>
+
 #include <functional>
 #include <map>
 
@@ -31,16 +33,6 @@ namespace cli
 		mtp::msg::DeviceInfo		_gdi;
 		mtp::u32					_cd;
 		bool						_running;
-
-		struct ICommand { virtual ~ICommand() { } };
-		DECLARE_PTR(ICommand);
-
-		template<typename Func>
-		struct Command : public ICommand
-		{
-			Func _func;
-			Command(Func && func) : _func(func) { }
-		};
 
 		std::map<std::string, ICommandPtr> _commands;
 
