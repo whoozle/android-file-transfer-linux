@@ -83,7 +83,6 @@ namespace cli
 			{
 				Tokens tokens;
 				Tokenizer(input, tokens);
-				printf("%lu\n", tokens.size());
 				if (tokens.empty())
 					continue;
 
@@ -92,6 +91,8 @@ namespace cli
 				auto cmd = _commands.find(cmdName);
 				if (cmd == _commands.end())
 					throw std::runtime_error("invalid command " + cmdName);
+
+				cmd->second->Execute(tokens);
 			}
 			catch(const std::exception &ex)
 			{ printf("error: %s\n", ex.what()); }

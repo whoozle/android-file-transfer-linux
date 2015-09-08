@@ -17,7 +17,6 @@ namespace cli
 	void Tokenizer::NextArgument()
 	{
 		std::string arg = _tempString.str();
-		printf("NEXT %s\n", arg.c_str());
 		if (!arg.empty())
 		{
 			_tokens.push_back(arg);
