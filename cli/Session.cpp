@@ -106,7 +106,6 @@ namespace cli
 			catch(const std::exception &ex)
 			{ printf("error: %s\n", ex.what()); }
 		}
-		printf("\n");
 	}
 
 	mtp::u32 Session::Resolve(const Path &path)
