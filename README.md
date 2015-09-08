@@ -22,7 +22,7 @@ If you're suffering from crashes, missing tags and album covers, usb freezes and
 * Automatically renames album cover to make it visible from media player.
 * No extra dependencies (e.g. `libptp`/`libmtp`).
 * Available as static/shared library.
-* Simple CLI tool.
+* Command line tool (aft-mtp-cli)
 
 ## FAQ
 ##### You're getting «ioctl(_fd, USBDEVFS_CLAIMINTERFACE, &interfaceNumber): Device or resource busy» or «Device is already used by another process» exception/message box right after you started the application. This clearly indicates that some other process is accessing MTP device right now.
