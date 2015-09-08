@@ -82,7 +82,7 @@ namespace cli
 	void Session::InteractiveInput()
 	{
 		using namespace mtp;
-		std::string prompt(_gdi.Manufacturer + " " + _gdi.Model + ">"), input;
+		std::string prompt(_gdi.Manufacturer + " " + _gdi.Model + "> "), input;
 		cli::CommandLine::Get().SetCallback([this](const char *text, int start, int end) -> char ** { return CompletionCallback(text, start, end); });
 
 		while (_running && cli::CommandLine::Get().ReadLine(prompt, input))
