@@ -12,8 +12,16 @@
 
 namespace cli
 {
-	struct Path : public std::string		{ Path(const std::string &path): std::string(path) { } };
-	struct LocalPath : public std::string	{ LocalPath(const std::string &path): std::string(path) { } };
+	struct Path : public std::string		{ Path(const std::string &path = std::string()): std::string(path) { } };
+	struct LocalPath : public std::string	{ LocalPath(const std::string &path = std::string()): std::string(path) { } };
+
+	template<typename StreamType>
+	StreamType & operator >> (StreamType &stream, Path &path)
+	{ return stream; }
+
+	template<typename StreamType>
+	StreamType & operator >> (StreamType &stream, LocalPath &path)
+	{ return stream; }
 
 	class Session
 	{
@@ -56,6 +64,9 @@ namespace cli
 
 		void Put(const LocalPath &src)
 		{ Put(_cd, src); }
+
+		void Get(const Path &src)
+		{ Get(Resolve(src)); }
 
 		void Get(const LocalPath &dst, const Path &src)
 		{ Get(dst, Resolve(src)); }
