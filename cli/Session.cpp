@@ -110,7 +110,31 @@ namespace cli
 
 	mtp::u32 Session::Resolve(const Path &path)
 	{
-		return mtp::Session::Root;
+		mtp::u32 id = _cd;
+		for(size_t p = 0; p < path.size(); )
+		{
+			size_t next = path.find('/', p);
+			if (next == path.npos)
+				next = path.size();
+
+			std::string entity(path.substr(p, next - p));
+			auto objectList = _session->GetObjectHandles(mtp::Session::AllStorages, mtp::Session::AllFormats, id);
+			bool found = false;
+			for(auto object : objectList.ObjectHandles)
+			{
+				std::string name = _session->GetObjectStringProperty(object, mtp::ObjectProperty::ObjectFilename);
+				if (name == entity)
+				{
+					id = object;
+					found = true;
+					break;
+				}
+			}
+			if (!found)
+				throw std::runtime_error("could not find " + entity + " in path " + path.substr(0, p));
+			p = next + 1;
+		}
+		return id;
 	}
 
 	void Session::List(mtp::u32 parent)
