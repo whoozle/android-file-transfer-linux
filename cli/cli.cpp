@@ -54,5 +54,5 @@ int main(int argc, char **argv)
 		return 0;
 	}
 	catch (const std::exception &ex)
-	{ fprintf(stderr, "%s\n", ex.what()); return 1; }
+	{ fprintf(stderr, "error: %s\n", ex.what()); return 1; }
 }
