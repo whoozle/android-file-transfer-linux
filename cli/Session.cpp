@@ -39,12 +39,14 @@ namespace cli
 		}
 		printf("\n");
 
-		AddCommand("ls",			make_function([this]() -> void { ListCurrent(); }));
-		AddCommand("list",			make_function([this]() -> void { ListCurrent(); }));
+		AddCommand("ls",			make_function([this]() -> void { List(); }));
+		AddCommand("list",			make_function([this]() -> void { List(); }));
 		AddCommand("list", 			make_function([this](mtp::u32 parent) -> void { List(parent); }));
 		AddCommand("quit", 			make_function([this]() -> void { Quit(); }));
 		AddCommand("exit", 			make_function([this]() -> void { Quit(); }));
 		AddCommand("storages", make_function([this]() -> void { ListStorages(); }));
+		AddCommand("device-properties", make_function([this]() -> void { ListDeviceProperties(); }));
+		AddCommand("help",			make_function([this]() -> void { Help(); }));
 	}
 
 	char ** Session::CompletionCallback(const char *text, int start, int end)
@@ -100,9 +102,6 @@ namespace cli
 		printf("\n");
 	}
 
-	void Session::ListCurrent()
-	{ List(_cd); }
-
 	mtp::u32 Session::Resolve(const Path &path)
 	{
 		return mtp::Session::Root;
@@ -139,98 +138,79 @@ namespace cli
 		}
 	}
 
-#if 0
-	else if (command == "get")
+	void Session::Help()
 	{
-		if (argc < 3)
-			return 1;
-		mtp::u32 objectId;
-		if (sscanf(argv[2], "%u", &objectId) != 1)
-			return 1;
-		printf("object id = %u\n", objectId);
-		msg::ObjectInfo info = session->GetObjectInfo(objectId);
-		printf("filename = %s\n", info.Filename.c_str());
-
-		session->GetObject(objectId, std::make_shared<ObjectOutputStream>(info.Filename));
+		printf("Available commands are:\n");
+		for(auto i : _commands)
+		{
+			printf("\t%s\n", i.first.c_str());
+		}
 	}
-	else if (command == "set")
+
+	void Session::Get(const LocalPath &dst, mtp::u32 srcId)
 	{
-		if (argc < 4)
-			return 1;
+		_session->GetObject(srcId, std::make_shared<ObjectOutputStream>(dst));
+	}
 
-		mtp::u32 parentObjectId;
-		if (sscanf(argv[2], "%u", &parentObjectId) != 1)
-			return 1;
+	void Session::Get(mtp::u32 srcId)
+	{
+		auto info = _session->GetObjectInfo(srcId);
+		printf("filename = %s\n", info.Filename.c_str());
+		Get(LocalPath(info.Filename), srcId);
+	}
 
-		std::string filename(argv[3]);
-		printf("uploading %s to %u\n", filename.c_str(), parentObjectId);
-
+	void Session::Put(mtp::u32 parentId, const LocalPath &src)
+	{
+		using namespace mtp;
 		msg::ObjectInfo oi;
-		oi.Filename = filename;
-		oi.ObjectFormat = ObjectFormatFromFilename(filename);
+		oi.Filename = src;
+		oi.ObjectFormat = ObjectFormatFromFilename(src);
 
-		std::shared_ptr<ObjectInputStream> objectInput(new ObjectInputStream(filename));
+		std::shared_ptr<ObjectInputStream> objectInput(new ObjectInputStream(src));
 		oi.SetSize(objectInput->GetSize());
 
-		Session::NewObjectInfo noi = session->SendObjectInfo(oi, 0, parentObjectId);
+		auto noi = _session->SendObjectInfo(oi, 0, parentId);
 		printf("new object id = %u\n", noi.ObjectId);
-		session->SendObject(objectInput);
+		_session->SendObject(objectInput);
 		printf("done\n");
 	}
-	else if (command == "delete")
+
+	void Session::MakeDirectory(mtp::u32 parentId, const std::string & name)
 	{
-		if (argc < 3)
-			return 1;
-
-		mtp::u32 objectId;
-		if (sscanf(argv[2], "%u", &objectId) != 1)
-			return 1;
-
-		printf("object id = %u\n", objectId);
-		session->DeleteObject(objectId);
-	}
-	else if (command == "mkdir")
-	{
-		if (argc < 3)
-			return 1;
-
-		mtp::u32 parentObjectId = mtp::Session::Root;
-		if (argc > 3 && sscanf(argv[3], "%u", &parentObjectId) != 1)
-			return 1;
-
-		std::string filename = argv[2];
+		using namespace mtp;
 		msg::ObjectInfo oi;
-		oi.Filename = filename;
+		oi.Filename = name;
 		oi.ObjectFormat = ObjectFormat::Association;
-		session->SendObjectInfo(oi, 0, parentObjectId);
+		_session->SendObjectInfo(oi, 0, parentId);
 	}
-	else if (command == "properties")
-	{
-		if (argc < 3)
-			return 1;
 
-		mtp::u32 objectId;
-		if (sscanf(argv[2], "%u", &objectId) != 1)
-			return 1;
-		msg::ObjectPropsSupported ops = session->GetObjectPropsSupported(objectId);
+	void Session::Delete(mtp::u32 id)
+	{
+		_session->DeleteObject(id);
+	}
+
+	void Session::ListProperties(mtp::u32 id)
+	{
+		auto ops = _session->GetObjectPropsSupported(id);
 		printf("properties supported: ");
-		for(u16 prop: ops.ObjectPropCodes)
+		for(mtp::u16 prop: ops.ObjectPropCodes)
 		{
 			printf("%02x ", prop);
 		}
 		printf("\n");
 	}
-	else if (command == "device-properties")
+
+	void Session::ListDeviceProperties()
 	{
-		for(u16 code : gdi.DevicePropertiesSupported)
+		using namespace mtp;
+		for(u16 code : _gdi.DevicePropertiesSupported)
 		{
 			if ((code & 0xff00) != 0x5000 )
 				continue;
 			printf("property code: %04x\n", (unsigned)code);
-			ByteArray data = session->GetDeviceProperty((mtp::DeviceProperty)code);
+			ByteArray data = _session->GetDeviceProperty((mtp::DeviceProperty)code);
 			HexDump("value", data);
 		}
 	}
-#endif
 
 }

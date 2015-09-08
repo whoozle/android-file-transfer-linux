@@ -12,19 +12,8 @@
 
 namespace cli
 {
-	class Path
-	{
-		std::string		_path;
-	public:
-		Path(const std::string &path): _path(path) { }
-	};
-
-	class LocalPath
-	{
-		std::string		_path;
-	public:
-		LocalPath(const std::string &path): _path(path) { }
-	};
+	struct Path : public std::string		{ Path(const std::string &path): std::string(path) { } };
+	struct LocalPath : public std::string	{ LocalPath(const std::string &path): std::string(path) { } };
 
 	class Session
 	{
@@ -45,13 +34,40 @@ namespace cli
 
 		mtp::u32 Resolve(const Path &path);
 
+		void Help();
 		void Quit() { _running = false; }
 
-		void ListCurrent();
 		void List(mtp::u32 parent);
-		void List(const Path &path) { return List(Resolve(path)); }
 
 		void ListStorages();
+		void Get(const LocalPath &dst, mtp::u32 srcId);
+		void Get(const mtp::u32 srcId);
+		void Put(mtp::u32 parentId, const LocalPath &src);
+		void MakeDirectory(mtp::u32 parentId, const std::string & name);
+		void Delete(mtp::u32 id);
+		void ListProperties(mtp::u32 id);
+		void ListDeviceProperties();
+
+		void List()
+		{ return List(_cd); }
+
+		void List(const Path &path)
+		{ return List(Resolve(path)); }
+
+		void Put(const LocalPath &src)
+		{ Put(_cd, src); }
+
+		void Get(const LocalPath &dst, const Path &src)
+		{ Get(dst, Resolve(src)); }
+
+		void MakeDirectory(const std::string &name)
+		{ MakeDirectory(_cd, name); }
+
+		void Delete(const Path &path)
+		{ Delete(Resolve(path)); }
+
+		void ListProperties(const Path &path)
+		{ ListProperties(Resolve(path)); }
 
 		template <typename ...Args>
 		void AddCommand(const std::string &name, std::function<void(Args...)> && callback)
