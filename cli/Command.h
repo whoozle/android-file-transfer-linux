@@ -21,14 +21,17 @@ namespace cli
 		template<typename First, typename ... Tail>
 		struct TupleBuilder<First, Tail...>
 		{
-			std::string						_value;
-			TupleBuilder<Tail...> 			_next;
-			std::tuple<First, Tail...> 		Values;
+			typedef typename std::decay<First>::type	ValueType;
 
-			TupleBuilder(Tokens::const_iterator tokens): _value(*tokens++), _next(tokens)
+			std::string									_text;
+			TupleBuilder<Tail...> 						_next;
+
+			std::tuple<ValueType, Tail...>				Values;
+
+			TupleBuilder(Tokens::const_iterator tokens): _text(*tokens++), _next(tokens)
 			{
-				std::stringstream ss(_value);
-				First value;
+				std::stringstream ss(_text);
+				ValueType value;
 				ss >> value;
 				Values = std::tuple_cat(std::make_tuple(value), _next.Values);
 			}
