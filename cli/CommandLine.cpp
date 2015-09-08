@@ -6,17 +6,6 @@
 
 namespace cli
 {
-	namespace
-	{
-		char * dupstr (const char * s)
-		{
-			char *r = strdup(s);
-			if (!r)
-				std::terminate();
-			return r;
-		}
-	}
-
 	CommandLine::CommandLine()
 	{
 		rl_readline_name = "AFT";
@@ -30,14 +19,12 @@ namespace cli
 	}
 
 	char * CommandLine::CompletionGenerator(const char *text, int state)
-	{
-		return state == 0? dupstr("dummy"): NULL;
-	}
+	{ return NULL; }
 
 	char ** CommandLine::CompletionCallback(const char *text, int start, int end)
 	{
-		if (start == 0)
-			return rl_completion_matches(text, &CompletionGenerator);
+		if (Get()._callback)
+			return Get()._callback(text, start, end);
 		else
 			return NULL;
 	}

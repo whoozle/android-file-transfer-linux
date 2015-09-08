@@ -43,6 +43,8 @@ namespace cli
 
 		std::map<std::string, ICommandPtr> _commands;
 
+		char ** CompletionCallback(const char *text, int start, int end);
+
 	public:
 		Session(const mtp::DevicePtr &device);
 
@@ -56,7 +58,7 @@ namespace cli
 
 		void ListStorages();
 
-		template <typename ...Args >
+		template <typename ...Args>
 		void AddCommand(const std::string &name, std::function<void(Args...)> && callback)
 		{
 			typedef std::function<void(Args...)> FuncType;

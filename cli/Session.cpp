@@ -42,10 +42,35 @@ namespace cli
 		AddCommand("storages", make_function([this]() -> void { ListStorages(); }));
 	}
 
+	char ** Session::CompletionCallback(const char *text, int start, int end)
+	{
+		if (start == 0)
+		{
+			char **comp = static_cast<char **>(calloc(sizeof(char *), _commands.size() + 1));
+			auto it = _commands.begin();
+			size_t i = 0, n = _commands.size();
+			for(; n--; ++it)
+			{
+				if (end != 0 && it->first.compare(0, end, text) != 0)
+					continue;
+
+				comp[i++] = strdup(it->first.c_str());
+			}
+			if (i == 0) //readline silently dereference matches[0]
+			{
+				free(comp);
+				comp = NULL;
+			};
+			return comp;
+		}
+		return NULL;
+	}
 
 	void Session::InteractiveInput()
 	{
+		using namespace mtp;
 		std::string prompt(_gdi.Manufacturer + " " + _gdi.Model + ">"), input;
+		cli::CommandLine::Get().SetCallback([this](const char *text, int start, int end) -> char ** { return CompletionCallback(text, start, end); });
 
 		while(cli::CommandLine::Get().ReadLine(prompt, input))
 		{
