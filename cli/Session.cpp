@@ -86,7 +86,7 @@ namespace cli
 		std::string prompt(_gdi.Manufacturer + " " + _gdi.Model + "> "), input;
 		cli::CommandLine::Get().SetCallback([this](const char *text, int start, int end) -> char ** { return CompletionCallback(text, start, end); });
 
-		while (_running && cli::CommandLine::Get().ReadLine(prompt, input))
+		while (cli::CommandLine::Get().ReadLine(prompt, input))
 		{
 			try
 			{
@@ -102,10 +102,13 @@ namespace cli
 					throw std::runtime_error("invalid command " + cmdName);
 
 				cmd->second->Execute(tokens);
+				if (!_running) //do not put newline
+					return;
 			}
 			catch(const std::exception &ex)
 			{ printf("error: %s\n", ex.what()); }
 		}
+		printf("\n");
 	}
 
 	mtp::u32 Session::Resolve(const Path &path)
