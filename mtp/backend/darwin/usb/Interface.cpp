@@ -43,11 +43,6 @@ namespace mtp { namespace usb
 		return intfNumber;
 	}
 
-	std::string Interface::GetName() const
-	{
-		return std::string();
-	}
-
 	int Interface::GetEndpointsCount() const
 	{
 		UInt8 intfNumEndpoints;

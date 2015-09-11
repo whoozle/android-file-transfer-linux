@@ -47,9 +47,6 @@ namespace mtp { namespace usb
 		int GetIndex() const
 		{ return _interface.bInterfaceNumber; }
 
-		std::string GetName() const
-		{ return _interface.iInterface? _device->GetString(_interface.iInterface): std::string(); }
-
 		EndpointPtr GetEndpoint(int idx) const
 		{ return std::make_shared<Endpoint>(_interface.endpoint[idx]); }
 

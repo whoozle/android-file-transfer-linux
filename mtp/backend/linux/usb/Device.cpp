@@ -282,6 +282,29 @@ namespace mtp { namespace usb
 		}
 	}
 
+	void Device::ReadControl(u8 type, u8 req, u16 value, u16 index, ByteArray &data, int timeout)
+	{
+		printf("%02x %02x %04x %04x\n", type, req, value, index);
+		usbdevfs_ctrltransfer ctrl = { };
+		ctrl.bRequestType = type;
+		ctrl.bRequest = req;
+		ctrl.wValue = value;
+		ctrl.wIndex = index;
+		ctrl.wLength = data.size();
+		ctrl.data = const_cast<u8 *>(data.data());
+		ctrl.timeout = timeout;
+
+		int fd = _fd.Get();
+
+		int r = ioctl(fd, USBDEVFS_CONTROL, &ctrl);
+		if (r >= 0)
+			data.resize(r);
+		else if (errno == EAGAIN)
+			throw TimeoutException("timeout sending control transfer");
+		else
+			throw Exception("ioctl");
+	}
+
 	void Device::WriteControl(u8 type, u8 req, u16 value, u16 index, const ByteArray &data, bool interruptCurrentTransaction, int timeout)
 	{
 		usbdevfs_ctrltransfer ctrl = { };

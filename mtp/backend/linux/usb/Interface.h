@@ -74,7 +74,6 @@ namespace mtp { namespace usb
 		u8							_class;
 		u8							_subclass;
 		int							_index;
-		std::string					_name;
 
 
 	public:
@@ -88,9 +87,6 @@ namespace mtp { namespace usb
 
 		int GetIndex() const
 		{ return _index; }
-
-		const std::string GetName() const
-		{ return _name; }
 
 		EndpointPtr GetEndpoint(int idx) const
 		{ return _endpoints.at(idx); }

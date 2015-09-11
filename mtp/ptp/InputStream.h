@@ -58,9 +58,12 @@ namespace mtp
 			u32 h = Read32();
 			return l | ((u64)h << 32);
 		}
+
 		std::string ReadString()
+		{ return ReadString(Read8()); }
+
+		std::string ReadString(unsigned len)
 		{
-			u8 len = Read8();
 			std::string str;
 			str.reserve(2 * len);
 			while(len--)

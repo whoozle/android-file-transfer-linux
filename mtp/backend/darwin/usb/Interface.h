@@ -40,7 +40,6 @@ namespace mtp { namespace usb
 		u8 GetClass() const;
 		u8 GetSubclass() const;
 		int GetIndex() const;
-		std::string GetName() const;
 		int GetEndpointsCount() const;
 
 		EndpointPtr GetEndpoint(int idx) const

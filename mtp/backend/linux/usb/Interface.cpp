@@ -64,9 +64,6 @@ namespace mtp { namespace usb
 		_class		= Directory::ReadInt(path + "/bInterfaceClass");
 		_subclass	= Directory::ReadInt(path + "/bInterfaceSubClass");
 		_index		= Directory::ReadInt(path + "/bInterfaceNumber");
-		try
-		{ _name		= Directory::ReadString(path + "/interface"); } catch(const std::exception &ex)
-		{ }
 
 		Directory dir(path);
 		while(true)

@@ -64,8 +64,25 @@ namespace mtp
 				for(int j = 0; j < interfaces; ++j)
 				{
 					usb::InterfacePtr iface = conf->GetInterface(device, conf, j, 0);
-					//fprintf(stderr, "%d:%d index %u, eps %u\n", i, j, iface->GetIndex(), iface->GetEndpointsCount());
-					std::string name = iface->GetName();
+					fprintf(stderr, "%d:%d index %u, eps %u\n", i, j, iface->GetIndex(), iface->GetEndpointsCount());
+
+					ByteArray data(255);
+					static const u16 DT_STRING = 3;
+					static const u16 DT_INTERFACE = 4;
+					device->ReadControl(0x80, 0x06, (DT_STRING << 8) | 0, 0, data, 1000);
+					if (data.size() < 4 || data[1] != DT_STRING)
+						continue;
+
+					u16 langId = data[2] | ((u16)data[3] << 8);
+					data.resize(255);
+					std::fill(data.begin(), data.end(), 0xff);
+					device->ReadControl(0x80, 0x06, (DT_STRING << 8) | DT_INTERFACE, langId, data, 1000);
+					if (data.size() < 4 || data[1] != DT_STRING)
+						continue;
+
+					u8 len = data[0];
+					InputStream stream(data, 2);
+					std::string name = stream.ReadString((len - 2) / 2);
 					if (name == "MTP")
 					{
 						//device->SetConfiguration(configuration->GetIndex());
