@@ -14,6 +14,7 @@ namespace cli
 		virtual ~ICommand() { }
 
 		virtual void Execute(const Tokens &tokens) const = 0;
+		virtual size_t ArgumentCount() const = 0;
 		virtual std::string GetHelpString() const = 0;
 	};
 	DECLARE_PTR(ICommand);
@@ -48,6 +49,9 @@ namespace cli
 		{
 			Execute(_func, tokens);
 		}
+
+		virtual size_t ArgumentCount() const
+		{ return sizeof...(Args); }
 	};
 
 
