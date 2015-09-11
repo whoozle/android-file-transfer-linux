@@ -91,6 +91,9 @@ namespace cli
 	void Session::ProcessCommand(Tokens && tokens_)
 	{
 		Tokens tokens(tokens_);
+		if (tokens.empty())
+			throw std::runtime_error("no token passed to ProcessCommand");
+
 		std::string cmdName = tokens.front();
 		tokens.pop_front();
 		auto cmd = _commands.find(cmdName);

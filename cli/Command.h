@@ -5,6 +5,7 @@
 #include <mtp/types.h>
 #include <mtp/function_invoker.h>
 #include <functional>
+#include <sstream>
 
 namespace cli
 {
@@ -15,7 +16,7 @@ namespace cli
 		struct TupleBuilder
 		{
 			std::tuple<> Values;
-			TupleBuilder(Tokens::const_iterator tokens) { }
+			TupleBuilder(Tokens::const_iterator begin, Tokens::const_iterator end) { }
 		};
 
 		template<typename First, typename ... Tail>
@@ -28,8 +29,19 @@ namespace cli
 
 			std::tuple<ValueType, Tail...>				Values;
 
-			TupleBuilder(Tokens::const_iterator tokens): _text(*tokens++), _next(tokens)
+			static Tokens::const_iterator Next(Tokens::const_iterator & begin, Tokens::const_iterator end)
 			{
+				if (begin == end)
+					throw std::runtime_error("not enough arguments");
+				return begin++;
+			}
+			
+			TupleBuilder(Tokens::const_iterator begin, Tokens::const_iterator end): 
+				_text(*Next(begin, end)), _next(begin, end)
+			{
+				if (begin == end)
+					throw std::runtime_error("not enough argument for command");
+
 				std::stringstream ss(_text);
 				ValueType value;
 				ss >> value;
@@ -40,9 +52,9 @@ namespace cli
 		template<typename ...Args>
 		struct Executor
 		{
-			static void Execute(std::function<void (Args...)> func, Tokens::const_iterator tokens)
+			static void Execute(std::function<void (Args...)> func, const Tokens & tokens)
 			{
-				TupleBuilder<Args...> b(tokens);
+				TupleBuilder<Args...> b(tokens.begin(), tokens.end());
 				mtp::invoke(func, b.Values);
 			}
 		};
@@ -66,7 +78,7 @@ namespace cli
 
 		virtual void Execute(const Tokens &tokens) const
 		{
-			impl::Executor<Args...>::Execute(_func, tokens.begin());
+			impl::Executor<Args...>::Execute(_func, tokens);
 		}
 	};
 
