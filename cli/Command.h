@@ -9,6 +9,18 @@
 
 namespace cli
 {
+	class Session;
+
+	struct CompletionContext
+	{
+		cli::Session &				Session;
+		size_t						Index;
+		std::string					Prefix;
+		std::list<std::string> &	Result;
+		CompletionContext(cli::Session &s, size_t i, const std::string &p, std::list<std::string> & r):
+			Session(s), Index(i), Prefix(p), Result(r) { }
+	};
+
 	struct ICommand
 	{
 		virtual ~ICommand() { }
@@ -16,6 +28,7 @@ namespace cli
 		virtual void Execute(const Tokens &tokens) const = 0;
 		virtual size_t GetArgumentCount() const = 0;
 		virtual std::string GetHelpString() const = 0;
+		virtual void Complete(const CompletionContext &ctx) const = 0;
 	};
 	DECLARE_PTR(ICommand);
 
@@ -52,6 +65,9 @@ namespace cli
 
 		virtual size_t GetArgumentCount() const
 		{ return sizeof...(Args); }
+
+		virtual void Complete(const CompletionContext &ctx) const
+		{ }
 	};
 
 

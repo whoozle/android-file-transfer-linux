@@ -103,21 +103,35 @@ namespace cli
 		else
 		{
 			//completion
-			const std::string &command = tokens.front();
-			auto b = _commands.lower_bound(command);
-			auto e = _commands.upper_bound(command);
+			const std::string &commandName = tokens.front();
+			auto b = _commands.lower_bound(commandName);
+			auto e = _commands.upper_bound(commandName);
 			if (b == e)
 				return NULL;
+
+			size_t idx = tokens.size() - 2;
 
 			decltype(b) i;
 			for(i = b; i != e; ++i)
 			{
-				if (tokens.size() <= 1 + i->second->GetArgumentCount())
+				if (idx < i->second->GetArgumentCount())
 					break;
 			}
 			if (i == e)
 				return NULL;
-			//printf("COMPLETING %s with %u args\n", command.c_str(), i->second->GetArgumentCount());
+			//printf("COMPLETING %s:%u with %u args\n", commandName.c_str(), idx, i->second->GetArgumentCount());
+			ICommandPtr command = i->second;
+			std::list<std::string> matches;
+			CompletionContext ctx(*this, idx, text, matches);
+			command->Complete(ctx);
+			if (ctx.Result.empty())
+				return NULL;
+
+			char **comp = static_cast<char **>(calloc(sizeof(char *), ctx.Result.size() + 1));
+			size_t dst = 0;
+			for(auto i : ctx.Result)
+				comp[dst++] = strdup(i.c_str());
+			return comp;
 		}
 		return NULL;
 	}
