@@ -24,11 +24,13 @@
 namespace mtp { namespace usb
 {
 
-	Device::Device(ContextPtr context): _context(context)
+	Device::Device(ContextPtr context, IOUSBDeviceInterface ** dev): _context(context), _dev(dev)
 	{ }
 
 	Device::~Device()
-	{ }
+	{
+		(*_dev)->USBDeviceClose(_dev);
+	}
 
 	int Device::GetConfiguration() const
 	{ return 0; }

@@ -55,21 +55,29 @@ namespace mtp { namespace usb
 	}
 
 	int DeviceDescriptor::GetConfigurationsCount() const
-	{ return 0; }
+	{
+		UInt8	numConfig;
+		USB_CALL((*_dev)->GetNumberOfConfigurations(_dev, &numConfig));
+		return numConfig;
+	}
 
 	ConfigurationPtr DeviceDescriptor::GetConfiguration(int conf)
 	{
-		return std::make_shared<Configuration>();
+		IOUSBConfigurationDescriptorPtr configDesc;
+		USB_CALL((*_dev)->GetConfigurationDescriptorPtr(_dev, conf, &configDesc));
+		return std::make_shared<Configuration>(configDesc);
 	}
 
 	DevicePtr DeviceDescriptor::Open(ContextPtr context)
 	{
-		return std::make_shared<Device>(context);
+		USB_CALL((*_dev)->USBDeviceOpen(_dev));
+		return std::make_shared<Device>(context, _dev);
 	}
 
 	DevicePtr DeviceDescriptor::TryOpen(ContextPtr context)
 	{
-		return nullptr;
+		int r = (*_dev)->USBDeviceOpen(_dev);
+		return r == kIOReturnSuccess? std::make_shared<Device>(context, _dev): nullptr;
 	}
 
 	DeviceDescriptor::~DeviceDescriptor()

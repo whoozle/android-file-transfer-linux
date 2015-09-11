@@ -24,6 +24,8 @@
 #include <mtp/Token.h>
 #include <mtp/types.h>
 
+#include <usb/usb.h>
+
 namespace mtp { namespace usb
 {
 	class Context;
@@ -63,7 +65,8 @@ namespace mtp { namespace usb
 	class Device : Noncopyable
 	{
 	private:
-		ContextPtr				_context;
+		ContextPtr					_context;
+		IOUSBDeviceInterface **		_dev;
 
 	public:
 		class InterfaceToken : public IToken
@@ -76,7 +79,7 @@ namespace mtp { namespace usb
 		};
 		DECLARE_PTR(InterfaceToken);
 
-		Device(ContextPtr ctx);
+		Device(ContextPtr ctx, IOUSBDeviceInterface **dev); //must be opened
 		~Device();
 
 		InterfaceTokenPtr ClaimInterface(int index)
