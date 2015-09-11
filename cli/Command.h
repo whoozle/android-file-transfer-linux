@@ -28,8 +28,8 @@ namespace cli
 		template<typename ...FuncArgs>
 		static void Execute(std::function<void (FuncArgs...)> func, const Tokens & tokens)
 		{
-			mtp::impl::TupleBuilder<Tokens::const_iterator, FuncArgs...> b(tokens.begin(), tokens.end());
-			mtp::invoke(func, b.Result);
+			auto args = mtp::make_tuple<Tokens::const_iterator, FuncArgs...>(tokens.begin(), tokens.end());
+			mtp::invoke(func, args);
 		}
 
 		virtual void Execute(const Tokens &tokens) const

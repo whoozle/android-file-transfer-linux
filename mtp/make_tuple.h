@@ -47,10 +47,15 @@ namespace mtp
 		};
 	}
 
+	template<typename IteratorType>
+	std::tuple<> make_tuple(IteratorType, IteratorType)
+	{ return std::tuple<>(); }
+
 	template<typename IteratorType, typename ...FuncArgs>
-	auto make_tuple(IteratorType begin, IteratorType end) -> typename impl::TupleBuilder<IteratorType, FuncArgs...>::ResultType
+	auto make_tuple(IteratorType begin, IteratorType end) -> typename impl::TupleBuilder<IteratorType, FuncArgs...>::ResultType &&
 	{
-		return impl::TupleBuilder<IteratorType, FuncArgs...>::Result;
+		impl::TupleBuilder<IteratorType, FuncArgs...> b(begin, end);
+		return std::move(b.Result);
 	}
 };
 
