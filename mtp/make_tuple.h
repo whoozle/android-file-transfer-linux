@@ -36,9 +36,6 @@ namespace mtp
 			TupleBuilder(IteratorType begin, IteratorType end):
 				_text(*Next(begin, end)), _next(begin, end)
 			{
-				if (begin == end)
-					throw std::runtime_error("not enough argument for command");
-
 				std::stringstream ss(_text);
 				ValueType value;
 				ss >> value;
