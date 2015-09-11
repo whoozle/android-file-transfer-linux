@@ -3,6 +3,11 @@ cmake_minimum_required(VERSION 2.8)
 set(CMAKE_USE_RELATIVE_PATHS TRUE)
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 
+message(STATUS "building for ${CMAKE_SYSTEM_NAME}")
+if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+	set(USB_BACKEND_DARWIN TRUE)
+endif()
+
 include(FindPkgConfig)
 include(CheckFunctionExists)
 
@@ -59,6 +64,14 @@ if (USB_BACKEND_LIBUSB)
 		mtp/backend/libusb/usb/Exception.cpp
 	)
 	list(APPEND MTP_LIBRARIES ${LIBUSB_LIBRARIES})
+elseif (USB_BACKEND_DARWIN)
+	include_directories(mtp/backend/darwin)
+	list(APPEND SOURCES
+		mtp/backend/darwin/usb/Context.cpp
+		mtp/backend/darwin/usb/Device.cpp
+		mtp/backend/darwin/usb/DeviceDescriptor.cpp
+		mtp/backend/darwin/usb/Exception.cpp
+	)
 else()
 	include_directories(mtp/backend/linux)
 	list(APPEND SOURCES
