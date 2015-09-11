@@ -78,14 +78,17 @@ namespace cli
 
 	char ** Session::CompletionCallback(const char *text, int start, int end)
 	{
-		if (start == 0)
+		Tokens tokens;
+		Tokenizer(text, tokens);
+		if (tokens.size() < 2) //0 or 1
 		{
+			std::string command = !tokens.empty()? tokens.back(): std::string();
 			char **comp = static_cast<char **>(calloc(sizeof(char *), _commands.size() + 1));
 			auto it = _commands.begin();
 			size_t i = 0, n = _commands.size();
 			for(; n--; ++it)
 			{
-				if (end != 0 && it->first.compare(0, end, text) != 0)
+				if (end != 0 && it->first.compare(0, end, command) != 0)
 					continue;
 
 				comp[i++] = strdup(it->first.c_str());
@@ -96,6 +99,10 @@ namespace cli
 				comp = NULL;
 			};
 			return comp;
+		}
+		else
+		{
+			//completion
 		}
 		return NULL;
 	}
