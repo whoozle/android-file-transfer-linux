@@ -44,7 +44,7 @@ namespace mtp { namespace usb
 		int GetEndpointsCount() const;
 
 		EndpointPtr GetEndpoint(int idx) const
-		{ return std::make_shared<Endpoint>(idx); }
+		{ return std::make_shared<Endpoint>(_interface, idx); }
 
 	};
 	DECLARE_PTR(Interface);

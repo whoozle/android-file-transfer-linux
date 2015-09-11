@@ -44,21 +44,26 @@ namespace mtp { namespace usb
 
 	class Endpoint
 	{
+	private:
+		int							_address;
+		int							_maxPacketSize;
+		EndpointDirection			_direction;
+		EndpointType				_type;
+
 	public:
-		Endpoint(int idx)
-		{ }
+		Endpoint(IOUSBInterfaceInterface **interface, int idx);
 
 		u8 GetAddress() const
-		{ return 0; }
+		{ return _address; }
 
 		int GetMaxPacketSize() const
-		{ return 512; }
+		{ return _maxPacketSize; }
 
 		EndpointDirection GetDirection() const
-		{ return EndpointDirection::Out; }
+		{ return _direction; }
 
 		EndpointType GetType() const
-		{ return EndpointType::Bulk; }
+		{ return _type; }
 	};
 	DECLARE_PTR(Endpoint);
 
