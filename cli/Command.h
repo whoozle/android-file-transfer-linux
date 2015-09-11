@@ -26,71 +26,63 @@
 #include <functional>
 #include <mtp/Demangle.h>
 
-namespace cli {
+namespace cli
+{
 	class Session;
 
-	struct Path : public std::string {
+	struct Path : public std::string		{ Path(const std::string &path = std::string()): std::string(path) { } };
+	struct LocalPath : public std::string	{ LocalPath(const std::string &path = std::string()): std::string(path) { } };
 
-		Path(const std::string &path = std::string()) : std::string(path) {
-		}
+	struct CompletionContext
+	{
+		cli::Session &				Session;
+		size_t						Index;
+		std::string					Prefix;
+		std::list<std::string> &	Result;
+		CompletionContext(cli::Session &s, size_t i, const std::string &p, std::list<std::string> & r):
+			Session(s), Index(i), Prefix(p), Result(r) { }
 	};
 
-	struct LocalPath : public std::string {
-
-		LocalPath(const std::string &path = std::string()) : std::string(path) {
-		}
-	};
-
-	struct CompletionContext {
-		cli::Session & Session;
-		size_t Index;
-		std::string Prefix;
-		std::list<std::string> & Result;
-
-		CompletionContext(cli::Session &s, size_t i, const std::string &p, std::list<std::string> & r) :
-		Session(s), Index(i), Prefix(p), Result(r) {
-		}
-	};
-
-	namespace impl {
+	namespace impl
+	{
 
 		template<typename Type>
-		struct Completer {
-
-			static void Complete(CompletionContext & ctx) {
-				printf("MISS\n");
-			}
+		struct Completer
+		{
+			static void Complete(CompletionContext & ctx) { printf("MISS\n"); }
 		};
 
 		template<>
-		struct Completer<Path> {
+		struct Completer<Path>
+		{
 			static void Complete(CompletionContext & ctx);
 		};
 
-		template<typename ... Tail>
-		struct CompletionForwarder {
 
-			static void Complete(CompletionContext & ctx, size_t index) {
-			}
+		template<typename ... Tail>
+		struct CompletionForwarder
+		{
+			static void Complete(CompletionContext & ctx, size_t index)
+			{ }
 		};
 
 		template<typename First, typename ... Tail>
-		struct CompletionForwarder<First, Tail...> {
-
-			static void Complete(CompletionContext & ctx, size_t index) {
-				printf("COMPLETER %u %s\n", (unsigned) index, mtp::Demangle(typeid (First).name()).c_str());
+		struct CompletionForwarder<First, Tail...>
+		{
+			static void Complete(CompletionContext & ctx, size_t index)
+			{
+				printf("COMPLETER %u %s\n", (unsigned)index, mtp::Demangle(typeid(First).name()).c_str());
 				if (index == 0)
 					Completer<First>::Complete(ctx);
 				else
-					CompletionForwarder < Tail...>::Complete(ctx, index - 1);
+					CompletionForwarder<Tail...>::Complete(ctx, index - 1);
 			}
 		};
 	};
 
-	struct ICommand {
-
-		virtual ~ICommand() {
-		}
+	struct ICommand
+	{
+		virtual ~ICommand() { }
 
 		virtual void Execute(const Tokens &tokens) const = 0;
 		virtual size_t GetArgumentCount() const = 0;
@@ -99,45 +91,42 @@ namespace cli {
 	};
 	DECLARE_PTR(ICommand);
 
-	class BaseCommand : public virtual ICommand {
+	class BaseCommand : public virtual ICommand
+	{
 		std::string _help;
 
 	public:
-
-		BaseCommand(const std::string &help) : _help(help) {
-		}
-
-		virtual std::string GetHelpString() const {
-			return _help;
-		}
+		BaseCommand(const std::string &help): _help(help) { }
+		virtual std::string GetHelpString() const
+		{ return _help; }
 	};
 
 	template<typename ... Args>
-	struct Command : public BaseCommand {
-		typedef std::function<void (Args...) > FuncType;
+	struct Command : public BaseCommand
+	{
+		typedef std::function<void (Args...)> FuncType;
 
-		FuncType _func;
+		FuncType		_func;
 
-		Command(const std::string &help, FuncType && func) : BaseCommand(help), _func(func) {
-		}
+		Command(const std::string &help, FuncType && func) : BaseCommand(help), _func(func) { }
 
 		template<typename ...FuncArgs>
-		static void Execute(std::function<void (FuncArgs...) > func, const Tokens & tokens) {
-			auto args = mtp::make_tuple < Tokens::const_iterator, FuncArgs...>(tokens.begin(), tokens.end());
+		static void Execute(std::function<void (FuncArgs...)> func, const Tokens & tokens)
+		{
+			auto args = mtp::make_tuple<Tokens::const_iterator, FuncArgs...>(tokens.begin(), tokens.end());
 			mtp::invoke(func, args);
 		}
 
-		virtual void Execute(const Tokens &tokens) const {
+		virtual void Execute(const Tokens &tokens) const
+		{
 			Execute(_func, tokens);
 		}
 
-		virtual size_t GetArgumentCount() const {
-			return sizeof...(Args);
-		}
+		virtual size_t GetArgumentCount() const
+		{ return sizeof...(Args); }
 
-		virtual void Complete(CompletionContext &ctx) const {
-			impl::CompletionForwarder < Args...>::Complete(ctx, ctx.Index);
-		}
+		virtual void Complete(CompletionContext &ctx) const
+		{ impl::CompletionForwarder<Args...>::Complete(ctx, ctx.Index); }
 	};
 
 
