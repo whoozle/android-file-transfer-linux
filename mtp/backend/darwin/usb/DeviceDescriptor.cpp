@@ -23,8 +23,8 @@
 
 namespace mtp { namespace usb
 {
-	Configuration::Configuration(IOUSBDeviceInterface * dev, *IOUSBConfigurationDescriptorPtr conf): 
-		_device(dev) _conf(conf)
+	Configuration::Configuration(IOUSBDeviceInterface ** dev, IOUSBConfigurationDescriptorPtr conf):
+		_dev(dev), _conf(conf)
 	{
 		IOUSBFindInterfaceRequest request = { };
 
@@ -34,14 +34,14 @@ namespace mtp { namespace usb
 		request.bAlternateSetting  = kIOUSBFindInterfaceDontCare;
 
 		io_iterator_t iterator;
-		USB_CALL((*dev)->CreateInterfaceIterator(dev, &request, &interface_iterator));
+		USB_CALL((*dev)->CreateInterfaceIterator(dev, &request, &iterator));
 
 		io_service_t interface;
-		while (interface = IOIteratorNext(iterator))
+		while ((interface = IOIteratorNext(iterator)))
 		{
 			IOCFPlugInInterface **plugInInterface = NULL;
-
-			USB_CALL(IOCreatePlugInInterfaceForService(usbInterface,
+			SInt32 score;
+			USB_CALL(IOCreatePlugInInterfaceForService(interface,
 				kIOUSBInterfaceUserClientTypeID,
 				kIOCFPlugInInterfaceID,
 				&plugInInterface, &score));
@@ -60,9 +60,10 @@ namespace mtp { namespace usb
 		}
 	}
 
-	DeviceDescriptor::DeviceDescriptor(io_service_t desc): _device()
+	DeviceDescriptor::DeviceDescriptor(io_service_t desc): _dev()
 	{
-		IOCFPlugInInterface		**plugInInterface = NULL;
+		IOCFPlugInInterface **plugInInterface = NULL;
+		SInt32 score;
 		USB_CALL( IOCreatePlugInInterfaceForService(desc,
 			kIOUSBDeviceUserClientTypeID, kIOCFPlugInInterfaceID,
 			&plugInInterface, &score) ); //wrap desc, so it cannot leak here
@@ -70,24 +71,24 @@ namespace mtp { namespace usb
 		USB_CALL(IOObjectRelease(desc));
 		(*plugInInterface)->QueryInterface(plugInInterface,
 			CFUUIDGetUUIDBytes(kIOUSBDeviceInterfaceID),
-			(LPVOID *)&_device);
+			(LPVOID *)&_dev);
 
 		(*plugInInterface)->Release(plugInInterface);
-		if (!_device)
+		if (!_dev)
 			throw std::runtime_error("cannot create device");
 	}
 
 	u16 DeviceDescriptor::GetVendorId() const
 	{
 		UInt16 vendor;
-		USB_CALL((*dev)->GetDeviceVendor(dev, &vendor));
+		USB_CALL((*_dev)->GetDeviceVendor(_dev, &vendor));
 		return vendor;
 	}
 
 	u16 DeviceDescriptor::GetProductId() const
 	{
-		Uint16 product;
-		USB_CALL((*dev)->GetDeviceProduct(dev, &product));
+		UInt16 product;
+		USB_CALL((*_dev)->GetDeviceProduct(_dev, &product));
 		return product;
 	}
 
