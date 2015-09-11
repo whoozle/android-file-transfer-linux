@@ -47,22 +47,19 @@ namespace mtp { namespace usb
 	class DeviceDescriptor
 	{
 	private:
+		IOUSBDeviceInterface        **_device;
 
 	public:
-		DeviceDescriptor();
+		DeviceDescriptor(io_service_t desc);
 		~DeviceDescriptor();
 
-		u16 GetVendorId() const
-		{ return 0; }
-
-		u16 GetProductId() const
-		{ return 0; }
+		u16 GetVendorId() const;
+		u16 GetProductId() const;
 
 		DevicePtr Open(ContextPtr context);
 		DevicePtr TryOpen(ContextPtr context);
 
-		int GetConfigurationsCount() const
-		{ return 0; }
+		int GetConfigurationsCount() const;
 
 		ConfigurationPtr GetConfiguration(int conf);
 	};

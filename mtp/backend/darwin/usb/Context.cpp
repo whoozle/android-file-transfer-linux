@@ -17,6 +17,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 #include <usb/Context.h>
+#include <usb/DeviceDescriptor.h>
 #include <usb/call.h>
 #include <stdio.h>
 
@@ -67,7 +68,9 @@ namespace mtp { namespace usb
 		io_service_t service;
 		while ((service = IOIteratorNext (deviceIterator)))
 		{
-			(void) process_new_device (ctx, service);
+			try { _devices.push_back(std::make_shared<DeviceDescriptor>(service)); }
+			catch(const std::exception &ex)
+			{ fprintf(stderr, "%s\n", ex.what()); }
 
 			IOObjectRelease(service);
 		}

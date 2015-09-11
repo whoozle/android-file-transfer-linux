@@ -19,10 +19,43 @@
 #include <usb/DeviceDescriptor.h>
 #include <usb/call.h>
 
+//https://developer.apple.com/library/mac/documentation/DeviceDrivers/Conceptual/USBBook/USBDeviceInterfaces/USBDevInterfaces.html
+
 namespace mtp { namespace usb
 {
-	DeviceDescriptor::DeviceDescriptor()
-	{ }
+	DeviceDescriptor::DeviceDescriptor(io_service_t desc): _device()
+	{
+		IOCFPlugInInterface		**plugInInterface = NULL;
+		USB_CALL( IOCreatePlugInInterfaceForService(desc,
+			kIOUSBDeviceUserClientTypeID, kIOCFPlugInInterfaceID,
+			&plugInInterface, &score) ); //wrap desc, so it cannot leak here
+
+		USB_CALL(IOObjectRelease(desc));
+		(*plugInInterface)->QueryInterface(plugInInterface,
+			CFUUIDGetUUIDBytes(kIOUSBDeviceInterfaceID),
+			(LPVOID *)&_device);
+
+		(*plugInInterface)->Release(plugInInterface);
+		if (!_device)
+			throw std::runtime_error("cannot create device");
+	}
+
+	u16 DeviceDescriptor::GetVendorId() const
+	{
+		UInt16 vendor;
+		USB_CALL((*dev)->GetDeviceVendor(dev, &vendor));
+		return vendor;
+	}
+
+	u16 DeviceDescriptor::GetProductId() const
+	{
+		Uint16 product;
+		USB_CALL((*dev)->GetDeviceProduct(dev, &product));
+		return product;
+	}
+
+	int DeviceDescriptor::GetConfigurationsCount() const
+	{ return 0; }
 
 	ConfigurationPtr DeviceDescriptor::GetConfiguration(int conf)
 	{
