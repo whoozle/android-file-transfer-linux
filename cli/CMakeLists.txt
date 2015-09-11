@@ -1,6 +1,7 @@
 find_package(Readline)
 
 set(CLI_SOURCES
+	Command.cpp
 	Session.cpp
 	Tokenizer.cpp
 	arg_lexer.l.cpp

@@ -30,10 +30,6 @@
 
 namespace cli
 {
-	struct Path : public std::string		{ Path(const std::string &path = std::string()): std::string(path) { } };
-	struct LocalPath : public std::string	{ LocalPath(const std::string &path = std::string()): std::string(path) { } };
-
-
 	class Session
 	{
 		mtp::DevicePtr				_device;
