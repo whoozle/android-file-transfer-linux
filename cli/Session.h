@@ -24,7 +24,7 @@ namespace cli
 		mtp::u32					_cd;
 		bool						_running;
 
-		std::map<std::string, ICommandPtr> _commands;
+		std::multimap<std::string, ICommandPtr> _commands;
 
 		char ** CompletionCallback(const char *text, int start, int end);
 
