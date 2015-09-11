@@ -36,6 +36,7 @@ namespace cli
 			return false;
 
 		input.assign(line);
+		add_history(input.c_str());
 		return true;
 	}
 }
