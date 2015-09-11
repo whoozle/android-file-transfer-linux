@@ -23,7 +23,7 @@ namespace mtp
 			std::string									_text;
 			TupleBuilder<IteratorType, Tail...> 		_next;
 
-			typedef std::tuple<ValueType, Tail...>		ResultType;
+			typedef std::tuple<ValueType, typename std::decay<Tail>::type ... >		ResultType;
 			ResultType									Result;
 
 			static IteratorType Next(IteratorType & begin, IteratorType end)
