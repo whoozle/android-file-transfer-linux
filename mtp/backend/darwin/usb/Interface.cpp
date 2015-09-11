@@ -16,5 +16,43 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-#include "Interface.h"
+#include <usb/Interface.h>
+#include <usb/call.h>
 
+namespace mtp { namespace usb
+{
+
+	u8 Interface::GetClass() const
+	{
+		UInt8 intfClass;
+		USB_CALL((*_interface)->GetInterfaceClass(_interface, &intfClass));
+		return intfClass;
+	}
+
+	u8 Interface::GetSubclass() const
+	{
+		UInt8 intfSubClass;
+		USB_CALL((*_interface)->GetInterfaceSubClass(_interface, &intfSubClass));
+		return intfSubClass;
+	}
+
+	int Interface::GetIndex() const
+	{
+		UInt8 intfNumber;
+		USB_CALL((*_interface)->GetInterfaceNumber(_interface, &intfNumber));
+		return intfNumber;
+	}
+
+	std::string Interface::GetName() const
+	{
+		return std::string();
+	}
+
+	int Interface::GetEndpointsCount() const
+	{
+		UInt8 intfNumEndpoints;
+		USB_CALL((*_interface)->GetNumEndpoints(_interface, &intfNumEndpoints));
+		return intfNumEndpoints;
+	}
+
+}}

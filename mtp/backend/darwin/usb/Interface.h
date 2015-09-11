@@ -37,23 +37,15 @@ namespace mtp { namespace usb
 	public:
 		Interface(DevicePtr device, ConfigurationPtr config, IOUSBInterfaceInterface **interface): _device(device), _config(config), _interface(interface) { }
 
-		u8 GetClass() const
-		{ return 0; }
-
-		u8 GetSubclass() const
-		{ return 0; }
-
-		int GetIndex() const
-		{ return 0; }
-
-		std::string GetName() const
-		{ return std::string(); }
+		u8 GetClass() const;
+		u8 GetSubclass() const;
+		int GetIndex() const;
+		std::string GetName() const;
+		int GetEndpointsCount() const;
 
 		EndpointPtr GetEndpoint(int idx) const
 		{ return std::make_shared<Endpoint>(idx); }
 
-		int GetEndpointsCount() const
-		{ return 0; }
 	};
 	DECLARE_PTR(Interface);
 
