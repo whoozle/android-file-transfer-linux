@@ -64,7 +64,7 @@ namespace mtp
 				for(int j = 0; j < interfaces; ++j)
 				{
 					usb::InterfacePtr iface = conf->GetInterface(device, conf, j, 0);
-					fprintf(stderr, "%d:%d index %u, eps %u\n", i, j, iface->GetIndex(), iface->GetEndpointsCount());
+					//fprintf(stderr, "%d:%d index %u, eps %u\n", i, j, iface->GetIndex(), iface->GetEndpointsCount());
 
 					ByteArray data(255);
 					static const u16 DT_STRING = 3;
