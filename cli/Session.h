@@ -82,8 +82,8 @@ namespace cli
 		{ ListProperties(Resolve(path)); }
 
 		template <typename ...Args>
-		void AddCommand(const std::string &name, std::function<void(Args...)> && callback)
-		{ _commands.insert(std::make_pair(name, ICommandPtr(new Command<Args...>(std::move(callback))))); }
+		void AddCommand(const std::string &name, const std::string &help, std::function<void(Args...)> && callback)
+		{ _commands.insert(std::make_pair(name, ICommandPtr(new Command<Args...>(help, std::move(callback))))); }
 	};
 }
 

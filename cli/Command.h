@@ -12,18 +12,30 @@ namespace cli
 	struct ICommand
 	{
 		virtual ~ICommand() { }
+
 		virtual void Execute(const Tokens &tokens) const = 0;
+		virtual std::string GetHelpString() const = 0;
 	};
 	DECLARE_PTR(ICommand);
 
+	class BaseCommand : public virtual ICommand
+	{
+		std::string _help;
+
+	public:
+		BaseCommand(const std::string &help): _help(help) { }
+		virtual std::string GetHelpString() const
+		{ return _help; }
+	};
+
 	template<typename ... Args>
-	struct Command : public ICommand
+	struct Command : public BaseCommand
 	{
 		typedef std::function<void (Args...)> FuncType;
 
-		FuncType _func;
+		FuncType		_func;
 
-		Command(FuncType && func) : _func(func) { }
+		Command(const std::string &help, FuncType && func) : BaseCommand(help), _func(func) { }
 
 		template<typename ...FuncArgs>
 		static void Execute(std::function<void (FuncArgs...)> func, const Tokens & tokens)

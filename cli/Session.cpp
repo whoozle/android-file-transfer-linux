@@ -39,26 +39,41 @@ namespace cli
 		}
 		printf("\n");
 
-		AddCommand("help",			make_function([this]() -> void { Help(); }));
+		AddCommand("help", "shows this help",
+			make_function([this]() -> void { Help(); }));
 
-		AddCommand("ls",			make_function([this]() -> void { List(); }));
-		AddCommand("ls",			make_function([this](const Path &path) -> void { List(path); }));
+		AddCommand("ls", "lists current directory",
+			make_function([this]() -> void { List(); }));
+		AddCommand("ls", "<path> lists objects in <path>",
+			make_function([this](const Path &path) -> void { List(path); }));
 
-		AddCommand("put", 			make_function([this](const LocalPath &path) -> void { Put(path); }));
-		AddCommand("put", 			make_function([this](const LocalPath &path, const Path &dst) -> void { Put(path, dst); }));
+		AddCommand("put", "<file> uploads file",
+			make_function([this](const LocalPath &path) -> void { Put(path); }));
 
-		AddCommand("get", 			make_function([this](const Path &path) -> void { Get(path); }));
-		AddCommand("get", 			make_function([this](const Path &path, const LocalPath &dst) -> void { Get(dst, path); }));
+		AddCommand("put", "put <file> <dir> uploads file to directory",
+			make_function([this](const LocalPath &path, const Path &dst) -> void { Put(path, dst); }));
 
-		AddCommand("quit", 			make_function([this]() -> void { Quit(); }));
-		AddCommand("exit", 			make_function([this]() -> void { Quit(); }));
+		AddCommand("get", "<file> downloads file",
+			make_function([this](const Path &path) -> void { Get(path); }));
+		AddCommand("get", "<file> <dst> downloads file to <dst>",
+			make_function([this](const Path &path, const LocalPath &dst) -> void { Get(dst, path); }));
 
-		AddCommand("cd", 			make_function([this](const Path &path) -> void { ChangeDirectory(path); }));
-		AddCommand("rm", 			make_function([this](const LocalPath &path) -> void { Delete(path); }));
-		AddCommand("mkdir",			make_function([this](const Path &path) -> void { MakeDirectory(path); }));
+		AddCommand("quit", "quits program",
+			make_function([this]() -> void { Quit(); }));
+		AddCommand("exit", "exits program",
+			make_function([this]() -> void { Quit(); }));
 
-		AddCommand("storages", make_function([this]() -> void { ListStorages(); }));
-		AddCommand("device-properties", make_function([this]() -> void { ListDeviceProperties(); }));
+		AddCommand("cd", "<path> change directory to <path>",
+			make_function([this](const Path &path) -> void { ChangeDirectory(path); }));
+		AddCommand("rm", "<path> removes object (WARNING: RECURSIVE, be careful!)",
+			make_function([this](const LocalPath &path) -> void { Delete(path); }));
+		AddCommand("mkdir", "<path> makes directory",
+			make_function([this](const Path &path) -> void { MakeDirectory(path); }));
+
+		AddCommand("storage-list", "shows available MTP storages",
+			make_function([this]() -> void { ListStorages(); }));
+		AddCommand("device-properties", "shows device's MTP properties",
+			make_function([this]() -> void { ListDeviceProperties(); }));
 	}
 
 	char ** Session::CompletionCallback(const char *text, int start, int end)
@@ -205,7 +220,7 @@ namespace cli
 		printf("Available commands are:\n");
 		for(auto i : _commands)
 		{
-			printf("\t%s\n", i.first.c_str());
+			printf("\t%-20s %s\n", i.first.c_str(), i.second->GetHelpString().c_str());
 		}
 	}
 
