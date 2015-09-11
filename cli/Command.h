@@ -48,16 +48,6 @@ namespace cli
 				Values = std::tuple_cat(std::make_tuple(value), _next.Values);
 			}
 		};
-
-		template<typename ...Args>
-		struct Executor
-		{
-			static void Execute(std::function<void (Args...)> func, const Tokens & tokens)
-			{
-				TupleBuilder<Args...> b(tokens.begin(), tokens.end());
-				mtp::invoke(func, b.Values);
-			}
-		};
 	}
 
 	struct ICommand
@@ -76,9 +66,16 @@ namespace cli
 
 		Command(FuncType && func) : _func(func) { }
 
+		template<typename ...FuncArgs>
+		static void Execute(std::function<void (FuncArgs...)> func, const Tokens & tokens)
+		{
+			impl::TupleBuilder<FuncArgs...> b(tokens.begin(), tokens.end());
+			mtp::invoke(func, b.Values);
+		}
+
 		virtual void Execute(const Tokens &tokens) const
 		{
-			impl::Executor<Args...>::Execute(_func, tokens);
+			Execute(_func, tokens);
 		}
 	};
 
