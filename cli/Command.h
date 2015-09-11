@@ -23,8 +23,11 @@
 #include <mtp/types.h>
 #include <mtp/function_invoker.h>
 #include <mtp/make_tuple.h>
-#include <functional>
 #include <mtp/Demangle.h>
+
+#include <functional>
+#include <string>
+#include <list>
 
 namespace cli
 {
@@ -33,12 +36,14 @@ namespace cli
 	struct Path : public std::string		{ Path(const std::string &path = std::string()): std::string(path) { } };
 	struct LocalPath : public std::string	{ LocalPath(const std::string &path = std::string()): std::string(path) { } };
 
+	typedef std::list<std::string> CompletionResult;
 	struct CompletionContext
 	{
 		cli::Session &				Session;
 		size_t						Index;
 		std::string					Prefix;
-		std::list<std::string> &	Result;
+		CompletionResult &			Result;
+
 		CompletionContext(cli::Session &s, size_t i, const std::string &p, std::list<std::string> & r):
 			Session(s), Index(i), Prefix(p), Result(r) { }
 	};

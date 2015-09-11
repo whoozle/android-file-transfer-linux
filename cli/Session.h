@@ -42,6 +42,8 @@ namespace cli
 
 		char ** CompletionCallback(const char *text, int start, int end);
 
+		mtp::u32 ResolvePath(const std::string &path, std::string &file);
+
 	public:
 		Session(const mtp::DevicePtr &device);
 
@@ -53,6 +55,8 @@ namespace cli
 
 		void Help();
 		void Quit() { _running = false; }
+
+		void CompletePath(const Path &path, CompletionResult &result);
 
 		void List(mtp::u32 parent);
 

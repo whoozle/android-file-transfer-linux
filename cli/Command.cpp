@@ -23,8 +23,6 @@ namespace cli
 {
 
 	void impl::Completer<Path>::Complete(CompletionContext & ctx)
-	{
-		printf("COMPLETING PATH %s\n", ctx.Prefix.c_str());
-	}
+	{ ctx.Session.CompletePath(ctx.Prefix, ctx.Result); }
 
 }

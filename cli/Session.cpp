@@ -238,6 +238,21 @@ namespace cli
 		return id;
 	}
 
+	mtp::u32 Session::ResolvePath(const std::string &path, std::string &file)
+	{
+		size_t pos = path.rfind('/');
+		if (pos == path.npos)
+		{
+			file = path;
+			return _cd;
+		}
+		else
+		{
+			file = path.substr(pos + 1);
+			return Resolve(path.substr(0, pos));
+		}
+	}
+
 	void Session::List(mtp::u32 parent)
 	{
 		using namespace mtp;
@@ -255,7 +270,24 @@ namespace cli
 				printf("error: %s\n", ex.what());
 			}
 		}
+	}
 
+	void Session::CompletePath(const Path &path, CompletionResult &result)
+	{
+		std::string filename;
+		mtp::u32 parent = ResolvePath(path, filename);
+		auto objectList = _session->GetObjectHandles(mtp::Session::AllStorages, mtp::Session::AllFormats, parent);
+		for(auto object : objectList.ObjectHandles)
+		{
+			std::string name = _session->GetObjectStringProperty(object, mtp::ObjectProperty::ObjectFilename);
+			if (name.size() >= filename.size() && name.compare(0, filename.size(), filename) == 0)
+			{
+				if (name.find(' ') != name.npos)
+					result.push_back('"' + name +'"');
+				else
+					result.push_back(name);
+			}
+		}
 	}
 
 	void Session::ListStorages()
