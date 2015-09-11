@@ -79,7 +79,7 @@ namespace cli
 	char ** Session::CompletionCallback(const char *text, int start, int end)
 	{
 		Tokens tokens;
-		Tokenizer(text, tokens);
+		Tokenizer(CommandLine::Get().GetLineBuffer(), tokens);
 		if (tokens.size() < 2) //0 or 1
 		{
 			std::string command = !tokens.empty()? tokens.back(): std::string();
@@ -103,6 +103,21 @@ namespace cli
 		else
 		{
 			//completion
+			const std::string &command = tokens.front();
+			auto b = _commands.lower_bound(command);
+			auto e = _commands.upper_bound(command);
+			if (b == e)
+				return NULL;
+
+			decltype(b) i;
+			for(i = b; i != e; ++i)
+			{
+				if (tokens.size() <= 1 + i->second->GetArgumentCount())
+					break;
+			}
+			if (i == e)
+				return NULL;
+			//printf("COMPLETING %s with %u args\n", command.c_str(), i->second->GetArgumentCount());
 		}
 		return NULL;
 	}

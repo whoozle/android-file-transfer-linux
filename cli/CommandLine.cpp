@@ -39,4 +39,7 @@ namespace cli
 		add_history(input.c_str());
 		return true;
 	}
+
+	std::string CommandLine::GetLineBuffer() const
+	{ return rl_line_buffer; }
 }

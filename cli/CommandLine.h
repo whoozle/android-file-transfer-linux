@@ -26,6 +26,7 @@ namespace cli
 		bool ReadLine(const std::string &prompt, std::string &input);
 		void SetCallback(const Callback &callback)
 		{ _callback = callback; }
+		std::string GetLineBuffer() const;
 	};
 }
 
