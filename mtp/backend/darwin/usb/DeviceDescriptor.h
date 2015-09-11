@@ -37,7 +37,7 @@ namespace mtp { namespace usb
 		std::vector<IOUSBInterfaceInterface **> _interfaces;
 
 	public:
-		Configuration(IOUSBDeviceInterface * dev, *IOUSBConfigurationDescriptorPtr conf): _dev(dev) _conf(conf) { }
+		Configuration(IOUSBDeviceInterface * dev, IOUSBConfigurationDescriptorPtr conf): _dev(dev) _conf(conf) { }
 		~Configuration() { }
 
 		int GetIndex() const
