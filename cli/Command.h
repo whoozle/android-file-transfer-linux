@@ -49,7 +49,7 @@ namespace cli
 		template<typename Type>
 		struct Completer
 		{
-			static void Complete(CompletionContext & ctx) { printf("MISS\n"); }
+			static void Complete(CompletionContext & ctx) { }
 		};
 
 		template<>
@@ -71,9 +71,8 @@ namespace cli
 		{
 			static void Complete(CompletionContext & ctx, size_t index)
 			{
-				printf("COMPLETER %u %s\n", (unsigned)index, mtp::Demangle(typeid(First).name()).c_str());
 				if (index == 0)
-					Completer<First>::Complete(ctx);
+					Completer<typename std::decay<First>::type>::Complete(ctx);
 				else
 					CompletionForwarder<Tail...>::Complete(ctx, index - 1);
 			}
