@@ -65,6 +65,9 @@ if (USB_BACKEND_LIBUSB)
 	)
 	list(APPEND MTP_LIBRARIES ${LIBUSB_LIBRARIES})
 elseif (USB_BACKEND_DARWIN)
+	find_library(CORE_LIBRARY CoreFoundation)
+	find_library(IOKIT_LIBRARY IOKit)
+	list(APPEND MTP_LIBRARIES ${IOKIT_LIBRARY} ${CORE_LIBRARY})
 	include_directories(mtp/backend/darwin)
 	list(APPEND SOURCES
 		mtp/backend/darwin/usb/Context.cpp
