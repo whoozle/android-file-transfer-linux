@@ -43,6 +43,7 @@ namespace cli
 		char ** CompletionCallback(const char *text, int start, int end);
 
 		mtp::u32 ResolvePath(const std::string &path, std::string &file);
+		static std::string GetFilename(const std::string & path);
 
 	public:
 		Session(const mtp::DevicePtr &device);
@@ -63,7 +64,7 @@ namespace cli
 		void ListStorages();
 		void Get(const LocalPath &dst, mtp::u32 srcId);
 		void Get(const mtp::u32 srcId);
-		void Put(mtp::u32 parentId, const LocalPath &src);
+		void Put(mtp::u32 parentId, const std::string &dst, const LocalPath &src);
 		void MakeDirectory(mtp::u32 parentId, const std::string & name);
 		void Delete(mtp::u32 id);
 		void ListProperties(mtp::u32 id);
@@ -79,10 +80,14 @@ namespace cli
 		{ return List(Resolve(path)); }
 
 		void Put(const LocalPath &src)
-		{ Put(_cd, src); }
+		{ Put(_cd, GetFilename(src), src); }
 
 		void Put(const LocalPath &src, const Path &dst)
-		{ Put(Resolve(dst), src); } //fixme: add dir/file distinction here
+		{
+			std::string filename;
+			mtp::u32 parent = ResolvePath(dst, filename);
+			Put(parent, filename, src);
+		}
 
 		void Get(const Path &src)
 		{ Get(Resolve(src)); }
@@ -90,8 +95,12 @@ namespace cli
 		void Get(const LocalPath &dst, const Path &src)
 		{ Get(dst, Resolve(src)); }
 
-		void MakeDirectory(const std::string &name)
-		{ MakeDirectory(_cd, name); }
+		void MakeDirectory(const std::string &path)
+		{
+			std::string name;
+			mtp::u32 parent = ResolvePath(path, name);
+			MakeDirectory(parent, name);
+		}
 
 		void Delete(const Path &path)
 		{ Delete(Resolve(path)); }

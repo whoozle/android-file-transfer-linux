@@ -238,6 +238,12 @@ namespace cli
 		return id;
 	}
 
+	std::string Session::GetFilename(const std::string &path)
+	{
+		size_t pos = path.rfind('/');
+		return (pos == path.npos)? path: path.substr(0, pos);
+	}
+
 	mtp::u32 Session::ResolvePath(const std::string &path, std::string &file)
 	{
 		size_t pos = path.rfind('/');
@@ -322,11 +328,11 @@ namespace cli
 		Get(LocalPath(info.Filename), srcId);
 	}
 
-	void Session::Put(mtp::u32 parentId, const LocalPath &src)
+	void Session::Put(mtp::u32 parentId, const std::string &dst, const LocalPath &src)
 	{
 		using namespace mtp;
 		msg::ObjectInfo oi;
-		oi.Filename = src;
+		oi.Filename = dst;
 		oi.ObjectFormat = ObjectFormatFromFilename(src);
 
 		std::shared_ptr<ObjectInputStream> objectInput(new ObjectInputStream(src));
