@@ -48,12 +48,14 @@ namespace cli
 		AddCommand("put", 			make_function([this](const LocalPath &path, const Path &dst) -> void { Put(path, dst); }));
 
 		AddCommand("get", 			make_function([this](const Path &path) -> void { Get(path); }));
+		AddCommand("get", 			make_function([this](const Path &path, const LocalPath &dst) -> void { Get(dst, path); }));
 
 		AddCommand("quit", 			make_function([this]() -> void { Quit(); }));
 		AddCommand("exit", 			make_function([this]() -> void { Quit(); }));
 
 		AddCommand("cd", 			make_function([this](const Path &path) -> void { ChangeDirectory(path); }));
 		AddCommand("rm", 			make_function([this](const LocalPath &path) -> void { Delete(path); }));
+		AddCommand("mkdir",			make_function([this](const Path &path) -> void { MakeDirectory(path); }));
 
 		AddCommand("storages", make_function([this]() -> void { ListStorages(); }));
 		AddCommand("device-properties", make_function([this]() -> void { ListDeviceProperties(); }));
