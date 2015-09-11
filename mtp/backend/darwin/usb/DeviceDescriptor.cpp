@@ -23,6 +23,43 @@
 
 namespace mtp { namespace usb
 {
+	Configuration::Configuration(IOUSBDeviceInterface * dev, *IOUSBConfigurationDescriptorPtr conf): 
+		_device(dev) _conf(conf)
+	{
+		IOUSBFindInterfaceRequest request = { };
+
+		request.bInterfaceClass    = kIOUSBFindInterfaceDontCare;
+		request.bInterfaceSubClass = kIOUSBFindInterfaceDontCare;
+		request.bInterfaceProtocol = kIOUSBFindInterfaceDontCare;
+		request.bAlternateSetting  = kIOUSBFindInterfaceDontCare;
+
+		io_iterator_t iterator;
+		USB_CALL((*dev)->CreateInterfaceIterator(dev, &request, &interface_iterator));
+
+		io_service_t interface;
+		while (interface = IOIteratorNext(iterator))
+		{
+			IOCFPlugInInterface **plugInInterface = NULL;
+
+			USB_CALL(IOCreatePlugInInterfaceForService(usbInterface,
+				kIOUSBInterfaceUserClientTypeID,
+				kIOCFPlugInInterfaceID,
+				&plugInInterface, &score));
+
+			IOObjectRelease(interface);
+
+			IOUSBInterfaceInterface **usbInterface = NULL;
+			USB_CALL((*plugInInterface)->QueryInterface(plugInInterface,
+				CFUUIDGetUUIDBytes(kIOUSBInterfaceInterfaceID),
+				(LPVOID *) &usbInterface));
+
+			(*plugInInterface)->Release(plugInInterface);
+
+			if (usbInterface)
+				_interfaces.push_back(usbInterface);
+		}
+	}
+
 	DeviceDescriptor::DeviceDescriptor(io_service_t desc): _device()
 	{
 		IOCFPlugInInterface		**plugInInterface = NULL;
@@ -65,7 +102,7 @@ namespace mtp { namespace usb
 	{
 		IOUSBConfigurationDescriptorPtr configDesc;
 		USB_CALL((*_dev)->GetConfigurationDescriptorPtr(_dev, conf, &configDesc));
-		return std::make_shared<Configuration>(configDesc);
+		return std::make_shared<Configuration>(_dev, configDesc);
 	}
 
 	DevicePtr DeviceDescriptor::Open(ContextPtr context)

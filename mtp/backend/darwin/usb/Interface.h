@@ -32,9 +32,10 @@ namespace mtp { namespace usb
 	{
 		DevicePtr							_device;
 		ConfigurationPtr					_config;
+		IOUSBInterfaceInterface **			_interface;
 
 	public:
-		Interface(DevicePtr device, ConfigurationPtr config, int idx): _device(device), _config(config) { }
+		Interface(DevicePtr device, ConfigurationPtr config, IOUSBInterfaceInterface **interface): _device(device), _config(config), _interface(interface) { }
 
 		u8 GetClass() const
 		{ return 0; }

@@ -25,32 +25,38 @@
 
 #include <usb/usb.h>
 
+#include <vector>
+
 namespace mtp { namespace usb
 {
 	class Configuration : Noncopyable
 	{
-		IOUSBConfigurationDescriptorPtr _conf;
+		IOUSBDeviceInterface			**_dev;
+		IOUSBConfigurationDescriptorPtr	_conf;
+
+		std::vector<IOUSBInterfaceInterface **> _interfaces;
+
 	public:
-		Configuration(IOUSBConfigurationDescriptorPtr conf): _conf(conf) { }
+		Configuration(IOUSBDeviceInterface * dev, *IOUSBConfigurationDescriptorPtr conf): _dev(dev) _conf(conf) { }
 		~Configuration() { }
 
 		int GetIndex() const
 		{ return _conf->configValue; }
 
 		int GetInterfaceCount() const
-		{ return _conf->numInterfaces; }
+		{ return _interfaces.size(); }
 
 		int GetInterfaceAltSettingsCount(int idx) const
 		{ return 1; }
 
 		InterfacePtr GetInterface(DevicePtr device, ConfigurationPtr config, int idx, int settings) const
-		{ return std::make_shared<Interface>(device, config, idx); }
+		{ return std::make_shared<Interface>(device, config, _interfaces.at(idx)); }
 	};
 
 	class DeviceDescriptor
 	{
 	private:
-		IOUSBDeviceInterface        **_device;
+		IOUSBDeviceInterface			**_dev;
 
 	public:
 		DeviceDescriptor(io_service_t desc);
