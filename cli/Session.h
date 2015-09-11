@@ -63,6 +63,9 @@ namespace cli
 		void Put(const LocalPath &src)
 		{ Put(_cd, src); }
 
+		void Put(const LocalPath &src, const Path &dst)
+		{ Put(Resolve(dst), src); } //fixme: add dir/file distinction here
+
 		void Get(const Path &src)
 		{ Get(Resolve(src)); }
 

@@ -42,15 +42,18 @@ namespace cli
 		AddCommand("help",			make_function([this]() -> void { Help(); }));
 
 		AddCommand("ls",			make_function([this]() -> void { List(); }));
-		AddCommand("list",			make_function([this]() -> void { List(); }));
-		AddCommand("list", 			make_function([this](mtp::u32 parent) -> void { List(parent); }));
+		AddCommand("ls",			make_function([this](const Path &path) -> void { List(path); }));
+
+		AddCommand("put", 			make_function([this](const LocalPath &path) -> void { Put(path); }));
+		AddCommand("put", 			make_function([this](const LocalPath &path, const Path &dst) -> void { Put(path, dst); }));
+
+		AddCommand("get", 			make_function([this](const Path &path) -> void { Get(path); }));
 
 		AddCommand("quit", 			make_function([this]() -> void { Quit(); }));
 		AddCommand("exit", 			make_function([this]() -> void { Quit(); }));
 
 		AddCommand("cd", 			make_function([this](const Path &path) -> void { ChangeDirectory(path); }));
 		AddCommand("rm", 			make_function([this](const LocalPath &path) -> void { Delete(path); }));
-		AddCommand("get", 			make_function([this](const LocalPath &path) -> void { Get(path); }));
 
 		AddCommand("storages", make_function([this]() -> void { ListStorages(); }));
 		AddCommand("device-properties", make_function([this]() -> void { ListDeviceProperties(); }));
