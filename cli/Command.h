@@ -12,31 +12,31 @@ namespace cli
 	namespace impl
 	{
 
-		template<typename ... Tail>
+		template<typename IteratorType, typename ... Tail>
 		struct TupleBuilder
 		{
 			std::tuple<> Values;
-			TupleBuilder(Tokens::const_iterator begin, Tokens::const_iterator end) { }
+			TupleBuilder(IteratorType begin, IteratorType end) { }
 		};
 
-		template<typename First, typename ... Tail>
-		struct TupleBuilder<First, Tail...>
+		template<typename IteratorType, typename First, typename ... Tail>
+		struct TupleBuilder<IteratorType, First, Tail...>
 		{
 			typedef typename std::decay<First>::type	ValueType;
 
 			std::string									_text;
-			TupleBuilder<Tail...> 						_next;
+			TupleBuilder<IteratorType, Tail...> 		_next;
 
 			std::tuple<ValueType, Tail...>				Values;
 
-			static Tokens::const_iterator Next(Tokens::const_iterator & begin, Tokens::const_iterator end)
+			static IteratorType Next(IteratorType & begin, IteratorType end)
 			{
 				if (begin == end)
 					throw std::runtime_error("not enough arguments");
 				return begin++;
 			}
 			
-			TupleBuilder(Tokens::const_iterator begin, Tokens::const_iterator end): 
+			TupleBuilder(IteratorType begin, IteratorType end):
 				_text(*Next(begin, end)), _next(begin, end)
 			{
 				if (begin == end)
@@ -69,7 +69,7 @@ namespace cli
 		template<typename ...FuncArgs>
 		static void Execute(std::function<void (FuncArgs...)> func, const Tokens & tokens)
 		{
-			impl::TupleBuilder<FuncArgs...> b(tokens.begin(), tokens.end());
+			impl::TupleBuilder<Tokens::const_iterator, FuncArgs...> b(tokens.begin(), tokens.end());
 			mtp::invoke(func, b.Values);
 		}
 
