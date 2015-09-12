@@ -92,6 +92,23 @@ namespace cli
 			make_function([this]() -> void { ListStorages(); }));
 		AddCommand("device-properties", "shows device's MTP properties",
 			make_function([this]() -> void { ListDeviceProperties(); }));
+#if 0
+		auto test = [](const std::string &input)
+		{
+			Tokens tokens;
+			Tokenizer(input, tokens);
+			printf("%s:\n", input.c_str());
+			for(auto t : tokens)
+				printf("\t%s\n", t.c_str());
+		};
+		AddCommand("test-lexer", "tests lexer",
+			make_function([&test]() -> void
+			{
+				test("a\\ b\\ c d");
+				test("\"a b c\" d");
+				test("\"\\\"\"");
+			}));
+#endif
 	}
 
 	char ** Session::CompletionCallback(const char *text, int start, int end)

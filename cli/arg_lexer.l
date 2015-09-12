@@ -31,9 +31,16 @@ void (*hide_warning)(const char*, yyscan_t) = &yy_fatal_error;
 
 \"											{ BEGIN(STRING); }
 
+<STRING>\\n									{ PARSER->Write('\n'); }
+<STRING>\\t									{ PARSER->Write('\t'); }
+<STRING>\\f									{ PARSER->Write('\f'); }
+<STRING>\\r									{ PARSER->Write('\r'); }
+<STRING>\\b									{ PARSER->Write('\b'); }
+<STRING>\\.									{ PARSER->Write(yytext[1]); }
 <STRING>\"									{ BEGIN(INITIAL); }
 <STRING>[^\\\"]+							{ PARSER->Write(yytext, yyleng); }
 
+"\\ "										{ PARSER->Write(' '); }
 [[:space:]]+								{ PARSER->NextArgument(); }
-.											{ PARSER->Write(yytext, yyleng); }
+<*>.										{ PARSER->Write(yytext[0]); }
 %%

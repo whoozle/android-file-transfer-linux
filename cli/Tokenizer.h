@@ -39,6 +39,8 @@ namespace cli
 
 		void Write(const char *text, size_t size)
 		{ _tempString.write(text, size); }
+		void Write(const char ch)
+		{ _tempString << ch; }
 		void NextArgument();
 		size_t Input(char *buf, size_t max_size);
 	};
