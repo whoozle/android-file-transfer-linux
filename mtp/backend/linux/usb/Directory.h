@@ -21,6 +21,7 @@
 #define	DIRECTORY_H
 
 #include <usb/Exception.h>
+#include <mtp/ByteArray.h>
 #include <vector>
 #include <sys/types.h>
 #include <dirent.h>
@@ -30,6 +31,62 @@
 
 namespace mtp { namespace usb
 {
+	class File : Noncopyable
+	{
+		FILE *_f;
+
+	public:
+		File(const std::string &path) : _f(fopen(path.c_str(), "rb"))
+		{
+			if (!_f)
+				throw Exception("open " + path);
+		}
+
+		~File()
+		{ fclose(_f); }
+
+		FILE *GetHandle()
+		{ return _f; }
+
+		std::string ReadLine(size_t bufSize = 1024)
+		{
+			std::vector<char> buf(bufSize);
+			if (!fgets(buf.data(), buf.size(), _f))
+				throw Exception("fgets");
+			return buf.data();
+		}
+
+		ByteArray ReadAll()
+		{
+			static const size_t step = 4096;
+
+			fseek(_f, 0, SEEK_SET);
+			ByteArray buf;
+			size_t r;
+			do
+			{
+				size_t offset = buf.size();
+				buf.resize(offset + step);
+				r = fread(buf.data() + offset, 1, step, _f);
+			}
+			while(r == step);
+			buf.resize(buf.size() - step + r);
+			return buf;
+		}
+
+		int ReadInt(int base)
+		{
+			int r;
+			switch(base)
+			{
+				case 16: if (fscanf(_f, "%x", &r) != 1) throw std::runtime_error("cannot read number"); break;
+				case 10: if (fscanf(_f, "%d", &r) != 1) throw std::runtime_error("cannot read number"); break;
+				default: throw std::runtime_error("invalid base");
+			}
+			return r;
+		}
+	};
+
 	class Directory : Noncopyable
 	{
 	private:
@@ -64,32 +121,22 @@ namespace mtp { namespace usb
 
 		static int ReadInt(const std::string &path, int base = 16)
 		{
-			FILE *f = fopen(path.c_str(), "rt");
-			if (!f)
-				throw Exception("opening " + path);
-			int r = 0;
-			switch(base)
-			{
-				case 16: if (fscanf(f, "%x", &r) != 1) throw std::runtime_error("cannot read number"); break;
-				case 10: if (fscanf(f, "%d", &r) != 1) throw std::runtime_error("cannot read number"); break;
-				default: throw std::runtime_error("invalid base");
-			}
-			fclose(f);
-			return r;
+			File f(path);
+			return f.ReadInt(base);
 		}
 
 		static std::string ReadString(const std::string &path)
 		{
-			FILE *f = fopen(path.c_str(), "rt");
-			if (!f)
-				throw Exception("opening " + path);
-			char buf[1024];
-			if (!fgets(buf, sizeof(buf), f))
-				throw Exception("fgets " + path);
-			std::string str(buf);
-			fclose(f);
+			File f(path);
+			std::string str = f.ReadLine();
 			size_t end = str.find_last_not_of(" \t\r\n\f");
-			return end != str.npos? std::string(buf, buf + end + 1): buf;
+			return end != str.npos? str.substr(0, end + 1): str;
+		}
+
+		static ByteArray ReadAll(const std::string &path)
+		{
+			File f(path);
+			return f.ReadAll();
 		}
 	};
 }}
