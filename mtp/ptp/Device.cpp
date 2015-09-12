@@ -70,6 +70,7 @@ namespace mtp
 					static const u16 DT_STRING = 3;
 					static const u16 DT_INTERFACE = 4;
 					device->ReadControl(0x80, 0x06, (DT_STRING << 8) | 0, 0, data, 1000);
+					HexDump("languages", data);
 					if (data.size() < 4 || data[1] != DT_STRING)
 						continue;
 
@@ -77,6 +78,7 @@ namespace mtp
 					data.resize(255);
 					std::fill(data.begin(), data.end(), 0xff);
 					device->ReadControl(0x80, 0x06, (DT_STRING << 8) | DT_INTERFACE, langId, data, 1000);
+					HexDump("interface name", data);
 					if (data.size() < 4 || data[1] != DT_STRING)
 						continue;
 
