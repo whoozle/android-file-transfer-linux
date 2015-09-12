@@ -41,10 +41,16 @@ namespace cli
 
 	char ** CommandLine::CompletionCallback(const char *text, int start, int end)
 	{
-		if (Get()._callback)
-			return Get()._callback(text, start, end);
-		else
-			return NULL;
+		try
+		{
+			if (Get()._callback)
+				return Get()._callback(text, start, end);
+			else
+				return NULL;
+		}
+		catch(const std::exception &ex)
+		{ fprintf(stderr, "%s\n", ex.what()); }
+		return NULL;
 	}
 
 	bool CommandLine::ReadLine(const std::string &prompt, std::string &input)
