@@ -272,7 +272,13 @@ namespace cli
 	std::string Session::GetFilename(const std::string &path)
 	{
 		size_t pos = path.rfind('/');
-		return (pos == path.npos)? path: path.substr(0, pos);
+		return (pos == path.npos)? path: path.substr(pos + 1);
+	}
+
+	std::string Session::GetDirname(const std::string &path)
+	{
+		size_t pos = path.rfind('/');
+		return (pos == path.npos)? std::string(): path.substr(0, pos);
 	}
 
 	mtp::u32 Session::ResolvePath(const std::string &path, std::string &file)
@@ -313,12 +319,20 @@ namespace cli
 	{
 		std::string filePrefix;
 		mtp::u32 parent = ResolvePath(path, filePrefix);
+		std::string dir = GetDirname(path);
 		auto objectList = _session->GetObjectHandles(mtp::Session::AllStorages, mtp::Session::AllFormats, parent);
 		for(auto object : objectList.ObjectHandles)
 		{
 			std::string name = _session->GetObjectStringProperty(object, mtp::ObjectProperty::ObjectFilename);
 			if (BeginsWith(name, filePrefix))
 			{
+				if (!dir.empty())
+					name = dir + '/' + name;
+
+				mtp::ObjectFormat format = (mtp::ObjectFormat)_session->GetObjectIntegerProperty(object, mtp::ObjectProperty::ObjectFormat);
+				if (format == mtp::ObjectFormat::Association)
+					name += '/';
+
 				if (name.find(' ') != name.npos)
 					result.push_back('"' + name +'"');
 				else

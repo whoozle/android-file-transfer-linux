@@ -43,7 +43,8 @@ namespace cli
 		char ** CompletionCallback(const char *text, int start, int end);
 
 		mtp::u32 ResolvePath(const std::string &path, std::string &file);
-		static std::string GetFilename(const std::string & path);
+		static std::string GetFilename(const std::string &path);
+		static std::string GetDirname(const std::string &path);
 
 	public:
 		Session(const mtp::DevicePtr &device);
