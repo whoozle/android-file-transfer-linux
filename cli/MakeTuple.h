@@ -4,10 +4,38 @@
 #include <sstream>
 #include <functional>
 
+#include <mtp/types.h>
+#include <mtp/Demangle.h>
+
 namespace cli
 {
 	namespace impl
 	{
+		template<typename T>
+		struct ValueConverter;
+
+		template<typename T>
+		struct StringStreamConverter
+		{
+			static T Convert(const std::string &text)
+			{
+				std::stringstream ss(text);
+				T value;
+				ss >> std::noskipws >> value;
+				return value;
+			}
+		};
+
+		template<>
+		struct ValueConverter<mtp::u32> : StringStreamConverter<mtp::u32>
+		{ };
+
+		template<>
+		struct ValueConverter<std::string>
+		{
+			static std::string Convert(const std::string &text)
+			{ return text; }
+		};
 
 		template<typename IteratorType, typename ... Tail>
 		struct TupleBuilder
@@ -36,12 +64,7 @@ namespace cli
 
 			TupleBuilder(IteratorType begin, IteratorType end):
 				_text(*Next(begin, end)), _next(begin, end)
-			{
-				std::stringstream ss(_text);
-				ValueType value;
-				ss >> value;
-				Result = std::tuple_cat(std::make_tuple(value), _next.Result);
-			}
+			{ Result = std::tuple_cat(std::make_tuple(ValueConverter<ValueType>::Convert(_text)), _next.Result); }
 		};
 	}
 

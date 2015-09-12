@@ -50,6 +50,19 @@ namespace cli
 
 	namespace impl
 	{
+		template<>
+		struct ValueConverter<LocalPath>
+		{
+			static LocalPath Convert(const Path &text)
+			{ return text; }
+		};
+
+		template<>
+		struct ValueConverter<Path>
+		{
+			static Path Convert(const Path &text)
+			{ return text; }
+		};
 
 		template<typename Type>
 		struct Completer
