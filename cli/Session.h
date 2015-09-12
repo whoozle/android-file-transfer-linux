@@ -65,6 +65,7 @@ namespace cli
 		void ListStorages();
 		void Get(const LocalPath &dst, mtp::u32 srcId);
 		void Get(const mtp::u32 srcId);
+		void Cat(const Path &path);
 		void Put(mtp::u32 parentId, const std::string &dst, const LocalPath &src);
 		void MakeDirectory(mtp::u32 parentId, const std::string & name);
 		void Delete(mtp::u32 id);

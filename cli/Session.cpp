@@ -22,6 +22,7 @@
 #include <cli/Tokenizer.h>
 
 #include <mtp/make_function.h>
+#include <mtp/ptp/ByteArrayObjectStream.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -89,6 +90,8 @@ namespace cli
 			make_function([this](const Path &path) -> void { Get(path); }));
 		AddCommand("get", "<file> <dst> downloads file to <dst>",
 			make_function([this](const Path &path, const LocalPath &dst) -> void { Get(dst, path); }));
+		AddCommand("cat", "<file> outputs file",
+			make_function([this](const Path &path) -> void { Cat(path); }));
 
 		AddCommand("quit", "quits program",
 			make_function([this]() -> void { Quit(); }));
@@ -371,6 +374,17 @@ namespace cli
 		auto info = _session->GetObjectInfo(srcId);
 		printf("filename = %s\n", info.Filename.c_str());
 		Get(LocalPath(info.Filename), srcId);
+	}
+
+	void Session::Cat(const Path &path)
+	{
+		mtp::ByteArrayObjectOutputStreamPtr stream(new mtp::ByteArrayObjectOutputStream);
+		_session->GetObject(Resolve(path), stream);
+		const mtp::ByteArray & data = stream->GetData();
+		std::string text(data.begin(), data.end());
+		fputs(text.c_str(), stdout);
+		if (text.empty() || text[text.size() - 1] == '\n')
+			fputc('\n', stdout);
 	}
 
 	void Session::Put(mtp::u32 parentId, const std::string &dst, const LocalPath &src)
