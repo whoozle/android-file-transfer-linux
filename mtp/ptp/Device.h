@@ -22,12 +22,16 @@
 #include <mtp/usb/BulkPipe.h>
 #include <mtp/ptp/PipePacketer.h>
 #include <mtp/ptp/Session.h>
+#include <usb/DeviceDescriptor.h>
 
 namespace mtp
 {
 	class Device
 	{
 		PipePacketer	_packeter;
+
+	private:
+		static int GetInterfaceStringIndex(usb::DeviceDescriptorPtr desc, int number);
 
 	public:
 		Device(usb::BulkPipePtr pipe);

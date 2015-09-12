@@ -60,6 +60,7 @@ namespace mtp { namespace usb
 		std::map<int, ConfigurationPtr>	_configurationMap;
 		std::vector<ConfigurationPtr>	_configuration;
 		EndpointPtr						_controlEp;
+		ByteArray						_descriptor;
 
 	public:
 		DeviceDescriptor(int busId, const std::string &path);
@@ -89,6 +90,9 @@ namespace mtp { namespace usb
 			}
 			conf->AddInterface(interface, path);
 		}
+
+		ByteArray GetDescriptor() const
+		{ return _descriptor; }
 	};
 	DECLARE_PTR(DeviceDescriptor);
 

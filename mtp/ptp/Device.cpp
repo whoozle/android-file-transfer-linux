@@ -22,6 +22,7 @@
 #include <mtp/ptp/Messages.h>
 #include <usb/Context.h>
 #include <mtp/ptp/OperationRequest.h>
+#include <stdexcept>
 
 
 namespace mtp
@@ -43,12 +44,34 @@ namespace mtp
 		return std::make_shared<Session>(_packeter.GetPipe(), sessionId);
 	}
 
+	int Device::GetInterfaceStringIndex(usb::DeviceDescriptorPtr desc, int number)
+	{
+		static const u16 DT_INTERFACE = 4;
+
+		ByteArray descData = desc->GetDescriptor();
+		size_t offset = 0;
+		while(offset < descData.size())
+		{
+			u8 len = descData.at(offset + 0);
+			u8 type = descData.at(offset + 1);
+			if (len < 2)
+				throw std::runtime_error("invalid descriptor length");
+
+			if (type == DT_INTERFACE && len >= 9)
+				return descData.at(offset + 8);
+
+			offset += len;
+		}
+		throw std::runtime_error("no interface descriptor found");
+	}
+
 	DevicePtr Device::Find()
 	{
 		using namespace mtp;
 		usb::ContextPtr ctx(new usb::Context);
 
 		for (usb::DeviceDescriptorPtr desc : ctx->GetDevices())
+		try
 		{
 			usb::DevicePtr device = desc->TryOpen(ctx);
 			if (!device)
@@ -64,20 +87,20 @@ namespace mtp
 				for(int j = 0; j < interfaces; ++j)
 				{
 					usb::InterfacePtr iface = conf->GetInterface(device, conf, j, 0);
-					//fprintf(stderr, "%d:%d index %u, eps %u\n", i, j, iface->GetIndex(), iface->GetEndpointsCount());
+					fprintf(stderr, "%d:%d index %u, eps %u\n", i, j, iface->GetIndex(), iface->GetEndpointsCount());
 
 					ByteArray data(255);
 					static const u16 DT_STRING = 3;
-					static const u16 DT_INTERFACE = 4;
 					device->ReadControl(0x80, 0x06, (DT_STRING << 8) | 0, 0, data, 1000);
-					HexDump("languages", data);
+					//HexDump("languages", data);
 					if (data.size() < 4 || data[1] != DT_STRING)
 						continue;
 
+					int interfaceStringIndex = GetInterfaceStringIndex(desc, iface->GetIndex());
 					u16 langId = data[2] | ((u16)data[3] << 8);
 					data.resize(255);
 					std::fill(data.begin(), data.end(), 0xff);
-					device->ReadControl(0x80, 0x06, (DT_STRING << 8) | DT_INTERFACE, langId, data, 1000);
+					device->ReadControl(0x80, 0x06, (DT_STRING << 8) | interfaceStringIndex, langId, data, 1000);
 					HexDump("interface name", data);
 					if (data.size() < 4 || data[1] != DT_STRING)
 						continue;
@@ -99,6 +122,8 @@ namespace mtp
 				}
 			}
 		}
+		catch(const std::exception &ex)
+		{ fprintf(stderr, "%s", ex.what()); }
 
 		return nullptr;
 	}

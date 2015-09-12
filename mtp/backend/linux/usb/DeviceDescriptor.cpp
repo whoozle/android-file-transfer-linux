@@ -31,6 +31,7 @@ namespace mtp { namespace usb
 		_product		= Directory::ReadInt(path + "/idProduct");
 		_deviceNumber	= Directory::ReadInt(path + "/devnum", 10);
 		_controlEp		= std::make_shared<Endpoint>(path + "/ep_00");
+		_descriptor		= Directory::ReadAll(path + "/descriptors");
 	}
 
 	DevicePtr DeviceDescriptor::Open(ContextPtr context)
