@@ -20,9 +20,9 @@
 #define AFT_CLI_COMMAND_H
 
 #include <cli/Tokens.h>
+#include <cli/MakeTuple.h>
 #include <mtp/types.h>
 #include <mtp/function_invoker.h>
-#include <mtp/make_tuple.h>
 #include <mtp/Demangle.h>
 
 #include <functional>
@@ -117,7 +117,7 @@ namespace cli
 		template<typename ...FuncArgs>
 		static void Execute(std::function<void (FuncArgs...)> func, const Tokens & tokens)
 		{
-			auto args = mtp::make_tuple<Tokens::const_iterator, FuncArgs...>(tokens.begin(), tokens.end());
+			auto args = cli::MakeTuple<Tokens::const_iterator, FuncArgs...>(tokens.begin(), tokens.end());
 			mtp::invoke(func, args);
 		}
 
