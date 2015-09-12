@@ -24,6 +24,20 @@
 #include <mtp/make_function.h>
 
 #include <stdio.h>
+#include <string.h>
+
+namespace
+{
+	bool BeginsWith(const std::string &str, const std::string &prefix)
+	{
+		if (prefix.size() > str.size())
+			return false;
+		const char *a = str.c_str();
+		const char *b = prefix.c_str();
+		return strncasecmp(a, b, prefix.size()) == 0;
+	}
+}
+
 
 namespace cli
 {
@@ -123,7 +137,7 @@ namespace cli
 			size_t i = 0, n = _commands.size();
 			for(; n--; ++it)
 			{
-				if (end != 0 && it->first.compare(0, end, command) != 0)
+				if (end != 0 && !BeginsWith(it->first, command))
 					continue;
 
 				comp[i++] = strdup(it->first.c_str());
@@ -297,13 +311,13 @@ namespace cli
 
 	void Session::CompletePath(const Path &path, CompletionResult &result)
 	{
-		std::string filename;
-		mtp::u32 parent = ResolvePath(path, filename);
+		std::string filePrefix;
+		mtp::u32 parent = ResolvePath(path, filePrefix);
 		auto objectList = _session->GetObjectHandles(mtp::Session::AllStorages, mtp::Session::AllFormats, parent);
 		for(auto object : objectList.ObjectHandles)
 		{
 			std::string name = _session->GetObjectStringProperty(object, mtp::ObjectProperty::ObjectFilename);
-			if (name.size() >= filename.size() && name.compare(0, filename.size(), filename) == 0)
+			if (BeginsWith(name, filePrefix))
 			{
 				if (name.find(' ') != name.npos)
 					result.push_back('"' + name +'"');
