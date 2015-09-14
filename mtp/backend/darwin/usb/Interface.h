@@ -93,7 +93,7 @@ namespace mtp { namespace usb
 		InterfaceTokenPtr Claim();
 
 		EndpointPtr GetEndpoint(int idx) const
-		{ return std::make_shared<Endpoint>(_interface, idx); }
+		{ return std::make_shared<Endpoint>(_interface, idx + 1); }
 
 	};
 	DECLARE_PTR(Interface);
