@@ -58,7 +58,7 @@ namespace mtp
 			if (len < 2)
 				throw std::runtime_error("invalid descriptor length");
 
-			if (type == DT_INTERFACE && len >= 9 && descData.at(2) == number)
+			if (type == DT_INTERFACE && len >= 9 && descData.at(offset + 2) == number)
 				return descData.at(offset + 8);
 
 			offset += len;
@@ -98,7 +98,7 @@ namespace mtp
 					if (data.size() < 4 || data[1] != DT_STRING)
 						continue;
 
-					int interfaceStringIndex = GetInterfaceStringIndex(desc, iface->GetIndex());
+					int interfaceStringIndex = GetInterfaceStringIndex(desc, j);
 					u16 langId = data[2] | ((u16)data[3] << 8);
 					data.resize(255);
 
