@@ -72,7 +72,19 @@ namespace mtp { namespace usb
 	}
 
 	void Device::ReadControl(u8 type, u8 req, u16 value, u16 index, ByteArray &data, int timeout)
-	{ fprintf(stderr, "ReadControl stub\n"); }
+	{
+		IOUSBDevRequest req = {};
+		req.rqDirection = kUSBIn;
+		req.rqType = (type >> 5) & 0x03;
+		req.rqRecipient = type & 0x1f;
+		req.bRequest = req;
+		req.wValue = value;
+		req.wIndex = index;
+		req.pData = data.data();
+		req.wLength = data.size();
+		USB_CALL((*_dev)->DeviceRequest(_dev, &req));
+		data.resize(req.wLenDone);
+	}
 
 	void Device::WriteControl(u8 type, u8 req, u16 value, u16 index, const ByteArray &data, bool interruptCurrentTransaction, int timeout)
 	{ fprintf(stderr, "WriteControl stub\n"); }
