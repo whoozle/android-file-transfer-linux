@@ -38,9 +38,10 @@ namespace mtp { namespace usb
 
 		switch (direction)
 		{
-		case kUSBOut:	_direction = EndpointDirection::Out; break;
-		case kUSBIn:	_direction = EndpointDirection::In; break;
-		default:		throw std::runtime_error("invalid endpoint direction");
+		case kUSBOut:		_direction = EndpointDirection::Out; break;
+		case kUSBIn:		_direction = EndpointDirection::In; break;
+		case kUSBAnyDirn:	_direction = EndpointDirection::Both; break;
+		default:			throw std::runtime_error("invalid endpoint direction");
 		}
 
 		_address = number;
