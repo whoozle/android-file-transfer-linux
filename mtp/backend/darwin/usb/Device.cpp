@@ -74,9 +74,7 @@ namespace mtp { namespace usb
 	void Device::ReadControl(u8 type, u8 req, u16 value, u16 index, ByteArray &data, int timeout)
 	{
 		IOUSBDevRequest request = {};
-		request.rqDirection = kUSBIn;
-		request.rqType = (type >> 5) & 0x03;
-		request.rqRecipient = type & 0x1f;
+		request.bmRequestType = type;
 		request.bRequest = req;
 		request.wValue = value;
 		request.wIndex = index;
