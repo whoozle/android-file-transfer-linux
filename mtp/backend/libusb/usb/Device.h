@@ -23,23 +23,13 @@
 #include <mtp/ByteArray.h>
 #include <mtp/Token.h>
 #include <mtp/types.h>
+#include <mtp/usb/types.h>
 #include <libusb.h>
 
 namespace mtp { namespace usb
 {
 	class Context;
 	DECLARE_PTR(Context);
-
-	enum struct EndpointType
-	{
-		Control = 0, Isochronous = 1, Bulk = 2, Interrupt = 3
-	};
-
-	enum struct EndpointDirection
-	{
-		In, Out
-	};
-
 
 	class Endpoint
 	{

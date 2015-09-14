@@ -20,20 +20,11 @@
 #define	INTERFACE_H
 
 #include <mtp/types.h>
+#include <mtp/usb/types.h>
 #include <vector>
 
 namespace mtp { namespace usb
 {
-	enum struct EndpointType
-	{
-		Control = 0, Isochronous = 1, Bulk = 2, Interrupt = 3
-	};
-
-	enum struct EndpointDirection
-	{
-		In, Out, Both
-	};
-
 
 	class Endpoint;
 	DECLARE_PTR(Endpoint);
