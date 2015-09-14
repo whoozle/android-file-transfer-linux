@@ -31,13 +31,13 @@ namespace mtp { namespace usb
 {
 	class Configuration : Noncopyable
 	{
-		IOUSBDeviceInterface			**_dev;
+		IOUSBDeviceType			**_dev;
 		IOUSBConfigurationDescriptorPtr	_conf;
 
 		std::vector<IOUSBInterfaceInterface **> _interfaces;
 
 	public:
-		Configuration(IOUSBDeviceInterface ** dev, IOUSBConfigurationDescriptorPtr conf);
+		Configuration(IOUSBDeviceType ** dev, IOUSBConfigurationDescriptorPtr conf);
 		~Configuration() { }
 
 		int GetIndex() const
@@ -56,7 +56,7 @@ namespace mtp { namespace usb
 	class DeviceDescriptor
 	{
 	private:
-		IOUSBDeviceInterface			**_dev;
+		IOUSBDeviceType			**_dev;
 
 	public:
 		DeviceDescriptor(io_service_t desc);
