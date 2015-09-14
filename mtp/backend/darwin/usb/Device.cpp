@@ -51,7 +51,7 @@ namespace mtp { namespace usb
 		do
 		{
 			r = inputStream->Read(buffer.data(), buffer.size());
-			USB_CALL((*interface)->WritePipe(interface, ep->GetRefIndex(), buffer.data(), buffer.size()));
+			USB_CALL((*interface)->WritePipe(interface, ep->GetRefIndex(), buffer.data(), r));
 		}
 		while(r == transferSize);
 	}
