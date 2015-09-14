@@ -62,10 +62,10 @@ namespace mtp { namespace usb
 
 	class InterfaceToken : public IToken
 	{
-		int						_index;
+		IOUSBInterfaceInterface **_interface;
 
 	public:
-		InterfaceToken(int index);
+		InterfaceToken(IOUSBInterfaceInterface **interface);
 		~InterfaceToken();
 	};
 	DECLARE_PTR(InterfaceToken);

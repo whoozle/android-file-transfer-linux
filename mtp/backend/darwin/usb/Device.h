@@ -27,10 +27,19 @@
 
 #include <usb/usb.h>
 
+#include "Interface.h"
+
 namespace mtp { namespace usb
 {
 	class Context;
 	DECLARE_PTR(Context);
+
+	class Endpoint;
+	DECLARE_PTR(Endpoint);
+	class Interface;
+	DECLARE_PTR(Interface);
+	class InterfaceToken;
+	DECLARE_PTR(InterfaceToken);
 
 	class Device : Noncopyable
 	{
