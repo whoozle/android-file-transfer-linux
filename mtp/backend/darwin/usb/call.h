@@ -22,7 +22,7 @@
 #include <usb/Exception.h>
 #include <usb/usb.h>
 
-#define USB_CALL(...) do { int r = (__VA_ARGS__); if (r != kIOReturnSuccess) throw mtp::usb::Exception(#__VA_ARGS__, r) ; } while(false)
+#define USB_CALL(...) do { int _r_ = (__VA_ARGS__); if (_r_ != kIOReturnSuccess) throw mtp::usb::Exception(#__VA_ARGS__, _r_) ; } while(false)
 
 #endif
 
