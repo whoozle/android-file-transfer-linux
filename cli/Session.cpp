@@ -306,17 +306,15 @@ namespace cli
 	{
 		std::string path;
 		mtp::u32 id = _cd;
-		while(true)
+		while(id && id != mtp::Session::Root)
 		{
 			std::string filename = _session->GetObjectStringProperty(id, mtp::ObjectProperty::ObjectFilename);
 			path = filename + "/" + path;
 			id = _session->GetObjectIntegerProperty(id, mtp::ObjectProperty::ParentObject);
 			if (id == 0)
-			{
-				path = "/" + path;
 				break;
-			}
 		}
+		path = "/" + path;
 		printf("%s\n", path.c_str());
 	}
 
