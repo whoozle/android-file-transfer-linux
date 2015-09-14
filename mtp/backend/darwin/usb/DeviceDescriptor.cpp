@@ -121,4 +121,10 @@ namespace mtp { namespace usb
 	DeviceDescriptor::~DeviceDescriptor()
 	{ }
 
+	ByteArray DeviceDescriptor::GetDescriptor()
+	{
+		ByteArray data;
+		return data;
+	}
+
 }}

@@ -71,6 +71,7 @@ namespace mtp { namespace usb
 		int GetConfigurationsCount() const;
 
 		ConfigurationPtr GetConfiguration(int conf);
+		ByteArray GetDescriptor();
 	};
 	DECLARE_PTR(DeviceDescriptor);
 
