@@ -58,7 +58,7 @@ namespace mtp
 			if (len < 2)
 				throw std::runtime_error("invalid descriptor length");
 
-			if (type == DT_INTERFACE && len >= 9 && descData.at(2) == number)
+			if (type == DT_INTERFACE && len >= 9 && descData.at(offset + 2) == number)
 				return descData.at(offset + 8);
 
 			offset += len;
