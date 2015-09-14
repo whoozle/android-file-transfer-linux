@@ -71,7 +71,7 @@ namespace mtp { namespace usb
 		while(r == transferSize);
 	}
 
-	void ReadControl(u8 type, u8 req, u16 value, u16 index, ByteArray &data, int timeout)
+	void Device::ReadControl(u8 type, u8 req, u16 value, u16 index, ByteArray &data, int timeout)
 	{ fprintf(stderr, "ReadControl stub\n"); }
 
 	void Device::WriteControl(u8 type, u8 req, u16 value, u16 index, const ByteArray &data, bool interruptCurrentTransaction, int timeout)
