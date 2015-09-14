@@ -47,6 +47,7 @@ namespace cli
 		_device(device),
 		_session(_device->OpenSession(1)),
 		_gdi(_session->GetDeviceInfo()),
+		_cs(mtp::Session::AllStorages),
 		_cd(mtp::Session::Root),
 		_running(true)
 	{
@@ -252,7 +253,7 @@ namespace cli
 			}
 			else
 			{
-				auto objectList = _session->GetObjectHandles(mtp::Session::AllStorages, mtp::Session::AllFormats, id);
+				auto objectList = _session->GetObjectHandles(_cs, mtp::Session::AllFormats, id);
 				bool found = false;
 				for(auto object : objectList.ObjectHandles)
 				{
@@ -302,7 +303,7 @@ namespace cli
 	void Session::List(mtp::u32 parent)
 	{
 		using namespace mtp;
-		msg::ObjectHandles handles = _session->GetObjectHandles(mtp::Session::AllStorages, mtp::Session::AllFormats, parent);
+		msg::ObjectHandles handles = _session->GetObjectHandles(_cs, mtp::Session::AllFormats, parent);
 
 		for(u32 objectId : handles.ObjectHandles)
 		{
@@ -323,7 +324,7 @@ namespace cli
 		std::string filePrefix;
 		mtp::u32 parent = ResolvePath(path, filePrefix);
 		std::string dir = GetDirname(path);
-		auto objectList = _session->GetObjectHandles(mtp::Session::AllStorages, mtp::Session::AllFormats, parent);
+		auto objectList = _session->GetObjectHandles(_cs, mtp::Session::AllFormats, parent);
 		for(auto object : objectList.ObjectHandles)
 		{
 			std::string name = _session->GetObjectStringProperty(object, mtp::ObjectProperty::ObjectFilename);

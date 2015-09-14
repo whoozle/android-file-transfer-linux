@@ -35,7 +35,8 @@ namespace cli
 		mtp::DevicePtr				_device;
 		mtp::SessionPtr				_session;
 		mtp::msg::DeviceInfo		_gdi;
-		mtp::u32					_cd;
+		mtp::u32					_cs; //current storage
+		mtp::u32					_cd; //current directory
 		bool						_running;
 
 		std::multimap<std::string, ICommandPtr> _commands;
