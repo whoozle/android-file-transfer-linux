@@ -101,6 +101,8 @@ namespace cli
 
 		AddCommand("cd", "<path> change directory to <path>",
 			make_function([this](const Path &path) -> void { ChangeDirectory(path); }));
+		AddCommand("pwd", "resolved current object directory",
+			make_function([this]() -> void { CurrentDirectory(); }));
 		AddCommand("rm", "<path> removes object (WARNING: RECURSIVE, be careful!)",
 			make_function([this](const LocalPath &path) -> void { Delete(path); }));
 		AddCommand("mkdir", "<path> makes directory",
@@ -299,6 +301,25 @@ namespace cli
 			return Resolve(path.substr(0, pos));
 		}
 	}
+
+	void Session::CurrentDirectory()
+	{
+		std::string path;
+		mtp::u32 id = _cd;
+		while(true)
+		{
+			std::string filename = _session->GetObjectStringProperty(id, mtp::ObjectProperty::ObjectFilename);
+			path = filename + "/" + path;
+			id = _session->GetObjectIntegerProperty(id, mtp::ObjectProperty::ParentObject);
+			if (id == 0)
+			{
+				path = "/" + path;
+				break;
+			}
+		}
+		printf("%s\n", path.c_str());
+	}
+
 
 	void Session::List(mtp::u32 parent)
 	{

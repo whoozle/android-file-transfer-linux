@@ -75,6 +75,7 @@ namespace cli
 
 		void ChangeDirectory(const Path &path)
 		{ _cd = Resolve(path); }
+		void CurrentDirectory();
 
 		void List()
 		{ return List(_cd); }
