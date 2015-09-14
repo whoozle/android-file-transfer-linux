@@ -125,7 +125,7 @@ namespace mtp
 			}
 		}
 		catch(const std::exception &ex)
-		{ fprintf(stderr, "%s", ex.what()); }
+		{ fprintf(stderr, "%s\n", ex.what()); }
 
 		return nullptr;
 	}
