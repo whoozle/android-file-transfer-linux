@@ -44,7 +44,7 @@ namespace mtp
 		return std::make_shared<Session>(_packeter.GetPipe(), sessionId);
 	}
 
-	int Device::GetInterfaceStringIndex(usb::DeviceDescriptorPtr desc, int number)
+	int Device::GetInterfaceStringIndex(usb::DeviceDescriptorPtr desc, u8 number)
 	{
 		static const u16 DT_INTERFACE = 4;
 
@@ -58,7 +58,7 @@ namespace mtp
 			if (len < 2)
 				throw std::runtime_error("invalid descriptor length");
 
-			if (type == DT_INTERFACE && len >= 9)
+			if (type == DT_INTERFACE && len >= 9 && descData.at(2) == number)
 				return descData.at(offset + 8);
 
 			offset += len;
