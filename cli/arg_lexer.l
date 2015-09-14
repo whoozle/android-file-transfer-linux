@@ -8,6 +8,7 @@
 
 %top {
 #	include <cli/Tokenizer.h>
+#	define register
 }
 
 %{
