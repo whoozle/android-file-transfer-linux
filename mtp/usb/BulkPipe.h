@@ -45,7 +45,7 @@ namespace mtp { namespace usb
 		ITokenPtr				_claimToken;
 
 	public:
-		BulkPipe(DevicePtr device, ConfigurationPtr conf, InterfacePtr interface, EndpointPtr in, EndpointPtr out, EndpointPtr interrupt);
+		BulkPipe(DevicePtr device, ConfigurationPtr conf, InterfacePtr interface, EndpointPtr in, EndpointPtr out, EndpointPtr interrupt, ITokenPtr claimToken);
 		~BulkPipe();
 
 		DevicePtr GetDevice() const;
@@ -55,7 +55,7 @@ namespace mtp { namespace usb
 		void Read(const IObjectOutputStreamPtr &outputStream, int timeout = 10000);
 		void Write(const IObjectInputStreamPtr &inputStream, int timeout = 10000);
 
-		static BulkPipePtr Create(const usb::DevicePtr & device, const ConfigurationPtr & conf, const usb::InterfacePtr & owner);
+		static BulkPipePtr Create(const usb::DevicePtr & device, const ConfigurationPtr & conf, const usb::InterfacePtr & owner, ITokenPtr claimToken);
 	};
 
 }}
