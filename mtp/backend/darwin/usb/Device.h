@@ -51,8 +51,7 @@ namespace mtp { namespace usb
 		Device(ContextPtr ctx, IOUSBDeviceInterface **dev); //must be opened
 		~Device();
 
-		InterfaceTokenPtr ClaimInterface(const InterfacePtr &interface)
-		{ return std::make_shared<InterfaceToken>(interface->GetInterfaceHandle()); }
+		InterfaceTokenPtr ClaimInterface(const InterfacePtr &interface);
 
 		int GetConfiguration() const;
 		void SetConfiguration(int idx);
