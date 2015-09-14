@@ -27,7 +27,7 @@
 namespace mtp { namespace usb
 {
 
-	Device::Device(ContextPtr context, IOUSBDeviceInterface ** dev): _context(context), _dev(dev)
+	Device::Device(ContextPtr context, IOUSBDeviceType ** dev): _context(context), _dev(dev)
 	{ }
 
 	Device::~Device()
@@ -71,7 +71,7 @@ namespace mtp { namespace usb
 		while(r == transferSize);
 	}
 
-	void Device::ReadControl(IOUSBDeviceInterface **dev, u8 type, u8 req, u16 value, u16 index, ByteArray &data, int timeout)
+	void Device::ReadControl(IOUSBDeviceType **dev, u8 type, u8 req, u16 value, u16 index, ByteArray &data, int timeout)
 	{
 		IOUSBDevRequest request = {};
 		request.bmRequestType = type;

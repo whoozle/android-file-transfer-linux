@@ -21,3 +21,14 @@
 #include <IOKit/IOCFBundle.h>
 #include <IOKit/usb/IOUSBLib.h>
 #include <IOKit/IOCFPlugIn.h>
+
+namespace mtp { namespace usb
+{
+#if defined (kIOUSBDeviceInterfaceID500)
+typedef IOUSBDeviceInterface500 IOUSBDeviceType;
+#define DeviceInterfaceID kIOUSBDeviceInterfaceID500
+#else
+typedef IOUSBDeviceInterface IOUSBDeviceType;
+#define DeviceInterfaceID kIOUSBDeviceInterface
+#endif
+}}

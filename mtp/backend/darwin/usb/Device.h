@@ -45,10 +45,10 @@ namespace mtp { namespace usb
 	{
 	private:
 		ContextPtr					_context;
-		IOUSBDeviceInterface **		_dev;
+		IOUSBDeviceType **		_dev;
 
 	public:
-		Device(ContextPtr ctx, IOUSBDeviceInterface **dev); //must be opened
+		Device(ContextPtr ctx, IOUSBDeviceType **dev); //must be opened
 		~Device();
 
 		InterfaceTokenPtr ClaimInterface(const InterfacePtr &interface);
@@ -59,7 +59,7 @@ namespace mtp { namespace usb
 		void WriteBulk(const EndpointPtr & ep, const IObjectInputStreamPtr &inputStream, int timeout);
 		void ReadBulk(const EndpointPtr & ep, const IObjectOutputStreamPtr &outputStream, int timeout);
 
-		static void ReadControl(IOUSBDeviceInterface **dev, u8 type, u8 req, u16 value, u16 index, ByteArray &data, int timeout); //result buffer must be allocated
+		static void ReadControl(IOUSBDeviceType **dev, u8 type, u8 req, u16 value, u16 index, ByteArray &data, int timeout); //result buffer must be allocated
 		void ReadControl(u8 type, u8 req, u16 value, u16 index, ByteArray &data, int timeout); //result buffer must be allocated
 		void WriteControl(u8 type, u8 req, u16 value, u16 index, const ByteArray &data, bool interruptCurrentTransaction, int timeout);
 	};

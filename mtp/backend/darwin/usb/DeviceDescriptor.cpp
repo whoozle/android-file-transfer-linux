@@ -23,7 +23,7 @@
 
 namespace mtp { namespace usb
 {
-	Configuration::Configuration(IOUSBDeviceInterface ** dev, IOUSBConfigurationDescriptorPtr conf):
+	Configuration::Configuration(IOUSBDeviceType ** dev, IOUSBConfigurationDescriptorPtr conf):
 		_dev(dev), _conf(conf)
 	{
 		IOUSBFindInterfaceRequest request = { };
@@ -70,12 +70,24 @@ namespace mtp { namespace usb
 
 		USB_CALL(IOObjectRelease(desc));
 		(*plugInInterface)->QueryInterface(plugInInterface,
-			CFUUIDGetUUIDBytes(kIOUSBDeviceInterfaceID),
+			CFUUIDGetUUIDBytes(DeviceInterfaceID),
 			(LPVOID *)&_dev);
 
 		(*plugInInterface)->Release(plugInInterface);
 		if (!_dev)
 			throw std::runtime_error("cannot create device");
+
+		bool wakeup = true;
+#if defined (kIOUSBInterfaceInterfaceID500)
+		UInt32 info = 0;
+		int r = (*_dev)->GetUSBDeviceInformation (_dev, &info);
+		if (r == kIOReturnSuccess && (info & (1 << kUSBInformationDeviceIsSuspendedBit)) == 0)
+			wakeup = false;
+#endif
+		if (wakeup)
+		{
+			(*_dev)->USBDeviceSuspend (_dev, 0);
+		}
 	}
 
 	u16 DeviceDescriptor::GetVendorId() const
