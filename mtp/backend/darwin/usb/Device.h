@@ -52,7 +52,7 @@ namespace mtp { namespace usb
 		~Device();
 
 		InterfaceTokenPtr ClaimInterface(const InterfacePtr &interface)
-		{ return std::make_shared<InterfaceToken>(interface); }
+		{ return std::make_shared<InterfaceToken>(interface->GetInterfaceHandle()); }
 
 		int GetConfiguration() const;
 		void SetConfiguration(int idx);
