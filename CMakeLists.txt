@@ -74,6 +74,7 @@ elseif (USB_BACKEND_DARWIN)
 		mtp/backend/darwin/usb/Device.cpp
 		mtp/backend/darwin/usb/DeviceDescriptor.cpp
 		mtp/backend/darwin/usb/Exception.cpp
+		mtp/backend/darwin/usb/Interface.cpp
 	)
 else()
 	include_directories(mtp/backend/linux)
