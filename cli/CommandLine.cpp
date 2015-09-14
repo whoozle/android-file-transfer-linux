@@ -26,7 +26,7 @@ namespace cli
 {
 	CommandLine::CommandLine()
 	{
-		rl_readline_name = "AFT";
+		rl_readline_name = const_cast<char *>("AFT");
 		rl_attempted_completion_function = &CommandLine::CompletionCallback;
 	}
 

@@ -24,7 +24,7 @@
 namespace mtp { namespace usb
 {
 	Configuration::Configuration(IOUSBDeviceType ** dev, IOUSBConfigurationDescriptorPtr conf):
-		_dev(dev), _conf(conf)
+		_conf(conf)
 	{
 		IOUSBFindInterfaceRequest request = { };
 

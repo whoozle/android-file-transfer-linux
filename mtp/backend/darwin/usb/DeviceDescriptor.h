@@ -31,7 +31,7 @@ namespace mtp { namespace usb
 {
 	class Configuration : Noncopyable
 	{
-		IOUSBDeviceType			**_dev;
+		//IOUSBDeviceType			**_dev;
 		IOUSBConfigurationDescriptorPtr	_conf;
 
 		std::vector<IOUSBInterfaceInterface **> _interfaces;
