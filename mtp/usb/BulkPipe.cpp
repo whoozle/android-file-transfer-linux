@@ -23,14 +23,12 @@
 
 namespace mtp { namespace usb
 {
-	BulkPipe::BulkPipe(DevicePtr device, ConfigurationPtr conf, InterfacePtr interface, EndpointPtr in, EndpointPtr out, EndpointPtr interrupt):
-		_device(device), _conf(conf), _interface(interface), _in(in), _out(out), _interrupt(interrupt)
+	BulkPipe::BulkPipe(DevicePtr device, ConfigurationPtr conf, InterfacePtr interface, EndpointPtr in, EndpointPtr out, EndpointPtr interrupt, ITokenPtr claimToken):
+		_device(device), _conf(conf), _interface(interface), _in(in), _out(out), _interrupt(interrupt), _claimToken(claimToken)
 	{
 		int currentConfigurationIndex = _device->GetConfiguration();
 		if (conf->GetIndex() != currentConfigurationIndex)
 			_device->SetConfiguration(conf->GetIndex());
-
-		_claimToken = _device->ClaimInterface(interface);
 	}
 
 	BulkPipe::~BulkPipe()
@@ -61,7 +59,7 @@ namespace mtp { namespace usb
 		_device->WriteBulk(_out, inputStream, timeout);
 	}
 
-	BulkPipePtr BulkPipe::Create(const usb::DevicePtr & device, const ConfigurationPtr & conf, const usb::InterfacePtr & interface)
+	BulkPipePtr BulkPipe::Create(const usb::DevicePtr & device, const ConfigurationPtr & conf, const usb::InterfacePtr & interface, ITokenPtr claimToken)
 	{
 		int epn = interface->GetEndpointsCount();
 
@@ -97,7 +95,7 @@ namespace mtp { namespace usb
 		if (!in || !out || !interrupt)
 			throw std::runtime_error("invalid endpoint");
 
-		return std::make_shared<BulkPipe>(device, conf, interface, in, out, interrupt);
+		return std::make_shared<BulkPipe>(device, conf, interface, in, out, interrupt, claimToken);
 	}
 
 }}
