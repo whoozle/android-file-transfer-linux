@@ -114,12 +114,12 @@ namespace mtp
 					if (name == "MTP")
 					{
 						//device->SetConfiguration(configuration->GetIndex());
-						usb::BulkPipePtr pipe = usb::BulkPipe::Create(device, conf, iface);
+						usb::BulkPipePtr pipe = usb::BulkPipe::Create(device, conf, iface, token);
 						return std::make_shared<Device>(pipe);
 					}
 					if (iface->GetClass() == 6 && iface->GetSubclass() == 1)
 					{
-						usb::BulkPipePtr pipe = usb::BulkPipe::Create(device, conf, iface);
+						usb::BulkPipePtr pipe = usb::BulkPipe::Create(device, conf, iface, token);
 						return std::make_shared<Device>(pipe);
 					}
 				}
