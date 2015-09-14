@@ -98,10 +98,7 @@ if (BUILD_SHARED_LIB)
 	endif()
 endif (BUILD_SHARED_LIB)
 
-check_function_exists(stat64 USE_STAT64)
-if (USE_STAT64)
-	add_definitions(-DMTP_USES_STAT64=1)
-endif()
+add_definitions(-D_LARGEFILE_SOURCE=1 -D_FILE_OFFSET_BITS=64)
 
 add_subdirectory(cli)
 

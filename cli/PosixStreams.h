@@ -42,17 +42,10 @@ namespace
 				perror("open");
 				throw std::runtime_error("cannot open file: " + fname);
 			}
-#ifdef MTP_USES_STAT64
-			struct stat64 st;
-			if (stat64(fname.c_str(), &st) != 0)
-				throw std::runtime_error("stat failed");
-			_size = st.st_size;
-#else
 			struct stat st;
 			if (stat(fname.c_str(), &st) != 0)
 				throw std::runtime_error("stat failed");
 			_size = st.st_size;
-#endif
 		}
 
 		~ObjectInputStream()
