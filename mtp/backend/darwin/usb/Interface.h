@@ -79,6 +79,9 @@ namespace mtp { namespace usb
 	public:
 		Interface(DevicePtr device, ConfigurationPtr config, IOUSBInterfaceInterface **interface): _device(device), _config(config), _interface(interface) { }
 
+		IOUSBInterfaceInterface ** GetInterfaceHandle()
+		{ return _interface; }
+
 		u8 GetClass() const;
 		u8 GetSubclass() const;
 		int GetIndex() const;
