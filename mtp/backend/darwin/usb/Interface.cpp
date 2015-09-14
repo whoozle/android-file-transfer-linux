@@ -17,6 +17,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 #include <usb/Interface.h>
+#include <usb/Device.h>
 #include <usb/call.h>
 
 namespace mtp { namespace usb
@@ -56,6 +57,10 @@ namespace mtp { namespace usb
 		_maxPacketSize = maxPacketSize;
 	}
 
+	Interface::Interface(DevicePtr device, ConfigurationPtr config, IOUSBInterfaceInterface **interface): _device(device), _config(config), _interface(interface) { }
+
+	Interface::~Interface()
+	{ }
 
 	u8 Interface::GetClass() const
 	{

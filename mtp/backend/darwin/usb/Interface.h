@@ -59,6 +59,8 @@ namespace mtp { namespace usb
 
 	class Configuration;
 	DECLARE_PTR(Configuration);
+	class Device;
+	DECLARE_PTR(Device);
 
 	class InterfaceToken : public IToken
 	{
@@ -77,7 +79,8 @@ namespace mtp { namespace usb
 		IOUSBInterfaceInterface **			_interface;
 
 	public:
-		Interface(DevicePtr device, ConfigurationPtr config, IOUSBInterfaceInterface **interface): _device(device), _config(config), _interface(interface) { }
+		Interface(DevicePtr device, ConfigurationPtr config, IOUSBInterfaceInterface **interface);
+		~Interface();
 
 		IOUSBInterfaceInterface ** GetInterfaceHandle()
 		{ return _interface; }
