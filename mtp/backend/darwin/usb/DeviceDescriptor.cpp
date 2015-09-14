@@ -78,6 +78,8 @@ namespace mtp { namespace usb
 			throw std::runtime_error("cannot create device");
 
 		bool wakeup = true;
+		if (GetVendorId() == kIOUSBVendorIDAppleComputer)
+			wakeup = false;
 #if defined (kIOUSBInterfaceInterfaceID500)
 		UInt32 info = 0;
 		int r = (*_dev)->GetUSBDeviceInformation (_dev, &info);
