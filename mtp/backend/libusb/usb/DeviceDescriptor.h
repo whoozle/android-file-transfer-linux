@@ -70,6 +70,8 @@ namespace mtp { namespace usb
 		{ return _descriptor.bNumConfigurations; }
 
 		ConfigurationPtr GetConfiguration(int conf);
+
+		ByteArray GetDescriptor() const;
 	};
 	DECLARE_PTR(DeviceDescriptor);
 

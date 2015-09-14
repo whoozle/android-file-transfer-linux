@@ -50,4 +50,10 @@ namespace mtp { namespace usb
 	DeviceDescriptor::~DeviceDescriptor()
 	{ libusb_unref_device(_dev); }
 
+	ByteArray DeviceDescriptor::GetDescriptor() const
+	{
+#warning not implemented
+		ByteArray stub; return stub;
+	}
+
 }}
