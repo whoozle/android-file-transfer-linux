@@ -234,7 +234,7 @@ namespace cli
 
 	mtp::u32 Session::Resolve(const Path &path)
 	{
-		mtp::u32 id = _cd;
+		mtp::u32 id = BeginsWith(path, "/")? mtp::Session::Root: _cd;
 		for(size_t p = 0; p < path.size(); )
 		{
 			size_t next = path.find('/', p);
@@ -242,7 +242,7 @@ namespace cli
 				next = path.size();
 
 			std::string entity(path.substr(p, next - p));
-			if (entity == ".")
+			if (entity.empty() || entity == ".")
 			{ }
 			else
 			if (entity == "..")
