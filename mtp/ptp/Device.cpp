@@ -88,6 +88,7 @@ namespace mtp
 				for(int j = 0; j < interfaces; ++j)
 				{
 					usb::InterfacePtr iface = conf->GetInterface(device, conf, j, 0);
+					usb::InterfaceTokenPtr token = device->ClaimInterface(iface);
 					fprintf(stderr, "%d:%d index %u, eps %u\n", i, j, iface->GetIndex(), iface->GetEndpointsCount());
 
 					static const u16 DT_STRING = 3;
