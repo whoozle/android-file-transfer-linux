@@ -124,7 +124,7 @@ namespace mtp { namespace usb
 	ByteArray DeviceDescriptor::GetDescriptor()
 	{
 		ByteArray data(255);
-		Device::ReadControl(_dev, 0x80, 6, 0x100, 0, data, 1000);
+		Device::ReadControl(_dev, 0x80, 6, 0x200, 0, data, 1000);
 		return data;
 	}
 

@@ -88,6 +88,7 @@ namespace mtp
 				for(int j = 0; j < interfaces; ++j)
 				{
 					usb::InterfacePtr iface = conf->GetInterface(device, conf, j, 0);
+					usb::InterfaceTokenPtr token = device->ClaimInterface(iface);
 					fprintf(stderr, "%d:%d index %u, eps %u\n", i, j, iface->GetIndex(), iface->GetEndpointsCount());
 
 					static const u16 DT_STRING = 3;
@@ -113,12 +114,12 @@ namespace mtp
 					if (name == "MTP")
 					{
 						//device->SetConfiguration(configuration->GetIndex());
-						usb::BulkPipePtr pipe = usb::BulkPipe::Create(device, conf, iface);
+						usb::BulkPipePtr pipe = usb::BulkPipe::Create(device, conf, iface, token);
 						return std::make_shared<Device>(pipe);
 					}
 					if (iface->GetClass() == 6 && iface->GetSubclass() == 1)
 					{
-						usb::BulkPipePtr pipe = usb::BulkPipe::Create(device, conf, iface);
+						usb::BulkPipePtr pipe = usb::BulkPipe::Create(device, conf, iface, token);
 						return std::make_shared<Device>(pipe);
 					}
 				}
