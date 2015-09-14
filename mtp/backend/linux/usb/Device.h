@@ -44,6 +44,16 @@ namespace mtp { namespace usb
 		{ return _fd; }
 	};
 
+	class InterfaceToken : public IToken
+	{
+		int			_fd;
+		unsigned	_interfaceNumber;
+	public:
+		InterfaceToken(int fd, unsigned interfaceNumber);
+		~InterfaceToken();
+	};
+	DECLARE_PTR(InterfaceToken);
+
 	class Device : Noncopyable
 	{
 	private:
@@ -60,16 +70,6 @@ namespace mtp { namespace usb
 	public:
 		Device(int fd, const EndpointPtr &controlEp);
 		~Device();
-
-		class InterfaceToken : public IToken
-		{
-			int			_fd;
-			unsigned	_interfaceNumber;
-		public:
-			InterfaceToken(int fd, unsigned interfaceNumber);
-			~InterfaceToken();
-		};
-		DECLARE_PTR(InterfaceToken);
 
 		InterfaceTokenPtr ClaimInterface(const InterfacePtr & interface)
 		{ return std::make_shared<InterfaceToken>(_fd.Get(), interface->GetIndex()); }

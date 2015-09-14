@@ -37,7 +37,7 @@ namespace mtp { namespace usb
 	FileHandler::~FileHandler()
 	{ close(_fd); }
 
-	Device::InterfaceToken::InterfaceToken(int fd, unsigned interfaceNumber): _fd(fd), _interfaceNumber(interfaceNumber)
+	InterfaceToken::InterfaceToken(int fd, unsigned interfaceNumber): _fd(fd), _interfaceNumber(interfaceNumber)
 	{
 		int r = ioctl(_fd, USBDEVFS_CLAIMINTERFACE, &interfaceNumber);
 		if (r < 0)
@@ -49,7 +49,7 @@ namespace mtp { namespace usb
 		}
 	}
 
-	Device::InterfaceToken::~InterfaceToken()
+	InterfaceToken::~InterfaceToken()
 	{
 		ioctl(_fd, USBDEVFS_RELEASEINTERFACE, &_interfaceNumber);
 	}

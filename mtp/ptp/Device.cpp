@@ -21,6 +21,8 @@
 #include <mtp/ptp/Container.h>
 #include <mtp/ptp/Messages.h>
 #include <usb/Context.h>
+#include <usb/Device.h>
+#include <usb/Interface.h>
 #include <mtp/ptp/OperationRequest.h>
 #include <stdexcept>
 
