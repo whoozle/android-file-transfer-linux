@@ -64,21 +64,11 @@ namespace mtp { namespace usb
 		IOUSBDeviceInterface **		_dev;
 
 	public:
-		class InterfaceToken : public IToken
-		{
-			int						_index;
-
-		public:
-			InterfaceToken(int index);
-			~InterfaceToken();
-		};
-		DECLARE_PTR(InterfaceToken);
-
 		Device(ContextPtr ctx, IOUSBDeviceInterface **dev); //must be opened
 		~Device();
 
-		InterfaceTokenPtr ClaimInterface(int index)
-		{ return std::make_shared<InterfaceToken>(index); }
+		InterfaceTokenPtr ClaimInterface(const InterfacePtr &interface)
+		{ return std::make_shared<InterfaceToken>(interface); }
 
 		int GetConfiguration() const;
 		void SetConfiguration(int idx);

@@ -18,6 +18,7 @@
  */
 #include <usb/Device.h>
 #include <usb/Context.h>
+#include <usb/Interface.h>
 #include <usb/call.h>
 #include <mtp/ByteArray.h>
 
@@ -44,13 +45,16 @@ namespace mtp { namespace usb
 		USB_CALL(libusb_set_configuration(_handle, idx));
 	}
 
-	Device::InterfaceToken::InterfaceToken(libusb_device_handle *handle, int index): _handle(handle), _index(index)
+	InterfaceToken::InterfaceToken(libusb_device_handle *handle, int index): _handle(handle), _index(index)
 	{
 		USB_CALL(libusb_claim_interface(handle, index));
 	}
 
-	Device::InterfaceToken::~InterfaceToken()
+	InterfaceToken::~InterfaceToken()
 	{ libusb_release_interface(_handle, _index); }
+
+	InterfaceTokenPtr Device::ClaimInterface(const InterfacePtr & interface)
+	{ return std::make_shared<InterfaceToken>(_handle, interface->GetIndex()); }
 
 	void Device::WriteBulk(const EndpointPtr & ep, const IObjectInputStreamPtr &inputStream, int timeout)
 	{

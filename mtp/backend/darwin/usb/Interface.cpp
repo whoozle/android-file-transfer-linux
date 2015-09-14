@@ -50,4 +50,16 @@ namespace mtp { namespace usb
 		return intfNumEndpoints;
 	}
 
+	InterfaceToken::InterfaceToken(IOUSBInterfaceInterface **interface): _interface(interface)
+	{
+		USB_CALL((*_interface)->USBInterfaceOpen(_interface));
+	}
+
+	InterfaceToken::~InterfaceToken()
+	{  (*_interface)->USBInterfaceClose(_interface); }
+
+	InterfaceTokenPtr Interface::Claim()
+	{ return std::make_shared<InterfaceToken>(_interface); }
+
+
 }}

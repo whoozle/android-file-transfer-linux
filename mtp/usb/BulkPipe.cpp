@@ -30,7 +30,7 @@ namespace mtp { namespace usb
 		if (conf->GetIndex() != currentConfigurationIndex)
 			_device->SetConfiguration(conf->GetIndex());
 
-		_claimToken = _device->ClaimInterface(interface->GetIndex());
+		_claimToken = _device->ClaimInterface(interface);
 	}
 
 	BulkPipe::~BulkPipe()

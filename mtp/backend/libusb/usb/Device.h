@@ -60,6 +60,11 @@ namespace mtp { namespace usb
 	};
 	DECLARE_PTR(Endpoint);
 
+	class Interface;
+	DECLARE_PTR(Interface);
+	class InterfaceToken;
+	DECLARE_PTR(InterfaceToken);
+
 	class Device : Noncopyable
 	{
 	private:
@@ -67,25 +72,13 @@ namespace mtp { namespace usb
 		libusb_device_handle *	_handle;
 
 	public:
-		class InterfaceToken : public IToken
-		{
-			libusb_device_handle *	_handle;
-			int						_index;
-
-		public:
-			InterfaceToken(libusb_device_handle *handle, int index);
-			~InterfaceToken();
-		};
-		DECLARE_PTR(InterfaceToken);
-
 		Device(ContextPtr ctx, libusb_device_handle * handle);
 		~Device();
 
 		libusb_device_handle * GetHandle()
 		{ return _handle; }
 
-		InterfaceTokenPtr ClaimInterface(int index)
-		{ return std::make_shared<InterfaceToken>(_handle, index); }
+		InterfaceTokenPtr ClaimInterface(const InterfacePtr & interface);
 
 		int GetConfiguration() const;
 		void SetConfiguration(int idx);

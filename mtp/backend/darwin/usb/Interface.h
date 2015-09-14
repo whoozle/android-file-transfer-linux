@@ -28,6 +28,16 @@ namespace mtp { namespace usb
 	class Configuration;
 	DECLARE_PTR(Configuration);
 
+	class InterfaceToken : public IToken
+	{
+		int						_index;
+
+	public:
+		InterfaceToken(int index);
+		~InterfaceToken();
+	};
+	DECLARE_PTR(InterfaceToken);
+
 	class Interface
 	{
 		DevicePtr							_device;
@@ -41,6 +51,8 @@ namespace mtp { namespace usb
 		u8 GetSubclass() const;
 		int GetIndex() const;
 		int GetEndpointsCount() const;
+
+		InterfaceTokenPtr Claim();
 
 		EndpointPtr GetEndpoint(int idx) const
 		{ return std::make_shared<Endpoint>(_interface, idx); }

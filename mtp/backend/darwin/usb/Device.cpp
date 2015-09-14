@@ -18,6 +18,7 @@
  */
 #include <usb/Device.h>
 #include <usb/Context.h>
+#include <usb/Interface.h>
 #include <usb/call.h>
 #include <mtp/ByteArray.h>
 
@@ -75,12 +76,6 @@ namespace mtp { namespace usb
 	void Device::SetConfiguration(int idx)
 	{ }
 
-	Device::InterfaceToken::InterfaceToken(int index): _index(index)
-	{ }
-
-	Device::InterfaceToken::~InterfaceToken()
-	{  }
-
 	void Device::WriteBulk(const EndpointPtr & ep, const IObjectInputStreamPtr &inputStream, int timeout)
 	{ }
 
@@ -91,9 +86,7 @@ namespace mtp { namespace usb
 	{
 	}
 
-	std::string Device::GetString(int idx) const
-	{
-		return std::string();
-	}
+	InterfaceTokenPtr Device::ClaimInterface(const InterfacePtr &interface)
+	{ return interface->Claim(); }
 
 }}

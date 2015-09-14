@@ -29,6 +29,17 @@ namespace mtp { namespace usb
 	class Configuration;
 	DECLARE_PTR(Configuration);
 
+	class InterfaceToken : public IToken
+	{
+		libusb_device_handle *	_handle;
+		int						_index;
+
+	public:
+		InterfaceToken(libusb_device_handle *handle, int index);
+		~InterfaceToken();
+	};
+	DECLARE_PTR(InterfaceToken);
+
 	class Interface
 	{
 		DevicePtr							_device;
