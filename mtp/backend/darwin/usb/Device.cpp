@@ -27,41 +27,6 @@
 namespace mtp { namespace usb
 {
 
-	Endpoint::Endpoint(IOUSBInterfaceInterface **interface, int idx)
-	{
-		UInt8		direction;
-		UInt8		number;
-		UInt8		transferType;
-		UInt16		maxPacketSize;
-		UInt8		interval;
-
-		USB_CALL((*interface)->GetPipeProperties(interface,
-			idx, &direction,
-			&number, &transferType,
-			&maxPacketSize, &interval));
-
-		switch (direction)
-		{
-		case kUSBOut:	_direction = EndpointDirection::Out; break;
-		case kUSBIn:	_direction = EndpointDirection::In; break;
-		default:		throw std::runtime_error("invalid endpoint direction");
-		}
-
-		_address = number;
-
-		switch(transferType)
-		{
-		case kUSBControl:	_type = EndpointType::Control; break;
-		case kUSBIsoc:		_type = EndpointType::Isochronous; break;
-		case kUSBBulk:		_type = EndpointType::Bulk; break;
-		case kUSBInterrupt:	_type = EndpointType::Interrupt; break;
-		default:		throw std::runtime_error("invalid endpoint type");
-		}
-
-		_maxPacketSize = maxPacketSize;
-	}
-
-
 	Device::Device(ContextPtr context, IOUSBDeviceInterface ** dev): _context(context), _dev(dev)
 	{ }
 
@@ -77,10 +42,34 @@ namespace mtp { namespace usb
 	{ }
 
 	void Device::WriteBulk(const EndpointPtr & ep, const IObjectInputStreamPtr &inputStream, int timeout)
-	{ }
+	{
+		IOUSBInterfaceInterface	** interface = ep->GetInterfaceHandle();
+
+		size_t transferSize = ep->GetMaxPacketSize();
+		ByteArray buffer(transferSize);
+		size_t r;
+		do
+		{
+			r = inputStream->Read(buffer.data(), buffer.size());
+			USB_CALL((*interface)->WritePipe(interface, ep->GetRefIndex(), buffer.data(), buffer.size()));
+		}
+		while(r == transferSize);
+	}
 
 	void Device::ReadBulk(const EndpointPtr & ep, const IObjectOutputStreamPtr &outputStream, int timeout)
-	{ }
+	{
+		IOUSBInterfaceInterface	** interface = ep->GetInterfaceHandle();
+		size_t transferSize = ep->GetMaxPacketSize();
+		ByteArray buffer(transferSize);
+		size_t r;
+		do
+		{
+			UInt32 readBytes = buffer.size();
+			USB_CALL((*interface)->ReadPipe(interface, ep->GetRefIndex(), buffer.data(), &readBytes));
+			r = outputStream->Write(buffer.data(), readBytes);
+		}
+		while(r == transferSize);
+	}
 
 	void Device::WriteControl(u8 type, u8 req, u16 value, u16 index, const ByteArray &data, bool interruptCurrentTransaction, int timeout)
 	{

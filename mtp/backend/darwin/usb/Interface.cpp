@@ -22,6 +22,41 @@
 namespace mtp { namespace usb
 {
 
+	Endpoint::Endpoint(IOUSBInterfaceInterface **interface, int idx): _interface(interface), _refIndex(idx)
+	{
+		UInt8		direction;
+		UInt8		number;
+		UInt8		transferType;
+		UInt16		maxPacketSize;
+		UInt8		interval;
+
+		USB_CALL((*interface)->GetPipeProperties(interface,
+			idx, &direction,
+			&number, &transferType,
+			&maxPacketSize, &interval));
+
+		switch (direction)
+		{
+		case kUSBOut:	_direction = EndpointDirection::Out; break;
+		case kUSBIn:	_direction = EndpointDirection::In; break;
+		default:		throw std::runtime_error("invalid endpoint direction");
+		}
+
+		_address = number;
+
+		switch(transferType)
+		{
+		case kUSBControl:	_type = EndpointType::Control; break;
+		case kUSBIsoc:		_type = EndpointType::Isochronous; break;
+		case kUSBBulk:		_type = EndpointType::Bulk; break;
+		case kUSBInterrupt:	_type = EndpointType::Interrupt; break;
+		default:		throw std::runtime_error("invalid endpoint type");
+		}
+
+		_maxPacketSize = maxPacketSize;
+	}
+
+
 	u8 Interface::GetClass() const
 	{
 		UInt8 intfClass;
