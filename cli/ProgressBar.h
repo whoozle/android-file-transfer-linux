@@ -17,7 +17,7 @@ namespace cli
 		unsigned	_maxWidth;
 
 	public:
-		ProgressBar(const std::string title, unsigned w, unsigned max): _title(title), _width(w), _maxWidth(max)
+		ProgressBar(const std::string & title, unsigned w, unsigned max): _title(title), _width(w), _maxWidth(max)
 		{
 			if (_maxWidth < Junk + _width)
 			{
