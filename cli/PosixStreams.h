@@ -32,18 +32,28 @@ namespace cli
 {
 	class BaseObjectStream
 	{
-		std::function<void (mtp::u64, mtp::u64)> _progressReporter;
+		std::function<void (mtp::u64, mtp::u64)>	_progressReporter;
+		mtp::u64									_current, _total;
 
 	public:
+		BaseObjectStream(): _current(0), _total(0) { }
+		virtual ~BaseObjectStream() { }
+
 		void SetProgressReporter(const decltype(_progressReporter) & pr)
 		{ _progressReporter = pr; }
 
-		virtual ~BaseObjectStream()
-		{ }
+		void SetTotal(mtp::u64 total)
+		{ _current = 0; _total = total; }
 
 	protected:
-		void Report(mtp::u64 current, mtp::u64 total)
-		{ if (_progressReporter) _progressReporter(current, total); }
+		void Report(mtp::u64 delta)
+		{
+			if (_progressReporter)
+			{
+				_current += delta;
+				_progressReporter(_current, _total);
+			}
+		}
 	};
 
 	class ObjectInputStream :
@@ -78,6 +88,7 @@ namespace cli
 			ssize_t r = read(_fd, data, size);
 			if (r < 0)
 				throw std::runtime_error("read failed");
+			Report(r);
 			return r;
 		}
 	};
@@ -106,6 +117,7 @@ namespace cli
 			ssize_t r = write(_fd, data, size);
 			if (r < 0)
 				throw std::runtime_error("write failed");
+			Report(r);
 			return r;
 		}
 	};
