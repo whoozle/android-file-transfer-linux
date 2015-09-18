@@ -19,6 +19,7 @@
 #include <cli/Session.h>
 #include <cli/CommandLine.h>
 #include <cli/PosixStreams.h>
+#include <cli/ProgressBar.h>
 #include <cli/Tokenizer.h>
 
 #include <mtp/make_function.h>
@@ -54,6 +55,10 @@ namespace cli
 	{
 		using namespace mtp;
 		using namespace std::placeholders;
+		{
+			const char *cols = getenv("COLUMNS");
+			_terminalWidth = cols? atoi(cols): 80;
+		}
 
 		printf("%s\n", _gdi.VendorExtensionDesc.c_str());
 		printf("%s ", _gdi.Manufacturer.c_str());
@@ -400,7 +405,16 @@ namespace cli
 			}
 		}
 		else
-			_session->GetObject(srcId, std::make_shared<ObjectOutputStream>(dst));
+		{
+			auto stream = std::make_shared<ObjectOutputStream>(dst);
+			if (IsInteractive())
+			{
+				mtp::u64 size = _session->GetObjectIntegerProperty(srcId, mtp::ObjectProperty::ObjectSize);
+				stream->SetTotal(size);
+				try { stream->SetProgressReporter(ProgressBar(dst, 15, _terminalWidth)); } catch(const std::exception &ex) { }
+			}
+			_session->GetObject(srcId, stream);
+		}
 	}
 
 	void Session::Get(mtp::u32 srcId)

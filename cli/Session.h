@@ -39,6 +39,7 @@ namespace cli
 		mtp::u32					_cd; //current directory
 		bool						_running;
 		bool						_interactive;
+		unsigned					_terminalWidth;
 
 		std::multimap<std::string, ICommandPtr> _commands;
 
