@@ -11,7 +11,7 @@ message(STATUS "building for ${CMAKE_SYSTEM_NAME}")
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 	set(USB_BACKEND_DARWIN TRUE)
-	set(CPACK_GENERATOR PackageMaker)
+	#set(CPACK_GENERATOR Bundle)
 endif()
 
 include(CPack)
