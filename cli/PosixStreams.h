@@ -28,7 +28,7 @@
 
 #include <functional>
 
-namespace
+namespace cli
 {
 	class BaseObjectStream
 	{
