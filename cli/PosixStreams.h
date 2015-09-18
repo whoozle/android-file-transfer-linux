@@ -26,10 +26,29 @@
 
 #include <mtp/ptp/IObjectStream.h>
 
+#include <functional>
+
 namespace
 {
+	class BaseObjectStream
+	{
+		std::function<void (mtp::u64, mtp::u64)> _progressReporter;
 
-	class ObjectInputStream : public mtp::IObjectInputStream
+	public:
+		void SetProgressReporter(const decltype(_progressReporter) & pr)
+		{ _progressReporter = pr; }
+
+		virtual ~BaseObjectStream()
+		{ }
+
+	protected:
+		void Report(mtp::u64 current, mtp::u64 total)
+		{ if (_progressReporter) _progressReporter(current, total); }
+	};
+
+	class ObjectInputStream :
+		public BaseObjectStream,
+		public virtual mtp::IObjectInputStream
 	{
 		int			_fd;
 		mtp::u64	_size;
@@ -63,7 +82,9 @@ namespace
 		}
 	};
 
-	class ObjectOutputStream : public mtp::IObjectOutputStream
+	class ObjectOutputStream :
+		public BaseObjectStream,
+		public mtp::IObjectOutputStream
 	{
 		int		_fd;
 
