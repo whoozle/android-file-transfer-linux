@@ -49,7 +49,8 @@ int main(int argc, char **argv)
 			session.ProcessCommand(std::move(tokens));
 		}
 		else
-			session.InteractiveInput();
+			if (session.IsInteractive())
+				session.InteractiveInput();
 
 		return 0;
 	}

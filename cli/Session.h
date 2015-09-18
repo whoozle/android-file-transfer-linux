@@ -38,6 +38,7 @@ namespace cli
 		mtp::u32					_cs; //current storage
 		mtp::u32					_cd; //current directory
 		bool						_running;
+		bool						_interactive;
 
 		std::multimap<std::string, ICommandPtr> _commands;
 
@@ -50,6 +51,8 @@ namespace cli
 	public:
 		Session(const mtp::DevicePtr &device);
 
+		bool IsInteractive() const
+		{ return _interactive; }
 		void InteractiveInput();
 		void ProcessCommand(const std::string &input);
 		void ProcessCommand(Tokens &&tokens);

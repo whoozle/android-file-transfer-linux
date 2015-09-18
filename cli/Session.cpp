@@ -49,7 +49,8 @@ namespace cli
 		_gdi(_session->GetDeviceInfo()),
 		_cs(mtp::Session::AllStorages),
 		_cd(mtp::Session::Root),
-		_running(true)
+		_running(true),
+		_interactive(isatty(STDOUT_FILENO))
 	{
 		using namespace mtp;
 		using namespace std::placeholders;
