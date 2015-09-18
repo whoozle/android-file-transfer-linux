@@ -3,6 +3,7 @@ project(mtp)
 set(CPACK_PACKAGE_VERSION "2.4")
 set(CPACK_PACKAGE_VERSION_MAJOR 2)
 set(CPACK_PACKAGE_VERSION_MAJOR 4)
+set(CPACK_RESOURCE_FILE_LICENSE ${CMAKE_SOURCE_DIR}/LICENSE)
 set(CPACK_PACKAGE_DESCRIPTION_FILE ${CMAKE_SOURCE_DIR}/README.md)
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Android File Transfer for Linux (and Mac OS X) - open source implementation of MTP protocol used on every modern android device")
 
