@@ -27,6 +27,10 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <errno.h>
 
 namespace
 {
@@ -437,17 +441,32 @@ namespace cli
 	void Session::Put(mtp::u32 parentId, const std::string &dst, const LocalPath &src)
 	{
 		using namespace mtp;
-		msg::ObjectInfo oi;
-		oi.Filename = dst;
-		oi.ObjectFormat = ObjectFormatFromFilename(src);
+		struct stat st = {};
+		if (stat(src.c_str(), &st))
+			throw std::runtime_error(std::string("stat failed: ") + strerror(errno));
 
-		std::shared_ptr<ObjectInputStream> objectInput(new ObjectInputStream(src));
-		oi.SetSize(objectInput->GetSize());
+		if (S_ISDIR(st.st_mode))
+		{
+			printf("skipping directory %s\n", src.c_str());
+		}
+		else
+		{
+			auto stream = std::make_shared<ObjectInputStream>(src);
+			stream->SetTotal(stream->GetSize());
 
-		auto noi = _session->SendObjectInfo(oi, 0, parentId);
-		printf("new object id = %u\n", noi.ObjectId);
-		_session->SendObject(objectInput);
-		printf("done\n");
+			msg::ObjectInfo oi;
+			oi.Filename = dst;
+			oi.ObjectFormat = ObjectFormatFromFilename(src);
+			oi.SetSize(stream->GetSize());
+
+			if (IsInteractive())
+			{
+				try { stream->SetProgressReporter(ProgressBar(src, 15, _terminalWidth)); } catch(const std::exception &ex) { }
+			}
+
+			_session->SendObjectInfo(oi, 0, parentId);
+			_session->SendObject(stream);
+		}
 	}
 
 	void Session::MakeDirectory(mtp::u32 parentId, const std::string & name)
