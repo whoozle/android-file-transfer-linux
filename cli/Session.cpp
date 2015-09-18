@@ -386,13 +386,25 @@ namespace cli
 
 	void Session::Get(const LocalPath &dst, mtp::u32 srcId)
 	{
-		_session->GetObject(srcId, std::make_shared<ObjectOutputStream>(dst));
+		mtp::ObjectFormat format = static_cast<mtp::ObjectFormat>(_session->GetObjectIntegerProperty(srcId, mtp::ObjectProperty::ObjectFormat));
+		if (format == mtp::ObjectFormat::Association)
+		{
+			mkdir(dst.c_str(), 0700);
+			auto obj = _session->GetObjectHandles(_cs, mtp::Session::AllFormats, srcId);
+			for(auto id : obj.ObjectHandles)
+			{
+				auto info = _session->GetObjectInfo(id);
+				LocalPath dstFile = dst + "/" + info.Filename;
+				Get(dstFile, id);
+			}
+		}
+		else
+			_session->GetObject(srcId, std::make_shared<ObjectOutputStream>(dst));
 	}
 
 	void Session::Get(mtp::u32 srcId)
 	{
 		auto info = _session->GetObjectInfo(srcId);
-		printf("filename = %s\n", info.Filename.c_str());
 		Get(LocalPath(info.Filename), srcId);
 	}
 
