@@ -47,6 +47,8 @@ namespace cli
 				unsigned chompRight = maxTitleSize - chompLeft;
 				title = _title.substr(0, chompLeft) + "…" + _title.substr(chompRight);
 			}
+			else
+				title = _title;
 			printf("] %s\n\033[1A\033[2K", title.c_str());
 		}
 	};
