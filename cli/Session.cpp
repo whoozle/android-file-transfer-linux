@@ -454,7 +454,6 @@ namespace cli
 
 		if (S_ISDIR(st.st_mode))
 		{
-			printf("directory %s -> %s\n", src.c_str(), GetFilename(dst).c_str());
 			mtp::u32 dirId = 0;
 
 			try
