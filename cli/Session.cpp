@@ -422,7 +422,7 @@ namespace cli
 				mtp::u64 size = _session->GetObjectIntegerProperty(srcId, mtp::ObjectProperty::ObjectSize);
 				stream->SetTotal(size);
 				if (IsInteractive())
-					try { stream->SetProgressReporter(ProgressBar(dst, 15, _terminalWidth)); } catch(const std::exception &ex) { }
+					try { stream->SetProgressReporter(ProgressBar(dst, _terminalWidth / 3, _terminalWidth)); } catch(const std::exception &ex) { }
 			}
 			_session->GetObject(srcId, stream);
 		}
@@ -500,7 +500,7 @@ namespace cli
 			oi.SetSize(stream->GetSize());
 
 			if (IsInteractive())
-				try { stream->SetProgressReporter(ProgressBar(dst, 15, _terminalWidth)); } catch(const std::exception &ex) { }
+				try { stream->SetProgressReporter(ProgressBar(dst, _terminalWidth / 3, _terminalWidth)); } catch(const std::exception &ex) { }
 
 			_session->SendObjectInfo(oi, 0, parentId);
 			_session->SendObject(stream);
@@ -514,11 +514,6 @@ namespace cli
 		oi.Filename = name;
 		oi.ObjectFormat = ObjectFormat::Association;
 		_session->SendObjectInfo(oi, 0, parentId);
-	}
-
-	void Session::Delete(mtp::u32 id)
-	{
-		_session->DeleteObject(id);
 	}
 
 	void Session::ListProperties(mtp::u32 id)

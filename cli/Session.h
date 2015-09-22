@@ -74,7 +74,6 @@ namespace cli
 		void Cat(const Path &path);
 		void Put(mtp::u32 parentId, const std::string &dst, const LocalPath &src);
 		void MakeDirectory(mtp::u32 parentId, const std::string & name);
-		void Delete(mtp::u32 id);
 		void ListProperties(mtp::u32 id);
 		void ListDeviceProperties();
 
@@ -112,7 +111,7 @@ namespace cli
 		}
 
 		void Delete(const Path &path)
-		{ Delete(Resolve(path)); }
+		{ _session->DeleteObject(Resolve(path)); }
 
 		void ListProperties(const Path &path)
 		{ ListProperties(Resolve(path)); }
