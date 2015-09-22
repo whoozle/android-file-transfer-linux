@@ -46,6 +46,7 @@ namespace cli
 		char ** CompletionCallback(const char *text, int start, int end);
 
 		mtp::u32 ResolvePath(const std::string &path, std::string &file);
+		mtp::u32 ResolveObjectChild(mtp::u32 parent, const std::string &entity);
 		static std::string GetFilename(const std::string &path);
 		static std::string GetDirname(const std::string &path);
 

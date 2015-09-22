@@ -29,6 +29,7 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <dirent.h>
 #include <unistd.h>
 #include <errno.h>
 
@@ -244,6 +245,22 @@ namespace cli
 		printf("\n");
 	}
 
+	mtp::u32 Session::ResolveObjectChild(mtp::u32 parent, const std::string &entity)
+	{
+		mtp::u32 id = 0;
+		auto objectList = _session->GetObjectHandles(_cs, mtp::Session::AllFormats, parent);
+		for(auto object : objectList.ObjectHandles)
+		{
+			std::string name = _session->GetObjectStringProperty(object, mtp::ObjectProperty::ObjectFilename);
+			if (name == entity)
+			{
+				id = object;
+				break;
+			}
+		}
+		return id;
+	}
+
 	mtp::u32 Session::Resolve(const Path &path)
 	{
 		mtp::u32 id = BeginsWith(path, "/")? mtp::Session::Root: _cd;
@@ -265,19 +282,8 @@ namespace cli
 			}
 			else
 			{
-				auto objectList = _session->GetObjectHandles(_cs, mtp::Session::AllFormats, id);
-				bool found = false;
-				for(auto object : objectList.ObjectHandles)
-				{
-					std::string name = _session->GetObjectStringProperty(object, mtp::ObjectProperty::ObjectFilename);
-					if (name == entity)
-					{
-						id = object;
-						found = true;
-						break;
-					}
-				}
-				if (!found)
+				id = ResolveObjectChild(id, entity);
+				if (!id)
 					throw std::runtime_error("could not find " + entity + " in path " + path.substr(0, p));
 			}
 			p = next + 1;
@@ -415,7 +421,8 @@ namespace cli
 			{
 				mtp::u64 size = _session->GetObjectIntegerProperty(srcId, mtp::ObjectProperty::ObjectSize);
 				stream->SetTotal(size);
-				try { stream->SetProgressReporter(ProgressBar(dst, 15, _terminalWidth)); } catch(const std::exception &ex) { }
+				if (IsInteractive())
+					try { stream->SetProgressReporter(ProgressBar(dst, 15, _terminalWidth)); } catch(const std::exception &ex) { }
 			}
 			_session->GetObject(srcId, stream);
 		}
@@ -447,7 +454,41 @@ namespace cli
 
 		if (S_ISDIR(st.st_mode))
 		{
-			printf("skipping directory %s\n", src.c_str());
+			printf("directory %s -> %s\n", src.c_str(), GetFilename(dst).c_str());
+			mtp::u32 dirId = 0;
+
+			try
+			{ dirId = _session->CreateDirectory(GetFilename(dst), parentId).ObjectId; }
+			catch(const std::exception & ex)
+			{ }
+
+			if (!dirId)
+				dirId = ResolveObjectChild(parentId, src);
+			if (!dirId)
+				throw std::runtime_error("cannot create/resolve directory '" + GetFilename(dst) + "'");
+
+			DIR *dir = opendir(src.c_str());
+			if (!dir)
+			{
+				perror("opendir");
+				return;
+			}
+			dirent entry = {};
+			while(true)
+			{
+				dirent *result = NULL;
+				if (readdir_r(dir, &entry, &result) != 0)
+					throw std::runtime_error(std::string("readdir failed: ") + strerror(errno));
+				if (!result)
+					break;
+
+				if (strcmp(result->d_name, ".") == 0 || strcmp(result->d_name, "..") == 0)
+					continue;
+
+				std::string fname = result->d_name;
+				Put(dirId, dst + "/" + fname, src + "/" + fname);
+			}
+			closedir(dir);
 		}
 		else
 		{
@@ -455,14 +496,12 @@ namespace cli
 			stream->SetTotal(stream->GetSize());
 
 			msg::ObjectInfo oi;
-			oi.Filename = dst;
+			oi.Filename = GetFilename(dst);
 			oi.ObjectFormat = ObjectFormatFromFilename(src);
 			oi.SetSize(stream->GetSize());
 
 			if (IsInteractive())
-			{
 				try { stream->SetProgressReporter(ProgressBar(src, 15, _terminalWidth)); } catch(const std::exception &ex) { }
-			}
 
 			_session->SendObjectInfo(oi, 0, parentId);
 			_session->SendObject(stream);
