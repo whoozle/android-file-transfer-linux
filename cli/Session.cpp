@@ -500,7 +500,7 @@ namespace cli
 			oi.SetSize(stream->GetSize());
 
 			if (IsInteractive())
-				try { stream->SetProgressReporter(ProgressBar(src, 15, _terminalWidth)); } catch(const std::exception &ex) { }
+				try { stream->SetProgressReporter(ProgressBar(dst, 15, _terminalWidth)); } catch(const std::exception &ex) { }
 
 			_session->SendObjectInfo(oi, 0, parentId);
 			_session->SendObject(stream);
