@@ -113,6 +113,10 @@ The actual list of all known problems and bugs available [here](https://github.c
 ### Contacts
 Please do not hesitate to contact me if you have any further questions, my email address is <vladimir.menshakov@gmail.com>.
 
+## Special thanks
+* All who filed bugs on github and wrote emails, many features appeared only because of your feedback. Thanks!
+* Alexey [gazay](https://github.com/gazay) Gaziev for ssh on his MacBook and continuous support.
+
 ## License
 
 Android File Transfer for Linux is released under [GNU GPLv3 License](https://github.com/whoozle/android-file-transfer-linux/blob/master/LICENSE).
