@@ -115,6 +115,6 @@ Please do not hesitate to contact me if you have any further questions, my email
 
 ## License
 
-Android File Transfer for Linux is released under [GNU GPLv2 License](https://github.com/whoozle/android-file-transfer-linux/blob/master/LICENSE).
+Android File Transfer for Linux is released under [GNU GPLv3 License](https://github.com/whoozle/android-file-transfer-linux/blob/master/LICENSE).
 
 Copyright © 2015 Vladimir Menshakov
