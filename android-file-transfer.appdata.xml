@@ -3,7 +3,7 @@
 <application>
   <id type="desktop">android-file-transfer.desktop</id>
   <metadata_license>CC0-1.0</metadata_license>
-  <project_license>GPL-2.0+</project_license>
+  <project_license>GPL-3.0+</project_license>
   <name>Android File Transfer for Linux</name>
   <summary>Interactive MTP client with Qt4/Qt5 GUI</summary>
   <description>

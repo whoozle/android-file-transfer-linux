@@ -1,6 +1,6 @@
 # Android File Transfer For Linux (and Mac OS X!)
 
-[![License](http://img.shields.io/:license-GPLv2-blue.svg)](https://github.com/whoozle/android-file-transfer-linux/blob/master/LICENSE)
+[![License](http://img.shields.io/:license-GPLv3-blue.svg)](https://github.com/whoozle/android-file-transfer-linux/blob/master/LICENSE)
 [![Version](http://img.shields.io/:version-2.4-red.svg)](https://github.com/whoozle/android-file-transfer-linux/blob/master)
 [![Build Status](https://travis-ci.org/whoozle/android-file-transfer-linux.svg?branch=master)](https://travis-ci.org/whoozle/android-file-transfer-linux)
 
