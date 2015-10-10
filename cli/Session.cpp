@@ -240,6 +240,12 @@ namespace cli
 				if (!_running) //do not put newline
 					return;
 			}
+			catch (const mtp::InvalidResponseException &ex)
+			{
+				printf("error: %s\n", ex.what());
+				if (ex.Type == mtp::ResponseType::InvalidStorageID)
+					printf("\033[1mYour device might be locked or in usb-charging mode, please unlock it and put it in MTP or PTP mode\033[0m\n");
+			}
 			catch(const std::exception &ex)
 			{ printf("error: %s\n", ex.what()); }
 		}
