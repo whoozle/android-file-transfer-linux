@@ -1,34 +1,25 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en-us">
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta charset="UTF-8">
     <title>Android-file-transfer-linux by whoozle</title>
-
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/github-light.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
   </head>
   <body>
-    <div class="wrapper">
-      <header>
-        <h1>Android-file-transfer-linux</h1>
-        <p>Android File Transfer for Linux</p>
+    <section class="page-header">
+      <h1 class="project-name">Android-file-transfer-linux</h1>
+      <h2 class="project-tagline">Android File Transfer for Linux</h2>
+      <a href="https://github.com/whoozle/android-file-transfer-linux" class="btn">View on GitHub</a>
+      <a href="https://github.com/whoozle/android-file-transfer-linux/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/whoozle/android-file-transfer-linux/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
 
-        <p class="view"><a href="https://github.com/whoozle/android-file-transfer-linux">View the Project on GitHub <small>whoozle/android-file-transfer-linux</small></a></p>
-
-
-        <ul>
-          <li><a href="https://github.com/whoozle/android-file-transfer-linux/zipball/master">Download <strong>ZIP File</strong></a></li>
-          <li><a href="https://github.com/whoozle/android-file-transfer-linux/tarball/master">Download <strong>TAR Ball</strong></a></li>
-          <li><a href="https://github.com/whoozle/android-file-transfer-linux">View On <strong>GitHub</strong></a></li>
-        </ul>
-      </header>
-      <section>
-        <h1>
+    <section class="main-content">
+      <h1>
 <a id="android-file-transfer-for-linux" class="anchor" href="#android-file-transfer-for-linux" aria-hidden="true"><span class="octicon octicon-link"></span></a>Android File Transfer For Linux</h1>
 
 <p><a href="https://github.com/whoozle/android-file-transfer-linux/blob/master/LICENSE"><img src="http://img.shields.io/:license-GPLv2-blue.svg" alt="License"></a>
@@ -99,7 +90,7 @@ ps -x -q 24377
 <li>
 <p>For ubuntu and other debian-based distros use the following command:</p>
 
-<div class="highlight highlight-shell"><pre>sudo apt-get install build-essential cmake libqt4-dev ninja-build libfuse-dev</pre></div>
+<div class="highlight highlight-source-shell"><pre>sudo apt-get install build-essential cmake libqt4-dev ninja-build libfuse-dev</pre></div>
 </li>
 <li>Basically, you need <code>libqtX-dev</code> for UI, <code>libfuse-dev</code> for FUSE interface, <code>cmake</code>, <code>ninja</code> or <code>make</code> for building the project. You could use libqt5-dev as well.</li>
 </ul>
@@ -107,7 +98,7 @@ ps -x -q 24377
 <h3>
 <a id="building-with-ninja" class="anchor" href="#building-with-ninja" aria-hidden="true"><span class="octicon octicon-link"></span></a>Building with ninja</h3>
 
-<div class="highlight highlight-shell"><pre>mkdir build
+<div class="highlight highlight-source-shell"><pre>mkdir build
 <span class="pl-c1">cd</span> build
 cmake -G Ninja ..
 ninja
@@ -117,7 +108,7 @@ ninja
 <h3>
 <a id="building-with-make" class="anchor" href="#building-with-make" aria-hidden="true"><span class="octicon octicon-link"></span></a>Building with make</h3>
 
-<div class="highlight highlight-shell"><pre>mkdir build
+<div class="highlight highlight-source-shell"><pre>mkdir build
 <span class="pl-c1">cd</span> build
 cmake ..
 make
@@ -135,7 +126,7 @@ make
 <h3>
 <a id="fuse-interface" class="anchor" href="#fuse-interface" aria-hidden="true"><span class="octicon octicon-link"></span></a>FUSE interface</h3>
 
-<div class="highlight highlight-shell"><pre>mkdir <span class="pl-k">~</span>/my-device
+<div class="highlight highlight-source-shell"><pre>mkdir <span class="pl-k">~</span>/my-device
 ./aft-mtp-mount <span class="pl-k">~</span>/my-device</pre></div>
 
 <p>Remember, if you want album art to be displayed, it must be named 'albumart.xxx' and placed <em>first</em> in the destination folder. Then copy other files.
@@ -171,14 +162,16 @@ The latter two are self-explanatory. <code>Upload album</code> tries searching s
 <p>Android File Transfer for Linux is released under <a href="https://github.com/whoozle/android-file-transfer-linux/blob/master/LICENSE">GNU GPLv2 License</a>.</p>
 
 <p>Copyright © 2015 Vladimir Menshakov</p>
-      </section>
-      <footer>
-        <p>This project is maintained by <a href="https://github.com/whoozle">whoozle</a></p>
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/whoozle/android-file-transfer-linux">Android-file-transfer-linux</a> is maintained by <a href="https://github.com/whoozle">whoozle</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
       </footer>
-    </div>
-    <script src="javascripts/scale.fix.js"></script>
-              <script type="text/javascript">
+
+    </section>
+
+            <script type="text/javascript">
             var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
             document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
           </script>
