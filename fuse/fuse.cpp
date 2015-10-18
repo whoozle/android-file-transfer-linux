@@ -53,10 +53,27 @@ namespace
 		Storages		_storages;
 
 	public:
-		FuseWrapper(mtp::DevicePtr device): _device(device), _session(device->OpenSession(1)), _editObjectSupported(_session->EditObjectSupported())
+		FuseWrapper()
+		{ Connect(); }
+
+		void Connect()
 		{
+			mtp::scoped_mutex_lock l(_mutex);
+
+			_openedFiles.clear();
+			_files.clear();
+			_storages.clear();
+			_session.reset();
+			_device.reset();
+			_device = mtp::Device::Find();
+			if (!_device)
+				throw std::runtime_error("no MTP device found");
+
+			_session = _device->OpenSession(1);
+			_editObjectSupported = _session->EditObjectSupported();
 			if (!_editObjectSupported)
 				fprintf(stderr, "your device does not have android EditObject extension, mounting read-only\n");
+
 			mtp::msg::StorageIDs ids = _session->GetStorageIDs();
 			for(size_t i = 0; i < ids.StorageIDs.size(); ++i)
 			{
@@ -457,7 +474,6 @@ namespace
 		}
 	};
 
-	mtp::DevicePtr					g_device;
 	std::unique_ptr<FuseWrapper>	g_wrapper;
 
 #define WRAP_EX(...) do { \
@@ -518,12 +534,8 @@ namespace
 int main(int argc, char **argv)
 {
 	try
-	{
-		g_device = mtp::Device::Find();
-		if (!g_device)
-			throw std::runtime_error("no MTP device found");
-		g_wrapper.reset(new FuseWrapper(g_device));
-	} catch(const std::exception &ex)
+	{ g_wrapper.reset(new FuseWrapper()); }
+	catch(const std::exception &ex)
 	{ printf("%s\n", ex.what()); return 1; }
 
 	struct fuse_operations ops = {};
