@@ -21,6 +21,7 @@
 #include <usb/Exception.h>
 #include <mtp/usb/TimeoutException.h>
 #include <mtp/usb/DeviceBusyException.h>
+#include <mtp/usb/DeviceNotFoundException.h>
 #include <mtp/ByteArray.h>
 
 #include <unistd.h>
@@ -30,7 +31,19 @@
 
 #include "linux/usbdevice_fs.h"
 
-#define IOCTL(...) do { int r = ioctl(__VA_ARGS__); if (r < 0) throw Exception("ioctl(" #__VA_ARGS__ ")"); } while(false)
+#define IOCTL(...) do \
+{ \
+	int r = ioctl(__VA_ARGS__); \
+	if (r < 0) \
+	{ \
+		if (errno == EBUSY) \
+			throw DeviceBusyException(); \
+		else if (errno == ENODEV) \
+			throw DeviceNotFoundException(); \
+		else \
+			throw Exception("ioctl(" #__VA_ARGS__ ")"); \
+	} \
+} while(false)
 
 namespace mtp { namespace usb
 {
@@ -40,14 +53,7 @@ namespace mtp { namespace usb
 
 	InterfaceToken::InterfaceToken(int fd, unsigned interfaceNumber): _fd(fd), _interfaceNumber(interfaceNumber)
 	{
-		int r = ioctl(_fd, USBDEVFS_CLAIMINTERFACE, &interfaceNumber);
-		if (r < 0)
-		{
-			if (errno == EBUSY)
-				throw DeviceBusyException();
-			else
-				throw Exception("ioctl(_fd, USBDEVFS_CLAIMINTERFACE, &interfaceNumber)");
-		}
+		IOCTL(_fd, USBDEVFS_CLAIMINTERFACE, &interfaceNumber);
 	}
 
 	InterfaceToken::~InterfaceToken()
