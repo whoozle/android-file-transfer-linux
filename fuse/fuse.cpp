@@ -24,6 +24,7 @@
 
 #include <mtp/ptp/Device.h>
 #include <mtp/ptp/ByteArrayObjectStream.h>
+#include <mtp/usb/DeviceNotFoundException.h>
 
 #include <map>
 #include <string>
@@ -478,6 +479,11 @@ namespace
 
 #define WRAP_EX(...) do { \
 		try { return __VA_ARGS__ ; } \
+		catch (const mtp::usb::DeviceNotFoundException &) \
+		{ \
+			g_wrapper->Connect(); \
+			return __VA_ARGS__ ; \
+		} \
 		catch (const std::exception &ex) \
 		{ fprintf(stderr, #__VA_ARGS__ " failed: %s", ex.what()); return -EIO; } \
 	} while(false)
