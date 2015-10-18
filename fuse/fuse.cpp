@@ -428,7 +428,7 @@ namespace
 
 			std::string ctime = mtp::ConvertDateTime(tv[1].tv_sec);
 			std::string mtime = mtp::ConvertDateTime(tv[1].tv_sec);
-			try { _session->SetObjectProperty(id, mtp::ObjectProperty::DateCreated, mtime); }
+			try { _session->SetObjectProperty(id, mtp::ObjectProperty::DateCreated, ctime); }
 			catch(const mtp::InvalidResponseException &ex)
 			{
 				if (ex.Type != mtp::ResponseType::ObjectPropNotSupported)
