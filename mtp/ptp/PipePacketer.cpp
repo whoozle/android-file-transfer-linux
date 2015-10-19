@@ -138,7 +138,7 @@ namespace mtp
 				header.Read(stream);
 				if (_transaction && _transaction != header.Transaction)
 				{
-					fprintf(stderr, "drop message %04hx %04hx, transaction %08x, expected: %08x\n", header.ContainerType, header.ResponseType, header.Transaction, _transaction);
+					fprintf(stderr, "drop message %04hx %04hx, transaction %08x, expected: %08x\n", (unsigned)header.ContainerType, (unsigned)header.ResponseType, header.Transaction, _transaction);
 					_valid = false;
 					_output = std::make_shared<DummyOutputStream>();
 					return;

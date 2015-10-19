@@ -352,7 +352,7 @@ namespace cli
 			try
 			{
 				msg::ObjectInfo info = _session->GetObjectInfo(objectId);
-				printf("%-10u %04hx %10u %s %ux%u, %s\n", objectId, info.ObjectFormat, info.ObjectCompressedSize, info.Filename.c_str(), info.ImagePixWidth, info.ImagePixHeight, info.CaptureDate.c_str());
+				printf("%-10u %04hx %10u %s %ux%u, %s\n", objectId, (unsigned)info.ObjectFormat, info.ObjectCompressedSize, info.Filename.c_str(), info.ImagePixWidth, info.ImagePixHeight, info.CaptureDate.c_str());
 			}
 			catch(const std::exception &ex)
 			{
