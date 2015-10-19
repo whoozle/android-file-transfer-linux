@@ -45,11 +45,21 @@ namespace
 
 int main(int argc, char *argv[])
 {
+	QApplication a(argc, argv);
 	QCoreApplication::setApplicationName("mtp-ng-qt");
 	QCoreApplication::setOrganizationDomain("whoozle.github.io");
 	QCoreApplication::setOrganizationName("whoozle.github.io");
 
-	Application a(argc, argv);
+	QTranslator qtTranslator;
+
+	qtTranslator.load("qt_" + QLocale::system().name(),
+					QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+	a.installTranslator(&qtTranslator);
+
+	QTranslator aTranslator;
+	aTranslator.load(":/translations/android-file-transfer-linux_" + QLocale::system().name());
+	a.installTranslator(&aTranslator);
+
 	MainWindow w;
 	w.show();
 

@@ -1,5 +1,6 @@
 <RCC>
-    <qresource prefix="/icons">
+    <qresource prefix="/">
         <file>android-file-transfer.png</file>
+        <file>translations/android-file-transfer-linux_ru.qm</file>
     </qresource>
 </RCC>
