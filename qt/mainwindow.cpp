@@ -47,7 +47,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	_uploader(new FileUploader(_objectModel, this))
 {
 	_ui->setupUi(this);
-	setWindowIcon(QIcon(":/icons/android-file-transfer.png"));
+	setWindowIcon(QIcon(":/android-file-transfer.png"));
 
 	_ui->listView->setModel(_proxyModel);
 
