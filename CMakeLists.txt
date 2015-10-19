@@ -24,7 +24,10 @@ include(FindPkgConfig)
 include(CheckFunctionExists)
 
 find_package ( Threads )
-pkg_check_modules ( FUSE fuse )
+
+if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+	pkg_check_modules ( FUSE fuse )
+endif()
 
 if (FUSE_FOUND)
 	message(STATUS "fuse found, building mount helper")
