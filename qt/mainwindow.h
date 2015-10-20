@@ -20,7 +20,6 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QtWidgets>
 #include <mtp/ptp/Device.h>
 #include <QMainWindow>
 #include <QModelIndex>
