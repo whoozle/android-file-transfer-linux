@@ -48,6 +48,8 @@ namespace
 
 int main(int argc, char *argv[])
 {
+	Q_INIT_RESOURCE(android_file_transfer);
+
 	QApplication a(argc, argv);
 	QCoreApplication::setApplicationName("mtp-ng-qt");
 	QCoreApplication::setOrganizationDomain("whoozle.github.io");
