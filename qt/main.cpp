@@ -20,7 +20,10 @@
 #include "mainwindow.h"
 #include "utils.h"
 #include <QApplication>
+#include <QLibraryInfo>
+#include <QLocale>
 #include <QMessageBox>
+#include <QTranslator>
 
 namespace
 {
