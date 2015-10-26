@@ -22,7 +22,6 @@
      <widget class="QListView" name="listView">
       <property name="font">
        <font>
-        <pointsize>18</pointsize>
         <weight>50</weight>
         <bold>false</bold>
        </font>
@@ -58,7 +57,7 @@
      <x>0</x>
      <y>0</y>
      <width>671</width>
-     <height>26</height>
+     <height>30</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -104,8 +103,7 @@
   <action name="actionUpload">
    <property name="icon">
     <iconset>
-     <normaloff/>
-    </iconset>
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>Upload</string>
@@ -117,8 +115,7 @@
   <action name="actionCreateDirectory">
    <property name="icon">
     <iconset theme="folder-new">
-     <normaloff/>
-    </iconset>
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>&amp;CreateDirectory</string>
@@ -135,8 +132,7 @@
   <action name="actionBack">
    <property name="icon">
     <iconset theme="go-previous">
-     <normaloff/>
-    </iconset>
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>&amp;Back</string>
@@ -148,8 +144,7 @@
   <action name="actionGo_Down">
    <property name="icon">
     <iconset theme="go-next">
-     <normaloff/>
-    </iconset>
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>&amp;Go Down</string>
@@ -166,8 +161,7 @@
   <action name="actionRename">
    <property name="icon">
     <iconset theme="edit-rename">
-     <normaloff/>
-    </iconset>
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>&amp;Rename</string>
@@ -179,8 +173,7 @@
   <action name="actionDelete">
    <property name="icon">
     <iconset theme="edit-delete">
-     <normaloff/>
-    </iconset>
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>D&amp;elete</string>
@@ -192,8 +185,7 @@
   <action name="actionDownload">
    <property name="icon">
     <iconset theme="download">
-     <normaloff/>
-    </iconset>
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>&amp;Download</string>
@@ -213,8 +205,7 @@
   <action name="actionRefresh">
    <property name="icon">
     <iconset theme="view-refresh">
-     <normaloff/>
-    </iconset>
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>Re&amp;fresh</string>
@@ -225,7 +216,7 @@
   </action>
   <action name="actionPaste">
    <property name="text">
-    <string>Paste</string>
+    <string>&amp;Paste</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+V</string>
