@@ -191,6 +191,15 @@ namespace mtp { namespace usb
 			throw Exception("ioctl");
 	}
 
+	void Device::ClearHalt(const EndpointPtr & ep)
+	{
+		try
+		{ unsigned index = ep->GetAddress(); IOCTL(_fd.Get(), USBDEVFS_CLEAR_HALT, &index); }
+		catch(const std::exception &ex)
+		{ fprintf(stderr, "clearing halt status for ep %02x: %s\n", (unsigned)ep->GetAddress(), ex.what()); }
+	}
+
+
 	void Device::Submit(const UrbPtr &urb, int timeout)
 	{
 		urb->Submit();

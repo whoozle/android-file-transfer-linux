@@ -78,6 +78,7 @@ namespace mtp { namespace usb
 		int GetConfiguration() const;
 		void SetConfiguration(int idx);
 
+		void ClearHalt(const EndpointPtr & ep);
 		void WriteBulk(const EndpointPtr & ep, const IObjectInputStreamPtr &inputStream, int timeout);
 		void ReadBulk(const EndpointPtr & ep, const IObjectOutputStreamPtr &outputStream, int timeout);
 
