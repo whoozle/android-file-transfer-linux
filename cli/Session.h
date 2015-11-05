@@ -117,6 +117,8 @@ namespace cli
 		void ListProperties(const Path &path)
 		{ ListProperties(Resolve(path)); }
 
+		static void ShowType(const LocalPath &src);
+
 		template <typename ...Args>
 		void AddCommand(const std::string &name, const std::string &help, std::function<void(Args...)> && callback)
 		{ _commands.insert(std::make_pair(name, ICommandPtr(new Command<Args...>(help, std::move(callback))))); }

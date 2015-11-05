@@ -119,6 +119,8 @@ namespace cli
 			make_function([this](const LocalPath &path) -> void { Delete(path); }));
 		AddCommand("mkdir", "<path> makes directory",
 			make_function([this](const Path &path) -> void { MakeDirectory(path); }));
+		AddCommand("type", "<path> shows type of file (recognized by libmagic/extension)",
+			make_function([this](const LocalPath &path) -> void { ShowType(path); }));
 
 		AddCommand("storage-list", "shows available MTP storages",
 			make_function([this]() -> void { ListStorages(); }));
@@ -521,6 +523,12 @@ namespace cli
 		oi.Filename = name;
 		oi.ObjectFormat = ObjectFormat::Association;
 		_session->SendObjectInfo(oi, 0, parentId);
+	}
+
+	void Session::ShowType(const LocalPath &src)
+	{
+		mtp::ObjectFormat format = mtp::ObjectFormatFromFilename(src);
+		printf("mtp object format = %04x\n", (unsigned)format);
 	}
 
 	void Session::ListProperties(mtp::u32 id)
