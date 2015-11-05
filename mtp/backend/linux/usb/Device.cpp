@@ -139,7 +139,7 @@ namespace mtp { namespace usb
 		ByteArray Recv()
 		{ return ByteArray(Buffer.begin(), Buffer.begin() + KernelUrb.actual_length); }
 
-		template<int Flag>
+		template<unsigned Flag>
 		void SetFlag(bool value)
 		{
 			if (value)
