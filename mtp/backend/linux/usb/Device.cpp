@@ -327,7 +327,7 @@ namespace mtp { namespace usb
 
 	void Device::ReadControl(u8 type, u8 req, u16 value, u16 index, ByteArray &data, int timeout)
 	{
-		printf("%02x %02x %04x %04x\n", type, req, value, index);
+		printf("read control %02x %02x %04x %04x\n", type, req, value, index);
 		usbdevfs_ctrltransfer ctrl = { };
 		ctrl.bRequestType = type;
 		ctrl.bRequest = req;
@@ -350,6 +350,7 @@ namespace mtp { namespace usb
 
 	void Device::WriteControl(u8 type, u8 req, u16 value, u16 index, const ByteArray &data, bool interruptCurrentTransaction, int timeout)
 	{
+		printf("write control %02x %02x %04x %04x\n", type, req, value, index);
 		usbdevfs_ctrltransfer ctrl = { };
 		ctrl.bRequestType = type;
 		ctrl.bRequest = req;
