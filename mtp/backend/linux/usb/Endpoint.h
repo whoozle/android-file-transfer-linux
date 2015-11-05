@@ -17,33 +17,45 @@
     If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <usb/Interface.h>
-#include <usb/Directory.h>
-#include <usb/Endpoint.h>
+#ifndef USBFS_ENDPOINT_H
+#define USBFS_ENDPOINT_H
+
+#include <mtp/types.h>
+#include <mtp/usb/types.h>
+#include <vector>
 
 namespace mtp { namespace usb
 {
 
-	Interface::Interface(int index, const std::string &path): _path(path)
+	class Endpoint;
+	DECLARE_PTR(Endpoint);
+
+	class Endpoint
 	{
-		_class		= Directory::ReadInt(path + "/bInterfaceClass");
-		_subclass	= Directory::ReadInt(path + "/bInterfaceSubClass");
-		_index		= Directory::ReadInt(path + "/bInterfaceNumber");
+		EndpointDirection	_direction;
+		EndpointType		_type;
+		u8					_addr;
+		u16					_maxPacketSize;
 
-		Directory dir(path);
-		while(true)
-		{
-			std::string entry = dir.Read();
-			if (entry.empty())
-				break;
+	public:
+		Endpoint(const std::string &path);
 
-			if (entry.compare(0, 3, "ep_") == 0)
-			{
-				EndpointPtr ep = Endpoint::TryOpen(path + "/" + entry);
-				if (ep)
-					_endpoints.push_back(ep);
-			}
-		}
-	}
+		u8 GetAddress() const
+		{ return _addr; }
+
+		int GetMaxPacketSize() const
+		{ return _maxPacketSize; }
+
+		EndpointDirection GetDirection() const
+		{ return _direction; }
+
+		EndpointType GetType() const
+		{ return _type; }
+
+		static EndpointPtr TryOpen(const std::string &path);
+	};
+	DECLARE_PTR(Endpoint);
 
 }}
+
+#endif

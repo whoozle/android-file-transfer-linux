@@ -22,38 +22,13 @@
 
 #include <mtp/types.h>
 #include <mtp/usb/types.h>
+#include <usb/Endpoint.h> //remove me later, when Endpoint.h will be available in all ports
 #include <vector>
 
 namespace mtp { namespace usb
 {
 
 	class Endpoint;
-	DECLARE_PTR(Endpoint);
-
-	class Endpoint
-	{
-		EndpointDirection	_direction;
-		EndpointType		_type;
-		u8					_addr;
-		u16					_maxPacketSize;
-
-	public:
-		Endpoint(const std::string &path);
-
-		u8 GetAddress() const
-		{ return _addr; }
-
-		int GetMaxPacketSize() const
-		{ return _maxPacketSize; }
-
-		EndpointDirection GetDirection() const
-		{ return _direction; }
-
-		EndpointType GetType() const
-		{ return _type; }
-
-		static EndpointPtr TryOpen(const std::string &path);
-	};
 	DECLARE_PTR(Endpoint);
 
 	class Configuration;

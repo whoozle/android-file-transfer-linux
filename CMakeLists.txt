@@ -94,6 +94,7 @@ elseif (USB_BACKEND_DARWIN)
 else()
 	include_directories(mtp/backend/linux)
 	list(APPEND SOURCES
+		mtp/backend/linux/usb/Endpoint.cpp
 		mtp/backend/linux/usb/Exception.cpp
 		mtp/backend/linux/usb/Context.cpp
 		mtp/backend/linux/usb/Device.cpp
