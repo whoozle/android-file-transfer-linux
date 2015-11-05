@@ -20,11 +20,79 @@
 #include <mtp/ptp/ObjectFormat.h>
 #include <algorithm>
 #include <ctype.h>
+#include <map>
+
+#ifdef HAVE_LIBMAGIC
+#	include <magic.h>
+#endif
 
 namespace mtp
 {
+
+#ifdef HAVE_LIBMAGIC
+	namespace
+	{
+		class Magic
+		{
+			magic_t								_magic;
+			std::map<std::string, ObjectFormat>	_types;
+
+		public:
+			Magic(): _magic(magic_open(MAGIC_MIME_TYPE | MAGIC_SYMLINK | MAGIC_ERROR))
+			{
+#define MAP_TYPE(name, format) _types[name] = (format)
+				magic_load(_magic, NULL);
+				MAP_TYPE("inode/directory",		ObjectFormat::Association);
+				MAP_TYPE("audio/mpeg",			ObjectFormat::Mp3);
+				MAP_TYPE("text/plain",			ObjectFormat::Text);
+				MAP_TYPE("image/jpeg",			ObjectFormat::Jfif);
+				MAP_TYPE("image/gif",			ObjectFormat::Gif);
+				MAP_TYPE("image/x-ms-bmp",		ObjectFormat::Bmp);
+				MAP_TYPE("image/png",			ObjectFormat::Png);
+				MAP_TYPE("audio/x-ms-wma",		ObjectFormat::Wma);
+				MAP_TYPE("audio/ogg",			ObjectFormat::Ogg);
+				MAP_TYPE("audio/x-flac",		ObjectFormat::Flac);
+				MAP_TYPE("audio/x-m4a",			ObjectFormat::Aac);
+				MAP_TYPE("audio/audio/x-wav",	ObjectFormat::Aiff);
+				MAP_TYPE("video/x-ms-asf",		ObjectFormat::Asf);
+				MAP_TYPE("audio/mp4",			ObjectFormat::Mp4);
+#undef MAP_TYPE
+			}
+
+			ObjectFormat GetType(const std::string &path)
+			{
+				const char *type = _magic? magic_file(_magic, path.c_str()): NULL;
+				if (!type)
+					return ObjectFormat::Undefined;
+
+				printf("MAGIC MIME: %s\n", type);
+				auto it = _types.find(type);
+				return it != _types.end()? it->second: ObjectFormat::Undefined;
+			}
+
+			~Magic()
+			{ if (_magic) magic_close(_magic); }
+		};
+	}
+#else
+	namespace
+	{
+		struct Magic
+		{
+			const ObjectFormat GetType(const std::string &) { return ObjectFormat::Undefined; }
+		};
+	}
+#endif
+
 	ObjectFormat ObjectFormatFromFilename(const std::string &filename)
 	{
+		static Magic magic;
+		{
+			ObjectFormat magicType = magic.GetType(filename);
+			if (magicType != ObjectFormat::Undefined)
+				return magicType;
+		}
+
 		size_t extPos = filename.rfind('.');
 		if (extPos == filename.npos)
 			return ObjectFormat::Undefined;

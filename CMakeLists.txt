@@ -24,6 +24,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 
 include(FindPkgConfig)
 include(CheckFunctionExists)
+include(CheckIncludeFiles)
 
 find_package ( Threads )
 
@@ -34,6 +35,15 @@ endif()
 if (FUSE_FOUND)
 	message(STATUS "fuse found, building mount helper")
 	add_definitions(${FUSE_CFLAGS} -DFUSE_USE_VERSION=26)
+endif()
+
+check_include_files (magic.h HAVE_MAGIC_H)
+check_library_exists(magic magic_open "" HAVE_LIBMAGIC)
+
+if (HAVE_MAGIC_H AND HAVE_LIBMAGIC)
+	message(STATUS "libmagic found")
+	add_definitions(-DHAVE_LIBMAGIC)
+	list(APPEND MTP_LIBRARIES magic)
 endif()
 
 option(BUILD_QT_UI "Build reference Qt application" ON)
