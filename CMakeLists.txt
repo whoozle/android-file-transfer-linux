@@ -7,6 +7,8 @@ set(CPACK_RESOURCE_FILE_LICENSE ${CMAKE_SOURCE_DIR}/LICENSE)
 set(CPACK_PACKAGE_DESCRIPTION_FILE ${CMAKE_SOURCE_DIR}/README.md)
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Android File Transfer for Linux (and Mac OS X) - open source implementation of MTP protocol used on every modern android device")
 
+set(MTP_LIBRARIES mtp-ng-static)
+
 message(STATUS "building for ${CMAKE_SYSTEM_NAME}")
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
@@ -63,8 +65,6 @@ set(SOURCES
 
 	mtp/usb/BulkPipe.cpp
 )
-
-set(MTP_LIBRARIES mtp-ng-static)
 
 if (USB_BACKEND_LIBUSB)
 
