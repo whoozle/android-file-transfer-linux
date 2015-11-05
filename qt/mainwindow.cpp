@@ -323,7 +323,16 @@ void MainWindow::createDirectory()
 	CreateDirectoryDialog d(this);
 	restoreGeometry("create-directory-dialog", d);
 	if (d.exec() && !d.name().isEmpty())
-		_objectModel->createDirectory(d.name(), mtp::AssociationType::GenericFolder);
+	{
+		try
+		{ _objectModel->createDirectory(d.name(), mtp::AssociationType::GenericFolder); }
+		catch(const std::exception &ex)
+		{
+			QMessageBox::warning(this, tr("Error"),
+				tr("Failed to create new directory:\n") + fromUtf8(ex.what())
+			);
+		}
+	}
 	saveGeometry("create-directory-dialog", d);
 }
 
