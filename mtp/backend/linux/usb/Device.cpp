@@ -95,6 +95,7 @@ namespace mtp { namespace usb
 			KernelUrb.type			= type;
 			KernelUrb.endpoint		= ep->GetAddress();
 			KernelUrb.buffer		= Buffer.data();
+			KernelUrb.buffer_length = Buffer.size();
 		}
 
 		size_t GetTransferSize() const
