@@ -61,11 +61,33 @@ namespace mtp { namespace usb
 		ioctl(_fd, USBDEVFS_RELEASEINTERFACE, &_interfaceNumber);
 	}
 
+#define PRINT_CAP(CAP, NAME) \
+	if (capabilities & (CAP)) \
+	{ \
+		printf(NAME " "); \
+		capabilities &= ~(CAP); \
+	}
+
+
 	Device::Device(int fd, const EndpointPtr &controlEp): _fd(fd), _capabilities(0), _controlEp(controlEp)
 	{
 		try { IOCTL(_fd.Get(), USBDEVFS_GET_CAPABILITIES, &_capabilities); }
 		catch(const std::exception &ex)
 		{ fprintf(stderr, "get usbfs capabilities failed: %s\n", ex.what()); }
+		printf("capabilities = 0x%02x: ", (unsigned)_capabilities);
+		if (_capabilities)
+		{
+			u32 capabilities = _capabilities;
+			PRINT_CAP(USBDEVFS_CAP_ZERO_PACKET, "<zero>");
+			PRINT_CAP(USBDEVFS_CAP_BULK_CONTINUATION, "<bulk-continuation>");
+			PRINT_CAP(USBDEVFS_CAP_NO_PACKET_SIZE_LIM, "<no-packet-size-limit>");
+			PRINT_CAP(USBDEVFS_CAP_BULK_SCATTER_GATHER, "<bulk-scatter-gather>");
+			if (capabilities)
+				printf("<unknown capability 0x%02x>", capabilities);
+			printf("\n");
+		}
+		else
+			printf("[none]\n");
 	}
 
 	Device::~Device()
