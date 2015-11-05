@@ -92,11 +92,9 @@ namespace mtp { namespace usb
 
 		Urb(int fd, u8 type, const EndpointPtr & ep): Fd(fd), Buffer(PacketsPerBuffer(type) * ep->GetMaxPacketSize()), KernelUrb()
 		{
-			usbdevfs_urb &urb	= KernelUrb;
-			urb.type			= type;
-			urb.endpoint		= ep->GetAddress();
-			urb.buffer			= Buffer.data();
-			urb.buffer_length	= Buffer.size();
+			KernelUrb.type			= type;
+			KernelUrb.endpoint		= ep->GetAddress();
+			KernelUrb.buffer		= Buffer.data();
 		}
 
 		size_t GetTransferSize() const
