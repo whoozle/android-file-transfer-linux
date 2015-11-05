@@ -104,7 +104,7 @@ namespace mtp { namespace usb
 		fprintf(stderr, "SetConfiguration(%d): not implemented", idx);
 	}
 
-	struct Device::Urb
+	struct Device::Urb : Noncopyable
 	{
 		int						Fd;
 		ByteArray				Buffer;
