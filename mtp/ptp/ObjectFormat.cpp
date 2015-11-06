@@ -65,7 +65,7 @@ namespace mtp
 				if (!type)
 					return ObjectFormat::Undefined;
 
-				printf("MAGIC MIME: %s\n", type);
+				//printf("MAGIC MIME: %s\n", type);
 				auto it = _types.find(type);
 				return it != _types.end()? it->second: ObjectFormat::Undefined;
 			}
