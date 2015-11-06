@@ -41,33 +41,42 @@ namespace mtp
 		return stream;
 	}
 
-	template<typename T>
-	struct Hex
+	template<typename T, bool Hex>
+	struct Format
 	{
 		T			Value;
 		unsigned	Width;
-		Hex(const T & value, unsigned width = 0): Value(value), Width(width) { }
+		Format(const T & value, unsigned width = 0): Value(value), Width(width) { }
 
 		template<typename Stream>
 		Stream & operator >> (Stream & stream) const
 		{
 			std::ios::fmtflags oldFlags = stream.flags();
-			stream << std::setw(Width) << std::setfill('0') << std::hex << Value;
+			char oldFill = stream.fill();
+			if (Hex)
+				stream << std::setw(Width) << std::setfill('0') << std::hex << Value;
+			else
+				stream << std::setw(Width) << std::setfill(' ') << Value;
 			stream.flags(oldFlags);
+			stream.fill(oldFill);
 			return stream;
 		}
 	};
 
-	template<typename Stream, typename T>
-	Stream & operator << (Stream &stream, const Hex<T> &hex)
+	template<typename Stream, typename T, bool H>
+	Stream & operator << (Stream &stream, const Format<T, H> &format)
 	{
-		hex >> stream;
+		format >> stream;
 		return stream;
 	}
 
 	template<typename T>
-	Hex<T> hex(const T & value, unsigned width = 0)
-	{ return Hex<T>(value, width); }
+	Format<T, true> hex(const T & value, unsigned width = 0)
+	{ return Format<T, true>(value, width); }
+
+	template<typename T>
+	Format<T, false> width(const T & value, unsigned width)
+	{ return Format<T, false>(value, width); }
 
 	inline void print()
 	{ std::cout << std::endl; }

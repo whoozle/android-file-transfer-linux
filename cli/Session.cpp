@@ -68,27 +68,6 @@ namespace cli
 			_terminalWidth = cols? atoi(cols): 80;
 		}
 
-		if (_interactive)
-		{
-			print(_gdi.Manufacturer, " ", _gdi.Model, " ", _gdi.DeviceVersion);
-			print("extensions: ", _gdi.VendorExtensionDesc);
-			//print("%s", _gdi.SerialNumber); //non-secure
-			std::stringstream ss;
-			ss << "supported op codes: ";
-			for(OperationCode code : _gdi.OperationsSupported)
-			{
-				ss << hex(code, 4) << " ";
-			}
-			ss << "\n";
-			ss << "supported properties: ";
-			for(u16 code : _gdi.DevicePropertiesSupported)
-			{
-				ss << hex(code, 4) << " ";
-			}
-			ss << "\n";
-			debug(ss.str());
-		}
-
 		AddCommand("help", "shows this help",
 			make_function([this]() -> void { Help(); }));
 
@@ -236,6 +215,27 @@ namespace cli
 	void Session::InteractiveInput()
 	{
 		using namespace mtp;
+		if (_interactive)
+		{
+			print(_gdi.Manufacturer, " ", _gdi.Model, " ", _gdi.DeviceVersion);
+			print("extensions: ", _gdi.VendorExtensionDesc);
+			//print("%s", _gdi.SerialNumber); //non-secure
+			std::stringstream ss;
+			ss << "supported op codes: ";
+			for(OperationCode code : _gdi.OperationsSupported)
+			{
+				ss << hex(code, 4) << " ";
+			}
+			ss << "\n";
+			ss << "supported properties: ";
+			for(u16 code : _gdi.DevicePropertiesSupported)
+			{
+				ss << hex(code, 4) << " ";
+			}
+			ss << "\n";
+			debug(ss.str());
+		}
+
 		std::string prompt(_gdi.Manufacturer + " " + _gdi.Model + "> "), input;
 		cli::CommandLine::Get().SetCallback([this](const char *text, int start, int end) -> char ** { return CompletionCallback(text, start, end); });
 
@@ -359,7 +359,16 @@ namespace cli
 			try
 			{
 				msg::ObjectInfo info = _session->GetObjectInfo(objectId);
-				printf("%-10u %04hx %10u %s %ux%u, %s\n", objectId, (unsigned)info.ObjectFormat, info.ObjectCompressedSize, info.Filename.c_str(), info.ImagePixWidth, info.ImagePixHeight, info.CaptureDate.c_str());
+				print(
+					std::left,
+					width(objectId, 10), " ",
+					std::right,
+					hex(info.ObjectFormat, 4), " ",
+					width(info.ObjectCompressedSize, 10), " ",
+					info.CaptureDate, " ",
+					info.Filename, " ",
+					info.ImagePixWidth, "x", info.ImagePixHeight, " "
+				);
 			}
 			catch(const std::exception &ex)
 			{
@@ -401,16 +410,20 @@ namespace cli
 		for(size_t i = 0; i < list.StorageIDs.size(); ++i)
 		{
 			msg::StorageInfo si = _session->GetStorageInfo(list.StorageIDs[i]);
-			printf("%08d volume: %s, description: %s\n", list.StorageIDs[i], si.VolumeLabel.c_str(), si.StorageDescription.c_str());
+			print(
+				std::left, width(list.StorageIDs[i], 8),
+				" volume: ", si.VolumeLabel,
+				", description: ", si.StorageDescription);
 		}
 	}
 
 	void Session::Help()
 	{
-		mtp::print("Available commands are:");
+		using namespace mtp;
+		print("Available commands are:");
 		for(auto i : _commands)
 		{
-			printf("\t%-20s %s\n", i.first.c_str(), i.second->GetHelpString().c_str());
+			print("\t", std::left, width(i.first, 20), i.second->GetHelpString());
 		}
 	}
 
