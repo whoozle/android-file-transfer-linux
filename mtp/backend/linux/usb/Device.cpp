@@ -140,7 +140,7 @@ namespace mtp { namespace usb
 		size_t Send(const IObjectInputStreamPtr &inputStream)
 		{
 			size_t r = inputStream->Read(Buffer.data(), Buffer.size());
-			//HexDump("write", ByteArray(Buffer.data(), Buffer.data() + r));
+			//HexDump("write", ByteArray(Buffer.data(), Buffer.data() + r), true);
 			KernelUrb.buffer_length = r;
 			return r;
 		}
@@ -155,7 +155,7 @@ namespace mtp { namespace usb
 
 		size_t Recv(const IObjectOutputStreamPtr &outputStream)
 		{
-			//HexDump("read", ByteArray(Buffer.data(), Buffer.data() + KernelUrb.actual_length));
+			//HexDump("read", ByteArray(Buffer.data(), Buffer.data() + KernelUrb.actual_length), true);
 			return outputStream->Write(Buffer.data(), KernelUrb.actual_length);
 		}
 
