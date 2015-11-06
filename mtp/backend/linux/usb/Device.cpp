@@ -106,11 +106,13 @@ namespace mtp { namespace usb
 
 	struct Device::Urb : Noncopyable
 	{
+		static const int 		MaxBufferSize = 4096;
 		int						Fd;
+		int						PacketSize;
 		ByteArray				Buffer;
 		usbdevfs_urb			KernelUrb;
 
-		Urb(int fd, u8 type, const EndpointPtr & ep): Fd(fd), Buffer(4096), KernelUrb()
+		Urb(int fd, u8 type, const EndpointPtr & ep): Fd(fd), PacketSize(ep->GetMaxPacketSize()), Buffer(std::max(PacketSize, MaxBufferSize / PacketSize * PacketSize)), KernelUrb()
 		{
 			KernelUrb.type			= type;
 			KernelUrb.endpoint		= ep->GetAddress();
