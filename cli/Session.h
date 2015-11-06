@@ -50,6 +50,7 @@ namespace cli
 		mtp::u32 ResolveObjectChild(mtp::u32 parent, const std::string &entity);
 		static std::string GetFilename(const std::string &path);
 		static std::string GetDirname(const std::string &path);
+		static std::string FormatTime(const std::string &timespec);
 
 	public:
 		Session(const mtp::DevicePtr &device);

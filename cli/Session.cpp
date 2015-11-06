@@ -317,6 +317,20 @@ namespace cli
 		return (pos == path.npos)? std::string(): path.substr(0, pos);
 	}
 
+	std::string Session::FormatTime(const std::string &timespec)
+	{
+		if (timespec.size() != 15 || timespec[8] != 'T')
+			return timespec;
+
+		return
+			timespec.substr(0, 4) + "-" +
+			timespec.substr(4, 2) + "-" +
+			timespec.substr(6, 2) + " " +
+			timespec.substr(9, 2) + ":" +
+			timespec.substr(11, 2) + ":" +
+			timespec.substr(13, 2);
+	}
+
 	mtp::u32 Session::ResolvePath(const std::string &path, std::string &file)
 	{
 		size_t pos = path.rfind('/');
@@ -365,7 +379,7 @@ namespace cli
 					std::right,
 					hex(info.ObjectFormat, 4), " ",
 					width(info.ObjectCompressedSize, 10), " ",
-					info.CaptureDate, " ",
+					FormatTime(info.CaptureDate), " ",
 					info.Filename, " ",
 					info.ImagePixWidth, "x", info.ImagePixHeight, " "
 				);
