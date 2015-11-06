@@ -110,15 +110,7 @@ namespace mtp { namespace usb
 		ByteArray				Buffer;
 		usbdevfs_urb			KernelUrb;
 
-		static size_t PacketsPerBuffer(u8 type)
-#if 0
-		//this will cause sudden freezes, almost every input transfer freezes on 4.3
-		{ return type == USBDEVFS_URB_TYPE_BULK? 2048: 1; }
-#else
-		{ return 1; }
-#endif
-
-		Urb(int fd, u8 type, const EndpointPtr & ep): Fd(fd), Buffer(PacketsPerBuffer(type) * ep->GetMaxPacketSize()), KernelUrb()
+		Urb(int fd, u8 type, const EndpointPtr & ep): Fd(fd), Buffer(4096), KernelUrb()
 		{
 			KernelUrb.type			= type;
 			KernelUrb.endpoint		= ep->GetAddress();
