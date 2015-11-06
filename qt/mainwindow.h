@@ -55,6 +55,7 @@ private:
 	void restoreGeometry(const QString &name, QWidget &widget);
 
 private slots:
+	bool reconnectToDevice();
 	void back();
 	void down();
 	void onActivated ( const QModelIndex & index );

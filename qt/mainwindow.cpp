@@ -28,6 +28,7 @@
 #include "utils.h"
 #include <mtp/usb/TimeoutException.h>
 #include <mtp/usb/DeviceBusyException.h>
+#include <mtp/usb/DeviceNotFoundException.h>
 #include <QClipboard>
 #include <QDebug>
 #include <QSortFilterProxyModel>
@@ -116,25 +117,33 @@ void MainWindow::closeEvent(QCloseEvent *event)
 	QMainWindow::closeEvent(event);
 }
 
+bool MainWindow::reconnectToDevice()
+{
+	_device.reset();
+	try
+	{ _device = mtp::Device::Find(); }
+	catch(const mtp::usb::DeviceBusyException &ex)
+	{
+		QMessageBox::critical(this, tr("Device is busy"), tr("Device is busy, maybe another process is using it. Close other MTP applications and restart Android File Transfer."));
+		return false;
+	}
+
+	if (!_device)
+	{
+		QMessageBox::critical(this, tr("No MTP device found"), tr("No MTP device found"));
+		return false;
+	}
+	return true;
+}
+
+
 void MainWindow::showEvent(QShowEvent *)
 {
 	if (!_device)
 	{
-		try
-		{
-			_device = mtp::Device::Find();
-		}
-		catch(const mtp::usb::DeviceBusyException &ex)
-		{
-			QMessageBox::critical(this, tr("Device is busy"), tr("Device is busy, maybe another process is using it. Close other MTP applications and restart Android File Transfer."));
+		if (!reconnectToDevice())
 			return;
-		}
 
-		if (!_device)
-		{
-			QMessageBox::critical(this, tr("No MTP device found"), tr("No MTP device found"));
-			return;
-		}
 		QSettings settings;
 		restoreGeometry("main-window", *this);
 		restoreState(settings.value("state/main-window").toByteArray());
@@ -160,6 +169,12 @@ void MainWindow::showEvent(QShowEvent *)
 					_device.reset();
 					return;
 				}
+			}
+			catch(const mtp::usb::DeviceNotFoundException &ex)
+			{
+				qDebug() << "device disconnected, retrying...";
+				if (!reconnectToDevice())
+					return;
 			}
 		}
 
