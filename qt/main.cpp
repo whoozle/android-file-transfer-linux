@@ -48,9 +48,9 @@ namespace
 
 int main(int argc, char *argv[])
 {
+	QApplication app(argc, argv);
 	Q_INIT_RESOURCE(android_file_transfer);
 
-	QApplication a(argc, argv);
 	QCoreApplication::setApplicationName("mtp-ng-qt");
 	QCoreApplication::setOrganizationDomain("whoozle.github.io");
 	QCoreApplication::setOrganizationName("whoozle.github.io");
@@ -59,11 +59,11 @@ int main(int argc, char *argv[])
 
 	qtTranslator.load("qt_" + QLocale::system().name(),
 					QLibraryInfo::location(QLibraryInfo::TranslationsPath));
-	a.installTranslator(&qtTranslator);
+	app.installTranslator(&qtTranslator);
 
 	QTranslator aTranslator;
 	aTranslator.load(":/translations/android-file-transfer-linux_" + QLocale::system().name());
-	a.installTranslator(&aTranslator);
+	app.installTranslator(&aTranslator);
 
 	MainWindow w;
 	w.show();
@@ -71,5 +71,5 @@ int main(int argc, char *argv[])
 	if (!w.started())
 		return 1;
 
-	return a.exec();
+	return app.exec();
 }
