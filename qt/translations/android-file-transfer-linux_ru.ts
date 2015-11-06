@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="ru_RU">
+<TS version="2.0" language="ru_RU">
 <context>
     <name>CreateDirectoryDialog</name>
     <message>
@@ -22,122 +22,126 @@
         <translation>Android File Transfer для Linux</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="66"/>
+        <location filename="../mainwindow.ui" line="65"/>
         <source>&amp;File</source>
         <translation>&amp;Файл</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="81"/>
+        <location filename="../mainwindow.ui" line="80"/>
         <source>&amp;Navigate</source>
         <translation>&amp;Навигация</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="111"/>
+        <location filename="../mainwindow.ui" line="109"/>
         <source>Upload</source>
         <translation>Закачать</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="114"/>
+        <location filename="../mainwindow.ui" line="112"/>
         <source>Ctrl+U</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="124"/>
+        <location filename="../mainwindow.ui" line="121"/>
         <source>&amp;CreateDirectory</source>
         <translation>Создать &amp;каталог</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="127"/>
+        <location filename="../mainwindow.ui" line="124"/>
         <source>Ctrl+N</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="132"/>
+        <location filename="../mainwindow.ui" line="129"/>
         <source>UploadDirectory</source>
         <translation>Закачать каталог</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="142"/>
+        <location filename="../mainwindow.ui" line="138"/>
         <source>&amp;Back</source>
         <translation>&amp;Назад</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="145"/>
+        <location filename="../mainwindow.ui" line="141"/>
         <source>Backspace</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="155"/>
+        <location filename="../mainwindow.ui" line="150"/>
         <source>&amp;Go Down</source>
         <translation>&amp;Зайти</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="158"/>
+        <location filename="../mainwindow.ui" line="153"/>
         <source>Return</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="163"/>
+        <location filename="../mainwindow.ui" line="158"/>
         <source>Upload Album</source>
         <translation>Закачать альбом</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="173"/>
+        <location filename="../mainwindow.ui" line="167"/>
         <source>&amp;Rename</source>
         <translation>&amp;Переименовать</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="176"/>
+        <location filename="../mainwindow.ui" line="170"/>
         <source>F2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="186"/>
+        <location filename="../mainwindow.ui" line="179"/>
         <source>D&amp;elete</source>
         <translation>&amp;Удалить</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="189"/>
+        <location filename="../mainwindow.ui" line="182"/>
         <source>Del</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="199"/>
+        <location filename="../mainwindow.ui" line="191"/>
         <source>&amp;Download</source>
         <translation>&amp;Скачать</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="202"/>
+        <location filename="../mainwindow.ui" line="194"/>
         <source>Ctrl+D</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="207"/>
+        <location filename="../mainwindow.ui" line="199"/>
         <source>E&amp;xit</source>
         <translation>В&amp;ыход</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="210"/>
+        <location filename="../mainwindow.ui" line="202"/>
         <source>Ctrl+Q</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="220"/>
+        <location filename="../mainwindow.ui" line="211"/>
         <source>Re&amp;fresh</source>
         <translation>&amp;Обновить</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="223"/>
+        <location filename="../mainwindow.ui" line="214"/>
         <source>F5</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="228"/>
+        <location filename="../mainwindow.ui" line="219"/>
+        <source>&amp;Paste</source>
+        <translation>&amp;Вставить</translation>
+    </message>
+    <message>
         <source>Paste</source>
         <translation>Вставить</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="231"/>
+        <location filename="../mainwindow.ui" line="222"/>
         <source>Ctrl+V</source>
         <translation></translation>
     </message>
@@ -149,7 +153,8 @@
     <message>
         <location filename="../mainwindow.cpp" line="129"/>
         <source>Device is busy, maybe another process is using it. Close other MTP applications and restart Android File Transfer.</source>
-        <translation>Устройство занято, вероятно, какой-то другой процесс в данный момент его использует. Закройте другие MTP приложения и перезапустите Android File Transfer for Linux.</translation>
+        <translation>Устройство занято, вероятно, какой-то другой процесс в данный момент его использует.
+Закройте другие MTP приложения и перезапустите Android File Transfer for Linux.</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="135"/>
@@ -175,7 +180,8 @@
         <location filename="../mainwindow.cpp" line="170"/>
         <source>No MTP storage found, your device might be locked.
 Please unlock and press Retry to continue or Abort to exit.</source>
-        <translation>Нет ни одного хранилища, возможно ваше устройство заблокировано\nРазблокируйте устройство и нажмите Повторить чтобы попробовать ещё раз или Прервать, чтобы выйти.</translation>
+        <translation>Нет ни одного хранилища, возможно ваше устройство заблокировано
+Разблокируйте устройство и нажмите Повторить чтобы попробовать ещё раз или Прервать, чтобы выйти.</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="267"/>
@@ -188,12 +194,24 @@ Please unlock and press Retry to continue or Abort to exit.</source>
         <translation>Вы уверены?</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="565"/>
+        <location filename="../mainwindow.cpp" line="331"/>
+        <source>Error</source>
+        <translation>Ошибка</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="332"/>
+        <source>Failed to create new directory:
+</source>
+        <translation>Не удалось создать новый каталог:
+</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="574"/>
         <source>Overwrite confirmation</source>
         <translation>Подтверждение перезаписи</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="565"/>
+        <location filename="../mainwindow.cpp" line="574"/>
         <source>You are about to overwrite file </source>
         <translation>Вы собираетесь перезаписать файл </translation>
     </message>
