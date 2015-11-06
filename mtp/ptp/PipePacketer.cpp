@@ -139,7 +139,7 @@ namespace mtp
 				header.Read(stream);
 				if (_transaction && _transaction != header.Transaction)
 				{
-					error("drop message", hex(header.ContainerType, 4), ", response: ", hex(header.ResponseType, 4), ", transaction: ", hex(header.Transaction, 8), ", transaction: ", hex(_transaction, 8));
+					error("drop message ", hex(header.ContainerType, 4), ", response: ", hex(header.ResponseType, 4), ", transaction: ", hex(header.Transaction, 8), ", transaction: ", hex(_transaction, 8));
 					_valid = false;
 					_output = std::make_shared<DummyOutputStream>();
 					return;
