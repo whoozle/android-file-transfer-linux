@@ -47,6 +47,6 @@ namespace mtp
 		if (i & 0xf)
 			ss << "\n";
 
-		debug(ss.str());
+		error(ss.str());
 	}
 }
