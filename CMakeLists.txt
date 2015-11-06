@@ -67,6 +67,8 @@ endif()
 include_directories(. ${CMAKE_SOURCE_DIR})
 
 set(SOURCES
+	mtp/log.cpp
+	mtp/ByteArray.cpp
 	mtp/ptp/Device.cpp
 	mtp/ptp/ObjectFormat.cpp
 	mtp/ptp/PipePacketer.cpp

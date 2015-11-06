@@ -19,6 +19,7 @@
 
 #include <usb/Context.h>
 #include <usb/Directory.h>
+#include <mtp/log.h>
 #include <map>
 #include <stdio.h>
 
@@ -58,7 +59,7 @@ namespace mtp { namespace usb
 			}
 			catch(const std::exception &ex)
 			{
-				fprintf(stderr, "%s\n", ex.what());
+				error(ex.what());
 			}
 		}
 	}

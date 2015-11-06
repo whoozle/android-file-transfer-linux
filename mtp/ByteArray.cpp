@@ -16,18 +16,37 @@
     along with Android File Transfer For Linux.
     If not, see <http://www.gnu.org/licenses/>.
  */
-
-#ifndef BYTEARRAY_H
-#define	BYTEARRAY_H
-
-#include <mtp/types.h>
-#include <vector>
+#include <mtp/ByteArray.h>
+#include <mtp/log.h>
+#include <sstream>
 
 namespace mtp
 {
-	typedef std::vector<u8> ByteArray;
 
-	void HexDump(const std::string &prefix, const ByteArray &data, bool force = false);
+	void HexDump(const std::string &prefix, const ByteArray &data, bool force)
+	{
+		if (!g_debug && !force)
+			return;
+
+		std::stringstream ss;
+		ss << prefix << "[" << data.size() << "]:\n";
+		size_t i;
+		for(i = 0; i < data.size(); ++i)
+		{
+			bool first = ((i & 0xf) == 0);
+			bool last = ((i & 0xf) == 0x0f);
+			if (first)
+				ss << hex(i, 8) << ": ";
+
+			ss << hex(data[i], 2);
+			if (last)
+				ss << "\n";
+			else
+				ss << " ";
+		}
+		if (i & 0xf)
+			ss << "\n";
+
+		debug(ss.str());
+	}
 }
-
-#endif	/* BYTEARRAY_H */

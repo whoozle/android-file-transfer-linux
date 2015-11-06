@@ -17,17 +17,9 @@
     If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BYTEARRAY_H
-#define	BYTEARRAY_H
-
-#include <mtp/types.h>
-#include <vector>
-
 namespace mtp
 {
-	typedef std::vector<u8> ByteArray;
 
-	void HexDump(const std::string &prefix, const ByteArray &data, bool force = false);
+	bool g_debug = false;
+
 }
-
-#endif	/* BYTEARRAY_H */

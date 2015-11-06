@@ -23,6 +23,7 @@
 #include <mtp/usb/DeviceBusyException.h>
 #include <mtp/usb/DeviceNotFoundException.h>
 #include <mtp/ByteArray.h>
+#include <mtp/log.h>
 
 #include <unistd.h>
 #include <sys/ioctl.h>
@@ -64,7 +65,7 @@ namespace mtp { namespace usb
 #define PRINT_CAP(CAP, NAME) \
 	if (capabilities & (CAP)) \
 	{ \
-		printf(NAME " "); \
+		debug(NAME " "); \
 		capabilities &= ~(CAP); \
 	}
 
@@ -73,8 +74,8 @@ namespace mtp { namespace usb
 	{
 		try { IOCTL(_fd.Get(), USBDEVFS_GET_CAPABILITIES, &_capabilities); }
 		catch(const std::exception &ex)
-		{ fprintf(stderr, "get usbfs capabilities failed: %s\n", ex.what()); }
-		printf("capabilities = 0x%02x: ", (unsigned)_capabilities);
+		{ error("get usbfs capabilities failed: ", ex.what()); }
+		debug("capabilities = ", std::hex, _capabilities);
 		if (_capabilities)
 		{
 			u32 capabilities = _capabilities;
@@ -84,11 +85,10 @@ namespace mtp { namespace usb
 			PRINT_CAP(USBDEVFS_CAP_BULK_SCATTER_GATHER, "<bulk-scatter-gather>");
 			PRINT_CAP(USBDEVFS_CAP_REAP_AFTER_DISCONNECT, "<reap-after-disconnect>");
 			if (capabilities)
-				printf("<unknown capability 0x%02x>", capabilities);
-			printf("\n");
+				debug("<unknown capability 0x", std::hex, capabilities, ">");
 		}
 		else
-			printf("[none]\n");
+			debug("[none]\n");
 	}
 
 	Device::~Device()
@@ -101,7 +101,7 @@ namespace mtp { namespace usb
 
 	void Device::SetConfiguration(int idx)
 	{
-		fprintf(stderr, "SetConfiguration(%d): not implemented", idx);
+		error("SetConfiguration(", idx, "): not implemented");
 	}
 
 	struct Device::Urb : Noncopyable
@@ -199,7 +199,7 @@ namespace mtp { namespace usb
 		if (r == 0 && timeout > 0)
 		{
 			int ms = (now.tv_sec - started.tv_sec) * 1000 + (now.tv_usec - started.tv_usec) / 1000;
-			fprintf(stderr, "%d ms since the last poll call\n", ms);
+			error(ms, " ms since the last poll call");
 		}
 
 		usbdevfs_urb *urb;
@@ -217,7 +217,7 @@ namespace mtp { namespace usb
 		try
 		{ unsigned index = ep->GetAddress(); IOCTL(_fd.Get(), USBDEVFS_CLEAR_HALT, &index); }
 		catch(const std::exception &ex)
-		{ fprintf(stderr, "clearing halt status for ep %02x: %s\n", (unsigned)ep->GetAddress(), ex.what()); }
+		{ error("clearing halt status for ep ", std::hex, ep->GetAddress(), ": ", ex.what()); }
 	}
 
 
@@ -239,7 +239,7 @@ namespace mtp { namespace usb
 					auto urbIt = _urbs.find(completedKernelUrb);
 					if (urbIt == _urbs.end())
 					{
-						fprintf(stderr, "got unknown urb: %p\n", completedKernelUrb);
+						error("got unknown urb: ", completedKernelUrb);
 						continue;
 					}
 					completedUrb = urbIt->second;
@@ -256,7 +256,7 @@ namespace mtp { namespace usb
 		}
 		catch(const std::exception &ex)
 		{
-			fprintf(stderr, "error while submitting urb: %s\n", ex.what());
+			error("error while submitting urb: ", ex.what());
 			urb->Discard();
 			throw;
 		}
@@ -321,7 +321,7 @@ namespace mtp { namespace usb
 
 	void Device::ReadControl(u8 type, u8 req, u16 value, u16 index, ByteArray &data, int timeout)
 	{
-		printf("read control %02x %02x %04x %04x\n", type, req, value, index);
+		debug("read control ", hex(type, 2), " ", hex(req, 2), " ", hex(value, 4), " ", hex(index, 4));
 		usbdevfs_ctrltransfer ctrl = { };
 		ctrl.bRequestType = type;
 		ctrl.bRequest = req;
@@ -344,7 +344,7 @@ namespace mtp { namespace usb
 
 	void Device::WriteControl(u8 type, u8 req, u16 value, u16 index, const ByteArray &data, bool interruptCurrentTransaction, int timeout)
 	{
-		printf("write control %02x %02x %04x %04x\n", type, req, value, index);
+		debug("write control ", hex(type, 2), " ", hex(req, 2), " ", hex(value, 4), " ", hex(index, 4));
 		usbdevfs_ctrltransfer ctrl = { };
 		ctrl.bRequestType = type;
 		ctrl.bRequest = req;

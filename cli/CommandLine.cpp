@@ -18,6 +18,7 @@
  */
 
 #include <cli/CommandLine.h>
+#include <mtp/log.h>
 
 #include <stdio.h>
 #include <readline/readline.h>
@@ -50,7 +51,7 @@ namespace cli
 				return NULL;
 		}
 		catch(const std::exception &ex)
-		{ fprintf(stderr, "%s\n", ex.what()); }
+		{ mtp::error(ex.what()); }
 		return NULL;
 	}
 

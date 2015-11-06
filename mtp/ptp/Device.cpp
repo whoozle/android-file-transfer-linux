@@ -21,6 +21,7 @@
 #include <mtp/ptp/Response.h>
 #include <mtp/ptp/Container.h>
 #include <mtp/ptp/Messages.h>
+#include <mtp/log.h>
 #include <usb/Context.h>
 #include <usb/Device.h>
 #include <usb/Interface.h>
@@ -81,18 +82,18 @@ namespace mtp
 			if (!device)
 				continue;
 			int confs = desc->GetConfigurationsCount();
-			//fprintf(stderr, "configurations: %d\n", confs);
+			//debug("configurations: ", confs);
 
 			for(int i = 0; i < confs; ++i)
 			{
 				usb::ConfigurationPtr conf = desc->GetConfiguration(i);
 				int interfaces = conf->GetInterfaceCount();
-				//fprintf(stderr, "interfaces: %d\n", interfaces);
+				//debug("interfaces: ", interfaces);
 				for(int j = 0; j < interfaces; ++j)
 				{
 					usb::InterfacePtr iface = conf->GetInterface(device, conf, j, 0);
 					usb::InterfaceTokenPtr token = device->ClaimInterface(iface);
-					fprintf(stderr, "%d:%d index %u, eps %u\n", i, j, iface->GetIndex(), iface->GetEndpointsCount());
+					debug(i, ':', j, "index ", iface->GetIndex(), ", eps ", iface->GetEndpointsCount());
 
 					static const u16 DT_STRING = 3;
 
@@ -129,7 +130,7 @@ namespace mtp
 			}
 		}
 		catch(const std::exception &ex)
-		{ fprintf(stderr, "%s\n", ex.what()); }
+		{ error(stderr, "%s\n", ex.what()); }
 
 		return nullptr;
 	}

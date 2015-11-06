@@ -25,8 +25,10 @@
 
 #include <mtp/make_function.h>
 #include <mtp/ptp/ByteArrayObjectStream.h>
+#include <mtp/log.h>
 
-#include <stdio.h>
+#include <sstream>
+
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -66,24 +68,26 @@ namespace cli
 			_terminalWidth = cols? atoi(cols): 80;
 		}
 
-		printf("%s\n", _gdi.VendorExtensionDesc.c_str());
-		printf("%s ", _gdi.Manufacturer.c_str());
-		printf("%s ", _gdi.Model.c_str());
-		printf("%s ", _gdi.DeviceVersion.c_str());
-		//printf("%s", _gdi.SerialNumber.c_str());
-		printf("\n");
-		printf("supported op codes: ");
-		for(OperationCode code : _gdi.OperationsSupported)
+		if (_interactive)
 		{
-			printf("%04x ", (unsigned)code);
+			print(_gdi.Manufacturer, " ", _gdi.Model, " ", _gdi.DeviceVersion);
+			print("extensions: ", _gdi.VendorExtensionDesc);
+			//print("%s", _gdi.SerialNumber); //non-secure
+			std::stringstream ss;
+			ss << "supported op codes: ";
+			for(OperationCode code : _gdi.OperationsSupported)
+			{
+				ss << hex(code, 4) << " ";
+			}
+			ss << "\n";
+			ss << "supported properties: ";
+			for(u16 code : _gdi.DevicePropertiesSupported)
+			{
+				ss << hex(code, 4) << " ";
+			}
+			ss << "\n";
+			debug(ss.str());
 		}
-		printf("\n");
-		printf("supported properties: ");
-		for(u16 code : _gdi.DevicePropertiesSupported)
-		{
-			printf("%04x ", (unsigned)code);
-		}
-		printf("\n");
 
 		AddCommand("help", "shows this help",
 			make_function([this]() -> void { Help(); }));
@@ -131,9 +135,9 @@ namespace cli
 		{
 			Tokens tokens;
 			Tokenizer(input, tokens);
-			printf("%s:\n", input.c_str());
+			print(input);
 			for(auto t : tokens)
-				printf("\t%s\n", t.c_str());
+				print("\t", t);
 		};
 		AddCommand("test-lexer", "tests lexer",
 			make_function([&test]() -> void
@@ -188,7 +192,8 @@ namespace cli
 			}
 			if (i == e)
 				return NULL;
-			//printf("COMPLETING %s:%u with %u args\n", commandName.c_str(), idx, i->second->GetArgumentCount());
+
+			//mtp::print("COMPLETING ", commandName, " ", idx, ":", commandName, " with ", i->second->GetArgumentCount(), " args");
 			ICommandPtr command = i->second;
 			std::list<std::string> matches;
 			CompletionContext ctx(*this, idx, text, matches);
@@ -244,14 +249,14 @@ namespace cli
 			}
 			catch (const mtp::InvalidResponseException &ex)
 			{
-				printf("error: %s\n", ex.what());
+				mtp::error("error: ", ex.what());
 				if (ex.Type == mtp::ResponseType::InvalidStorageID)
-					printf("\033[1mYour device might be locked or in usb-charging mode, please unlock it and put it in MTP or PTP mode\033[0m\n");
+					error("\033[1mYour device might be locked or in usb-charging mode, please unlock it and put it in MTP or PTP mode\033[0m\n");
 			}
 			catch(const std::exception &ex)
-			{ printf("error: %s\n", ex.what()); }
+			{ error("error: ", ex.what()); }
 		}
-		printf("\n");
+		print("");
 	}
 
 	mtp::u32 Session::ResolveObjectChild(mtp::u32 parent, const std::string &entity)
@@ -340,7 +345,7 @@ namespace cli
 				break;
 		}
 		path = "/" + path;
-		printf("%s\n", path.c_str());
+		mtp::print(path);
 	}
 
 
@@ -358,7 +363,7 @@ namespace cli
 			}
 			catch(const std::exception &ex)
 			{
-				printf("error: %s\n", ex.what());
+				mtp::error("error: ", ex.what());
 			}
 		}
 	}
@@ -402,7 +407,7 @@ namespace cli
 
 	void Session::Help()
 	{
-		printf("Available commands are:\n");
+		mtp::print("Available commands are:");
 		for(auto i : _commands)
 		{
 			printf("\t%-20s %s\n", i.first.c_str(), i.second->GetHelpString().c_str());
@@ -528,18 +533,20 @@ namespace cli
 	void Session::ShowType(const LocalPath &src)
 	{
 		mtp::ObjectFormat format = mtp::ObjectFormatFromFilename(src);
-		printf("mtp object format = %04x\n", (unsigned)format);
+		print("mtp object format = ", hex(format, 4));
 	}
 
 	void Session::ListProperties(mtp::u32 id)
 	{
 		auto ops = _session->GetObjectPropsSupported(id);
-		printf("properties supported: ");
+		std::stringstream ss;
+		ss << "properties supported: ";
 		for(mtp::u16 prop: ops.ObjectPropCodes)
 		{
-			printf("%02x ", prop);
+			ss << mtp::hex(prop, 4) << " ";
 		}
-		printf("\n");
+		ss << "\n";
+		mtp::print(ss.str());
 	}
 
 	void Session::ListDeviceProperties()
@@ -549,9 +556,9 @@ namespace cli
 		{
 			if ((code & 0xff00) != 0x5000 )
 				continue;
-			printf("property code: %04x\n", (unsigned)code);
+			print("property code: ", hex(code, 4));
 			ByteArray data = _session->GetDeviceProperty((mtp::DeviceProperty)code);
-			HexDump("value", data);
+			HexDump("value", data, true);
 		}
 	}
 

@@ -89,7 +89,7 @@ namespace mtp { namespace usb
 	{ ReadControl(_dev, type, req, value, index, data, timeout); }
 
 	void Device::WriteControl(u8 type, u8 req, u16 value, u16 index, const ByteArray &data, bool interruptCurrentTransaction, int timeout)
-	{ fprintf(stderr, "WriteControl stub\n"); }
+	{ error("WriteControl stub"); }
 
 	InterfaceTokenPtr Device::ClaimInterface(const InterfacePtr &interface)
 	{ return interface->Claim(); }

@@ -22,6 +22,7 @@
 #include <mtp/ptp/InputStream.h>
 #include <mtp/ptp/ByteArrayObjectStream.h>
 #include <mtp/ptp/JoinedObjectStream.h>
+#include <mtp/log.h>
 
 
 namespace mtp
@@ -101,7 +102,7 @@ namespace mtp
 		stream >> transactionId;
 		if (containerType != ContainerType::Event)
 			throw std::runtime_error("not an event");
-		fprintf(stderr, "event %04x\n", eventCode);
+		debug("event ", hex(eventCode, 8));
 	}
 
 	namespace
@@ -138,7 +139,7 @@ namespace mtp
 				header.Read(stream);
 				if (_transaction && _transaction != header.Transaction)
 				{
-					fprintf(stderr, "drop message %04hx %04hx, transaction %08x, expected: %08x\n", (unsigned)header.ContainerType, (unsigned)header.ResponseType, header.Transaction, _transaction);
+					error("drop message", hex(header.ContainerType, 4), ", response: ", hex(header.ResponseType, 4), ", transaction: ", hex(header.Transaction, 8), ", transaction: ", hex(_transaction, 8));
 					_valid = false;
 					_output = std::make_shared<DummyOutputStream>();
 					return;
@@ -196,7 +197,7 @@ namespace mtp
 		try
 		{ PollEvent(); }
 		catch(const std::exception &ex)
-		{ fprintf(stderr, "exception in interrupt: %s\n", ex.what()); }
+		{ error("exception in interrupt: ", ex.what()); }
 
 		response.clear();
 

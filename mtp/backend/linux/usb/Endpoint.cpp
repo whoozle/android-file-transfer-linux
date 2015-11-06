@@ -19,6 +19,7 @@
 
 #include <usb/Interface.h>
 #include <usb/Directory.h>
+#include <mtp/log.h>
 
 namespace mtp { namespace usb
 {
@@ -56,7 +57,7 @@ namespace mtp { namespace usb
 		try
 		{ return std::make_shared<Endpoint>(path); }
 		catch(const std::exception &ex)
-		{ fprintf(stderr, "failed adding endpoint: %s\n", ex.what()); }
+		{ error("failed adding endpoint: ", ex.what()); }
 		return nullptr;
 	}
 

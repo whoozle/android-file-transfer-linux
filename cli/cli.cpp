@@ -25,6 +25,8 @@
 #include <cli/CommandLine.h>
 #include <cli/Session.h>
 
+#include <mtp/log.h>
+
 #include <getopt.h>
 
 int main(int argc, char **argv)
@@ -35,6 +37,7 @@ int main(int argc, char **argv)
 
 	static struct option long_options[] =
 	{
+		{"verbose",			no_argument,		0,	'v' },
 		{"interactive",		no_argument,		0,	'i' },
 		{"help",			no_argument,		0,	'h' },
 		{0,					0,					0,	 0	}
@@ -43,13 +46,16 @@ int main(int argc, char **argv)
 	while(true)
 	{
 		int optionIndex = 0; //index of matching option
-		int c = getopt_long(argc, argv, "ih", long_options, &optionIndex);
+		int c = getopt_long(argc, argv, "ihv", long_options, &optionIndex);
 		if (c == -1)
 			break;
 		switch(c)
 		{
 		case 'i':
 			forceInteractive = true;
+			break;
+		case 'v':
+			g_debug = true;
 			break;
 		case '?':
 		case 'h':
@@ -60,10 +66,11 @@ int main(int argc, char **argv)
 
 	if (showHelp)
 	{
-		fprintf(stderr,
+		error(
 			"usage:\n"
 			"-h\tshow this help\n"
-			"-i\tforce interactive mode\n"
+			"-v\tshow debug output\n"
+			"-i\tforce interactive mode"
 			);
 		exit(0);
 	}
@@ -71,7 +78,7 @@ int main(int argc, char **argv)
 	DevicePtr mtp(Device::Find());
 	if (!mtp)
 	{
-		printf("no mtp device found\n");
+		error("no mtp device found");
 		exit(1);
 	}
 
@@ -97,5 +104,5 @@ int main(int argc, char **argv)
 		exit(0);
 	}
 	catch (const std::exception &ex)
-	{ fprintf(stderr, "error: %s\n", ex.what()); exit(1); }
+	{ error("error: ", ex.what()); exit(1); }
 }
