@@ -123,7 +123,7 @@ namespace mtp
 		void EndEditObject(u32 objectId);
 
 		ByteArray Get(u32 transaction, int timeout = 0);
-		void Send(const OperationRequest &req);
+		void Send(const OperationRequest &req, int timeout = 0);
 		void Close();
 	};
 

@@ -69,10 +69,12 @@ namespace mtp
 	}
 
 
-	void Session::Send(const OperationRequest &req)
+	void Session::Send(const OperationRequest &req, int timeout)
 	{
+		if (timeout <= 0)
+			timeout = _defaultTimeout;
 		Container container(req);
-		_packeter.Write(container.Data, _defaultTimeout);
+		_packeter.Write(container.Data, timeout);
 	}
 
 	void Session::Close()
@@ -113,7 +115,7 @@ namespace mtp
 	{
 		scoped_mutex_lock l(_mutex);
 		Transaction transaction(this);
-		Send(OperationRequest(OperationCode::GetObjectHandles, transaction.Id, storageId, objectFormat, parent));
+		Send(OperationRequest(OperationCode::GetObjectHandles, transaction.Id, storageId, objectFormat, parent), timeout);
 		ByteArray data = Get(transaction.Id, timeout);
 		InputStream stream(data);
 
