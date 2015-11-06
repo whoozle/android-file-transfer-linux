@@ -47,6 +47,7 @@ namespace mtp
 		msg::DeviceInfo	_deviceInfo;
 		bool			_getPartialObject64Supported;
 		bool			_editObjectSupported;
+		int				_defaultTimeout;
 
 	public:
 		static const u32 AllStorages = 0xffffffffu;
@@ -82,7 +83,7 @@ namespace mtp
 		const msg::DeviceInfo & GetDeviceInfo() const
 		{ return _deviceInfo; }
 
-		msg::ObjectHandles GetObjectHandles(u32 storageId = AllStorages, u32 objectFormat = AllFormats, u32 parent = Device);
+		msg::ObjectHandles GetObjectHandles(u32 storageId = AllStorages, u32 objectFormat = AllFormats, u32 parent = Device, int timeout = 30000);
 		msg::StorageIDs GetStorageIDs();
 		msg::StorageInfo GetStorageInfo(u32 storageId);
 

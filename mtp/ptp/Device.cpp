@@ -35,14 +35,14 @@ namespace mtp
 	Device::Device(usb::BulkPipePtr pipe): _packeter(pipe)
 	{ }
 
-	SessionPtr Device::OpenSession(u32 sessionId)
+	SessionPtr Device::OpenSession(u32 sessionId, int timeout)
 	{
 		OperationRequest req(OperationCode::OpenSession, 0, sessionId);
 		Container container(req);
 		_packeter.Write(container.Data);
 		ByteArray data, response;
 		ResponseType code;
-		_packeter.Read(0, data, code, response);
+		_packeter.Read(0, data, code, response, timeout);
 		//HexDump("payload", data);
 
 		return std::make_shared<Session>(_packeter.GetPipe(), sessionId);

@@ -35,7 +35,7 @@ namespace mtp
 } while(false)
 
 	Session::Session(usb::BulkPipePtr pipe, u32 sessionId):
-		_packeter(pipe), _sessionId(sessionId), _nextTransactionId(1)
+		_packeter(pipe), _sessionId(sessionId), _nextTransactionId(1), _defaultTimeout(10000)
 	{
 		_deviceInfo = GetDeviceInfoImpl();
 		_getPartialObject64Supported = _deviceInfo.Supports(OperationCode::GetPartialObject64);
@@ -81,7 +81,7 @@ namespace mtp
 		Send(OperationRequest(OperationCode::CloseSession, 0, _sessionId));
 		ByteArray data, response;
 		ResponseType responseCode;
-		_packeter.Read(0, data, responseCode, response);
+		_packeter.Read(0, data, responseCode, response, _defaultTimeout);
 		//HexDump("payload", data);
 	}
 
@@ -89,7 +89,7 @@ namespace mtp
 	{
 		ByteArray data, response;
 		ResponseType responseCode;
-		_packeter.Read(transaction, data, responseCode, response);
+		_packeter.Read(transaction, data, responseCode, response, _defaultTimeout);
 		CHECK_RESPONSE(responseCode);
 		return data;
 	}
@@ -107,7 +107,7 @@ namespace mtp
 	}
 
 
-	msg::ObjectHandles Session::GetObjectHandles(u32 storageId, u32 objectFormat, u32 parent)
+	msg::ObjectHandles Session::GetObjectHandles(u32 storageId, u32 objectFormat, u32 parent, int timeout)
 	{
 		scoped_mutex_lock l(_mutex);
 		Transaction transaction(this);
@@ -190,7 +190,7 @@ namespace mtp
 		Send(OperationRequest(OperationCode::GetObject, transaction.Id, objectId));
 		ByteArray response;
 		ResponseType responseCode;
-		_packeter.Read(transaction.Id, outputStream, responseCode, response);
+		_packeter.Read(transaction.Id, outputStream, responseCode, response, _defaultTimeout);
 		CHECK_RESPONSE(responseCode);
 	}
 
@@ -226,7 +226,7 @@ namespace mtp
 		}
 		ByteArray data, response;
 		ResponseType responseCode;
-		_packeter.Read(transaction.Id, data, responseCode, response);
+		_packeter.Read(transaction.Id, data, responseCode, response, _defaultTimeout);
 		//HexDump("response", response);
 		CHECK_RESPONSE(responseCode);
 		InputStream stream(response);
