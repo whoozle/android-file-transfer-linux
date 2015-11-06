@@ -52,14 +52,15 @@ namespace
 namespace cli
 {
 
-	Session::Session(const mtp::DevicePtr &device):
+	Session::Session(const mtp::DevicePtr &device, bool showPrompt):
 		_device(device),
 		_session(_device->OpenSession(1)),
 		_gdi(_session->GetDeviceInfo()),
 		_cs(mtp::Session::AllStorages),
 		_cd(mtp::Session::Root),
 		_running(true),
-		_interactive(isatty(STDOUT_FILENO))
+		_interactive(isatty(STDOUT_FILENO)),
+		_showPrompt(showPrompt)
 	{
 		using namespace mtp;
 		using namespace std::placeholders;
@@ -215,7 +216,7 @@ namespace cli
 	void Session::InteractiveInput()
 	{
 		using namespace mtp;
-		if (_interactive)
+		if (_interactive && _showPrompt)
 		{
 			print(_gdi.Manufacturer, " ", _gdi.Model, " ", _gdi.DeviceVersion);
 			print("extensions: ", _gdi.VendorExtensionDesc);
@@ -236,10 +237,10 @@ namespace cli
 			debug(ss.str());
 		}
 
-		std::string prompt(_gdi.Manufacturer + " " + _gdi.Model + "> "), input;
+		std::string prompt(_showPrompt? _gdi.Manufacturer + " " + _gdi.Model + "> ": std::string()), input;
 		cli::CommandLine::Get().SetCallback([this](const char *text, int start, int end) -> char ** { return CompletionCallback(text, start, end); });
 
-		while (cli::CommandLine::Get().ReadLine(prompt, input))
+		while (_showPrompt? cli::CommandLine::Get().ReadLine(prompt, input): cli::CommandLine::Get().ReadRawLine(input))
 		{
 			try
 			{
@@ -256,7 +257,8 @@ namespace cli
 			catch(const std::exception &ex)
 			{ error("error: ", ex.what()); }
 		}
-		print("");
+		if (_showPrompt)
+			print("");
 	}
 
 	mtp::u32 Session::ResolveObjectChild(mtp::u32 parent, const std::string &entity)

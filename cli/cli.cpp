@@ -28,6 +28,7 @@
 #include <mtp/log.h>
 
 #include <getopt.h>
+#include <unistd.h>
 
 int main(int argc, char **argv)
 {
@@ -84,7 +85,11 @@ int main(int argc, char **argv)
 
 	try
 	{
-		cli::Session session(mtp);
+		bool showPrompt = true;
+		if (!isatty(STDIN_FILENO))
+			showPrompt = false;
+
+		cli::Session session(mtp, showPrompt);
 
 		if (forceInteractive || (session.IsInteractive() && optind >= argc))
 		{

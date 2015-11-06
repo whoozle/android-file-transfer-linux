@@ -43,6 +43,7 @@ namespace cli
 		static CommandLine & Get();
 
 		bool ReadLine(const std::string &prompt, std::string &input);
+		bool ReadRawLine(std::string &input);
 		void SetCallback(const Callback &callback)
 		{ _callback = callback; }
 		std::string GetLineBuffer() const;

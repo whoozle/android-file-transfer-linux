@@ -40,6 +40,7 @@ namespace cli
 		mtp::u32					_cd; //current directory
 		bool						_running;
 		bool						_interactive;
+		bool						_showPrompt;
 		unsigned					_terminalWidth;
 
 		std::multimap<std::string, ICommandPtr> _commands;
@@ -53,7 +54,7 @@ namespace cli
 		static std::string FormatTime(const std::string &timespec);
 
 	public:
-		Session(const mtp::DevicePtr &device);
+		Session(const mtp::DevicePtr &device, bool showPrompt);
 
 		bool IsInteractive() const
 		{ return _interactive; }
