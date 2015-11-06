@@ -25,15 +25,54 @@
 #include <cli/CommandLine.h>
 #include <cli/Session.h>
 
+#include <getopt.h>
+
 int main(int argc, char **argv)
 {
 	using namespace mtp;
+	bool forceInteractive = false;
+	bool showHelp = false;
+
+	static struct option long_options[] =
+	{
+		{"interactive",		no_argument,		0,	'i' },
+		{"help",			no_argument,		0,	'h' },
+		{0,					0,					0,	 0	}
+	};
+
+	while(true)
+	{
+		int optionIndex = 0; //index of matching option
+		int c = getopt_long(argc, argv, "ih", long_options, &optionIndex);
+		if (c == -1)
+			break;
+		switch(c)
+		{
+		case 'i':
+			forceInteractive = true;
+			break;
+		case '?':
+		case 'h':
+		default:
+			showHelp = true;
+		}
+	}
+
+	if (showHelp)
+	{
+		fprintf(stderr,
+			"usage:\n"
+			"-h\tshow this help\n"
+			"-i\tforce interactive mode\n"
+			);
+		exit(0);
+	}
 
 	DevicePtr mtp(Device::Find());
 	if (!mtp)
 	{
 		printf("no mtp device found\n");
-		return 1;
+		exit(1);
 	}
 
 	try
@@ -43,18 +82,18 @@ int main(int argc, char **argv)
 		if (argc >= 2)
 		{
 			cli::Tokens tokens;
-			for(int i = 1; i < argc; ++i)
+			for(int i = optind; i < argc; ++i)
 			{
 				tokens.push_back(argv[i]);
 			}
 			session.ProcessCommand(std::move(tokens));
 		}
 		else
-			if (session.IsInteractive())
+			if (forceInteractive || session.IsInteractive())
 				session.InteractiveInput();
 
-		return 0;
+		exit(0);
 	}
 	catch (const std::exception &ex)
-	{ fprintf(stderr, "error: %s\n", ex.what()); return 1; }
+	{ fprintf(stderr, "error: %s\n", ex.what()); exit(1); }
 }
