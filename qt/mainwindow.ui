@@ -57,7 +57,7 @@
      <x>0</x>
      <y>0</y>
      <width>671</width>
-     <height>30</height>
+     <height>32</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -101,10 +101,6 @@
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionUpload">
-   <property name="icon">
-    <iconset>
-     <normaloff>.</normaloff>.</iconset>
-   </property>
    <property name="text">
     <string>Upload</string>
    </property>
@@ -115,7 +111,8 @@
   <action name="actionCreateDirectory">
    <property name="icon">
     <iconset theme="folder-new">
-     <normaloff>.</normaloff>.</iconset>
+     <normaloff/>
+    </iconset>
    </property>
    <property name="text">
     <string>&amp;CreateDirectory</string>
@@ -132,7 +129,8 @@
   <action name="actionBack">
    <property name="icon">
     <iconset theme="go-previous">
-     <normaloff>.</normaloff>.</iconset>
+     <normaloff/>
+    </iconset>
    </property>
    <property name="text">
     <string>&amp;Back</string>
@@ -144,7 +142,8 @@
   <action name="actionGo_Down">
    <property name="icon">
     <iconset theme="go-next">
-     <normaloff>.</normaloff>.</iconset>
+     <normaloff/>
+    </iconset>
    </property>
    <property name="text">
     <string>&amp;Go Down</string>
@@ -161,7 +160,8 @@
   <action name="actionRename">
    <property name="icon">
     <iconset theme="edit-rename">
-     <normaloff>.</normaloff>.</iconset>
+     <normaloff/>
+    </iconset>
    </property>
    <property name="text">
     <string>&amp;Rename</string>
@@ -173,7 +173,8 @@
   <action name="actionDelete">
    <property name="icon">
     <iconset theme="edit-delete">
-     <normaloff>.</normaloff>.</iconset>
+     <normaloff/>
+    </iconset>
    </property>
    <property name="text">
     <string>D&amp;elete</string>
@@ -185,7 +186,8 @@
   <action name="actionDownload">
    <property name="icon">
     <iconset theme="download">
-     <normaloff>.</normaloff>.</iconset>
+     <normaloff/>
+    </iconset>
    </property>
    <property name="text">
     <string>&amp;Download</string>
@@ -205,7 +207,8 @@
   <action name="actionRefresh">
    <property name="icon">
     <iconset theme="view-refresh">
-     <normaloff>.</normaloff>.</iconset>
+     <normaloff/>
+    </iconset>
    </property>
    <property name="text">
     <string>Re&amp;fresh</string>
