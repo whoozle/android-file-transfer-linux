@@ -122,7 +122,7 @@ namespace mtp
 		void TruncateObject(u32 objectId, u64 size);
 		void EndEditObject(u32 objectId);
 
-		ByteArray Get(u32 transaction);
+		ByteArray Get(u32 transaction, int timeout = 0);
 		void Send(const OperationRequest &req);
 		void Close();
 	};

@@ -39,7 +39,7 @@ namespace mtp
 	{
 		OperationRequest req(OperationCode::OpenSession, 0, sessionId);
 		Container container(req);
-		_packeter.Write(container.Data);
+		_packeter.Write(container.Data, timeout);
 		ByteArray data, response;
 		ResponseType code;
 		_packeter.Read(0, data, code, response, timeout);

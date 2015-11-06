@@ -72,7 +72,7 @@ namespace mtp
 	void Session::Send(const OperationRequest &req)
 	{
 		Container container(req);
-		_packeter.Write(container.Data);
+		_packeter.Write(container.Data, _defaultTimeout);
 	}
 
 	void Session::Close()
@@ -85,11 +85,13 @@ namespace mtp
 		//HexDump("payload", data);
 	}
 
-	ByteArray Session::Get(u32 transaction)
+	ByteArray Session::Get(u32 transaction, int timeout)
 	{
+		if (timeout <= 0)
+			timeout = _defaultTimeout;
 		ByteArray data, response;
 		ResponseType responseCode;
-		_packeter.Read(transaction, data, responseCode, response, _defaultTimeout);
+		_packeter.Read(transaction, data, responseCode, response, timeout);
 		CHECK_RESPONSE(responseCode);
 		return data;
 	}
@@ -112,7 +114,7 @@ namespace mtp
 		scoped_mutex_lock l(_mutex);
 		Transaction transaction(this);
 		Send(OperationRequest(OperationCode::GetObjectHandles, transaction.Id, storageId, objectFormat, parent));
-		ByteArray data = Get(transaction.Id);
+		ByteArray data = Get(transaction.Id, timeout);
 		InputStream stream(data);
 
 		msg::ObjectHandles goh;
@@ -222,7 +224,7 @@ namespace mtp
 			OutputStream stream(req.Data);
 			objectInfo.Write(stream);
 			Container container(req);
-			_packeter.Write(container.Data);
+			_packeter.Write(container.Data, _defaultTimeout);
 		}
 		ByteArray data, response;
 		ResponseType responseCode;
@@ -271,7 +273,7 @@ namespace mtp
 			DataRequest req(OperationCode::SendPartialObject, transaction.Id);
 			IObjectInputStreamPtr inputStream = std::make_shared<ByteArrayObjectInputStream>(data);
 			Container container(req, inputStream);
-			_packeter.Write(std::make_shared<JoinedObjectInputStream>(std::make_shared<ByteArrayObjectInputStream>(container.Data), inputStream));
+			_packeter.Write(std::make_shared<JoinedObjectInputStream>(std::make_shared<ByteArrayObjectInputStream>(container.Data), inputStream), _defaultTimeout);
 		}
 		Get(transaction.Id);
 	}
@@ -302,7 +304,7 @@ namespace mtp
 			DataRequest req(OperationCode::SetObjectPropValue, transaction.Id);
 			req.Append(value);
 			Container container(req);
-			_packeter.Write(container.Data);
+			_packeter.Write(container.Data, _defaultTimeout);
 		}
 		Get(transaction.Id);
 	}

@@ -39,8 +39,8 @@ namespace mtp
 		usb::BulkPipePtr GetPipe() const
 		{ return _pipe; }
 
-		void Write(const IObjectInputStreamPtr &inputStream, int timeout = 10000);
-		void Write(const ByteArray &data, int timeout = 10000);
+		void Write(const IObjectInputStreamPtr &inputStream, int timeout);
+		void Write(const ByteArray &data, int timeout);
 
 		void Read(u32 transaction, const IObjectOutputStreamPtr &outputStream, ResponseType &code, ByteArray &response, int timeout);
 		void Read(u32 transaction, ByteArray &data, ResponseType &code, ByteArray &response, int timeout);
