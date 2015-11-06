@@ -79,18 +79,20 @@ int main(int argc, char **argv)
 	{
 		cli::Session session(mtp);
 
-		if (argc >= 2)
+		if (forceInteractive || (session.IsInteractive() && optind >= argc))
+		{
+			session.InteractiveInput();
+		}
+		else
 		{
 			cli::Tokens tokens;
 			for(int i = optind; i < argc; ++i)
 			{
 				tokens.push_back(argv[i]);
 			}
-			session.ProcessCommand(std::move(tokens));
+			if (!tokens.empty())
+				session.ProcessCommand(std::move(tokens));
 		}
-		else
-			if (forceInteractive || session.IsInteractive())
-				session.InteractiveInput();
 
 		exit(0);
 	}
