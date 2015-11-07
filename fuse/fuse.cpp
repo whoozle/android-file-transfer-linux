@@ -105,6 +105,7 @@ namespace
 			std::string path(path_);
 			if (path == "/")
 			{
+				stbuf->st_ino = 1;
 				stbuf->st_mode = S_IFDIR | 0755;
 				stbuf->st_nlink = 2;
 				return 0;
@@ -114,6 +115,7 @@ namespace
 			auto i = _storages.find(path);
 			if (i != _storages.end())
 			{
+				stbuf->st_ino = i->second;
 				stbuf->st_mode = S_IFDIR | 0755;
 				stbuf->st_nlink = 2;
 				return 0;
