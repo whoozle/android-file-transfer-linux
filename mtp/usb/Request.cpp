@@ -46,4 +46,53 @@ namespace mtp { namespace usb
 	void DeviceRequest::SetConfiguration(u8 index)
 	{ _device->WriteControl((u8)Type::DeviceOut, (u8)Request::SetConfiguration, index, 0, ByteArray(), _timeout); }
 
+
+	//interface requests
+
+	u16 InterfaceRequest::GetStatus(u16 interface)
+	{
+		ByteArray data(2);
+		_device->ReadControl((u8)Type::InterfaceIn, (u8)Request::GetStatus, 0, interface, data, _timeout);
+		return data[0] | ((u16)data[1] << 8);
+	}
+
+	void InterfaceRequest::ClearFeature(u16 interface, u16 feature)
+	{ _device->WriteControl((u8)Type::InterfaceOut, (u8)Request::ClearFeature, feature, interface, ByteArray(), _timeout); }
+
+	void InterfaceRequest::SetFeature(u16 interface, u16 feature)
+	{ _device->WriteControl((u8)Type::InterfaceOut, (u8)Request::SetFeature, feature, interface, ByteArray(), _timeout); }
+
+	u8 InterfaceRequest::GetInterface(u16 interface)
+	{
+		ByteArray data(1);
+		_device->ReadControl((u8)Type::InterfaceIn, (u8)Request::GetInterface, 0, interface, data, _timeout);
+		return data[0];
+	}
+
+	void InterfaceRequest::SetInterface(u16 interface, u8 alt)
+	{ _device->WriteControl((u8)Type::InterfaceOut, (u8)Request::SetInterface, alt, interface, ByteArray(), _timeout); }
+
+	//endpoint requests
+
+	u16 EndpointRequest::GetStatus(u16 endpoint)
+	{
+		ByteArray data(2);
+		_device->ReadControl((u8)Type::EnpointIn, (u8)Request::GetStatus, 0, endpoint, data, _timeout);
+		return data[0] | ((u16)data[1] << 8);
+	}
+
+	void EndpointRequest::ClearFeature(u16 endpoint, u16 feature)
+	{ _device->WriteControl((u8)Type::EnpointOut, (u8)Request::ClearFeature, feature, endpoint, ByteArray(), _timeout); }
+
+	void EndpointRequest::SetFeature(u16 endpoint, u16 feature)
+	{ _device->WriteControl((u8)Type::EnpointOut, (u8)Request::SetFeature, feature, endpoint, ByteArray(), _timeout); }
+
+	void EndpointRequest::SynchFrame(u16 endpoint, u16 frameIndex)
+	{
+		ByteArray data(2);
+		data[0] = frameIndex;
+		data[1] = frameIndex >> 8;
+		_device->WriteControl((u8)Type::EnpointOut, (u8)Request::SynchFrame, 0, endpoint, ByteArray(), _timeout);
+	}
+
 }}
