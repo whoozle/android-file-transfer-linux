@@ -35,11 +35,15 @@ int main(int argc, char **argv)
 	using namespace mtp;
 	bool forceInteractive = false;
 	bool showHelp = false;
+	bool showPrompt = true;
+	if (!isatty(STDIN_FILENO))
+		showPrompt = false;
 
 	static struct option long_options[] =
 	{
 		{"verbose",			no_argument,		0,	'v' },
 		{"interactive",		no_argument,		0,	'i' },
+		{"batch",			no_argument,		0,	'b' },
 		{"help",			no_argument,		0,	'h' },
 		{0,					0,					0,	 0	}
 	};
@@ -47,11 +51,13 @@ int main(int argc, char **argv)
 	while(true)
 	{
 		int optionIndex = 0; //index of matching option
-		int c = getopt_long(argc, argv, "ihv", long_options, &optionIndex);
+		int c = getopt_long(argc, argv, "ibhv", long_options, &optionIndex);
 		if (c == -1)
 			break;
 		switch(c)
 		{
+		case 'b':
+			showPrompt = false; //no break here, prompt = false, interactive = true
 		case 'i':
 			forceInteractive = true;
 			break;
@@ -85,10 +91,6 @@ int main(int argc, char **argv)
 
 	try
 	{
-		bool showPrompt = true;
-		if (!isatty(STDIN_FILENO))
-			showPrompt = false;
-
 		cli::Session session(mtp, showPrompt);
 
 		if (forceInteractive || (session.IsInteractive() && optind >= argc))
