@@ -9,6 +9,24 @@ namespace mtp { namespace usb
 	class Device;
 	DECLARE_PTR(Device);
 
+	enum struct RequestType : u8
+	{
+		HostToDevice		= 0x00,
+		DeviceToHost		= 0x80,
+
+		Standard			= 0x00,
+		Class				= 0x20,
+		Vendor				= 0x40,
+
+		Device				= 0x00,
+		Interface			= 0x01,
+		Endpoint			= 0x02,
+		Other				= 0x03
+	};
+
+	constexpr RequestType operator | (RequestType r1, RequestType r2)
+	{ return static_cast<RequestType>(static_cast<u8>(r1) | static_cast<u8>(r2)); };
+
 	class BaseRequest
 	{
 	public:
@@ -41,8 +59,8 @@ namespace mtp { namespace usb
 
 		enum struct Type : u8
 		{
-			DeviceOut	= 0x00,
-			DeviceIn	= 0x80
+			DeviceOut	= RequestType::HostToDevice | RequestType::Standard | RequestType::Device,
+			DeviceIn	= RequestType::DeviceToHost | RequestType::Standard | RequestType::Device
 		};
 
 		enum struct Request : u8
@@ -77,8 +95,8 @@ namespace mtp { namespace usb
 
 		enum struct Type : u8
 		{
-			InterfaceOut	= 0x01,
-			InterfaceIn		= 0x81
+			InterfaceOut	= RequestType::HostToDevice | RequestType::Standard | RequestType::Interface,
+			InterfaceIn		= RequestType::DeviceToHost | RequestType::Standard | RequestType::Interface
 		};
 
 		enum struct Request : u8
@@ -108,8 +126,8 @@ namespace mtp { namespace usb
 	public:
 		enum struct Type : u8
 		{
-			EnpointOut		= 0x02,
-			EnpointIn		= 0x82
+			EnpointOut		= RequestType::HostToDevice | RequestType::Standard | RequestType::Endpoint,
+			EnpointIn		= RequestType::DeviceToHost | RequestType::Standard | RequestType::Endpoint
 		};
 
 		enum struct Request : u8
