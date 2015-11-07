@@ -24,7 +24,7 @@
 
 namespace mtp
 {
-	class JoinedObjectInputStreamBase : public IObjectInputStream
+	class JoinedObjectInputStreamBase : public IObjectInputStream, public CancellableStream
 	{
 	protected:
 		bool					_stream1Exhausted;
@@ -38,6 +38,7 @@ namespace mtp
 
 		virtual size_t Read(u8 *data, size_t size)
 		{
+			CheckCancelled();
 			size_t r;
 			if (!_stream1Exhausted)
 			{
@@ -77,7 +78,7 @@ namespace mtp
 	};
 	DECLARE_PTR(JoinedObjectInputStream);
 
-	class JoinedObjectOutputStreamBase : public IObjectOutputStream
+	class JoinedObjectOutputStreamBase : public IObjectOutputStream, public CancellableStream
 	{
 	protected:
 		bool					_stream1Exhausted;
@@ -91,6 +92,7 @@ namespace mtp
 
 		virtual size_t Write(const u8 *data, size_t size)
 		{
+			CheckCancelled();
 			size_t r;
 			if (!_stream1Exhausted)
 			{

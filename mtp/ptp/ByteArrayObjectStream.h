@@ -25,7 +25,7 @@
 
 namespace mtp
 {
-	class ByteArrayObjectInputStream : public IObjectInputStream
+	class ByteArrayObjectInputStream : public IObjectInputStream, public CancellableStream
 	{
 		ByteArray	_data;
 		size_t		_offset;
@@ -42,6 +42,7 @@ namespace mtp
 
 		virtual size_t Read(u8 *data, size_t size)
 		{
+			CheckCancelled();
 			size_t n = std::min(size, _data.size() - _offset);
 			std::copy(_data.data() + _offset, _data.data() + _offset + n, data);
 			_offset += n;
@@ -50,7 +51,7 @@ namespace mtp
 	};
 	DECLARE_PTR(ByteArrayObjectInputStream);
 
-	class ByteArrayObjectOutputStream : public IObjectOutputStream
+	class ByteArrayObjectOutputStream : public IObjectOutputStream, public CancellableStream
 	{
 		ByteArray	_data;
 
@@ -62,13 +63,14 @@ namespace mtp
 
 		virtual size_t Write(const u8 *data, size_t size)
 		{
+			CheckCancelled();
 			std::copy(data, data + size, std::back_inserter(_data));
 			return size;
 		}
 	};
 	DECLARE_PTR(ByteArrayObjectOutputStream);
 
-	class FixedSizeByteArrayObjectOutputStream : public IObjectOutputStream
+	class FixedSizeByteArrayObjectOutputStream : public IObjectOutputStream, public CancellableStream
 	{
 		ByteArray	_data;
 		size_t		_offset;
@@ -81,6 +83,7 @@ namespace mtp
 
 		virtual size_t Write(const u8 *data, size_t size)
 		{
+			CheckCancelled();
 			size_t n = std::min(size, _data.size() - _offset);
 			std::copy(data, data + n, _data.data() + _offset);
 			_offset += n;

@@ -110,7 +110,7 @@ namespace mtp
 
 	namespace
 	{
-		struct DummyOutputStream : IObjectOutputStream
+		struct DummyOutputStream : IObjectOutputStream, public CancellableStream
 		{
 			virtual size_t Write(const u8 *data, size_t size)
 			{ return size; }

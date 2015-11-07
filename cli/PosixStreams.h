@@ -31,7 +31,7 @@
 
 namespace cli
 {
-	class BaseObjectStream
+	class BaseObjectStream : public mtp::CancellableStream
 	{
 		std::function<void (mtp::u64, mtp::u64)>	_progressReporter;
 		mtp::u64									_current, _total;
@@ -86,6 +86,7 @@ namespace cli
 
 		virtual size_t Read(mtp::u8 *data, size_t size)
 		{
+			CheckCancelled();
 			ssize_t r = read(_fd, data, size);
 			if (r < 0)
 				throw std::runtime_error("read failed");
@@ -115,6 +116,7 @@ namespace cli
 
 		virtual size_t Write(const mtp::u8 *data, size_t size)
 		{
+			CheckCancelled();
 			ssize_t r = write(_fd, data, size);
 			if (r < 0)
 				throw std::runtime_error("write failed");

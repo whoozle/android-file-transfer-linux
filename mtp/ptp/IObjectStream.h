@@ -21,21 +21,50 @@
 #define	IOBJECTSTREAM_H
 
 #include <mtp/types.h>
+#include <atomic>
+#include <stdexcept>
 
 namespace mtp
 {
-
-	struct IObjectInputStream
+	struct ICancellableStream
 	{
-		virtual ~IObjectInputStream() { }
+		virtual ~ICancellableStream() { }
+		virtual void Cancel() = 0;
+	};
+
+	struct OperationCancelledException : public std::runtime_error
+	{
+		OperationCancelledException(): std::runtime_error("operation cancelled") { }
+	};
+
+	class CancellableStream : public virtual ICancellableStream
+	{
+		std::atomic_bool _cancelled;
+
+	public:
+		CancellableStream(): _cancelled(false)
+		{ }
+
+		void Cancel()
+		{ _cancelled.store(true); }
+
+		void CheckCancelled()
+		{
+			bool cancelled = _cancelled.load();
+			if (cancelled)
+				throw OperationCancelledException();
+		}
+	};
+
+	struct IObjectInputStream : public virtual ICancellableStream
+	{
 		virtual u64 GetSize() const = 0;
 		virtual size_t Read(u8 *data, size_t size) = 0;
 	};
 	DECLARE_PTR(IObjectInputStream);
 
-	struct IObjectOutputStream
+	struct IObjectOutputStream : public virtual ICancellableStream
 	{
-		virtual ~IObjectOutputStream() { }
 		virtual size_t Write(const u8 *data, size_t size) = 0;
 	};
 	DECLARE_PTR(IObjectOutputStream);

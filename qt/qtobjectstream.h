@@ -24,7 +24,7 @@
 #include <QFile>
 #include <mtp/ptp/IObjectStream.h>
 
-class QtObjectInputStream : public QObject, public mtp::IObjectInputStream
+class QtObjectInputStream : public QObject, public mtp::IObjectInputStream, public mtp::CancellableStream
 {
 	Q_OBJECT
 
@@ -48,6 +48,7 @@ public:
 
 	virtual size_t Read(mtp::u8 *data, size_t size)
 	{
+		CheckCancelled();
 		qint64 r = _file.read(static_cast<char *>(static_cast<void *>(data)), size);
 		if (r < 0)
 			throw std::runtime_error(_file.errorString().toStdString());
@@ -56,7 +57,7 @@ public:
 	}
 };
 
-class QtObjectOutputStream : public QObject, public mtp::IObjectOutputStream
+class QtObjectOutputStream : public QObject, public mtp::IObjectOutputStream, public mtp::CancellableStream
 {
 	Q_OBJECT
 
@@ -76,6 +77,7 @@ public:
 
 	virtual size_t Write(const mtp::u8 *data, size_t size)
 	{
+		CheckCancelled();
 		qint64 r = _file.write(static_cast<const char *>(static_cast<const void *>(data)), size);
 		if (r < 0)
 			throw std::runtime_error(_file.errorString().toStdString());
