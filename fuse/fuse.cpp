@@ -123,6 +123,7 @@ namespace
 			if (id)
 			{
 				stbuf->st_mode = 0644;
+				stbuf->st_ino = id;
 
 				mtp::msg::ObjectInfo oi = _session->GetObjectInfo(id);
 				if (oi.ObjectFormat == mtp::ObjectFormat::Association)
@@ -143,14 +144,16 @@ namespace
 
 		void Append(const std::string &path, const mtp::msg::ObjectHandles &handles, void * buf, fuse_fill_dir_t filler)
 		{
+			struct stat fileInfo = { };
 			for(auto & id : handles.ObjectHandles)
 			{
 				try
 				{
 					std::string name = _session->GetObjectStringProperty(id, mtp::ObjectProperty::ObjectFilename);
 					_files[path + "/" + name] = id;
+					fileInfo.st_ino = id;
 					if (filler)
-						filler(buf, name.c_str(), NULL, 0);
+						filler(buf, name.c_str(), &fileInfo, 0);
 				} catch(const std::exception &ex)
 				{ }
 			}
