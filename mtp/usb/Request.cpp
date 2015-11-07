@@ -48,51 +48,56 @@ namespace mtp { namespace usb
 
 
 	//interface requests
+	InterfaceRequest::InterfaceRequest(const DevicePtr & device, u16 interface, int timeout): BaseRequest(device, timeout), _interface(interface)
+	{}
 
-	u16 InterfaceRequest::GetStatus(u16 interface)
+	u16 InterfaceRequest::GetStatus()
 	{
 		ByteArray data(2);
-		_device->ReadControl((u8)Type::InterfaceIn, (u8)Request::GetStatus, 0, interface, data, _timeout);
+		_device->ReadControl((u8)Type::InterfaceIn, (u8)Request::GetStatus, 0, _interface, data, _timeout);
 		return data[0] | ((u16)data[1] << 8);
 	}
 
-	void InterfaceRequest::ClearFeature(u16 interface, u16 feature)
-	{ _device->WriteControl((u8)Type::InterfaceOut, (u8)Request::ClearFeature, feature, interface, ByteArray(), _timeout); }
+	void InterfaceRequest::ClearFeature(u16 feature)
+	{ _device->WriteControl((u8)Type::InterfaceOut, (u8)Request::ClearFeature, feature, _interface, ByteArray(), _timeout); }
 
-	void InterfaceRequest::SetFeature(u16 interface, u16 feature)
-	{ _device->WriteControl((u8)Type::InterfaceOut, (u8)Request::SetFeature, feature, interface, ByteArray(), _timeout); }
+	void InterfaceRequest::SetFeature(u16 feature)
+	{ _device->WriteControl((u8)Type::InterfaceOut, (u8)Request::SetFeature, feature, _interface, ByteArray(), _timeout); }
 
-	u8 InterfaceRequest::GetInterface(u16 interface)
+	u8 InterfaceRequest::GetInterface()
 	{
 		ByteArray data(1);
-		_device->ReadControl((u8)Type::InterfaceIn, (u8)Request::GetInterface, 0, interface, data, _timeout);
+		_device->ReadControl((u8)Type::InterfaceIn, (u8)Request::GetInterface, 0, _interface, data, _timeout);
 		return data[0];
 	}
 
-	void InterfaceRequest::SetInterface(u16 interface, u8 alt)
-	{ _device->WriteControl((u8)Type::InterfaceOut, (u8)Request::SetInterface, alt, interface, ByteArray(), _timeout); }
+	void InterfaceRequest::SetInterface(u8 alt)
+	{ _device->WriteControl((u8)Type::InterfaceOut, (u8)Request::SetInterface, alt, _interface, ByteArray(), _timeout); }
 
 	//endpoint requests
 
-	u16 EndpointRequest::GetStatus(u16 endpoint)
+	EndpointRequest::EndpointRequest(const DevicePtr & device, u16 endpoint, int timeout): BaseRequest(device, timeout), _endpoint(endpoint)
+	{ }
+
+	u16 EndpointRequest::GetStatus()
 	{
 		ByteArray data(2);
-		_device->ReadControl((u8)Type::EnpointIn, (u8)Request::GetStatus, 0, endpoint, data, _timeout);
+		_device->ReadControl((u8)Type::EnpointIn, (u8)Request::GetStatus, 0, _endpoint, data, _timeout);
 		return data[0] | ((u16)data[1] << 8);
 	}
 
-	void EndpointRequest::ClearFeature(u16 endpoint, u16 feature)
-	{ _device->WriteControl((u8)Type::EnpointOut, (u8)Request::ClearFeature, feature, endpoint, ByteArray(), _timeout); }
+	void EndpointRequest::ClearFeature(u16 feature)
+	{ _device->WriteControl((u8)Type::EnpointOut, (u8)Request::ClearFeature, feature, _endpoint, ByteArray(), _timeout); }
 
-	void EndpointRequest::SetFeature(u16 endpoint, u16 feature)
-	{ _device->WriteControl((u8)Type::EnpointOut, (u8)Request::SetFeature, feature, endpoint, ByteArray(), _timeout); }
+	void EndpointRequest::SetFeature(u16 feature)
+	{ _device->WriteControl((u8)Type::EnpointOut, (u8)Request::SetFeature, feature, _endpoint, ByteArray(), _timeout); }
 
-	void EndpointRequest::SynchFrame(u16 endpoint, u16 frameIndex)
+	void EndpointRequest::SynchFrame(u16 frameIndex)
 	{
 		ByteArray data(2);
 		data[0] = frameIndex;
 		data[1] = frameIndex >> 8;
-		_device->WriteControl((u8)Type::EnpointOut, (u8)Request::SynchFrame, 0, endpoint, ByteArray(), _timeout);
+		_device->WriteControl((u8)Type::EnpointOut, (u8)Request::SynchFrame, 0, _endpoint, ByteArray(), _timeout);
 	}
 
 }}

@@ -70,9 +70,10 @@ namespace mtp { namespace usb
 		void SetConfiguration(u8 index);
 	};
 
-	struct InterfaceRequest : BaseRequest
+	class InterfaceRequest : public BaseRequest
 	{
-		using BaseRequest::BaseRequest;
+		u16 _interface;
+	public:
 
 		enum struct Type : u8
 		{
@@ -89,19 +90,22 @@ namespace mtp { namespace usb
 			SetInterface		= 17
 		};
 
-		u16 GetStatus(u16 interface);
+		InterfaceRequest(const DevicePtr & device, u16 interface, int timeout = DefaultTimeout);
 
-		void ClearFeature(u16 interface, u16 feature);
-		void SetFeature(u16 interface, u16 feature);
+		u16 GetStatus();
 
-		u8 GetInterface(u16 interface);
-		void SetInterface(u16 interface, u8 alt);
+		void ClearFeature(u16 feature);
+		void SetFeature(u16 feature);
+
+		u8 GetInterface();
+		void SetInterface(u8 alt);
 	};
 
-	struct EndpointRequest : BaseRequest
+	class EndpointRequest : public BaseRequest
 	{
-		using BaseRequest::BaseRequest;
+		u16 _endpoint;
 
+	public:
 		enum struct Type : u8
 		{
 			EnpointOut		= 0x02,
@@ -116,12 +120,14 @@ namespace mtp { namespace usb
 			SynchFrame			= 18
 		};
 
-		u16 GetStatus(u16 endpoint);
+		EndpointRequest(const DevicePtr & device, u16 endpoint, int timeout = DefaultTimeout);
 
-		void ClearFeature(u16 endpoint, u16 feature);
-		void SetFeature(u16 endpoint, u16 feature);
+		u16 GetStatus();
 
-		void SynchFrame(u16 endpoint, u16 frameIndex);
+		void ClearFeature(u16 feature);
+		void SetFeature(u16 feature);
+
+		void SynchFrame(u16 frameIndex);
 	};
 
 }}
