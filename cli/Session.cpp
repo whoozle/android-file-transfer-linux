@@ -220,7 +220,7 @@ namespace cli
 		{
 			print(_gdi.Manufacturer, " ", _gdi.Model, " ", _gdi.DeviceVersion);
 			print("extensions: ", _gdi.VendorExtensionDesc);
-			//print("%s", _gdi.SerialNumber); //non-secure
+			//print(_gdi.SerialNumber); //non-secure
 			std::stringstream ss;
 			ss << "supported op codes: ";
 			for(OperationCode code : _gdi.OperationsSupported)
