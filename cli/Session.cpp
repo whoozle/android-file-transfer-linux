@@ -108,6 +108,8 @@ namespace cli
 
 		AddCommand("storage-list", "shows available MTP storages",
 			make_function([this]() -> void { ListStorages(); }));
+		AddCommand("properties", "<path> lists properties for <path>",
+			make_function([this](const Path &path) -> void { ListProperties(path); }));
 		AddCommand("device-properties", "shows device's MTP properties",
 			make_function([this]() -> void { ListDeviceProperties(); }));
 #if 0
