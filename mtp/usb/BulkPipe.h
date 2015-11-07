@@ -39,11 +39,19 @@ namespace mtp { namespace usb
 
 	class BulkPipe
 	{
+		std::mutex				_mutex;
 		DevicePtr				_device;
 		ConfigurationPtr		_conf;
 		InterfacePtr			_interface;
 		EndpointPtr				_in, _out, _interrupt;
 		ITokenPtr				_claimToken;
+		ICancellableStreamPtr	_currentStream;
+
+	private:
+		void SetCurrentStream(const ICancellableStreamPtr &stream);
+		ICancellableStreamPtr GetCurrentStream();
+
+		class CurrentStreamSetter;
 
 	public:
 		BulkPipe(DevicePtr device, ConfigurationPtr conf, InterfacePtr interface, EndpointPtr in, EndpointPtr out, EndpointPtr interrupt, ITokenPtr claimToken);
@@ -55,6 +63,7 @@ namespace mtp { namespace usb
 
 		void Read(const IObjectOutputStreamPtr &outputStream, int timeout = 10000);
 		void Write(const IObjectInputStreamPtr &inputStream, int timeout = 10000);
+		void Cancel();
 
 		static BulkPipePtr Create(const usb::DevicePtr & device, const ConfigurationPtr & conf, const usb::InterfacePtr & owner, ITokenPtr claimToken);
 	};

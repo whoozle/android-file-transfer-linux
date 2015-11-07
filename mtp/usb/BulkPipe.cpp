@@ -21,6 +21,7 @@
 #include <usb/DeviceDescriptor.h>
 #include <mtp/usb/TimeoutException.h>
 #include <mtp/ptp/ByteArrayObjectStream.h>
+#include <mtp/log.h>
 
 namespace mtp { namespace usb
 {
@@ -50,14 +51,48 @@ namespace mtp { namespace usb
 #endif
 	}
 
+	void BulkPipe::SetCurrentStream(const ICancellableStreamPtr &stream)
+	{
+		scoped_mutex_lock l(_mutex);
+		_currentStream = stream;
+	}
+
+	ICancellableStreamPtr BulkPipe::GetCurrentStream()
+	{
+		scoped_mutex_lock l(_mutex);
+		return _currentStream;
+	}
+
+
+	class BulkPipe::CurrentStreamSetter
+	{
+		BulkPipe *					_owner;
+
+	public:
+		CurrentStreamSetter(BulkPipe *owner, ICancellableStreamPtr stream): _owner(owner)
+		{ _owner->SetCurrentStream(stream); }
+		~CurrentStreamSetter()
+		{ _owner->SetCurrentStream(nullptr); }
+	};
+
 	void BulkPipe::Read(const IObjectOutputStreamPtr &outputStream, int timeout)
 	{
+		CurrentStreamSetter s(this, std::dynamic_pointer_cast<ICancellableStream>(outputStream));
 		_device->ReadBulk(_in, outputStream, timeout);
 	}
 
 	void BulkPipe::Write(const IObjectInputStreamPtr &inputStream, int timeout)
 	{
+		CurrentStreamSetter s(this, std::dynamic_pointer_cast<ICancellableStream>(inputStream));
 		_device->WriteBulk(_out, inputStream, timeout);
+	}
+
+	void BulkPipe::Cancel()
+	{
+		ICancellableStreamPtr stream = GetCurrentStream();
+		print("cancelling stream ", stream.get());
+		if (stream)
+			stream->Cancel();
 	}
 
 	BulkPipePtr BulkPipe::Create(const usb::DevicePtr & device, const ConfigurationPtr & conf, const usb::InterfacePtr & interface, ITokenPtr claimToken)

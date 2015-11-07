@@ -31,6 +31,7 @@ namespace mtp
 		virtual ~ICancellableStream() { }
 		virtual void Cancel() = 0;
 	};
+	DECLARE_PTR(ICancellableStream);
 
 	struct OperationCancelledException : public std::runtime_error
 	{

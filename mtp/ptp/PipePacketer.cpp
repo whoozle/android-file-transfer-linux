@@ -228,6 +228,7 @@ namespace mtp
 
 	void PipePacketer::Abort(u32 transaction, int timeout)
 	{
+		_pipe->Cancel();
 		ByteArray data;
 		OutputStream s(data);
 		s.Write16(0x4001);
