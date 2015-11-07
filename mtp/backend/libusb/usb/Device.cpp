@@ -99,7 +99,7 @@ namespace mtp { namespace usb
 		USB_CALL(libusb_control_transfer(_handle, type, req, value, index, data.data(), data.size(), timeout));
 	}
 
-	void Device::WriteControl(u8 type, u8 req, u16 value, u16 index, const ByteArray &data, bool interruptCurrentTransaction, int timeout)
+	void Device::WriteControl(u8 type, u8 req, u16 value, u16 index, const ByteArray &data, int timeout)
 	{
 		USB_CALL(libusb_control_transfer(_handle, type, req, value, index, const_cast<u8 *>(data.data()), data.size(), timeout));
 	}
