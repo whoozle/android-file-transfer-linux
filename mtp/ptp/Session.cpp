@@ -23,7 +23,6 @@
 #include <mtp/ptp/OperationRequest.h>
 #include <mtp/ptp/ByteArrayObjectStream.h>
 #include <mtp/ptp/JoinedObjectStream.h>
-#include <mtp/usb/Request.h>
 #include <usb/Device.h>
 #include <limits>
 
@@ -36,7 +35,7 @@ namespace mtp
 } while(false)
 
 	Session::Session(usb::BulkPipePtr pipe, u32 sessionId):
-		_packeter(pipe), _sessionId(sessionId), _nextTransactionId(1), _defaultTimeout(10000)
+		_packeter(pipe), _sessionId(sessionId), _nextTransactionId(1), _transaction(), _defaultTimeout(10000)
 	{
 		_deviceInfo = GetDeviceInfoImpl();
 		_getPartialObject64Supported = _deviceInfo.Supports(OperationCode::GetPartialObject64);
@@ -398,16 +397,7 @@ namespace mtp
 				throw std::runtime_error("no transaction in progress");
 			transactionId = _transaction->Id;
 		}
-		ByteArray data;
-		OutputStream s(data);
-		s.Write16(0x4001);
-		s.Write32(transactionId);
-		HexDump("abort control message", data);
-		/* 0x21: host-to-device, class specific, recipient - interface, 0x64: cancel request */
-		_packeter.GetPipe()->GetDevice()->WriteControl(
-			(u8)(usb::RequestType::HostToDevice | usb::RequestType::Class | usb::RequestType::Interface),
-			0x64,
-			0, 0, data, timeout);
+		_packeter.Abort(transactionId, timeout);
 	}
 
 }

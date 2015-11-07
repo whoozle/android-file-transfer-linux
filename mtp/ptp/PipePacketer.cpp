@@ -22,6 +22,9 @@
 #include <mtp/ptp/InputStream.h>
 #include <mtp/ptp/ByteArrayObjectStream.h>
 #include <mtp/ptp/JoinedObjectStream.h>
+#include <mtp/ptp/OutputStream.h>
+#include <mtp/usb/Request.h>
+#include <usb/Device.h>
 #include <mtp/log.h>
 
 
@@ -223,6 +226,19 @@ namespace mtp
 		data = stream->GetData();
 	}
 
+	void PipePacketer::Abort(u32 transaction, int timeout)
+	{
+		ByteArray data;
+		OutputStream s(data);
+		s.Write16(0x4001);
+		s.Write32(transaction);
+		HexDump("abort control message", data);
+		/* 0x21: host-to-device, class specific, recipient - interface, 0x64: cancel request */
+		_pipe->GetDevice()->WriteControl(
+			(u8)(usb::RequestType::HostToDevice | usb::RequestType::Class | usb::RequestType::Interface),
+			0x64,
+			0, 0, data, timeout);
+	}
 
 
 }

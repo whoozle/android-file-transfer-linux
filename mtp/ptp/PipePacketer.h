@@ -46,6 +46,7 @@ namespace mtp
 		void Read(u32 transaction, ByteArray &data, ResponseType &code, ByteArray &response, int timeout);
 
 		void PollEvent();
+		void Abort(u32 transaction, int timeout);
 
 	private:
 		void ReadMessage(const IObjectOutputStreamPtr &outputStream, int timeout);
