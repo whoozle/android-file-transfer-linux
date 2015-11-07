@@ -126,7 +126,7 @@ namespace mtp
 			}
 		}
 		catch(const std::exception &ex)
-		{ error(stderr, "%s\n", ex.what()); }
+		{ error("Device::Find", ex.what()); }
 
 		return nullptr;
 	}
