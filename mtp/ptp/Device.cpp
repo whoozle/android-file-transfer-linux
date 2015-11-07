@@ -26,6 +26,7 @@
 #include <usb/Device.h>
 #include <usb/Interface.h>
 #include <mtp/ptp/OperationRequest.h>
+#include <mtp/usb/Request.h>
 #include <stdexcept>
 
 
@@ -95,21 +96,16 @@ namespace mtp
 					usb::InterfaceTokenPtr token = device->ClaimInterface(iface);
 					debug(i, ':', j, "index ", iface->GetIndex(), ", eps ", iface->GetEndpointsCount());
 
-					static const u16 DT_STRING = 3;
-
-					ByteArray data(255);
-					device->ReadControl(0x80, 0x06, (DT_STRING << 8) | 0, 0, data, 1000);
+					ByteArray data = usb::DeviceRequest(device).GetDescriptor(usb::DescriptorType::String, 0, 0);
 					HexDump("languages", data);
-					if (data.size() < 4 || data[1] != DT_STRING)
+					if (data.size() < 4 || data[1] != (u8)usb::DescriptorType::String)
 						continue;
 
 					int interfaceStringIndex = GetInterfaceStringIndex(desc, j);
 					u16 langId = data[2] | ((u16)data[3] << 8);
-					data.resize(255);
-
-					device->ReadControl(0x80, 0x06, (DT_STRING << 8) | interfaceStringIndex, langId, data, 1000);
+					data = usb::DeviceRequest(device).GetDescriptor(usb::DescriptorType::String, interfaceStringIndex, langId);
 					HexDump("interface name", data);
-					if (data.size() < 4 || data[1] != DT_STRING)
+					if (data.size() < 4 || data[1] != (u8)usb::DescriptorType::String)
 						continue;
 
 					u8 len = data[0];

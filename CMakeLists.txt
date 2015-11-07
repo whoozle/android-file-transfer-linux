@@ -76,6 +76,7 @@ set(SOURCES
 	mtp/ptp/Session.cpp
 
 	mtp/usb/BulkPipe.cpp
+	mtp/usb/Request.cpp
 )
 
 if (USB_BACKEND_LIBUSB)
