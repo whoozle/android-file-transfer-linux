@@ -29,6 +29,8 @@
 #include <map>
 #include <string>
 
+#define USE_OBJECT_INFO 1
+
 namespace
 {
 	class FuseWrapper
@@ -126,19 +128,29 @@ namespace
 			{
 				stbuf->st_mode = 0644;
 				stbuf->st_ino = id;
-
+				stbuf->st_ctim = timespec();
+				stbuf->st_mtim = timespec();
+				stbuf->st_nlink = 1;
+#if USE_OBJECT_INFO
 				mtp::msg::ObjectInfo oi = _session->GetObjectInfo(id);
 				if (oi.ObjectFormat == mtp::ObjectFormat::Association)
 					stbuf->st_mode |= S_IFDIR | 0111;
 				else
 					stbuf->st_mode |= S_IFREG;
 
-				stbuf->st_ctim = timespec();
 				stbuf->st_ctim.tv_sec = mtp::ConvertDateTime(oi.CaptureDate);
-				stbuf->st_mtim = timespec();
 				stbuf->st_mtim.tv_sec = mtp::ConvertDateTime(oi.ModificationDate);
-				stbuf->st_nlink = 1;
 				stbuf->st_size = oi.ObjectCompressedSize != mtp::MaxObjectSize? oi.ObjectCompressedSize: _session->GetObjectIntegerProperty(id, mtp::ObjectProperty::ObjectSize);
+#else
+				mtp::ObjectFormat format = static_cast<mtp::ObjectFormat>(_session->GetObjectIntegerProperty(id, mtp::ObjectProperty::ObjectFormat));
+				if (format == mtp::ObjectFormat::Association)
+					stbuf->st_mode |= S_IFDIR | 0111;
+				else
+					stbuf->st_mode |= S_IFREG;
+
+				//date created, date added always returns 0, date created is unsupported on android
+				stbuf->st_size = _session->GetObjectIntegerProperty(id, mtp::ObjectProperty::ObjectSize);
+#endif
 				return 0;
 			}
 			return -ENOENT;
