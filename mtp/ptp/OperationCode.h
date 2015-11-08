@@ -65,6 +65,12 @@ namespace mtp
 		GetObjectPropDesc		= 0x9802,
 		GetObjectPropValue		= 0x9803,
 		SetObjectPropValue		= 0x9804,
+
+		GetObjectPropList		= 0x9805,
+		SetObjectPropList		= 0x9806,
+		GetInterdependentPropDesc = 0x9807,
+		SendObjectPropList		= 0x9808,
+
 		GetObjectReferences		= 0x9810,
 		SetObjectReferences		= 0x9811,
 		Skip					= 0x9820
