@@ -502,7 +502,7 @@ namespace
 			return __VA_ARGS__ ; \
 		} \
 		catch (const std::exception &ex) \
-		{ fprintf(stderr, #__VA_ARGS__ " failed: %s", ex.what()); return -EIO; } \
+		{ fprintf(stderr, #__VA_ARGS__ " failed: %s\n", ex.what()); return -EIO; } \
 	} while(false)
 
 	void * Init (struct fuse_conn_info *conn)
@@ -559,7 +559,7 @@ int main(int argc, char **argv)
 	try
 	{ g_wrapper.reset(new FuseWrapper()); }
 	catch(const std::exception &ex)
-	{ printf("%s\n", ex.what()); return 1; }
+	{ fprintf(stderr, "%s\n", ex.what()); return 1; }
 
 	struct fuse_operations ops = {};
 
