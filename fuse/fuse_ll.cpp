@@ -404,7 +404,7 @@ namespace
 			}
 			else
 			{
-				auto it = _storages.find((mtp::u32)ino);
+				auto it = _storages.find(ino);
 				if (it != _storages.end())
 				{
 					entry.SetDirectoryMode();
@@ -413,8 +413,13 @@ namespace
 				}
 
 				try {
+					mtp::msg::ObjectInfo oi = _session->GetObjectInfo(ino);
+					_objectFormats[ino] = oi.ObjectFormat;
+					_objectSizes[ino] = oi.ObjectCompressedSize != mtp::MaxObjectSize? oi.ObjectCompressedSize: _session->GetObjectIntegerProperty(ino, mtp::ObjectProperty::ObjectSize);
 					entry.SetFormat(GetObjectFormat(ino));
 					entry.SetSize(GetObjectSize(ino));
+					entry.attr.st_ctim.tv_sec = mtp::ConvertDateTime(oi.CaptureDate);
+					entry.attr.st_mtim.tv_sec = mtp::ConvertDateTime(oi.ModificationDate);
 					entry.ReplyAttr();
 					return;
 				}
