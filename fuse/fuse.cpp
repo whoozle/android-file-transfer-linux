@@ -25,6 +25,7 @@
 #include <mtp/ptp/Device.h>
 #include <mtp/ptp/ByteArrayObjectStream.h>
 #include <mtp/usb/DeviceNotFoundException.h>
+#include <mtp/ptp/ObjectPropertyListParser.h>
 
 #include <map>
 #include <string>
@@ -156,20 +157,44 @@ namespace
 			return -ENOENT;
 		}
 
-		void Append(const std::string &path, const mtp::msg::ObjectHandles &handles, void * buf, fuse_fill_dir_t filler)
+		void Append(const std::string &path, mtp::u32 id, const std::string &name, void * buf, fuse_fill_dir_t filler)
 		{
 			struct stat fileInfo = { };
+			fileInfo.st_ino = id;
+			if (filler)
+				filler(buf, name.c_str(), &fileInfo, 0);
+			_files[path + "/" + name] = id;
+		}
+
+		void Append(const std::string &path, const mtp::msg::ObjectHandles &handles, void * buf, fuse_fill_dir_t filler)
+		{
 			for(auto & id : handles.ObjectHandles)
 			{
 				try
 				{
 					std::string name = _session->GetObjectStringProperty(id, mtp::ObjectProperty::ObjectFilename);
-					_files[path + "/" + name] = id;
-					fileInfo.st_ino = id;
-					if (filler)
-						filler(buf, name.c_str(), &fileInfo, 0);
+					Append(path, id, name, buf, filler);
 				} catch(const std::exception &ex)
 				{ }
+			}
+		}
+
+		void AppendAllSubobjects(const std::string &subpath, mtp::u32 parent, void * buf, fuse_fill_dir_t filler)
+		{
+			using namespace mtp;
+			if (_session->GetObjectPropertyListSupported())
+			{
+				ByteArray data = _session->GetObjectPropertyList(parent, ObjectFormat::Any, ObjectProperty::ObjectFilename, 0, 1);
+				ObjectPropertyListParser<std::string> parser;
+				parser.Parse(data, [this, &subpath, buf, filler](u32 objectId, const std::string &name)
+				{
+					Append(subpath, objectId, name, buf, filler);
+				});
+			}
+			else
+			{
+				msg::ObjectHandles list = _session->GetObjectHandles(mtp::Session::AllStorages, mtp::Session::AllFormats, parent);
+				Append(subpath, list, buf, filler);
 			}
 		}
 
@@ -199,7 +224,7 @@ namespace
 					if (file != _files.end())
 					{
 						mtp::msg::ObjectHandles list = _session->GetObjectHandles(mtp::Session::AllStorages, mtp::Session::AllFormats, file->second);
-						Append(subpath, list, 0, 0);
+						AppendAllSubobjects(subpath, file->second, 0, 0);
 					}
 					else
 						return 0;
@@ -252,8 +277,7 @@ namespace
 				filler(buf, ".", NULL, 0);
 				filler(buf, "..", NULL, 0);
 
-				mtp::msg::ObjectHandles list = _session->GetObjectHandles(mtp::Session::AllStorages, mtp::Session::AllFormats, id);
-				Append(path, list, buf, filler);
+				AppendAllSubobjects(path, id, buf, filler);
 				return 0;
 			}
 
