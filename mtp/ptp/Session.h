@@ -54,7 +54,6 @@ namespace mtp
 		static const u32 AllStorages = 0xffffffffu;
 		static const u32 Root = 0xffffffffu;
 		static const u32 Device = 0;
-		static const u32 AllFormats = 0;
 
 		struct NewObjectInfo
 		{
@@ -84,7 +83,7 @@ namespace mtp
 		const msg::DeviceInfo & GetDeviceInfo() const
 		{ return _deviceInfo; }
 
-		msg::ObjectHandles GetObjectHandles(u32 storageId = AllStorages, u32 objectFormat = AllFormats, u32 parent = Device, int timeout = 30000);
+		msg::ObjectHandles GetObjectHandles(u32 storageId = AllStorages, ObjectFormat objectFormat = ObjectFormat::Any, u32 parent = Device, int timeout = 30000);
 		msg::StorageIDs GetStorageIDs();
 		msg::StorageInfo GetStorageInfo(u32 storageId);
 

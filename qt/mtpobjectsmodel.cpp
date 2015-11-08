@@ -45,7 +45,7 @@ void MtpObjectsModel::setParent(mtp::u32 parentObjectId)
 	beginResetModel();
 
 	_parentObjectId = parentObjectId;
-	mtp::msg::ObjectHandles handles = _session->GetObjectHandles(_storageId, mtp::Session::AllFormats, parentObjectId);
+	mtp::msg::ObjectHandles handles = _session->GetObjectHandles(_storageId, mtp::ObjectFormat::Any, parentObjectId);
 	_rows.clear();
 	_rows.reserve(handles.ObjectHandles.size());
 	for(size_t i = 0; i < handles.ObjectHandles.size(); ++i)

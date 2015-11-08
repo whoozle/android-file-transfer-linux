@@ -272,7 +272,7 @@ namespace cli
 	mtp::u32 Session::ResolveObjectChild(mtp::u32 parent, const std::string &entity)
 	{
 		mtp::u32 id = 0;
-		auto objectList = _session->GetObjectHandles(_cs, mtp::Session::AllFormats, parent);
+		auto objectList = _session->GetObjectHandles(_cs, mtp::ObjectFormat::Any, parent);
 		for(auto object : objectList.ObjectHandles)
 		{
 			std::string name = _session->GetObjectStringProperty(object, mtp::ObjectProperty::ObjectFilename);
@@ -388,7 +388,7 @@ namespace cli
 		}
 		else
 		{
-			msg::ObjectHandles handles = _session->GetObjectHandles(_cs, mtp::Session::AllFormats, parent);
+			msg::ObjectHandles handles = _session->GetObjectHandles(_cs, mtp::ObjectFormat::Any, parent);
 
 			for(u32 objectId : handles.ObjectHandles)
 			{
@@ -422,7 +422,7 @@ namespace cli
 		std::string filePrefix;
 		mtp::u32 parent = ResolvePath(path, filePrefix);
 		std::string dir = GetDirname(path);
-		auto objectList = _session->GetObjectHandles(_cs, mtp::Session::AllFormats, parent);
+		auto objectList = _session->GetObjectHandles(_cs, mtp::ObjectFormat::Any, parent);
 		for(auto object : objectList.ObjectHandles)
 		{
 			std::string name = _session->GetObjectStringProperty(object, mtp::ObjectProperty::ObjectFilename);
@@ -473,7 +473,7 @@ namespace cli
 		if (format == mtp::ObjectFormat::Association)
 		{
 			mkdir(dst.c_str(), 0700);
-			auto obj = _session->GetObjectHandles(_cs, mtp::Session::AllFormats, srcId);
+			auto obj = _session->GetObjectHandles(_cs, mtp::ObjectFormat::Any, srcId);
 			for(auto id : obj.ObjectHandles)
 			{
 				auto info = _session->GetObjectInfo(id);

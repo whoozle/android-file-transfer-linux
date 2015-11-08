@@ -193,7 +193,7 @@ namespace
 			}
 			else
 			{
-				msg::ObjectHandles list = _session->GetObjectHandles(mtp::Session::AllStorages, mtp::Session::AllFormats, parent);
+				msg::ObjectHandles list = _session->GetObjectHandles(mtp::Session::AllStorages, mtp::ObjectFormat::Any, parent);
 				Append(subpath, list, buf, filler);
 			}
 		}
@@ -215,7 +215,7 @@ namespace
 				auto storage = _storages.find(subpath);
 				if (storage != _storages.end())
 				{
-					mtp::msg::ObjectHandles list = _session->GetObjectHandles(storage->second, mtp::Session::AllFormats, mtp::Session::Root);
+					mtp::msg::ObjectHandles list = _session->GetObjectHandles(storage->second, mtp::ObjectFormat::Any, mtp::Session::Root);
 					Append(subpath, list, 0, 0);
 				}
 				else
@@ -223,7 +223,7 @@ namespace
 					auto file = _files.find(subpath);
 					if (file != _files.end())
 					{
-						mtp::msg::ObjectHandles list = _session->GetObjectHandles(mtp::Session::AllStorages, mtp::Session::AllFormats, file->second);
+						mtp::msg::ObjectHandles list = _session->GetObjectHandles(mtp::Session::AllStorages, mtp::ObjectFormat::Any, file->second);
 						AppendAllSubobjects(subpath, file->second, 0, 0);
 					}
 					else
@@ -265,7 +265,7 @@ namespace
 				filler(buf, ".", NULL, 0);
 				filler(buf, "..", NULL, 0);
 
-				mtp::msg::ObjectHandles list = _session->GetObjectHandles(storage->second, mtp::Session::AllFormats, mtp::Session::Root);
+				mtp::msg::ObjectHandles list = _session->GetObjectHandles(storage->second, mtp::ObjectFormat::Any, mtp::Session::Root);
 				Append(path, list, buf, filler);
 				return 0;
 			}

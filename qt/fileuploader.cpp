@@ -150,7 +150,7 @@ void FileUploader::download(const QString &rootPath, const QVector<quint32> &obj
 			//enumerate here
 			QString dirPath = prefix + "/" + oi.Filename;
 			mtp::SessionPtr session = _model->session();
-			mtp::msg::ObjectHandles handles = session->GetObjectHandles(mtp::Session::AllStorages, mtp::Session::AllFormats, id);
+			mtp::msg::ObjectHandles handles = session->GetObjectHandles(mtp::Session::AllStorages, mtp::ObjectFormat::Any, id);
 			qDebug() << "found " << handles.ObjectHandles.size() << " objects in " << dirPath;
 			for(mtp::u32 id : handles.ObjectHandles)
 				input.push_back(qMakePair(dirPath, id));

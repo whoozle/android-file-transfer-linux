@@ -113,11 +113,11 @@ namespace mtp
 	}
 
 
-	msg::ObjectHandles Session::GetObjectHandles(u32 storageId, u32 objectFormat, u32 parent, int timeout)
+	msg::ObjectHandles Session::GetObjectHandles(u32 storageId, ObjectFormat objectFormat, u32 parent, int timeout)
 	{
 		scoped_mutex_lock l(_mutex);
 		Transaction transaction(this);
-		Send(OperationRequest(OperationCode::GetObjectHandles, transaction.Id, storageId, objectFormat, parent), timeout);
+		Send(OperationRequest(OperationCode::GetObjectHandles, transaction.Id, storageId, static_cast<u32>(objectFormat), parent), timeout);
 		ByteArray data = Get(transaction.Id, timeout);
 		InputStream stream(data);
 
