@@ -55,6 +55,8 @@ namespace mtp
 		GetPartialObject        = 0x101b,
 		InitiateOpenCapture     = 0x101c,
 
+		CancelTransaction		= 0x4001,
+
 		GetPartialObject64		= 0x95c1,
 		SendPartialObject		= 0x95c2,
 		TruncateObject			= 0x95c3,
