@@ -25,6 +25,7 @@
 #include <mtp/ptp/JoinedObjectStream.h>
 #include <usb/Device.h>
 #include <limits>
+#include <array>
 
 namespace mtp
 {
