@@ -370,6 +370,16 @@ namespace mtp
 		return value;
 	}
 
+	ByteArray Session::GetObjectPropertyList(u32 objectId, ObjectFormat format, ObjectProperty property, u32 groupCode, u32 depth)
+	{
+		if (objectId == Root)
+			objectId = 0;
+		scoped_mutex_lock l(_mutex);
+		Transaction transaction(this);
+		Send(OperationRequest(OperationCode::GetObjectPropList, transaction.Id, objectId, (u32)format, (u32)property, groupCode, depth));
+		return Get(transaction.Id);
+	}
+
 	void Session::DeleteObject(u32 objectId)
 	{
 		scoped_mutex_lock l(_mutex);

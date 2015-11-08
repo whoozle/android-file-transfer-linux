@@ -32,6 +32,7 @@ namespace mtp
 
 	enum struct ObjectFormat : u16
 	{
+		Any				= 0x0000,
 		Undefined		= 0x3000,
 		Association		= 0x3001,
 		Script			= 0x3002,

@@ -110,6 +110,8 @@ namespace mtp
 		u64 GetObjectIntegerProperty(u32 objectId, ObjectProperty property);
 		std::string GetObjectStringProperty(u32 objectId, ObjectProperty property);
 
+		ByteArray GetObjectPropertyList(u32 objectId, ObjectFormat format, ObjectProperty property, u32 groupCode, u32 depth);
+
 		ByteArray GetDeviceProperty(DeviceProperty property);
 
 		void AbortCurrentTransaction(int timeout);
