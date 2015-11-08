@@ -52,6 +52,7 @@ namespace mtp
 
 		String						= 0xffff
 	};
+	DECLARE_ENUM(DataTypeCode, u16);
 
 	enum struct ObjectProperty : u16
 	{
@@ -87,6 +88,7 @@ namespace mtp
 
 		MediaGUID					= 0xdd72
 	};
+	DECLARE_ENUM(ObjectProperty, u16);
 
 }
 
