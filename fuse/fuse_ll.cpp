@@ -149,54 +149,7 @@ namespace
 		std::map<mtp::u32, std::string>		_storages;
 		std::map<std::string, mtp::u32>		_storagesByName;
 
-	public:
-		FuseWrapper()
-		{ Connect(); }
-
-		void Connect()
-		{
-			mtp::scoped_mutex_lock l(_mutex);
-
-			_openedFiles.clear();
-			_files.clear();
-			_storages.clear();
-			_storagesByName.clear();
-			_session.reset();
-			_device.reset();
-			_device = mtp::Device::Find();
-			if (!_device)
-				throw std::runtime_error("no MTP device found");
-
-			_session = _device->OpenSession(1);
-			_editObjectSupported = _session->EditObjectSupported();
-			if (!_editObjectSupported)
-				fprintf(stderr, "your device does not have android EditObject extension, mounting read-only\n");
-
-			mtp::msg::StorageIDs ids = _session->GetStorageIDs();
-			for(size_t i = 0; i < ids.StorageIDs.size(); ++i)
-			{
-				mtp::u32 id = ids.StorageIDs[i];
-				mtp::msg::StorageInfo si = _session->GetStorageInfo(id);
-				std::string path = (!si.StorageDescription.empty()? si.StorageDescription:  si.VolumeLabel);
-				if (path.empty())
-				{
-					char buf[64];
-					snprintf(buf, sizeof(buf), "sdcard%u", (unsigned)i);
-					path = buf;
-				}
-				_storages[id] = path;
-				_storagesByName[path] = id;
-			}
-		}
-
-		void Init(void *, fuse_conn_info *conn)
-		{
-			conn->want |= conn->capable & FUSE_CAP_BIG_WRITES; //big writes
-			static const size_t MaxWriteSize = 1024 * 1024;
-			if (conn->max_write < MaxWriteSize)
-				conn->max_write = MaxWriteSize;
-		}
-
+	private:
 		mtp::ObjectFormat GetObjectFormat(mtp::u32 id)
 		{
 			auto i = _objectFormats.find(id);
@@ -281,127 +234,6 @@ namespace
 			return cache;
 		}
 
-		void Lookup (fuse_req_t req, fuse_ino_t parent, const char *name)
-		{
-			mtp::print("LOOKUP ", name, " IN ", parent);
-			FuseEntry entry(req);
-			if (parent != 1)
-			{
-				const ChildrenObjects & children = GetChildren(parent);
-				auto it = children.find(name);
-				if (it != children.end())
-				{
-					entry.ino = it->second;
-					try
-					{
-						entry.SetFormat(GetObjectFormat(it->second));
-						entry.SetSize(GetObjectSize(it->second));
-						entry.Reply();
-						return;
-					}
-					catch(const std::exception &ex)
-					{ }
-				}
-			}
-			else
-			{
-				//parent == 1 -> storage
-				auto sit = _storagesByName.find(name);
-				if (sit != _storagesByName.end())
-				{
-					entry.ino = sit->second;
-					entry.SetDirectoryMode();
-					entry.Reply();
-					return;
-				}
-			}
-			entry.ReplyError(ENOENT);
-		}
-
-		void ReadDir(fuse_req_t req, fuse_ino_t ino, size_t size, off_t off, struct fuse_file_info *fi)
-		{
-			FuseDirectory dir(req);
-			if (ino == 1)
-			{
-				dir.Add(1, ".");
-				dir.Add(1, "..");
-				for(auto it : _storages)
-				{
-					dir.Add(it.first, it.second);
-				}
-				dir.Reply(off, size);
-				return;
-			}
-			else
-			{
-				const ChildrenObjects & cache = GetChildren(ino);
-				dir.Add(ino, ".");
-				dir.Add(1, "..");
-				for(auto it : cache)
-				{
-					dir.Add(it.second, it.first);
-				}
-				dir.Reply(off, size);
-				return;
-			}
-			fuse_reply_err(req, ENOTDIR);
-		}
-
-		void GetAttr(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi)
-		{
-			FuseEntry entry(req);
-			entry.ino = ino;
-			if (ino == 1)
-			{
-				entry.SetDirectoryMode();
-				entry.ReplyAttr();
-				return;
-			}
-			else
-			{
-				auto it = _storages.find((mtp::u32)ino);
-				if (it != _storages.end())
-				{
-					entry.SetDirectoryMode();
-					entry.ReplyAttr();
-					return;
-				}
-
-				try {
-					entry.SetFormat(GetObjectFormat(ino));
-					entry.SetSize(GetObjectSize(ino));
-					entry.ReplyAttr();
-					return;
-				}
-				catch(const std::exception &ex)
-				{ }
-			}
-			entry.ReplyError(ENOENT);
-		}
-
-		void Read(fuse_req_t req, fuse_ino_t ino, size_t size, off_t off, struct fuse_file_info *fi)
-		{
-			mtp::ByteArray data = _session->GetPartialObject(ino, off, size);
-			FUSE_CALL(fuse_reply_buf(req, static_cast<char *>(static_cast<void *>(data.data())), data.size()));
-		}
-
-		void Write(fuse_req_t req, fuse_ino_t ino, const char *buf, size_t size, off_t off, struct fuse_file_info *fi)
-		{
-			mtp::Session::ObjectEditSessionPtr tr;
-			{
-				auto it = _openedFiles.find(ino);
-				if (it != _openedFiles.end())
-					_openedFiles[ino] = it->second;
-				else
-				{
-					tr = mtp::Session::EditObject(_session, ino);
-					_openedFiles[ino] = tr;
-				}
-			}
-			tr->Send(off, mtp::ByteArray(buf, buf + size));
-			fuse_reply_write(req, size);
-		}
-
 		mtp::u32 CreateObject(mtp::u32 parentId, const std::string &filename, mtp::ObjectFormat format)
 		{
 			mtp::u32 cacheParent = parentId;
@@ -440,17 +272,192 @@ namespace
 			entry.Reply();
 		}
 
+	public:
+		FuseWrapper()
+		{ Connect(); }
+
+		void Connect()
+		{
+			mtp::scoped_mutex_lock l(_mutex);
+
+			_openedFiles.clear();
+			_files.clear();
+			_storages.clear();
+			_storagesByName.clear();
+			_session.reset();
+			_device.reset();
+			_device = mtp::Device::Find();
+			if (!_device)
+				throw std::runtime_error("no MTP device found");
+
+			_session = _device->OpenSession(1);
+			_editObjectSupported = _session->EditObjectSupported();
+			if (!_editObjectSupported)
+				fprintf(stderr, "your device does not have android EditObject extension, mounting read-only\n");
+
+			mtp::msg::StorageIDs ids = _session->GetStorageIDs();
+			for(size_t i = 0; i < ids.StorageIDs.size(); ++i)
+			{
+				mtp::u32 id = ids.StorageIDs[i];
+				mtp::msg::StorageInfo si = _session->GetStorageInfo(id);
+				std::string path = (!si.StorageDescription.empty()? si.StorageDescription:  si.VolumeLabel);
+				if (path.empty())
+				{
+					char buf[64];
+					snprintf(buf, sizeof(buf), "sdcard%u", (unsigned)i);
+					path = buf;
+				}
+				_storages[id] = path;
+				_storagesByName[path] = id;
+			}
+		}
+
+		void Init(void *, fuse_conn_info *conn)
+		{
+			mtp::scoped_mutex_lock l(_mutex);
+			conn->want |= conn->capable & FUSE_CAP_BIG_WRITES; //big writes
+			static const size_t MaxWriteSize = 1024 * 1024;
+			if (conn->max_write < MaxWriteSize)
+				conn->max_write = MaxWriteSize;
+		}
+
+		void Lookup (fuse_req_t req, fuse_ino_t parent, const char *name)
+		{
+			mtp::scoped_mutex_lock l(_mutex);
+			FuseEntry entry(req);
+			if (parent != 1)
+			{
+				const ChildrenObjects & children = GetChildren(parent);
+				auto it = children.find(name);
+				if (it != children.end())
+				{
+					entry.ino = it->second;
+					try
+					{
+						entry.SetFormat(GetObjectFormat(it->second));
+						entry.SetSize(GetObjectSize(it->second));
+						entry.Reply();
+						return;
+					}
+					catch(const std::exception &ex)
+					{ }
+				}
+			}
+			else
+			{
+				//parent == 1 -> storage
+				auto sit = _storagesByName.find(name);
+				if (sit != _storagesByName.end())
+				{
+					entry.ino = sit->second;
+					entry.SetDirectoryMode();
+					entry.Reply();
+					return;
+				}
+			}
+			entry.ReplyError(ENOENT);
+		}
+
+		void ReadDir(fuse_req_t req, fuse_ino_t ino, size_t size, off_t off, struct fuse_file_info *fi)
+		{
+			mtp::scoped_mutex_lock l(_mutex);
+			FuseDirectory dir(req);
+			if (ino == 1)
+			{
+				dir.Add(1, ".");
+				dir.Add(1, "..");
+				for(auto it : _storages)
+				{
+					dir.Add(it.first, it.second);
+				}
+				dir.Reply(off, size);
+				return;
+			}
+			else
+			{
+				const ChildrenObjects & cache = GetChildren(ino);
+				dir.Add(ino, ".");
+				dir.Add(1, "..");
+				for(auto it : cache)
+				{
+					dir.Add(it.second, it.first);
+				}
+				dir.Reply(off, size);
+				return;
+			}
+			fuse_reply_err(req, ENOTDIR);
+		}
+
+		void GetAttr(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi)
+		{
+			mtp::scoped_mutex_lock l(_mutex);
+			FuseEntry entry(req);
+			entry.ino = ino;
+			if (ino == 1)
+			{
+				entry.SetDirectoryMode();
+				entry.ReplyAttr();
+				return;
+			}
+			else
+			{
+				auto it = _storages.find((mtp::u32)ino);
+				if (it != _storages.end())
+				{
+					entry.SetDirectoryMode();
+					entry.ReplyAttr();
+					return;
+				}
+
+				try {
+					entry.SetFormat(GetObjectFormat(ino));
+					entry.SetSize(GetObjectSize(ino));
+					entry.ReplyAttr();
+					return;
+				}
+				catch(const std::exception &ex)
+				{ }
+			}
+			entry.ReplyError(ENOENT);
+		}
+
+		void Read(fuse_req_t req, fuse_ino_t ino, size_t size, off_t off, struct fuse_file_info *fi)
+		{
+			mtp::scoped_mutex_lock l(_mutex);
+			mtp::ByteArray data = _session->GetPartialObject(ino, off, size);
+			FUSE_CALL(fuse_reply_buf(req, static_cast<char *>(static_cast<void *>(data.data())), data.size()));
+		}
+
+		void Write(fuse_req_t req, fuse_ino_t ino, const char *buf, size_t size, off_t off, struct fuse_file_info *fi)
+		{
+			mtp::scoped_mutex_lock l(_mutex);
+			mtp::Session::ObjectEditSessionPtr tr;
+			{
+				auto it = _openedFiles.find(ino);
+				if (it != _openedFiles.end())
+					_openedFiles[ino] = it->second;
+				else
+				{
+					tr = mtp::Session::EditObject(_session, ino);
+					_openedFiles[ino] = tr;
+				}
+			}
+			tr->Send(off, mtp::ByteArray(buf, buf + size));
+			fuse_reply_write(req, size);
+		}
+
 		void MakeNode(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t mode, dev_t rdev)
-		{ CreateObject(mtp::ObjectFormat::Undefined, req, parent, name, mode); }
+		{ mtp::scoped_mutex_lock l(_mutex); CreateObject(mtp::ObjectFormat::Undefined, req, parent, name, mode); }
 
 		void Create(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t mode, struct fuse_file_info *fi)
-		{ CreateObject(mtp::ObjectFormat::Undefined, req, parent, name, mode); }
+		{ mtp::scoped_mutex_lock l(_mutex); CreateObject(mtp::ObjectFormat::Undefined, req, parent, name, mode); }
 
 		void MakeDir(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t mode)
-		{ CreateObject(mtp::ObjectFormat::Association, req, parent, name, mode); }
+		{ mtp::scoped_mutex_lock l(_mutex); CreateObject(mtp::ObjectFormat::Association, req, parent, name, mode); }
 
 		void Open(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi)
 		{
+			mtp::scoped_mutex_lock l(_mutex);
 			mtp::ObjectFormat format;
 
 			try
@@ -470,21 +477,21 @@ namespace
 
 		void Release(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi)
 		{
+			mtp::scoped_mutex_lock l(_mutex);
 			auto i = _openedFiles.find(ino);
 			if (i != _openedFiles.end())
 				_openedFiles.erase(i);
 		}
 
 		void SetAttr(fuse_req_t req, fuse_ino_t ino, struct stat *attr, int to_set, struct fuse_file_info *fi)
-		{
-			GetAttr(req, ino, fi);
-		}
+		{ GetAttr(req, ino, fi); }
 
 		void RemoveDir (fuse_req_t req, fuse_ino_t parent, const char *name)
 		{ Unlink(req, parent, name); }
 
 		void Unlink(fuse_req_t req, fuse_ino_t parent, const char *name)
 		{
+			mtp::scoped_mutex_lock l(_mutex);
 			ChildrenObjects &children = GetChildren(parent);
 			auto i = children.find(name);
 			if (i == children.end())
@@ -505,6 +512,7 @@ namespace
 
 		void StatFS(fuse_req_t req, fuse_ino_t ino)
 		{
+			mtp::scoped_mutex_lock l(_mutex);
 			struct statvfs stat = { };
 			stat.f_namemax = 254;
 
