@@ -405,7 +405,7 @@ namespace
 			return noi.ObjectId;
 		}
 
-		void CreateObject(fuse_req_t req, fuse_ino_t parentId, const char *name, mode_t mode)
+		void CreateObject(mtp::ObjectFormat format, fuse_req_t req, fuse_ino_t parentId, const char *name, mode_t mode)
 		{
 			if (parentId == 1)
 			{
@@ -413,15 +413,18 @@ namespace
 				return;
 			}
 			FuseEntry entry(req);
-			entry.ino = CreateObject(parentId, name, mtp::ObjectFormat::Undefined);
+			entry.ino = CreateObject(parentId, name, format);
 			entry.Reply();
 		}
 
 		void MakeNode(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t mode, dev_t rdev)
-		{ CreateObject(req, parent, name, mode); }
+		{ CreateObject(mtp::ObjectFormat::Undefined, req, parent, name, mode); }
 
 		void Create(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t mode, struct fuse_file_info *fi)
-		{ CreateObject(req, parent, name, mode); }
+		{ CreateObject(mtp::ObjectFormat::Undefined, req, parent, name, mode); }
+
+		void MakeDir(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t mode)
+		{ CreateObject(mtp::ObjectFormat::Association, req, parent, name, mode); }
 	};
 
 	std::unique_ptr<FuseWrapper>	g_wrapper;
@@ -455,8 +458,11 @@ namespace
 	void MakeNode(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t mode, dev_t rdev)
 	{ WRAP_EX(g_wrapper->MakeNode(req, parent, name, mode, rdev)); }
 
-	void Create(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t mode, struct fuse_file_info *fi)
-	{ WRAP_EX(g_wrapper->Create(req, parent, name, mode, fi)); }
+	//void Create(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t mode, struct fuse_file_info *fi)
+	//{ WRAP_EX(g_wrapper->Create(req, parent, name, mode, fi)); }
+
+	void MakeDir(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t mode)
+	{ WRAP_EX(g_wrapper->MakeDir(req, parent, name, mode)); }
 }
 
 int main(int argc, char **argv)
@@ -477,7 +483,7 @@ int main(int argc, char **argv)
 	//ops.create		= &Create;
 	ops.read		= &Read;
 //	ops.write		= &Write;
-//	ops.mkdir		= &MakeDir;
+	ops.mkdir		= &MakeDir;
 //	ops.rmdir		= &RemoveDir;
 //	ops.unlink		= &Unlink;
 //	ops.truncate	= &Truncate;
