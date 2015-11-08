@@ -118,10 +118,12 @@ namespace
 
 		void Reply(off_t off, size_t size)
 		{
-			if ((size_t)off < size)
-				fuse_reply_buf(Request, Data.data() + off, std::min<size_t>(size, Data.size() - off));
-			else
+			if (off >= (off_t)Data.size())
 				fuse_reply_buf(Request, NULL, 0);
+			else
+			{
+				fuse_reply_buf(Request, Data.data() + off, std::min<size_t>(size, Data.size() - off));
+			}
 		}
 	};
 
@@ -361,6 +363,7 @@ namespace
 		void ReadDir(fuse_req_t req, fuse_ino_t ino, size_t size, off_t off, struct fuse_file_info *fi)
 		{
 			mtp::scoped_mutex_lock l(_mutex);
+			//fixme: store dir in cache too
 			FuseDirectory dir(req);
 			if (ino == 1)
 			{
