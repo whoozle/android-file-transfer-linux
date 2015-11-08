@@ -78,6 +78,11 @@ namespace
 			}
 		}
 
+		void SetSize(mtp::u64 size)
+		{
+			attr.st_size = size;
+		}
+
 		void Reply()
 		{
 			FUSE_CALL(fuse_reply_entry(Request, this));
@@ -133,6 +138,9 @@ namespace
 
 		typedef std::map<mtp::u32, mtp::ObjectFormat> ObjectTypes;
 		ObjectTypes		_objectFormats;
+
+		typedef std::map<mtp::u32, mtp::u64> ObjectSizes;
+		ObjectSizes		_objectSizes;
 
 		typedef mtp::Session::ObjectEditSessionPtr ObjectEditSessionPtr;
 		typedef std::map<mtp::u32, ObjectEditSessionPtr> OpenedFiles;
@@ -199,6 +207,17 @@ namespace
 			return format;
 		}
 
+		mtp::u64 GetObjectSize(mtp::u32 id)
+		{
+			auto i = _objectSizes.find(id);
+			if (i != _objectSizes.end())
+				return i->second;
+
+			mtp::u64 size = _session->GetObjectIntegerProperty(id, mtp::ObjectProperty::ObjectSize);
+			_objectSizes.insert(std::make_pair(id, size));
+			return size;
+		}
+
 		ChildrenObjects & GetChildren(mtp::u32 parent)
 		{
 			{
@@ -236,6 +255,14 @@ namespace
 							_objectFormats[objectId] = static_cast<ObjectFormat>(format);
 						});
 					}
+					{
+						data = _session->GetObjectPropertyList(parent, ObjectFormat::Any, ObjectProperty::ObjectSize, 0, 1);
+						ObjectPropertyListParser<u64> parser;
+						parser.Parse(data, [this](u32 objectId, u64 size)
+						{
+							_objectSizes[objectId] = size;
+						});
+					}
 					return cache;
 				}
 				oh = _session->GetObjectHandles(mtp::Session::AllStorages, mtp::ObjectFormat::Any, parent);
@@ -266,12 +293,14 @@ namespace
 				{
 					entry.ino = it->second;
 					entry.SetFormat(GetObjectFormat(it->second));
+					entry.SetSize(GetObjectSize(it->second));
 					entry.Reply();
 					return;
 				}
 			}
 			else
 			{
+				//parent == 1 -> storage
 				auto sit = _storagesByName.find(name);
 				if (sit != _storagesByName.end())
 				{
@@ -341,7 +370,7 @@ namespace
 
 				try {
 					entry.SetFormat(GetObjectFormat(ino));
-					entry.attr.st_size = _session->GetObjectIntegerProperty(ino, mtp::ObjectProperty::ObjectSize);
+					entry.SetSize(GetObjectSize(ino));
 					entry.ReplyAttr();
 					return;
 				}
