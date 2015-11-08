@@ -342,12 +342,6 @@ namespace
 			fuse_reply_err(req, ENOTDIR);
 		}
 
-		void Read(fuse_req_t req, fuse_ino_t ino, size_t size, off_t off, struct fuse_file_info *fi)
-		{
-			mtp::ByteArray data = _session->GetPartialObject(ino, off, size);
-			FUSE_CALL(fuse_reply_buf(req, static_cast<char *>(static_cast<void *>(data.data())), data.size()));
-		}
-
 		void GetAttr(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi)
 		{
 			FuseEntry entry(req);
@@ -379,6 +373,55 @@ namespace
 			}
 			entry.ReplyError(ENOENT);
 		}
+
+		void Read(fuse_req_t req, fuse_ino_t ino, size_t size, off_t off, struct fuse_file_info *fi)
+		{
+			mtp::ByteArray data = _session->GetPartialObject(ino, off, size);
+			FUSE_CALL(fuse_reply_buf(req, static_cast<char *>(static_cast<void *>(data.data())), data.size()));
+		}
+
+		mtp::u32 CreateObject(mtp::u32 parentId, const std::string &filename, mtp::ObjectFormat format)
+		{
+			mtp::u32 storageId;
+			if (_storages.find(parentId) != _storages.end())
+			{
+				storageId = parentId;
+				parentId = mtp::Session::Root;
+			}
+			else
+				storageId = _session->GetObjectIntegerProperty(parentId, mtp::ObjectProperty::StorageId);
+
+			mtp::msg::ObjectInfo oi;
+			oi.Filename = filename;
+			oi.ObjectFormat = format;
+			mtp::Session::NewObjectInfo noi = _session->SendObjectInfo(oi, storageId, parentId);
+			_session->SendObject(std::make_shared<mtp::ByteArrayObjectInputStream>(mtp::ByteArray()));
+
+			{ //update cache:
+				auto i = _files.find(parentId);
+				if (i != _files.end())
+					i->second[filename] = noi.ObjectId;
+			}
+			return noi.ObjectId;
+		}
+
+		void CreateObject(fuse_req_t req, fuse_ino_t parentId, const char *name, mode_t mode)
+		{
+			if (parentId == 1)
+			{
+				fuse_reply_err(req, EPERM); //cannot create files in the same level with storages
+				return;
+			}
+			FuseEntry entry(req);
+			entry.ino = CreateObject(parentId, name, mtp::ObjectFormat::Undefined);
+			entry.Reply();
+		}
+
+		void MakeNode(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t mode, dev_t rdev)
+		{ CreateObject(req, parent, name, mode); }
+
+		void Create(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t mode, struct fuse_file_info *fi)
+		{ CreateObject(req, parent, name, mode); }
 	};
 
 	std::unique_ptr<FuseWrapper>	g_wrapper;
@@ -391,7 +434,7 @@ namespace
 			__VA_ARGS__ ; \
 		} \
 		catch (const std::exception &ex) \
-		{ fprintf(stderr, #__VA_ARGS__ " failed: %s\n", ex.what()); fuse_reply_err(req, -EIO); } \
+		{ fprintf(stderr, #__VA_ARGS__ " failed: %s\n", ex.what()); fuse_reply_err(req, EIO); } \
 	} while(false)
 
 	void Init (void *userdata, struct fuse_conn_info *conn)
@@ -408,6 +451,12 @@ namespace
 
 	void Read(fuse_req_t req, fuse_ino_t ino, size_t size, off_t off, struct fuse_file_info *fi)
 	{ WRAP_EX(g_wrapper->Read(req, ino, size, off, fi)); }
+
+	void MakeNode(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t mode, dev_t rdev)
+	{ WRAP_EX(g_wrapper->MakeNode(req, parent, name, mode, rdev)); }
+
+	void Create(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t mode, struct fuse_file_info *fi)
+	{ WRAP_EX(g_wrapper->Create(req, parent, name, mode, fi)); }
 }
 
 int main(int argc, char **argv)
@@ -423,8 +472,9 @@ int main(int argc, char **argv)
 	ops.lookup		= &Lookup;
 	ops.readdir		= &ReadDir;
 	ops.getattr		= &GetAttr;
+	ops.mknod		= &MakeNode;
 //	ops.open		= &Open;
-//	ops.create		= &Create;
+	//ops.create		= &Create;
 	ops.read		= &Read;
 //	ops.write		= &Write;
 //	ops.mkdir		= &MakeDir;
