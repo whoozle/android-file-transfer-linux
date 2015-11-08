@@ -382,6 +382,7 @@ namespace
 
 		mtp::u32 CreateObject(mtp::u32 parentId, const std::string &filename, mtp::ObjectFormat format)
 		{
+			mtp::u32 cacheParent = parentId;
 			mtp::u32 storageId;
 			if (_storages.find(parentId) != _storages.end())
 			{
@@ -398,7 +399,7 @@ namespace
 			_session->SendObject(std::make_shared<mtp::ByteArrayObjectInputStream>(mtp::ByteArray()));
 
 			{ //update cache:
-				auto i = _files.find(parentId);
+				auto i = _files.find(cacheParent);
 				if (i != _files.end())
 					i->second[filename] = noi.ObjectId;
 			}
