@@ -33,6 +33,10 @@ namespace mtp { namespace usb
 	{ }
 
 	std::string Exception::GetErrorMessage(int returnCode)
-	{ return strerror(returnCode); }
+	{
+		char buf[1024];
+		std::string text(strerror_r(returnCode, buf, sizeof(buf)));
+		return text;
+	}
 
 }}
