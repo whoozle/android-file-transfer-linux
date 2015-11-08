@@ -25,6 +25,7 @@
 
 #include <mtp/make_function.h>
 #include <mtp/ptp/ByteArrayObjectStream.h>
+#include <mtp/ptp/ObjectPropertyListParser.h>
 #include <mtp/log.h>
 
 #include <sstream>
@@ -73,9 +74,14 @@ namespace cli
 			make_function([this]() -> void { Help(); }));
 
 		AddCommand("ls", "lists current directory",
-			make_function([this]() -> void { List(); }));
+			make_function([this]() -> void { List(false); }));
 		AddCommand("ls", "<path> lists objects in <path>",
-			make_function([this](const Path &path) -> void { List(path); }));
+			make_function([this](const Path &path) -> void { List(path, false); }));
+
+		AddCommand("lsext", "lists current directory [extended info]",
+			make_function([this]() -> void { List(true); }));
+		AddCommand("lsext", "<path> lists objects in <path> [extended info]",
+			make_function([this](const Path &path) -> void { List(path, true); }));
 
 		AddCommand("put", "<file> uploads file",
 			make_function([this](const LocalPath &path) -> void { Put(path); }));
@@ -367,30 +373,46 @@ namespace cli
 	}
 
 
-	void Session::List(mtp::u32 parent)
+	void Session::List(mtp::u32 parent, bool extended)
 	{
 		using namespace mtp;
-		msg::ObjectHandles handles = _session->GetObjectHandles(_cs, mtp::Session::AllFormats, parent);
-
-		for(u32 objectId : handles.ObjectHandles)
+		if (!extended && _session->GetObjectPropertyListSupported())
 		{
-			try
+			ByteArray data = _session->GetObjectPropertyList(parent, ObjectFormat::Any, ObjectProperty::ObjectFilename, 0, 1);
+			ObjectPropertyListParser<std::string> parser;
+			HexDump("list", data, true);
+			parser.Parse(data, [](u32 objectId, const std::string &name)
 			{
-				msg::ObjectInfo info = _session->GetObjectInfo(objectId);
-				print(
-					std::left,
-					width(objectId, 10), " ",
-					std::right,
-					hex(info.ObjectFormat, 4), " ",
-					width(info.ObjectCompressedSize, 10), " ",
-					FormatTime(info.CaptureDate), " ",
-					info.Filename, " ",
-					info.ImagePixWidth, "x", info.ImagePixHeight, " "
-				);
-			}
-			catch(const std::exception &ex)
+				print(std::left, width(objectId, 10), " ", name);
+			});
+		}
+		else
+		{
+			msg::ObjectHandles handles = _session->GetObjectHandles(_cs, mtp::Session::AllFormats, parent);
+
+			for(u32 objectId : handles.ObjectHandles)
 			{
-				mtp::error("error: ", ex.what());
+				try
+				{
+					msg::ObjectInfo info = _session->GetObjectInfo(objectId);
+					if (extended)
+						print(
+							std::left,
+							width(objectId, 10), " ",
+							std::right,
+							hex(info.ObjectFormat, 4), " ",
+							width(info.ObjectCompressedSize, 10), " ",
+							FormatTime(info.CaptureDate), " ",
+							info.Filename, " ",
+							info.ImagePixWidth, "x", info.ImagePixHeight, " "
+						);
+					else
+						print(std::left, width(objectId, 10), " ", info.Filename);
+				}
+				catch(const std::exception &ex)
+				{
+					mtp::error("error: ", ex.what());
+				}
 			}
 		}
 	}

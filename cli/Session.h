@@ -69,7 +69,7 @@ namespace cli
 
 		void CompletePath(const Path &path, CompletionResult &result);
 
-		void List(mtp::u32 parent);
+		void List(mtp::u32 parent, bool extended);
 
 		void ListStorages();
 		void Get(const LocalPath &dst, mtp::u32 srcId);
@@ -84,11 +84,11 @@ namespace cli
 		{ _cd = Resolve(path); }
 		void CurrentDirectory();
 
-		void List()
-		{ return List(_cd); }
+		void List(bool extended)
+		{ return List(_cd, extended); }
 
-		void List(const Path &path)
-		{ return List(Resolve(path)); }
+		void List(const Path &path, bool extended)
+		{ return List(Resolve(path), extended); }
 
 		void Put(const LocalPath &src)
 		{ Put(_cd, GetFilename(src), src); }
