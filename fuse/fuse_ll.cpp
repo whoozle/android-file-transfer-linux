@@ -314,6 +314,14 @@ namespace
 			fuse_reply_err(req, ENOTDIR);
 		}
 
+		void Read(fuse_req_t req, fuse_ino_t ino, size_t size, off_t off, struct fuse_file_info *fi)
+		{
+			mtp::print("READ ", off, " ", size);
+			mtp::ByteArray data = _session->GetPartialObject(ino, off, size);
+			mtp::HexDump("data", data, true);
+			FUSE_CALL(fuse_reply_buf(req, static_cast<char *>(static_cast<void *>(data.data())), data.size()));
+		}
+
 		void GetAttr(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi)
 		{
 			FuseEntry entry(req);
@@ -336,6 +344,7 @@ namespace
 
 				try {
 					entry.SetFormat(GetObjectFormat(ino));
+					entry.attr.st_size = _session->GetObjectIntegerProperty(ino, mtp::ObjectProperty::ObjectSize);
 					entry.ReplyAttr();
 					return;
 				}
@@ -371,6 +380,8 @@ namespace
 	void GetAttr(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi)
 	{ WRAP_EX(g_wrapper->GetAttr(req, ino, fi)); }
 
+	void Read(fuse_req_t req, fuse_ino_t ino, size_t size, off_t off, struct fuse_file_info *fi)
+	{ WRAP_EX(g_wrapper->Read(req, ino, size, off, fi)); }
 }
 
 int main(int argc, char **argv)
@@ -388,9 +399,8 @@ int main(int argc, char **argv)
 	ops.getattr		= &GetAttr;
 //	ops.open		= &Open;
 //	ops.create		= &Create;
-//	ops.read		= &Read;
+	ops.read		= &Read;
 //	ops.write		= &Write;
-//	ops.flush		= &Flush;
 //	ops.mkdir		= &MakeDir;
 //	ops.rmdir		= &RemoveDir;
 //	ops.unlink		= &Unlink;
