@@ -91,21 +91,19 @@ int main(int argc, char **argv)
 
 	try
 	{
+		bool hasCommands = optind >= argc;
 		cli::Session session(mtp, showPrompt);
 
-		if (forceInteractive || (session.IsInteractive() && optind >= argc))
+		if (forceInteractive || (session.IsInteractive() && hasCommands))
 		{
 			session.InteractiveInput();
 		}
 		else
 		{
-			cli::Tokens tokens;
 			for(int i = optind; i < argc; ++i)
 			{
-				tokens.push_back(argv[i]);
+				session.ProcessCommand(argv[i]);
 			}
-			if (!tokens.empty())
-				session.ProcessCommand(std::move(tokens));
 		}
 
 		exit(0);
