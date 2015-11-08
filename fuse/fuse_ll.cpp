@@ -503,6 +503,38 @@ namespace
 			fuse_reply_err(req, 0);
 		}
 
+		void StatFS(fuse_req_t req, fuse_ino_t ino)
+		{
+			struct statvfs stat = { };
+			stat.f_namemax = 254;
+
+			mtp::u64 freeSpace = 0, capacity = 0;
+			if (ino == 1)
+			{
+				for(auto storage = _storages.begin(); storage != _storages.end(); ++storage)
+				{
+					mtp::msg::StorageInfo si = _session->GetStorageInfo(storage->first);
+					freeSpace += si.FreeSpaceInBytes;
+					capacity += si.MaxCapacity;
+				}
+			}
+			else
+			{
+				auto sit = _storages.find(ino);
+				if (sit == _storages.end()) //not a storage
+					ino = _session->GetObjectIntegerProperty(ino, mtp::ObjectProperty::StorageId);
+
+				mtp::msg::StorageInfo si = _session->GetStorageInfo(ino);
+				freeSpace = si.FreeSpaceInBytes;
+				capacity = si.MaxCapacity;
+			}
+
+			stat.f_frsize = stat.f_bsize = 1024 * 1024;
+			stat.f_blocks = capacity / stat.f_frsize;
+			stat.f_bfree = stat.f_bavail = freeSpace / stat.f_frsize;
+
+			fuse_reply_statfs(req, &stat);
+		}
 	};
 
 	std::unique_ptr<FuseWrapper>	g_wrapper;
@@ -559,6 +591,9 @@ namespace
 
 	void Unlink(fuse_req_t req, fuse_ino_t parent, const char *name)
 	{ WRAP_EX(g_wrapper->Unlink(req, parent, name)); }
+
+	void StatFS(fuse_req_t req, fuse_ino_t ino)
+	{ WRAP_EX(g_wrapper->StatFS(req, ino)); }
 }
 
 int main(int argc, char **argv)
@@ -584,8 +619,7 @@ int main(int argc, char **argv)
 	ops.release		= &Release;
 	ops.rmdir		= &RemoveDir;
 	ops.unlink		= &Unlink;
-//	ops.truncate	= &Truncate;
-//	ops.statfs		= &StatFS;
+	ops.statfs		= &StatFS;
 
 	struct fuse_args args = FUSE_ARGS_INIT(argc, argv);
 	struct fuse_chan *ch;
