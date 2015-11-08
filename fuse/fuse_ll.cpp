@@ -187,7 +187,6 @@ namespace
 			static const size_t MaxWriteSize = 1024 * 1024;
 			if (conn->max_write < MaxWriteSize)
 				conn->max_write = MaxWriteSize;
-			conn->max_readahead = 0;
 		}
 
 		mtp::ObjectFormat GetObjectFormat(mtp::u32 id)
@@ -316,9 +315,7 @@ namespace
 
 		void Read(fuse_req_t req, fuse_ino_t ino, size_t size, off_t off, struct fuse_file_info *fi)
 		{
-			mtp::print("READ ", off, " ", size);
 			mtp::ByteArray data = _session->GetPartialObject(ino, off, size);
-			mtp::HexDump("data", data, true);
 			FUSE_CALL(fuse_reply_buf(req, static_cast<char *>(static_cast<void *>(data.data())), data.size()));
 		}
 
