@@ -20,10 +20,40 @@
 #ifndef OBJECTPROPERTY_H
 #define	OBJECTPROPERTY_H
 
+#include <mtp/types.h>
+
 namespace mtp
 {
+	enum struct DataTypeCode : u16
+	{
+		Undefined					= 0x0000,
 
-	enum struct ObjectProperty
+		Int8						= 0x0001,
+		Uint8						= 0x0002,
+		Int16						= 0x0003,
+		Uint16						= 0x0004,
+		Int32						= 0x0005,
+		Uint32						= 0x0006,
+		Int64						= 0x0007,
+		Uint64						= 0x0008,
+		Int128						= 0x0009,
+		Uint128						= 0x000a,
+
+		ArrayInt8					= 0x4001,
+		ArrayUint8					= 0x4002,
+		ArrayInt16					= 0x4003,
+		ArrayUint16					= 0x4004,
+		ArrayInt32					= 0x4005,
+		ArrayUint32					= 0x4006,
+		ArrayInt64					= 0x4007,
+		ArrayUint64					= 0x4008,
+		ArrayInt128					= 0x4009,
+		ArrayUint128				= 0x400a,
+
+		String						= 0xffff
+	};
+
+	enum struct ObjectProperty : u16
 	{
 		StorageId					= 0xdc01,
 		ObjectFormat				= 0xdc02,
