@@ -547,8 +547,8 @@ namespace
 	int StatFS (const char *path, struct statvfs *stat)
 	{ WRAP_EX(g_wrapper->StatFS(path, stat)); }
 
-	int SetTimes(const char *path, const struct timespec tv[2])
-	{ WRAP_EX(g_wrapper->SetTimes(path, tv)); }
+	//int SetTimes(const char *path, const struct timespec tv[2])
+	//{ WRAP_EX(g_wrapper->SetTimes(path, tv)); }
 
 	int ChangeMode (const char *path, mode_t mode)
 	{ WRAP_EX(g_wrapper->ChangeMode(path, mode)); }
@@ -576,7 +576,7 @@ int main(int argc, char **argv)
 	ops.unlink		= &Unlink;
 	ops.truncate	= &Truncate;
 	ops.statfs		= &StatFS;
-	ops.utimens		= &SetTimes;
+	//ops.utimens		= &SetTimes; //this is slow, access time is not supported by MTP, DateModified property does not work reliably.
 	ops.chmod		= &ChangeMode;
 
 	return fuse_main(argc, argv, &ops, NULL);
