@@ -229,6 +229,14 @@ namespace
 							cache[name] = objectId;
 						});
 					}
+					{
+						data = _session->GetObjectPropertyList(parent, ObjectFormat::Any, ObjectProperty::ObjectFormat, 0, 1);
+						ObjectPropertyListParser<u16> parser;
+						parser.Parse(data, [this](u32 objectId, u16 format)
+						{
+							_objectFormats[objectId] = static_cast<ObjectFormat>(format);
+						});
+					}
 					return cache;
 				}
 				oh = _session->GetObjectHandles(mtp::Session::AllStorages, mtp::ObjectFormat::Any, parent);
