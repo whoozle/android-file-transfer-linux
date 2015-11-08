@@ -292,10 +292,15 @@ namespace
 				if (it != children.end())
 				{
 					entry.ino = it->second;
-					entry.SetFormat(GetObjectFormat(it->second));
-					entry.SetSize(GetObjectSize(it->second));
-					entry.Reply();
-					return;
+					try
+					{
+						entry.SetFormat(GetObjectFormat(it->second));
+						entry.SetSize(GetObjectSize(it->second));
+						entry.Reply();
+						return;
+					}
+					catch(const std::exception &ex)
+					{ }
 				}
 			}
 			else
@@ -475,6 +480,29 @@ namespace
 			GetAttr(req, ino, fi);
 		}
 
+		void RemoveDir (fuse_req_t req, fuse_ino_t parent, const char *name)
+		{ Unlink(req, parent, name); }
+
+		void Unlink(fuse_req_t req, fuse_ino_t parent, const char *name)
+		{
+			ChildrenObjects &children = GetChildren(parent);
+			auto i = children.find(name);
+			if (i == children.end())
+			{
+				FUSE_CALL(fuse_reply_err(req, ENOENT));
+				return;
+			}
+
+			mtp::u32 id = i->second;
+			_openedFiles.erase(id);
+			_objectFormats.erase(id);
+			_objectSizes.erase(id);
+			children.erase(i);
+
+			_session->DeleteObject(id);
+			fuse_reply_err(req, 0);
+		}
+
 	};
 
 	std::unique_ptr<FuseWrapper>	g_wrapper;
@@ -525,6 +553,12 @@ namespace
 
 	void MakeDir(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t mode)
 	{ WRAP_EX(g_wrapper->MakeDir(req, parent, name, mode)); }
+
+	void RemoveDir (fuse_req_t req, fuse_ino_t parent, const char *name)
+	{ WRAP_EX(g_wrapper->RemoveDir(req, parent, name)); }
+
+	void Unlink(fuse_req_t req, fuse_ino_t parent, const char *name)
+	{ WRAP_EX(g_wrapper->Unlink(req, parent, name)); }
 }
 
 int main(int argc, char **argv)
@@ -548,11 +582,10 @@ int main(int argc, char **argv)
 	ops.write		= &Write;
 	ops.mkdir		= &MakeDir;
 	ops.release		= &Release;
-//	ops.rmdir		= &RemoveDir;
-//	ops.unlink		= &Unlink;
+	ops.rmdir		= &RemoveDir;
+	ops.unlink		= &Unlink;
 //	ops.truncate	= &Truncate;
 //	ops.statfs		= &StatFS;
-//	ops.chmod		= &ChangeMode;
 
 	struct fuse_args args = FUSE_ARGS_INIT(argc, argv);
 	struct fuse_chan *ch;
