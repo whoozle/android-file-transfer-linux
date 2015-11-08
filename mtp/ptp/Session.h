@@ -47,6 +47,7 @@ namespace mtp
 		msg::DeviceInfo	_deviceInfo;
 		bool			_getPartialObject64Supported;
 		bool			_editObjectSupported;
+		bool			_getObjectPropertyListSupported;
 		int				_defaultTimeout;
 
 	public:
@@ -97,6 +98,9 @@ namespace mtp
 
 		bool EditObjectSupported() const
 		{ return _editObjectSupported; }
+		bool GetObjectPropertyListSupported() const
+		{ return _getObjectPropertyListSupported; }
+
 		static ObjectEditSessionPtr EditObject(const SessionPtr &session, u32 objectId)
 		{ return std::make_shared<ObjectEditSession>(session, objectId); }
 

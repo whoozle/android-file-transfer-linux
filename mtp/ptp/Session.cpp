@@ -40,6 +40,7 @@ namespace mtp
 	{
 		_deviceInfo = GetDeviceInfoImpl();
 		_getPartialObject64Supported = _deviceInfo.Supports(OperationCode::GetPartialObject64);
+		_getObjectPropertyListSupported = _deviceInfo.Supports(OperationCode::GetObjectPropList);
 		_editObjectSupported = _deviceInfo.Supports(OperationCode::BeginEditObject) &&
 			_deviceInfo.Supports(OperationCode::EndEditObject) &&
 			_deviceInfo.Supports(OperationCode::TruncateObject) &&
