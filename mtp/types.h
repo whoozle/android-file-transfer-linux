@@ -73,6 +73,7 @@ namespace mtp
 #define ASSERT(expr) if (!(expr)) throw std::runtime_error("assertion " #expr " failed")
 #define CATCH(WHAT, ...) catch(const std::exception &ex) { LOG(WARNING) << WHAT << ": " << ex.what(); __VA_ARGS__ }
 
+//fixme: c++17 will allow implement it in stream with std::is_enum(c++11) + std::underlying_type(c++17)
 #define DECLARE_ENUM(TYPE, BASETYPE) \
 	template<typename Stream> \
 	Stream &operator << (Stream & stream, TYPE format) \
