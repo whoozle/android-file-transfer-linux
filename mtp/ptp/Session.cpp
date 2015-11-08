@@ -343,6 +343,23 @@ namespace mtp
 		}
 	}
 
+	void Session::SetObjectProperty(u32 objectId, ObjectProperty property, u64 value)
+	{
+		std::array<u8, sizeof(value)> data;
+		std::fill(data.begin(), data.end(), 0);
+		size_t i;
+		for(i = 0; i < data.size() && value != 0; ++i, value >>= 8)
+		{
+			data[i] = value;
+		}
+		if (i <= 4)
+			i = 4;
+		else
+			i = 8;
+
+		SetObjectProperty(objectId, property, ByteArray(data.begin(), data.begin() + i));
+	}
+
 	std::string Session::GetObjectStringProperty(u32 objectId, ObjectProperty property)
 	{
 		ByteArray data = GetObjectProperty(objectId, property);

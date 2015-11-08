@@ -103,7 +103,9 @@ namespace mtp
 		msg::ObjectPropsSupported GetObjectPropsSupported(u32 objectId);
 
 		void SetObjectProperty(u32 objectId, ObjectProperty property, const ByteArray &value);
+		void SetObjectProperty(u32 objectId, ObjectProperty property, u64 value);
 		void SetObjectProperty(u32 objectId, ObjectProperty property, const std::string &value);
+
 		ByteArray GetObjectProperty(u32 objectId, ObjectProperty property);
 		u64 GetObjectIntegerProperty(u32 objectId, ObjectProperty property);
 		std::string GetObjectStringProperty(u32 objectId, ObjectProperty property);
