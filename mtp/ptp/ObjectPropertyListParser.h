@@ -33,21 +33,21 @@ namespace mtp
 		template<typename PropertyType>
 		struct ObjectPropertyParser
 		{
-			static u64 Parse(InputStream &stream)
+			static PropertyType Parse(InputStream &stream)
 			{
 				DataTypeCode dataType;
 				stream >> dataType;
 				switch(dataType)
 				{
-#define HANDLE_TYPE(NATIVE, TYPE, METHOD) case DataTypeCode::TYPE : { NATIVE value = stream . METHOD () ; return value; }
-				HANDLE_TYPE(u8,  Uint8,  Read8)
-				HANDLE_TYPE(u16, Uint16, Read16)
-				HANDLE_TYPE(u32, Uint32, Read32)
-				HANDLE_TYPE(u64, Uint64, Read64)
-				HANDLE_TYPE(s8,  Int8,   Read8)
-				HANDLE_TYPE(s16, Int16,  Read16)
-				HANDLE_TYPE(s32, Int32,  Read32)
-				HANDLE_TYPE(s64, Int64,  Read64)
+#define HANDLE_TYPE(TYPE, METHOD) case DataTypeCode::TYPE : { return static_cast<PropertyType> (stream . METHOD ()) ; }
+				HANDLE_TYPE(Uint8,  Read8)
+				HANDLE_TYPE(Uint16, Read16)
+				HANDLE_TYPE(Uint32, Read32)
+				HANDLE_TYPE(Uint64, Read64)
+				HANDLE_TYPE(Int8,   Read8)
+				HANDLE_TYPE(Int16,  Read16)
+				HANDLE_TYPE(Int32,  Read32)
+				HANDLE_TYPE(Int64,  Read64)
 #undef HANDLE_TYPE
 				default:
 					throw std::runtime_error("got invalid type");
