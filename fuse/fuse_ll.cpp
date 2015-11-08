@@ -380,6 +380,23 @@ namespace
 			FUSE_CALL(fuse_reply_buf(req, static_cast<char *>(static_cast<void *>(data.data())), data.size()));
 		}
 
+		void Write(fuse_req_t req, fuse_ino_t ino, const char *buf, size_t size, off_t off, struct fuse_file_info *fi)
+		{
+			mtp::Session::ObjectEditSessionPtr tr;
+			{
+				auto it = _openedFiles.find(ino);
+				if (it != _openedFiles.end())
+					_openedFiles[ino] = it->second;
+				else
+				{
+					tr = mtp::Session::EditObject(_session, ino);
+					_openedFiles[ino] = tr;
+				}
+			}
+			tr->Send(off, mtp::ByteArray(buf, buf + size));
+			fuse_reply_write(req, size);
+		}
+
 		mtp::u32 CreateObject(mtp::u32 parentId, const std::string &filename, mtp::ObjectFormat format)
 		{
 			mtp::u32 cacheParent = parentId;
@@ -426,6 +443,38 @@ namespace
 
 		void MakeDir(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t mode)
 		{ CreateObject(mtp::ObjectFormat::Association, req, parent, name, mode); }
+
+		void Open(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi)
+		{
+			mtp::ObjectFormat format;
+
+			try
+			{
+				format = GetObjectFormat(ino);
+			}
+			catch(const std::exception &ex)
+			{ fuse_reply_err(req, ENOENT); return; }
+
+			if (format == mtp::ObjectFormat::Association)
+			{
+				fuse_reply_err(req, EISDIR);
+				return;
+			}
+			fuse_reply_open(req, fi);
+		}
+
+		void Release(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi)
+		{
+			auto i = _openedFiles.find(ino);
+			if (i != _openedFiles.end())
+				_openedFiles.erase(i);
+		}
+
+		void SetAttr(fuse_req_t req, fuse_ino_t ino, struct stat *attr, int to_set, struct fuse_file_info *fi)
+		{
+			GetAttr(req, ino, fi);
+		}
+
 	};
 
 	std::unique_ptr<FuseWrapper>	g_wrapper;
@@ -453,14 +502,26 @@ namespace
 	void GetAttr(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi)
 	{ WRAP_EX(g_wrapper->GetAttr(req, ino, fi)); }
 
+	void SetAttr(fuse_req_t req, fuse_ino_t ino, struct stat *attr, int to_set, struct fuse_file_info *fi)
+	{ WRAP_EX(g_wrapper->SetAttr(req, ino, attr, to_set, fi)); }
+
 	void Read(fuse_req_t req, fuse_ino_t ino, size_t size, off_t off, struct fuse_file_info *fi)
 	{ WRAP_EX(g_wrapper->Read(req, ino, size, off, fi)); }
+
+	void Write(fuse_req_t req, fuse_ino_t ino, const char *buf, size_t size, off_t off, struct fuse_file_info *fi)
+	{ WRAP_EX(g_wrapper->Write(req, ino, buf, size, off, fi)); }
 
 	void MakeNode(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t mode, dev_t rdev)
 	{ WRAP_EX(g_wrapper->MakeNode(req, parent, name, mode, rdev)); }
 
-	//void Create(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t mode, struct fuse_file_info *fi)
-	//{ WRAP_EX(g_wrapper->Create(req, parent, name, mode, fi)); }
+	void Open(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi)
+	{ WRAP_EX(g_wrapper->Open(req, ino, fi)); }
+
+	void Release(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi)
+	{ WRAP_EX(g_wrapper->Release(req, ino, fi)); }
+
+	void Create(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t mode, struct fuse_file_info *fi)
+	{ WRAP_EX(g_wrapper->Create(req, parent, name, mode, fi)); }
 
 	void MakeDir(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t mode)
 	{ WRAP_EX(g_wrapper->MakeDir(req, parent, name, mode)); }
@@ -479,12 +540,14 @@ int main(int argc, char **argv)
 	ops.lookup		= &Lookup;
 	ops.readdir		= &ReadDir;
 	ops.getattr		= &GetAttr;
+	ops.setattr		= &SetAttr;
 	ops.mknod		= &MakeNode;
-//	ops.open		= &Open;
-	//ops.create		= &Create;
+	ops.open		= &Open;
+	ops.create		= &Create;
 	ops.read		= &Read;
-//	ops.write		= &Write;
+	ops.write		= &Write;
 	ops.mkdir		= &MakeDir;
+	ops.release		= &Release;
 //	ops.rmdir		= &RemoveDir;
 //	ops.unlink		= &Unlink;
 //	ops.truncate	= &Truncate;
