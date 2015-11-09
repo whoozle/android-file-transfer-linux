@@ -288,9 +288,15 @@ namespace
 			{
 				try
 				{
-					std::string name = _session->GetObjectStringProperty(id, mtp::ObjectProperty::ObjectFilename);
-					_objectAttrs[id].st_mode = FuseEntry::GetMode((ObjectFormat)_session->GetObjectIntegerProperty(id, ObjectProperty::ObjectFormat));
-					cache[name] = id;
+					msg::ObjectInfo oi = _session->GetObjectInfo(id);
+
+					cache[oi.Filename] = id;
+
+					struct stat &attr = _objectAttrs[id];
+					attr.st_mode = FuseEntry::GetMode(oi.ObjectFormat);
+					attr.st_atime = attr.st_mtime = mtp::ConvertDateTime(oi.ModificationDate);
+					attr.st_ctime = mtp::ConvertDateTime(oi.CaptureDate);
+					attr.st_size = oi.ObjectCompressedSize != mtp::MaxObjectSize? oi.ObjectCompressedSize: _session->GetObjectIntegerProperty(id, mtp::ObjectProperty::ObjectSize);
 				} catch(const std::exception &ex)
 				{ }
 			}
