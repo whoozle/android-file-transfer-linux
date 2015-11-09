@@ -140,6 +140,7 @@ namespace
 		mtp::DevicePtr	_device;
 		mtp::SessionPtr	_session;
 		bool			_editObjectSupported;
+		time_t			_connectTime;
 
 		typedef std::map<std::string, mtp::u32> ChildrenObjects;
 		typedef std::map<mtp::u32, ChildrenObjects> Files;
@@ -162,6 +163,7 @@ namespace
 			{
 				struct stat attr = { };
 				attr.st_ino = id;
+				attr.st_mtime = attr.st_ctime = attr.st_atime = _connectTime;
 				attr.st_mode = FuseEntry::DirectoryMode;
 				return attr;
 			}
@@ -171,6 +173,7 @@ namespace
 			{
 				struct stat attr = { };
 				attr.st_ino = id;
+				attr.st_mtime = attr.st_ctime = attr.st_atime = _connectTime;
 				attr.st_mode = FuseEntry::DirectoryMode;
 				return attr;
 			}
@@ -363,6 +366,8 @@ namespace
 			_editObjectSupported = _session->EditObjectSupported();
 			if (!_editObjectSupported)
 				fprintf(stderr, "your device does not have android EditObject extension, mounting read-only\n");
+
+			_connectTime = time(NULL);
 
 			mtp::msg::StorageIDs ids = _session->GetStorageIDs();
 			for(size_t i = 0; i < ids.StorageIDs.size(); ++i)
