@@ -206,6 +206,13 @@ namespace
 
 			ChildrenObjects & cache = _files[parent];
 			using namespace mtp;
+			if (parent == 1)
+			{
+				for(const auto & i : _storagesByName) {
+					cache[i.first] = i.second;
+				}
+				return cache;
+			}
 
 			msg::ObjectHandles oh;
 
@@ -381,6 +388,7 @@ namespace
 
 		void PopulateStorages()
 		{
+			_objectAttrs.erase(1); //drop root's cache
 			_storages.clear();
 			_storagesByName.clear();
 			mtp::msg::StorageIDs ids = _session->GetStorageIDs();
@@ -413,27 +421,13 @@ namespace
 		{
 			mtp::scoped_mutex_lock l(_mutex);
 			FuseEntry entry(req);
-			if (parent != 1)
+
+			const ChildrenObjects & children = GetChildren(parent);
+			auto it = children.find(name);
+			if (it != children.end())
 			{
-				const ChildrenObjects & children = GetChildren(parent);
-				auto it = children.find(name);
-				if (it != children.end())
+				if (FillEntry(entry, it->second))
 				{
-					if (FillEntry(entry, it->second))
-					{
-						entry.Reply();
-						return;
-					}
-				}
-			}
-			else
-			{
-				//parent == 1 -> storage
-				auto sit = _storagesByName.find(name);
-				if (sit != _storagesByName.end())
-				{
-					entry.SetId(sit->second);
-					entry.SetDirectoryMode();
 					entry.Reply();
 					return;
 				}
@@ -446,30 +440,21 @@ namespace
 			mtp::scoped_mutex_lock l(_mutex);
 			//fixme: store dir in cache too
 			FuseDirectory dir(req);
-			if (ino == 1)
+
+			if (!(GetObjectAttr(ino).st_mode & S_IFDIR))
 			{
-				dir.Add(1, ".");
-				dir.Add(1, "..");
-				for(auto it : _storages)
-				{
-					dir.Add(it.first, it.second);
-				}
-				dir.Reply(off, size);
+				FUSE_CALL(fuse_reply_err(req, ENOTDIR));
 				return;
 			}
-			else
+
+			const ChildrenObjects & cache = GetChildren(ino);
+			dir.Add(ino, ".");
+			dir.Add(GetParentObject(ino), "..");
+			for(auto it : cache)
 			{
-				const ChildrenObjects & cache = GetChildren(ino);
-				dir.Add(ino, ".");
-				dir.Add(GetParentObject(ino), "..");
-				for(auto it : cache)
-				{
-					dir.Add(it.second, it.first);
-				}
-				dir.Reply(off, size);
-				return;
+				dir.Add(it.second, it.first);
 			}
-			FUSE_CALL(fuse_reply_err(req, ENOTDIR));
+			dir.Reply(off, size);
 		}
 
 		void GetAttr(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi)
