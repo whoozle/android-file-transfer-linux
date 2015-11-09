@@ -157,6 +157,19 @@ namespace
 		std::map<std::string, mtp::u32>		_storagesByName;
 
 	private:
+		void GetObjectInfo(ChildrenObjects &cache, mtp::u32 id)
+		{
+			mtp::msg::ObjectInfo oi = _session->GetObjectInfo(id);
+
+			cache[oi.Filename] = id;
+
+			struct stat &attr = _objectAttrs[id];
+			attr.st_mode = FuseEntry::GetMode(oi.ObjectFormat);
+			attr.st_atime = attr.st_mtime = mtp::ConvertDateTime(oi.ModificationDate);
+			attr.st_ctime = mtp::ConvertDateTime(oi.CaptureDate);
+			attr.st_size = oi.ObjectCompressedSize != mtp::MaxObjectSize? oi.ObjectCompressedSize: _session->GetObjectIntegerProperty(id, mtp::ObjectProperty::ObjectSize);
+		}
+
 		struct stat GetObjectAttr(mtp::u32 id)
 		{
 			if (id == 1)
@@ -184,10 +197,7 @@ namespace
 
 			//populate cache for parent
 			mtp::u32 parent = GetParentObject(id);
-			if (_files.find(parent) != _files.end())
-				throw std::runtime_error("no such object (in cache)");
-
-			GetChildren(parent); //populate cachec
+			GetChildren(parent); //populate cache
 
 			i = _objectAttrs.find(id);
 			if (i != _objectAttrs.end())
@@ -208,6 +218,7 @@ namespace
 			}
 
 			ChildrenObjects & cache = _files[parent];
+
 			using namespace mtp;
 			if (parent == 1)
 			{
@@ -291,15 +302,7 @@ namespace
 			{
 				try
 				{
-					msg::ObjectInfo oi = _session->GetObjectInfo(id);
-
-					cache[oi.Filename] = id;
-
-					struct stat &attr = _objectAttrs[id];
-					attr.st_mode = FuseEntry::GetMode(oi.ObjectFormat);
-					attr.st_atime = attr.st_mtime = mtp::ConvertDateTime(oi.ModificationDate);
-					attr.st_ctime = mtp::ConvertDateTime(oi.CaptureDate);
-					attr.st_size = oi.ObjectCompressedSize != mtp::MaxObjectSize? oi.ObjectCompressedSize: _session->GetObjectIntegerProperty(id, mtp::ObjectProperty::ObjectSize);
+					GetObjectInfo(cache, id);
 				} catch(const std::exception &ex)
 				{ }
 			}
@@ -333,10 +336,7 @@ namespace
 			{ //update cache:
 				auto i = _files.find(cacheParent);
 				if (i != _files.end())
-				{
-					i->second[filename] = noi.ObjectId;
-					GetObjectAttr(noi.ObjectId);
-				}
+					GetObjectInfo(i->second, noi.ObjectId); //insert object info into cache
 			}
 			return noi.ObjectId;
 		}
