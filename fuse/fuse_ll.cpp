@@ -60,6 +60,12 @@ namespace
 			attr_timeout = entry_timeout = Timeout;
 		};
 
+		void SetId(mtp::u32 id)
+		{
+			ino = id;
+			attr.st_ino = id;
+		}
+
 		void SetFileMode()
 		{ attr.st_mode = S_IFREG | 0444; }
 
@@ -270,7 +276,7 @@ namespace
 				return;
 			}
 			FuseEntry entry(req);
-			entry.ino = CreateObject(parentId, name, format);
+			entry.SetId(CreateObject(parentId, name, format));
 			entry.Reply();
 		}
 
@@ -283,6 +289,39 @@ namespace
 				return 1;
 			else
 				return _session->GetObjectIntegerProperty(id, mtp::ObjectProperty::ParentObject);
+		}
+
+		bool FillEntry(FuseEntry &entry, mtp::u32 id)
+		{
+			entry.SetId(id);
+			if (id == 1)
+			{
+				entry.SetDirectoryMode();
+				return true;
+			}
+			else
+			{
+				auto it = _storages.find(id);
+				if (it != _storages.end())
+				{
+					entry.SetDirectoryMode();
+					return true;
+				}
+
+				try {
+					mtp::msg::ObjectInfo oi = _session->GetObjectInfo(id);
+					_objectFormats[id] = oi.ObjectFormat;
+					_objectSizes[id] = oi.ObjectCompressedSize != mtp::MaxObjectSize? oi.ObjectCompressedSize: _session->GetObjectIntegerProperty(id, mtp::ObjectProperty::ObjectSize);
+					entry.SetFormat(GetObjectFormat(id));
+					entry.SetSize(GetObjectSize(id));
+					entry.attr.st_ctim.tv_sec = mtp::ConvertDateTime(oi.CaptureDate);
+					entry.attr.st_mtim.tv_sec = mtp::ConvertDateTime(oi.ModificationDate);
+					return true;
+				}
+				catch(const std::exception &ex)
+				{ }
+			}
+			return false;
 		}
 
 	public:
@@ -344,16 +383,11 @@ namespace
 				auto it = children.find(name);
 				if (it != children.end())
 				{
-					entry.ino = it->second;
-					try
+					if (FillEntry(entry, it->second))
 					{
-						entry.SetFormat(GetObjectFormat(it->second));
-						entry.SetSize(GetObjectSize(it->second));
 						entry.Reply();
 						return;
 					}
-					catch(const std::exception &ex)
-					{ }
 				}
 			}
 			else
@@ -362,7 +396,7 @@ namespace
 				auto sit = _storagesByName.find(name);
 				if (sit != _storagesByName.end())
 				{
-					entry.ino = sit->second;
+					entry.SetId(sit->second);
 					entry.SetDirectoryMode();
 					entry.Reply();
 					return;
@@ -399,45 +433,17 @@ namespace
 				dir.Reply(off, size);
 				return;
 			}
-			fuse_reply_err(req, ENOTDIR);
+			FUSE_CALL(fuse_reply_err(req, ENOTDIR));
 		}
 
 		void GetAttr(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi)
 		{
 			mtp::scoped_mutex_lock l(_mutex);
 			FuseEntry entry(req);
-			entry.ino = ino;
-			if (ino == 1)
-			{
-				entry.SetDirectoryMode();
+			if (FillEntry(entry, ino))
 				entry.ReplyAttr();
-				return;
-			}
 			else
-			{
-				auto it = _storages.find(ino);
-				if (it != _storages.end())
-				{
-					entry.SetDirectoryMode();
-					entry.ReplyAttr();
-					return;
-				}
-
-				try {
-					mtp::msg::ObjectInfo oi = _session->GetObjectInfo(ino);
-					_objectFormats[ino] = oi.ObjectFormat;
-					_objectSizes[ino] = oi.ObjectCompressedSize != mtp::MaxObjectSize? oi.ObjectCompressedSize: _session->GetObjectIntegerProperty(ino, mtp::ObjectProperty::ObjectSize);
-					entry.SetFormat(GetObjectFormat(ino));
-					entry.SetSize(GetObjectSize(ino));
-					entry.attr.st_ctim.tv_sec = mtp::ConvertDateTime(oi.CaptureDate);
-					entry.attr.st_mtim.tv_sec = mtp::ConvertDateTime(oi.ModificationDate);
-					entry.ReplyAttr();
-					return;
-				}
-				catch(const std::exception &ex)
-				{ }
-			}
-			entry.ReplyError(ENOENT);
+				entry.ReplyError(ENOENT);
 		}
 
 		void Read(fuse_req_t req, fuse_ino_t ino, size_t size, off_t off, struct fuse_file_info *fi)
