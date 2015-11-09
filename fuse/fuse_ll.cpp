@@ -184,7 +184,10 @@ namespace
 
 			//populate cache for parent
 			mtp::u32 parent = GetParentObject(id);
-			GetChildren(parent);
+			if (_files.find(parent) != _files.end())
+				throw std::runtime_error("no such object (in cache)");
+
+			GetChildren(parent); //populate cachec
 
 			i = _objectAttrs.find(id);
 			if (i != _objectAttrs.end())
