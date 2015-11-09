@@ -315,17 +315,25 @@ namespace
 			else
 				storageId = _session->GetObjectIntegerProperty(parentId, mtp::ObjectProperty::StorageId);
 
-			mtp::msg::ObjectInfo oi;
-			oi.Filename = filename;
-			oi.ObjectFormat = format;
-			mtp::Session::NewObjectInfo noi = _session->SendObjectInfo(oi, storageId, parentId);
-			_session->SendObject(std::make_shared<mtp::ByteArrayObjectInputStream>(mtp::ByteArray()));
+			mtp::Session::NewObjectInfo noi;
+			if (format != mtp::ObjectFormat::Association)
+			{
+				mtp::msg::ObjectInfo oi;
+				oi.Filename = filename;
+				oi.ObjectFormat = format;
+				noi = _session->SendObjectInfo(oi, storageId, parentId);
+				_session->SendObject(std::make_shared<mtp::ByteArrayObjectInputStream>(mtp::ByteArray()));
+			}
+			else
+				noi = _session->CreateDirectory(filename, parentId, storageId);
 
 			{ //update cache:
 				auto i = _files.find(cacheParent);
 				if (i != _files.end())
+				{
 					i->second[filename] = noi.ObjectId;
-				GetObjectAttr(noi.ObjectId);
+					GetObjectAttr(noi.ObjectId);
+				}
 			}
 			return noi.ObjectId;
 		}
