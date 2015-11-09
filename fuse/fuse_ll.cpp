@@ -333,7 +333,12 @@ namespace
 			if (_storages.find(id) != _storages.end())
 				return 1;
 			else
-				return _session->GetObjectIntegerProperty(id, mtp::ObjectProperty::ParentObject);
+			{
+				mtp::u64 parent = _session->GetObjectIntegerProperty(id, mtp::ObjectProperty::ParentObject);
+				if (parent == 0 || parent == mtp::Session::Root) //parent == root -> storage
+					parent = _session->GetObjectIntegerProperty(id, mtp::ObjectProperty::StorageId);
+				return parent;
+			}
 		}
 
 		bool FillEntry(FuseEntry &entry, mtp::u32 id)
