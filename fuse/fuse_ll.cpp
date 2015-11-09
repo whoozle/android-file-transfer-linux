@@ -308,18 +308,9 @@ namespace
 					return true;
 				}
 
-				try {
-					mtp::msg::ObjectInfo oi = _session->GetObjectInfo(id);
-					_objectFormats[id] = oi.ObjectFormat;
-					_objectSizes[id] = oi.ObjectCompressedSize != mtp::MaxObjectSize? oi.ObjectCompressedSize: _session->GetObjectIntegerProperty(id, mtp::ObjectProperty::ObjectSize);
-					entry.SetFormat(GetObjectFormat(id));
-					entry.SetSize(GetObjectSize(id));
-					entry.attr.st_ctim.tv_sec = mtp::ConvertDateTime(oi.CaptureDate);
-					entry.attr.st_mtim.tv_sec = mtp::ConvertDateTime(oi.ModificationDate);
-					return true;
-				}
-				catch(const std::exception &ex)
-				{ }
+				entry.SetFormat(GetObjectFormat(id));
+				entry.SetSize(GetObjectSize(id));
+				return true;
 			}
 			return false;
 		}
