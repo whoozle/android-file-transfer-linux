@@ -195,6 +195,9 @@ namespace
 
 		ChildrenObjects & GetChildren(mtp::u32 parent)
 		{
+			if (parent == 1)
+				PopulateStorages();
+
 			{
 				auto i = _files.find(parent);
 				if (i != _files.end())
@@ -373,7 +376,13 @@ namespace
 				fprintf(stderr, "your device does not have android EditObject extension, mounting read-only\n");
 
 			_connectTime = time(NULL);
+			PopulateStorages();
+		}
 
+		void PopulateStorages()
+		{
+			_storages.clear();
+			_storagesByName.clear();
 			mtp::msg::StorageIDs ids = _session->GetStorageIDs();
 			for(size_t i = 0; i < ids.StorageIDs.size(); ++i)
 			{
