@@ -32,7 +32,7 @@ If you're suffering from crashes, missing tags and album covers, usb freezes and
 * For ubuntu and other debian-based distros use the following command:
 
   ```shell
-  sudo apt-get install build-essential cmake libqt4-dev ninja-build libfuse-dev
+  sudo apt-get install build-essential cmake libqt4-dev ninja-build libfuse-dev libreadline-dev
   ```
 * Basically, you need `libqtX-dev` for UI, `libfuse-dev` for FUSE interface, `cmake`, `ninja` or `make` for building the project. You could use libqt5-dev as well.
 
