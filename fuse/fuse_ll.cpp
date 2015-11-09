@@ -210,6 +210,7 @@ namespace
 			{
 				if (_session->GetObjectPropertyListSupported())
 				{
+					//populate filenames
 					ByteArray data;
 					{
 						data = _session->GetObjectPropertyList(parent, ObjectFormat::Any, ObjectProperty::ObjectFilename, 0, 1);
@@ -219,6 +220,8 @@ namespace
 							cache[name] = objectId;
 						});
 					}
+
+					//format
 					{
 						data = _session->GetObjectPropertyList(parent, ObjectFormat::Any, ObjectProperty::ObjectFormat, 0, 1);
 						ObjectPropertyListParser<mtp::ObjectFormat> parser;
@@ -227,6 +230,8 @@ namespace
 							_objectAttrs[objectId].st_mode = FuseEntry::GetMode(format);
 						});
 					}
+
+					//size
 					{
 						data = _session->GetObjectPropertyList(parent, ObjectFormat::Any, ObjectProperty::ObjectSize, 0, 1);
 						ObjectPropertyListParser<u64> parser;
@@ -235,6 +240,32 @@ namespace
 							_objectAttrs[objectId].st_size = size;
 						});
 					}
+
+					//mtime
+					try
+					{
+						data = _session->GetObjectPropertyList(parent, ObjectFormat::Any, ObjectProperty::DateModified, 0, 1);
+						ObjectPropertyListParser<std::string> parser;
+						parser.Parse(data, [this](u32 objectId, const std::string & mtime)
+						{
+							_objectAttrs[objectId].st_mtime = mtp::ConvertDateTime(mtime);
+						});
+					}
+					catch(const std::exception &ex)
+					{ }
+
+					//ctime
+					try
+					{
+						data = _session->GetObjectPropertyList(parent, ObjectFormat::Any, ObjectProperty::DateAdded, 0, 1);
+						ObjectPropertyListParser<std::string> parser;
+						parser.Parse(data, [this](u32 objectId, const std::string & mtime)
+						{
+							_objectAttrs[objectId].st_ctime = mtp::ConvertDateTime(mtime);
+						});
+					}
+					catch(const std::exception &ex)
+					{ }
 					return cache;
 				}
 				oh = _session->GetObjectHandles(mtp::Session::AllStorages, mtp::ObjectFormat::Any, parent);
