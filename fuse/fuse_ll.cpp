@@ -274,6 +274,17 @@ namespace
 			entry.Reply();
 		}
 
+		mtp::u32 GetParentObject(mtp::u32 id)
+		{
+			if (id == 1)
+				return 1;
+
+			if (_storages.find(id) != _storages.end())
+				return 1;
+			else
+				return _session->GetObjectIntegerProperty(id, mtp::ObjectProperty::ParentObject);
+		}
+
 	public:
 		FuseWrapper()
 		{ Connect(); }
@@ -380,7 +391,7 @@ namespace
 			{
 				const ChildrenObjects & cache = GetChildren(ino);
 				dir.Add(ino, ".");
-				dir.Add(1, "..");
+				dir.Add(GetParentObject(ino), "..");
 				for(auto it : cache)
 				{
 					dir.Add(it.second, it.first);
