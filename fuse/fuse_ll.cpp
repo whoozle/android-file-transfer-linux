@@ -119,10 +119,10 @@ namespace
 		void Reply(off_t off, size_t size)
 		{
 			if (off >= (off_t)Data.size())
-				fuse_reply_buf(Request, NULL, 0);
+				FUSE_CALL(fuse_reply_buf(Request, NULL, 0));
 			else
 			{
-				fuse_reply_buf(Request, Data.data() + off, std::min<size_t>(size, Data.size() - off));
+				FUSE_CALL(fuse_reply_buf(Request, Data.data() + off, std::min<size_t>(size, Data.size() - off)));
 			}
 		}
 	};
@@ -266,7 +266,7 @@ namespace
 		{
 			if (parentId == 1)
 			{
-				fuse_reply_err(req, EPERM); //cannot create files in the same level with storages
+				FUSE_CALL(fuse_reply_err(req, EPERM)); //cannot create files in the same level with storages
 				return;
 			}
 			FuseEntry entry(req);
@@ -462,7 +462,7 @@ namespace
 				}
 			}
 			tr->Send(off, mtp::ByteArray(buf, buf + size));
-			fuse_reply_write(req, size);
+			FUSE_CALL(fuse_reply_write(req, size));
 		}
 
 		void MakeNode(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t mode, dev_t rdev)
@@ -484,14 +484,14 @@ namespace
 				format = GetObjectFormat(ino);
 			}
 			catch(const std::exception &ex)
-			{ fuse_reply_err(req, ENOENT); return; }
+			{ FUSE_CALL(fuse_reply_err(req, ENOENT)); return; }
 
 			if (format == mtp::ObjectFormat::Association)
 			{
-				fuse_reply_err(req, EISDIR);
+				FUSE_CALL(fuse_reply_err(req, EISDIR));
 				return;
 			}
-			fuse_reply_open(req, fi);
+			FUSE_CALL(fuse_reply_open(req, fi));
 		}
 
 		void Release(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi)
@@ -526,7 +526,7 @@ namespace
 			children.erase(i);
 
 			_session->DeleteObject(id);
-			fuse_reply_err(req, 0);
+			FUSE_CALL(fuse_reply_err(req, 0));
 		}
 
 		void StatFS(fuse_req_t req, fuse_ino_t ino)
@@ -560,7 +560,7 @@ namespace
 			stat.f_blocks = capacity / stat.f_frsize;
 			stat.f_bfree = stat.f_bavail = freeSpace / stat.f_frsize;
 
-			fuse_reply_statfs(req, &stat);
+			FUSE_CALL(fuse_reply_statfs(req, &stat));
 		}
 	};
 
