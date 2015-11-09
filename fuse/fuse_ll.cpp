@@ -325,6 +325,7 @@ namespace
 				auto i = _files.find(cacheParent);
 				if (i != _files.end())
 					i->second[filename] = noi.ObjectId;
+				GetObjectAttr(noi.ObjectId);
 			}
 			return noi.ObjectId;
 		}
