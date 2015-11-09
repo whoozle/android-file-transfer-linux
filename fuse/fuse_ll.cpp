@@ -348,8 +348,10 @@ namespace
 				FUSE_CALL(fuse_reply_err(req, EPERM)); //cannot create files in the same level with storages
 				return;
 			}
+			mtp::u32 objectId = CreateObject(parentId, name, format);
 			FuseEntry entry(req);
-			entry.SetId(CreateObject(parentId, name, format));
+			entry.SetId(objectId);
+			entry.attr = GetObjectAttr(objectId);
 			entry.Reply();
 		}
 
