@@ -31,6 +31,9 @@ namespace mtp
 		std::stringstream ss;
 		ss << prefix << "[" << data.size() << "]:\n";
 		size_t i;
+
+		std::string chars;
+		chars.reserve(16);
 		for(i = 0; i < data.size(); ++i)
 		{
 			bool first = ((i & 0xf) == 0);
@@ -38,14 +41,21 @@ namespace mtp
 			if (first)
 				ss << hex(i, 8) << ": ";
 
-			ss << hex(data[i], 2);
+			u8 value = data[i];
+			ss << hex(value, 2);
+			chars.push_back(value < 0x20 || value >= 0x7f? '.': value);
 			if (last)
-				ss << "\n";
+			{
+				ss << " " << chars << "\n";
+				chars.clear();
+			}
 			else
 				ss << " ";
 		}
-		if (i & 0xf)
-			ss << "\n";
+		if (chars.size())
+		{
+			ss << std::string((size_t)(16 - chars.size()) * 3, ' ') << chars << "\n";
+		}
 
 		error(ss.str());
 	}
