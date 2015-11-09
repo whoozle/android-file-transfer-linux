@@ -158,9 +158,36 @@ namespace
 	private:
 		struct stat GetObjectAttr(mtp::u32 id)
 		{
+			if (id == 1)
+			{
+				struct stat attr = { };
+				attr.st_ino = id;
+				attr.st_mode = FuseEntry::DirectoryMode;
+				return attr;
+			}
+
+			auto sit = _storages.find(id);
+			if (sit != _storages.end())
+			{
+				struct stat attr = { };
+				attr.st_ino = id;
+				attr.st_mode = FuseEntry::DirectoryMode;
+				return attr;
+			}
+
 			auto i = _objectAttrs.find(id);
 			if (i != _objectAttrs.end())
 				return i->second;
+
+			//populate cache for parent
+			mtp::u32 parent = GetParentObject(id);
+			GetChildren(parent);
+
+			i = _objectAttrs.find(id);
+			if (i != _objectAttrs.end())
+				return i->second;
+			else
+				throw std::runtime_error("no such object");
 		}
 
 		ChildrenObjects & GetChildren(mtp::u32 parent)
@@ -277,25 +304,9 @@ namespace
 
 		bool FillEntry(FuseEntry &entry, mtp::u32 id)
 		{
+			try { entry.attr = GetObjectAttr(id); } catch(const std::exception &ex) { return false; }
 			entry.SetId(id);
-			if (id == 1)
-			{
-				entry.SetDirectoryMode();
-				return true;
-			}
-			else
-			{
-				auto it = _storages.find(id);
-				if (it != _storages.end())
-				{
-					entry.SetDirectoryMode();
-					return true;
-				}
-
-				entry.attr = GetObjectAttr(id);
-				return true;
-			}
-			return false;
+			return true;
 		}
 
 	public:
