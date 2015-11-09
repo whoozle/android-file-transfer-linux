@@ -50,7 +50,9 @@ namespace
 
 	struct FuseEntry : fuse_entry_param
 	{
-		static constexpr const double Timeout = 60.0;
+		static constexpr const double	Timeout = 60.0;
+		static constexpr unsigned 		FileMode 		= S_IFREG | 0444;
+		static constexpr unsigned 		DirectoryMode	= S_IFDIR | 0755;
 
 		fuse_req_t Request;
 
@@ -67,20 +69,19 @@ namespace
 		}
 
 		void SetFileMode()
-		{ attr.st_mode = S_IFREG | 0444; }
+		{ attr.st_mode = FileMode; }
 
 		void SetDirectoryMode()
-		{ attr.st_mode = S_IFDIR | 0755; }
+		{ attr.st_mode = DirectoryMode; }
 
-		void SetFormat(mtp::ObjectFormat format)
+		static mode_t GetMode(mtp::ObjectFormat format)
 		{
 			switch(format)
 			{
 			case mtp::ObjectFormat::Association:
-				SetDirectoryMode();
-				break;
+				return DirectoryMode;
 			default:
-				SetFileMode();
+				return FileMode;
 			}
 		}
 
@@ -144,11 +145,8 @@ namespace
 		typedef std::map<mtp::u32, ChildrenObjects> Files;
 		Files			_files;
 
-		typedef std::map<mtp::u32, mtp::ObjectFormat> ObjectTypes;
-		ObjectTypes		_objectFormats;
-
-		typedef std::map<mtp::u32, mtp::u64> ObjectSizes;
-		ObjectSizes		_objectSizes;
+		typedef std::map<mtp::u32, struct stat> ObjectAttrs;
+		ObjectAttrs		_objectAttrs;
 
 		typedef mtp::Session::ObjectEditSessionPtr ObjectEditSessionPtr;
 		typedef std::map<mtp::u32, ObjectEditSessionPtr> OpenedFiles;
@@ -158,25 +156,11 @@ namespace
 		std::map<std::string, mtp::u32>		_storagesByName;
 
 	private:
-		mtp::ObjectFormat GetObjectFormat(mtp::u32 id)
+		struct stat GetObjectAttr(mtp::u32 id)
 		{
-			auto i = _objectFormats.find(id);
-			if (i != _objectFormats.end())
+			auto i = _objectAttrs.find(id);
+			if (i != _objectAttrs.end())
 				return i->second;
-			mtp::ObjectFormat format = static_cast<mtp::ObjectFormat>(_session->GetObjectIntegerProperty(id, mtp::ObjectProperty::ObjectFormat));
-			_objectFormats.insert(std::make_pair(id, format));
-			return format;
-		}
-
-		mtp::u64 GetObjectSize(mtp::u32 id)
-		{
-			auto i = _objectSizes.find(id);
-			if (i != _objectSizes.end())
-				return i->second;
-
-			mtp::u64 size = _session->GetObjectIntegerProperty(id, mtp::ObjectProperty::ObjectSize);
-			_objectSizes.insert(std::make_pair(id, size));
-			return size;
 		}
 
 		ChildrenObjects & GetChildren(mtp::u32 parent)
@@ -210,10 +194,10 @@ namespace
 					}
 					{
 						data = _session->GetObjectPropertyList(parent, ObjectFormat::Any, ObjectProperty::ObjectFormat, 0, 1);
-						ObjectPropertyListParser<u16> parser;
-						parser.Parse(data, [this](u32 objectId, u16 format)
+						ObjectPropertyListParser<mtp::ObjectFormat> parser;
+						parser.Parse(data, [this](u32 objectId, mtp::ObjectFormat format)
 						{
-							_objectFormats[objectId] = static_cast<ObjectFormat>(format);
+							_objectAttrs[objectId].st_mode = FuseEntry::GetMode(format);
 						});
 					}
 					{
@@ -221,7 +205,7 @@ namespace
 						ObjectPropertyListParser<u64> parser;
 						parser.Parse(data, [this](u32 objectId, u64 size)
 						{
-							_objectSizes[objectId] = size;
+							_objectAttrs[objectId].st_size = size;
 						});
 					}
 					return cache;
@@ -234,7 +218,7 @@ namespace
 				try
 				{
 					std::string name = _session->GetObjectStringProperty(id, mtp::ObjectProperty::ObjectFilename);
-					_objectFormats[id] = (ObjectFormat)_session->GetObjectIntegerProperty(id, ObjectProperty::ObjectFormat);
+					_objectAttrs[id].st_mode = FuseEntry::GetMode((ObjectFormat)_session->GetObjectIntegerProperty(id, ObjectProperty::ObjectFormat));
 					cache[name] = id;
 				} catch(const std::exception &ex)
 				{ }
@@ -308,8 +292,7 @@ namespace
 					return true;
 				}
 
-				entry.SetFormat(GetObjectFormat(id));
-				entry.SetSize(GetObjectSize(id));
+				entry.attr = GetObjectAttr(id);
 				return true;
 			}
 			return false;
@@ -325,6 +308,7 @@ namespace
 
 			_openedFiles.clear();
 			_files.clear();
+			_objectAttrs.clear();
 			_storages.clear();
 			_storagesByName.clear();
 			_session.reset();
@@ -478,7 +462,7 @@ namespace
 
 			try
 			{
-				format = GetObjectFormat(ino);
+				format = static_cast<mtp::ObjectFormat>(_session->GetObjectIntegerProperty(ino, mtp::ObjectProperty::ObjectFormat));
 			}
 			catch(const std::exception &ex)
 			{ FUSE_CALL(fuse_reply_err(req, ENOENT)); return; }
@@ -518,8 +502,7 @@ namespace
 
 			mtp::u32 id = i->second;
 			_openedFiles.erase(id);
-			_objectFormats.erase(id);
-			_objectSizes.erase(id);
+			_objectAttrs.erase(id);
 			children.erase(i);
 
 			_session->DeleteObject(id);
