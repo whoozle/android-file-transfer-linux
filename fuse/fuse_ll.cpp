@@ -755,6 +755,14 @@ namespace
 
 int main(int argc, char **argv)
 {
+	for(int i = 0; i < argc; ++i)
+	{
+		if (strcmp(argv[i], "-d") == 0 || strcmp(argv[i], "-odebug") == 0)
+			mtp::g_debug = true;
+		if (i + 1 < argc && strcmp(argv[i], "-o") == 0 && strcmp(argv[i + 1], "debug") == 0)
+			mtp::g_debug = true;
+	}
+
 	try
 	{ g_wrapper.reset(new FuseWrapper()); }
 	catch(const std::exception &ex)
