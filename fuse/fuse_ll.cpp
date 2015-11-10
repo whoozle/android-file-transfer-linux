@@ -390,6 +390,7 @@ namespace
 			}
 			else
 				storageId = _session->GetObjectStorage(parentId);
+			mtp::debug("   creating object in storage ", mtp::hex(storageId.Id), ", parent: ", mtp::hex(parentId.Id, 8));
 
 			mtp::Session::NewObjectInfo noi;
 			if (format != mtp::ObjectFormat::Association)
