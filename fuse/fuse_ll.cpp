@@ -402,6 +402,8 @@ namespace
 			else
 				noi = _session->CreateDirectory(filename, parentId, storageId);
 
+			mtp::debug("   new object id ", noi.ObjectId.Id);
+
 			{ //update cache:
 				auto i = _files.find(parentInode);
 				if (i != _files.end())
@@ -648,7 +650,9 @@ namespace
 			}
 
 			FuseId inode = i->second;
+			mtp::debug("   unlinking inode ", inode.Inode);
 			mtp::ObjectId id = FromFuse(inode);
+			_directoryCache.erase(parent);
 			_openedFiles.erase(inode);
 			_objectAttrs.erase(id);
 			children.erase(i);
