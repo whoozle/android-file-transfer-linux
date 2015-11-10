@@ -254,7 +254,9 @@ namespace
 						ObjectPropertyListParser<mtp::ObjectFormat> parser;
 						parser.Parse(data, [this](u32 objectId, mtp::ObjectFormat format)
 						{
-							_objectAttrs[objectId].st_mode = FuseEntry::GetMode(format);
+							struct stat & attr = _objectAttrs[objectId];
+							attr.st_ino = objectId;
+							attr.st_mode = FuseEntry::GetMode(format);
 						});
 					}
 
