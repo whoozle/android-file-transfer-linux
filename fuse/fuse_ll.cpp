@@ -716,8 +716,9 @@ namespace
 		mtp::debug("Init: fuse proto version: ", conn->proto_major, ".", conn->proto_minor,
 			", capability: 0x", mtp::hex(conn->capable, 8),
 			", async read: ", conn->async_read,
-			", congestion_threshold: ", conn->congestion_threshold,
-			", max bg: ", conn->max_background, ", max readahead: ", conn->max_readahead, ", max write: ", conn->max_write
+			//", congestion_threshold: ", conn->congestion_threshold,
+			//", max bg: ", conn->max_background,
+			", max readahead: ", conn->max_readahead, ", max write: ", conn->max_write
 		);
 		try { g_wrapper->Init(userdata, conn); } catch (const std::exception &ex) { mtp::error("init failed:", ex.what()); }
 	}
