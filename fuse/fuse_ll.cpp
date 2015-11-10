@@ -582,21 +582,39 @@ namespace
 			FUSE_CALL(fuse_reply_buf(req, static_cast<char *>(static_cast<void *>(data.data())), data.size()));
 		}
 
-		void Write(fuse_req_t req, FuseId ino, const char *buf, size_t size, off_t off, struct fuse_file_info *fi)
+		mtp::Session::ObjectEditSessionPtr GetTransaction(FuseId inode)
 		{
-			mtp::scoped_mutex_lock l(_mutex);
 			mtp::Session::ObjectEditSessionPtr tr;
 			{
-				auto it = _openedFiles.find(ino);
+				auto it = _openedFiles.find(inode);
 				if (it != _openedFiles.end())
 					tr = it->second;
 				else
 				{
-					tr = mtp::Session::EditObject(_session, FromFuse(ino));
-					_openedFiles[ino] = tr;
+					tr = mtp::Session::EditObject(_session, FromFuse(inode));
+					_openedFiles[inode] = tr;
 				}
 			}
-			NOT_NULL(tr)->Send(off, mtp::ByteArray(buf, buf + size));
+			return NOT_NULL(tr);
+		}
+
+		void Write(fuse_req_t req, FuseId inode, const char *buf, size_t size, off_t off, struct fuse_file_info *fi)
+		{
+			mtp::scoped_mutex_lock l(_mutex);
+
+			struct stat attr = GetObjectAttr(inode);
+			mtp::ObjectId objectId = FromFuse(inode);
+
+			ObjectEditSessionPtr tr = GetTransaction(inode);
+
+			off_t newSize = off + size;
+			if (newSize > attr.st_size)
+			{
+				tr->Truncate(newSize);
+				_objectAttrs[objectId].st_size = newSize;
+			}
+
+			tr->Send(off, mtp::ByteArray(buf, buf + size));
 			FUSE_CALL(fuse_reply_write(req, size));
 		}
 
@@ -634,8 +652,25 @@ namespace
 				_openedFiles.erase(i);
 		}
 
-		void SetAttr(fuse_req_t req, FuseId ino, struct stat *attr, int to_set, struct fuse_file_info *fi)
-		{ GetAttr(req, ino, fi); }
+		void SetAttr(fuse_req_t req, FuseId inode, struct stat *attr, int to_set, struct fuse_file_info *fi)
+		{
+			mtp::scoped_mutex_lock l(_mutex);
+			FuseEntry entry(req);
+			if (FillEntry(entry, inode))
+			{
+				if (to_set & FUSE_SET_ATTR_SIZE)
+				{
+					off_t newSize = attr->st_size;
+					ObjectEditSessionPtr tr = GetTransaction(inode);
+					tr->Truncate(newSize);
+					entry.attr.st_size = newSize;
+					_objectAttrs[FromFuse(inode)].st_size = newSize;
+				}
+				entry.ReplyAttr();
+			}
+			else
+				entry.ReplyError(ENOENT);
+		}
 
 		void RemoveDir (fuse_req_t req, FuseId parent, const char *name)
 		{ Unlink(req, parent, name); }
