@@ -94,7 +94,7 @@ namespace mtp
 				{
 					usb::InterfacePtr iface = conf->GetInterface(device, conf, j, 0);
 					usb::InterfaceTokenPtr token = device->ClaimInterface(iface);
-					debug(i, ':', j, "index ", iface->GetIndex(), ", eps ", iface->GetEndpointsCount());
+					debug(i, ':', j, ", index: ", iface->GetIndex(), ", enpoints: ", iface->GetEndpointsCount());
 
 					ByteArray data = usb::DeviceRequest(device).GetDescriptor(usb::DescriptorType::String, 0, 0);
 					HexDump("languages", data);

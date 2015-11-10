@@ -75,7 +75,7 @@ namespace mtp { namespace usb
 		try { IOCTL(_fd.Get(), USBDEVFS_GET_CAPABILITIES, &_capabilities); }
 		catch(const std::exception &ex)
 		{ error("get usbfs capabilities failed: ", ex.what()); }
-		debug("capabilities = ", std::hex, _capabilities);
+		debug("capabilities = 0x", hex(_capabilities, 8));
 		if (_capabilities)
 		{
 			u32 capabilities = _capabilities;
@@ -85,7 +85,7 @@ namespace mtp { namespace usb
 			PRINT_CAP(USBDEVFS_CAP_BULK_SCATTER_GATHER, "<bulk-scatter-gather>");
 			PRINT_CAP(USBDEVFS_CAP_REAP_AFTER_DISCONNECT, "<reap-after-disconnect>");
 			if (capabilities)
-				debug("<unknown capability 0x", std::hex, capabilities, ">");
+				debug("<unknown capability 0x", hex(capabilities, 2), ">");
 		}
 		else
 			debug("[none]\n");
@@ -217,7 +217,7 @@ namespace mtp { namespace usb
 		try
 		{ unsigned index = ep->GetAddress(); IOCTL(_fd.Get(), USBDEVFS_CLEAR_HALT, &index); }
 		catch(const std::exception &ex)
-		{ error("clearing halt status for ep ", std::hex, ep->GetAddress(), ": ", ex.what()); }
+		{ error("clearing halt status for ep ", hex(ep->GetAddress(), 2), ": ", ex.what()); }
 	}
 
 
