@@ -48,6 +48,8 @@ namespace
 
 #define FUSE_CALL(...) do { int _r = __VA_ARGS__ ; if (_r < 0) throw Exception(#__VA_ARGS__ " failed", -_r); } while(false)
 
+	typedef std::vector<char> CharArray;
+
 	struct FuseEntry : fuse_entry_param
 	{
 		static constexpr const double	Timeout = 60.0;
@@ -109,25 +111,26 @@ namespace
 	struct FuseDirectory
 	{
 		fuse_req_t			Request;
-		std::vector<char>	Data;
 
-		FuseDirectory(fuse_req_t request): Request(request) { Data.reserve(4096); }
+		FuseDirectory(fuse_req_t request): Request(request) { }
 
-		void Add(const std::string &name, const struct stat & entry)
+		void Add(CharArray & data, const std::string &name, const struct stat & entry)
 		{
+			if (data.empty())
+				data.reserve(4096);
 			size_t size = fuse_add_direntry(Request, NULL, 0, name.c_str(), NULL, 0);
-			size_t offset = Data.size();
-			Data.resize(Data.size() + size);
-			fuse_add_direntry(Request, Data.data() + offset, size, name.c_str(), &entry, Data.size());
+			size_t offset = data.size();
+			data.resize(data.size() + size);
+			fuse_add_direntry(Request, data.data() + offset, size, name.c_str(), &entry, data.size()); //request is not used inside fuse here, so we could cache resulting dirent data
 		}
 
-		void Reply(off_t off, size_t size)
+		static void Reply(fuse_req_t req, const CharArray &data, off_t off, size_t size)
 		{
-			if (off >= (off_t)Data.size())
-				FUSE_CALL(fuse_reply_buf(Request, NULL, 0));
+			if (off >= (off_t)data.size())
+				FUSE_CALL(fuse_reply_buf(req, NULL, 0));
 			else
 			{
-				FUSE_CALL(fuse_reply_buf(Request, Data.data() + off, std::min<size_t>(size, Data.size() - off)));
+				FUSE_CALL(fuse_reply_buf(req, data.data() + off, std::min<size_t>(size, data.size() - off)));
 			}
 		}
 	};
@@ -150,6 +153,9 @@ namespace
 		typedef mtp::Session::ObjectEditSessionPtr ObjectEditSessionPtr;
 		typedef std::map<mtp::u32, ObjectEditSessionPtr> OpenedFiles;
 		OpenedFiles		_openedFiles;
+
+		typedef std::map<fuse_ino_t, CharArray> DirectoryCache;
+		DirectoryCache	_directoryCache;
 
 		std::map<mtp::u32, std::string>		_storages;
 		std::map<std::string, mtp::u32>		_storagesByName;
@@ -338,6 +344,7 @@ namespace
 				auto i = _files.find(cacheParent);
 				if (i != _files.end())
 					GetObjectInfo(i->second, noi.ObjectId); //insert object info into cache
+				_directoryCache.erase(cacheParent);
 			}
 			return noi.ObjectId;
 		}
@@ -390,6 +397,7 @@ namespace
 			_openedFiles.clear();
 			_files.clear();
 			_objectAttrs.clear();
+			_directoryCache.clear();
 			_storages.clear();
 			_storagesByName.clear();
 			_session.reset();
@@ -465,17 +473,24 @@ namespace
 				return;
 			}
 
-			const ChildrenObjects & cache = GetChildren(ino);
-
-			//fixme: store dir in cache too
 			FuseDirectory dir(req);
-			dir.Add(".", GetObjectAttr(FUSE_ROOT_ID));
-			dir.Add("..", GetObjectAttr(GetParentObject(ino)));
-			for(auto it : cache)
+			auto it = _directoryCache.find(ino);
+			if (it == _directoryCache.end())
 			{
-				dir.Add(it.first, GetObjectAttr(it.second));
+				const ChildrenObjects & cache = GetChildren(ino);
+
+				it = _directoryCache.insert(std::make_pair(ino, CharArray())).first;
+				CharArray &data = it->second;
+
+				dir.Add(data, ".", GetObjectAttr(FUSE_ROOT_ID));
+				dir.Add(data, "..", GetObjectAttr(GetParentObject(ino)));
+				for(auto it : cache)
+				{
+					dir.Add(data, it.first, GetObjectAttr(it.second));
+				}
 			}
-			dir.Reply(off, size);
+
+			dir.Reply(req, it->second, off, size);
 		}
 
 		void GetAttr(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi)
