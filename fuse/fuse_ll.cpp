@@ -602,9 +602,6 @@ namespace
 		void MakeNode(fuse_req_t req, FuseId parent, const char *name, mode_t mode, dev_t rdev)
 		{ mtp::scoped_mutex_lock l(_mutex); CreateObject(mtp::ObjectFormat::Undefined, req, parent, name, mode); }
 
-		void Create(fuse_req_t req, FuseId parent, const char *name, mode_t mode, struct fuse_file_info *fi)
-		{ mtp::scoped_mutex_lock l(_mutex); CreateObject(mtp::ObjectFormat::Undefined, req, parent, name, mode); }
-
 		void MakeDir(fuse_req_t req, FuseId parent, const char *name, mode_t mode)
 		{ mtp::scoped_mutex_lock l(_mutex); CreateObject(mtp::ObjectFormat::Association, req, parent, name, mode); }
 
@@ -754,9 +751,6 @@ namespace
 	void Release(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi)
 	{ mtp::debug("   Release ", ino); WRAP_EX(g_wrapper->Release(req, FuseId(ino), fi)); }
 
-	void Create(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t mode, struct fuse_file_info *fi)
-	{ mtp::debug("   Create ", parent, " ", name, " 0x", mtp::hex(mode, 8)); WRAP_EX(g_wrapper->Create(req, FuseId(parent), name, mode, fi)); }
-
 	void MakeDir(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t mode)
 	{ mtp::debug("   MakeDir ", parent, " ", name, " 0x", mtp::hex(mode, 8)); WRAP_EX(g_wrapper->MakeDir(req, FuseId(parent), name, mode)); }
 
@@ -794,7 +788,6 @@ int main(int argc, char **argv)
 	ops.setattr		= &SetAttr;
 	ops.mknod		= &MakeNode;
 	ops.open		= &Open;
-	ops.create		= &Create;
 	ops.read		= &Read;
 	ops.write		= &Write;
 	ops.mkdir		= &MakeDir;
