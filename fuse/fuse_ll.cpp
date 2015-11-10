@@ -154,6 +154,7 @@ namespace
 		mtp::DevicePtr	_device;
 		mtp::SessionPtr	_session;
 		bool			_editObjectSupported;
+		bool			_getObjectPropertyListSupported;
 		time_t			_connectTime;
 
 		typedef std::map<std::string, FuseId> ChildrenObjects;
@@ -300,7 +301,7 @@ namespace
 			{
 				mtp::ObjectId parent = FromFuse(inode);
 
-				if (_session->GetObjectPropertyListSupported())
+				if (_getObjectPropertyListSupported)
 				{
 					//populate filenames
 					ByteArray data;
@@ -474,6 +475,9 @@ namespace
 			_editObjectSupported = _session->EditObjectSupported();
 			if (!_editObjectSupported)
 				mtp::error("your device does not have android EditObject extension, mounting read-only\n");
+			_getObjectPropertyListSupported = _session->GetObjectPropertyListSupported();
+			if (!_getObjectPropertyListSupported)
+				mtp::error("your device does not have GetObjectPropertyList extension, expect slow enumeration of big directories\n");
 
 			_connectTime = time(NULL);
 			PopulateStorages();
