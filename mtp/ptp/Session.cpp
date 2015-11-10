@@ -320,7 +320,12 @@ namespace mtp
 	}
 
 	StorageId Session::GetObjectStorage(mtp::ObjectId id)
-	{ return StorageId(GetObjectIntegerProperty(id, ObjectProperty::StorageId)); }
+	{
+		StorageId storageId(GetObjectIntegerProperty(id, ObjectProperty::StorageId));
+		if (storageId == AnyStorage || storageId == AllStorages)
+			throw std::runtime_error("returned wildcard storage id as storage for object");
+		return storageId;
+	}
 
 	ObjectId Session::GetObjectParent(mtp::ObjectId id)
 	{ return ObjectId(GetObjectIntegerProperty(id, ObjectProperty::ParentObject)); }
