@@ -113,13 +113,11 @@ namespace
 
 		FuseDirectory(fuse_req_t request): Request(request) { Data.reserve(4096); }
 
-		void Add(mtp::u32 id, const std::string &name)
+		void Add(const std::string &name, const struct stat & entry)
 		{
 			size_t size = fuse_add_direntry(Request, NULL, 0, name.c_str(), NULL, 0);
 			size_t offset = Data.size();
 			Data.resize(Data.size() + size);
-			struct stat entry = { };
-			entry.st_ino = id;
 			fuse_add_direntry(Request, Data.data() + offset, size, name.c_str(), &entry, Data.size());
 		}
 
@@ -461,9 +459,6 @@ namespace
 		void ReadDir(fuse_req_t req, fuse_ino_t ino, size_t size, off_t off, struct fuse_file_info *fi)
 		{
 			mtp::scoped_mutex_lock l(_mutex);
-			//fixme: store dir in cache too
-			FuseDirectory dir(req);
-
 			if (!(GetObjectAttr(ino).st_mode & S_IFDIR))
 			{
 				FUSE_CALL(fuse_reply_err(req, ENOTDIR));
@@ -471,11 +466,14 @@ namespace
 			}
 
 			const ChildrenObjects & cache = GetChildren(ino);
-			dir.Add(ino, ".");
-			dir.Add(GetParentObject(ino), "..");
+
+			//fixme: store dir in cache too
+			FuseDirectory dir(req);
+			dir.Add(".", GetObjectAttr(FUSE_ROOT_ID));
+			dir.Add("..", GetObjectAttr(GetParentObject(ino)));
 			for(auto it : cache)
 			{
-				dir.Add(it.second, it.first);
+				dir.Add(it.first, GetObjectAttr(it.second));
 			}
 			dir.Reply(off, size);
 		}
