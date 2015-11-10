@@ -708,49 +708,57 @@ namespace
 	} while(false)
 
 	void Init (void *userdata, struct fuse_conn_info *conn)
-	{ try { g_wrapper->Init(userdata, conn); } catch (const std::exception &ex) { mtp::error("init failed:", ex.what()); } }
+	{
+		mtp::debug("Init: fuse proto version: ", conn->proto_major, ".", conn->proto_minor,
+			", capability: 0x", mtp::hex(conn->capable, 8),
+			", async read: ", conn->async_read,
+			", congestion_threshold: ", conn->congestion_threshold,
+			", max bg: ", conn->max_background, ", max readahead: ", conn->max_readahead, ", max write: ", conn->max_write
+		);
+		try { g_wrapper->Init(userdata, conn); } catch (const std::exception &ex) { mtp::error("init failed:", ex.what()); }
+	}
 
 	void Lookup (fuse_req_t req, fuse_ino_t parent, const char *name)
-	{ WRAP_EX(g_wrapper->Lookup(req, FuseId(parent), name)); }
+	{ mtp::debug("Lookup ", parent, " ", name); WRAP_EX(g_wrapper->Lookup(req, FuseId(parent), name)); }
 
 	void ReadDir(fuse_req_t req, fuse_ino_t ino, size_t size, off_t off, struct fuse_file_info *fi)
-	{ WRAP_EX(g_wrapper->ReadDir(req, FuseId(ino), size, off, fi)); }
+	{ mtp::debug("Readdir ", ino, " ", size, " ", off); WRAP_EX(g_wrapper->ReadDir(req, FuseId(ino), size, off, fi)); }
 
 	void GetAttr(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi)
-	{ WRAP_EX(g_wrapper->GetAttr(req, FuseId(ino), fi)); }
+	{ mtp::debug("GetAttr ", ino); WRAP_EX(g_wrapper->GetAttr(req, FuseId(ino), fi)); }
 
 	void SetAttr(fuse_req_t req, fuse_ino_t ino, struct stat *attr, int to_set, struct fuse_file_info *fi)
-	{ WRAP_EX(g_wrapper->SetAttr(req, FuseId(ino), attr, to_set, fi)); }
+	{ mtp::debug("SetAttr ", ino, " 0x", mtp::hex(to_set, 8)); WRAP_EX(g_wrapper->SetAttr(req, FuseId(ino), attr, to_set, fi)); }
 
 	void Read(fuse_req_t req, fuse_ino_t ino, size_t size, off_t off, struct fuse_file_info *fi)
-	{ WRAP_EX(g_wrapper->Read(req, FuseId(ino), size, off, fi)); }
+	{ mtp::debug("Read ", ino, " ", size, " ", off); WRAP_EX(g_wrapper->Read(req, FuseId(ino), size, off, fi)); }
 
 	void Write(fuse_req_t req, fuse_ino_t ino, const char *buf, size_t size, off_t off, struct fuse_file_info *fi)
-	{ WRAP_EX(g_wrapper->Write(req, FuseId(ino), buf, size, off, fi)); }
+	{ mtp::debug("Write ", ino, " ", size, " ", off); WRAP_EX(g_wrapper->Write(req, FuseId(ino), buf, size, off, fi)); }
 
 	void MakeNode(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t mode, dev_t rdev)
-	{ WRAP_EX(g_wrapper->MakeNode(req, FuseId(parent), name, mode, rdev)); }
+	{ mtp::debug("MakeNode ", parent, " ", name, " 0x", mtp::hex(mode, 8)); WRAP_EX(g_wrapper->MakeNode(req, FuseId(parent), name, mode, rdev)); }
 
 	void Open(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi)
-	{ WRAP_EX(g_wrapper->Open(req, FuseId(ino), fi)); }
+	{ mtp::debug("Open ", ino); WRAP_EX(g_wrapper->Open(req, FuseId(ino), fi)); }
 
 	void Release(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi)
-	{ WRAP_EX(g_wrapper->Release(req, FuseId(ino), fi)); }
+	{ mtp::debug("Release ", ino); WRAP_EX(g_wrapper->Release(req, FuseId(ino), fi)); }
 
 	void Create(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t mode, struct fuse_file_info *fi)
-	{ WRAP_EX(g_wrapper->Create(req, FuseId(parent), name, mode, fi)); }
+	{ mtp::debug("Create ", parent, " ", name, " 0x", mtp::hex(mode, 8)); WRAP_EX(g_wrapper->Create(req, FuseId(parent), name, mode, fi)); }
 
 	void MakeDir(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t mode)
-	{ WRAP_EX(g_wrapper->MakeDir(req, FuseId(parent), name, mode)); }
+	{ mtp::debug("MakeDir ", parent, " ", name, " 0x", mtp::hex(mode, 8)); WRAP_EX(g_wrapper->MakeDir(req, FuseId(parent), name, mode)); }
 
 	void RemoveDir (fuse_req_t req, fuse_ino_t parent, const char *name)
-	{ WRAP_EX(g_wrapper->RemoveDir(req, FuseId(parent), name)); }
+	{ mtp::debug("RemoveDir ", parent, " ", name); WRAP_EX(g_wrapper->RemoveDir(req, FuseId(parent), name)); }
 
 	void Unlink(fuse_req_t req, fuse_ino_t parent, const char *name)
-	{ WRAP_EX(g_wrapper->Unlink(req, FuseId(parent), name)); }
+	{ mtp::debug("Unlink ", parent, " ", name); WRAP_EX(g_wrapper->Unlink(req, FuseId(parent), name)); }
 
 	void StatFS(fuse_req_t req, fuse_ino_t ino)
-	{ WRAP_EX(g_wrapper->StatFS(req, FuseId(ino))); }
+	{ mtp::debug("StatFS ", ino); WRAP_EX(g_wrapper->StatFS(req, FuseId(ino))); }
 }
 
 int main(int argc, char **argv)
