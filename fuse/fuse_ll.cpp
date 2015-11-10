@@ -588,14 +588,14 @@ namespace
 			{
 				auto it = _openedFiles.find(ino);
 				if (it != _openedFiles.end())
-					_openedFiles[ino] = it->second;
+					tr = it->second;
 				else
 				{
 					tr = mtp::Session::EditObject(_session, FromFuse(ino));
 					_openedFiles[ino] = tr;
 				}
 			}
-			tr->Send(off, mtp::ByteArray(buf, buf + size));
+			NOT_NULL(tr)->Send(off, mtp::ByteArray(buf, buf + size));
 			FUSE_CALL(fuse_reply_write(req, size));
 		}
 

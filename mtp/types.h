@@ -68,7 +68,7 @@ namespace mtp
 	};
 }
 
-#define NOT_NULL(x) (RequireNotNull((x), #x))
+#define NOT_NULL(x) (mtp::RequireNotNull((x), #x))
 
 #define ASSERT(expr) if (!(expr)) throw std::runtime_error("assertion " #expr " failed")
 #define CATCH(WHAT, ...) catch(const std::exception &ex) { LOG(WARNING) << WHAT << ": " << ex.what(); __VA_ARGS__ }
