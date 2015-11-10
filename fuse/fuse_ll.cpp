@@ -105,11 +105,6 @@ namespace
 			}
 		}
 
-		void SetSize(mtp::u64 size)
-		{
-			attr.st_size = size;
-		}
-
 		void Reply()
 		{
 			FUSE_CALL(fuse_reply_entry(Request, this));
