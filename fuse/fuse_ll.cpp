@@ -164,6 +164,7 @@ namespace
 			cache[oi.Filename] = id;
 
 			struct stat &attr = _objectAttrs[id];
+			attr.st_ino = id;
 			attr.st_mode = FuseEntry::GetMode(oi.ObjectFormat);
 			attr.st_atime = attr.st_mtime = mtp::ConvertDateTime(oi.ModificationDate);
 			attr.st_ctime = mtp::ConvertDateTime(oi.CaptureDate);
