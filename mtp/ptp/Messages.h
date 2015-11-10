@@ -24,6 +24,7 @@
 #include <mtp/ptp/OutputStream.h>
 #include <mtp/ptp/ObjectFormat.h>
 #include <mtp/ptp/ObjectId.h>
+#include <mtp/ptp/ObjectProperty.h>
 #include <mtp/ptp/OperationCode.h>
 #include <algorithm>
 
@@ -198,13 +199,13 @@ namespace mtp { namespace msg
 	};
 	DECLARE_PTR(ObjectInfo);
 
-	struct ObjectPropsSupported
+	struct ObjectPropertiesSupported
 	{
-		std::vector<u16>	ObjectPropCodes;
+		std::vector<ObjectProperty>		ObjectPropertyCodes;
 
 		void Read(InputStream &stream)
 		{
-			stream >> ObjectPropCodes;
+			stream >> ObjectPropertyCodes;
 		}
 	};
 

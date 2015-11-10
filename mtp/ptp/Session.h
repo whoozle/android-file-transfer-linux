@@ -105,7 +105,7 @@ namespace mtp
 		static ObjectEditSessionPtr EditObject(const SessionPtr &session, ObjectId objectId)
 		{ return std::make_shared<ObjectEditSession>(session, objectId); }
 
-		msg::ObjectPropsSupported GetObjectPropsSupported(ObjectId objectId);
+		msg::ObjectPropertiesSupported GetObjectPropertiesSupported(ObjectId objectId);
 
 		void SetObjectProperty(ObjectId objectId, ObjectProperty property, const ByteArray &value);
 		void SetObjectProperty(ObjectId objectId, ObjectProperty property, u64 value);

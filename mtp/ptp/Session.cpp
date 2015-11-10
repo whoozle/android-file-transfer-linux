@@ -183,14 +183,14 @@ namespace mtp
 		return goi;
 	}
 
-	msg::ObjectPropsSupported Session::GetObjectPropsSupported(ObjectId objectId)
+	msg::ObjectPropertiesSupported Session::GetObjectPropertiesSupported(ObjectId objectId)
 	{
 		scoped_mutex_lock l(_mutex);
 		Transaction transaction(this);
 		Send(OperationRequest(OperationCode::GetObjectPropsSupported, transaction.Id, objectId.Id));
 		ByteArray data = Get(transaction.Id);
 		InputStream stream(data);
-		msg::ObjectPropsSupported ops;
+		msg::ObjectPropertiesSupported ops;
 		ops.Read(stream);
 		return ops;
 	}

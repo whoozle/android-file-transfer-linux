@@ -589,10 +589,10 @@ namespace cli
 
 	void Session::ListProperties(mtp::ObjectId id)
 	{
-		auto ops = _session->GetObjectPropsSupported(id);
+		auto ops = _session->GetObjectPropertiesSupported(id);
 		std::stringstream ss;
 		ss << "properties supported: ";
-		for(mtp::u16 prop: ops.ObjectPropCodes)
+		for(mtp::ObjectProperty prop: ops.ObjectPropertyCodes)
 		{
 			ss << mtp::hex(prop, 4) << " ";
 		}
