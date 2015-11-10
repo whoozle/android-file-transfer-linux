@@ -50,6 +50,24 @@ namespace
 
 	typedef std::vector<char> CharArray;
 
+	struct FuseId
+	{
+		static const FuseId Root;
+
+		fuse_ino_t Index;
+
+		explicit FuseId(fuse_ino_t index): Index(index) { }
+
+		bool operator == (const FuseId &o) const
+		{ return Index == o.Index; }
+		bool operator != (const FuseId &o) const
+		{ return !((*this) == o); }
+		bool operator < (const FuseId &o) const
+		{ return Index < o.Index; }
+	};
+
+	const FuseId FuseId::Root(FUSE_ROOT_ID);
+
 	struct FuseEntry : fuse_entry_param
 	{
 		static constexpr const double	Timeout = 60.0;
@@ -64,10 +82,10 @@ namespace
 			attr_timeout = entry_timeout = Timeout;
 		};
 
-		void SetId(mtp::u32 id)
+		void SetId(FuseId id)
 		{
-			ino = id;
-			attr.st_ino = id;
+			ino = id.Index;
+			attr.st_ino = id.Index;
 		}
 
 		void SetFileMode()
@@ -151,16 +169,22 @@ namespace
 		ObjectAttrs		_objectAttrs;
 
 		typedef mtp::Session::ObjectEditSessionPtr ObjectEditSessionPtr;
-		typedef std::map<mtp::u32, ObjectEditSessionPtr> OpenedFiles;
+		typedef std::map<FuseId, ObjectEditSessionPtr> OpenedFiles;
 		OpenedFiles		_openedFiles;
 
-		typedef std::map<fuse_ino_t, CharArray> DirectoryCache;
+		typedef std::map<FuseId, CharArray> DirectoryCache;
 		DirectoryCache	_directoryCache;
 
 		std::map<mtp::u32, std::string>		_storages;
 		std::map<std::string, mtp::u32>		_storagesByName;
 
 	private:
+		FuseId ToFuse(mtp::u32 id)
+		{ return FuseId(id + FUSE_ROOT_ID); }
+
+		mtp::u32 FromFuse(FuseId id)
+		{ return id.Index - FUSE_ROOT_ID; }
+
 		void GetObjectInfo(ChildrenObjects &cache, mtp::u32 id)
 		{
 			mtp::msg::ObjectInfo oi = _session->GetObjectInfo(id);
@@ -168,29 +192,31 @@ namespace
 			cache[oi.Filename] = id;
 
 			struct stat &attr = _objectAttrs[id];
-			attr.st_ino = id;
+			attr.st_ino = ToFuse(id).Index;
 			attr.st_mode = FuseEntry::GetMode(oi.ObjectFormat);
 			attr.st_atime = attr.st_mtime = mtp::ConvertDateTime(oi.ModificationDate);
 			attr.st_ctime = mtp::ConvertDateTime(oi.CaptureDate);
 			attr.st_size = oi.ObjectCompressedSize != mtp::MaxObjectSize? oi.ObjectCompressedSize: _session->GetObjectIntegerProperty(id, mtp::ObjectProperty::ObjectSize);
 		}
 
-		struct stat GetObjectAttr(mtp::u32 id)
+		struct stat GetObjectAttr(FuseId inode)
 		{
-			if (id == FUSE_ROOT_ID)
+			if (inode == FuseId::Root)
 			{
 				struct stat attr = { };
-				attr.st_ino = id;
+				attr.st_ino = inode.Index;
 				attr.st_mtime = attr.st_ctime = attr.st_atime = _connectTime;
 				attr.st_mode = FuseEntry::DirectoryMode;
 				return attr;
 			}
 
+			mtp::u32 id = FromFuse(inode);
+
 			auto sit = _storages.find(id);
 			if (sit != _storages.end())
 			{
 				struct stat attr = { };
-				attr.st_ino = id;
+				attr.st_ino = inode.Index;
 				attr.st_mtime = attr.st_ctime = attr.st_atime = _connectTime;
 				attr.st_mode = FuseEntry::DirectoryMode;
 				return attr;
@@ -201,7 +227,7 @@ namespace
 				return i->second;
 
 			//populate cache for parent
-			mtp::u32 parent = GetParentObject(id);
+			auto parent = GetParentObject(inode);
 			GetChildren(parent); //populate cache
 
 			i = _objectAttrs.find(id);
@@ -211,11 +237,12 @@ namespace
 				throw std::runtime_error("no such object");
 		}
 
-		ChildrenObjects & GetChildren(mtp::u32 parent)
+		ChildrenObjects & GetChildren(FuseId inode)
 		{
-			if (parent == FUSE_ROOT_ID)
+			if (inode == FuseId::Root)
 				PopulateStorages();
 
+			mtp::u32 parent = FromFuse(inode);
 			{
 				auto i = _files.find(parent);
 				if (i != _files.end())
@@ -225,7 +252,7 @@ namespace
 			ChildrenObjects & cache = _files[parent];
 
 			using namespace mtp;
-			if (parent == FUSE_ROOT_ID)
+			if (inode == FuseId::Root)
 			{
 				for(const auto & i : _storagesByName) {
 					cache[i.first] = i.second;
@@ -260,7 +287,7 @@ namespace
 						parser.Parse(data, [this](u32 objectId, mtp::ObjectFormat format)
 						{
 							struct stat & attr = _objectAttrs[objectId];
-							attr.st_ino = objectId;
+							attr.st_ino = ToFuse(objectId).Index;
 							attr.st_mode = FuseEntry::GetMode(format);
 						});
 					}
@@ -316,8 +343,9 @@ namespace
 			return cache;
 		}
 
-		mtp::u32 CreateObject(mtp::u32 parentId, const std::string &filename, mtp::ObjectFormat format)
+		FuseId CreateObject(FuseId parentInode, const std::string &filename, mtp::ObjectFormat format)
 		{
+			mtp::u32 parentId = FromFuse(parentInode);
 			mtp::u32 cacheParent = parentId;
 			mtp::u32 storageId;
 			if (_storages.find(parentId) != _storages.end())
@@ -344,42 +372,43 @@ namespace
 				auto i = _files.find(cacheParent);
 				if (i != _files.end())
 					GetObjectInfo(i->second, noi.ObjectId); //insert object info into cache
-				_directoryCache.erase(cacheParent);
+				_directoryCache.erase(parentInode);
 			}
-			return noi.ObjectId;
+			return ToFuse(noi.ObjectId);
 		}
 
-		void CreateObject(mtp::ObjectFormat format, fuse_req_t req, fuse_ino_t parentId, const char *name, mode_t mode)
+		void CreateObject(mtp::ObjectFormat format, fuse_req_t req, FuseId parentId, const char *name, mode_t mode)
 		{
-			if (parentId == FUSE_ROOT_ID)
+			if (parentId == FuseId::Root)
 			{
 				FUSE_CALL(fuse_reply_err(req, EPERM)); //cannot create files in the same level with storages
 				return;
 			}
-			mtp::u32 objectId = CreateObject(parentId, name, format);
+			auto objectId = CreateObject(parentId, name, format);
 			FuseEntry entry(req);
 			entry.SetId(objectId);
 			entry.attr = GetObjectAttr(objectId);
 			entry.Reply();
 		}
 
-		mtp::u32 GetParentObject(mtp::u32 id)
+		FuseId GetParentObject(FuseId inode)
 		{
-			if (id == FUSE_ROOT_ID)
-				return FUSE_ROOT_ID;
+			if (inode == FuseId::Root)
+				return inode;
 
+			mtp::u32 id = FromFuse(inode);
 			if (_storages.find(id) != _storages.end())
-				return FUSE_ROOT_ID;
+				return FuseId::Root;
 			else
 			{
 				mtp::u64 parent = _session->GetObjectIntegerProperty(id, mtp::ObjectProperty::ParentObject);
 				if (parent == 0 || parent == mtp::Session::Root) //parent == root -> storage
 					parent = _session->GetObjectIntegerProperty(id, mtp::ObjectProperty::StorageId);
-				return parent;
+				return ToFuse(parent);
 			}
 		}
 
-		bool FillEntry(FuseEntry &entry, mtp::u32 id)
+		bool FillEntry(FuseEntry &entry, FuseId id)
 		{
 			try { entry.attr = GetObjectAttr(id); } catch(const std::exception &ex) { return false; }
 			entry.SetId(id);
@@ -417,7 +446,6 @@ namespace
 
 		void PopulateStorages()
 		{
-			_objectAttrs.erase(FUSE_ROOT_ID); //drop root's cache
 			_storages.clear();
 			_storagesByName.clear();
 			mtp::msg::StorageIDs ids = _session->GetStorageIDs();
@@ -446,7 +474,7 @@ namespace
 				conn->max_write = MaxWriteSize;
 		}
 
-		void Lookup (fuse_req_t req, fuse_ino_t parent, const char *name)
+		void Lookup (fuse_req_t req, FuseId parent, const char *name)
 		{
 			mtp::scoped_mutex_lock l(_mutex);
 			FuseEntry entry(req);
@@ -455,7 +483,7 @@ namespace
 			auto it = children.find(name);
 			if (it != children.end())
 			{
-				if (FillEntry(entry, it->second))
+				if (FillEntry(entry, ToFuse(it->second)))
 				{
 					entry.Reply();
 					return;
@@ -464,7 +492,7 @@ namespace
 			entry.ReplyError(ENOENT);
 		}
 
-		void ReadDir(fuse_req_t req, fuse_ino_t ino, size_t size, off_t off, struct fuse_file_info *fi)
+		void ReadDir(fuse_req_t req, FuseId ino, size_t size, off_t off, struct fuse_file_info *fi)
 		{
 			mtp::scoped_mutex_lock l(_mutex);
 			if (!(GetObjectAttr(ino).st_mode & S_IFDIR))
@@ -482,18 +510,18 @@ namespace
 				it = _directoryCache.insert(std::make_pair(ino, CharArray())).first;
 				CharArray &data = it->second;
 
-				dir.Add(data, ".", GetObjectAttr(FUSE_ROOT_ID));
+				dir.Add(data, ".", GetObjectAttr(FuseId::Root));
 				dir.Add(data, "..", GetObjectAttr(GetParentObject(ino)));
-				for(auto it : cache)
+				for(auto entry : cache)
 				{
-					dir.Add(data, it.first, GetObjectAttr(it.second));
+					dir.Add(data, entry.first, GetObjectAttr(ToFuse(entry.second)));
 				}
 			}
 
 			dir.Reply(req, it->second, off, size);
 		}
 
-		void GetAttr(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi)
+		void GetAttr(fuse_req_t req, FuseId ino, struct fuse_file_info *fi)
 		{
 			mtp::scoped_mutex_lock l(_mutex);
 			FuseEntry entry(req);
@@ -503,14 +531,14 @@ namespace
 				entry.ReplyError(ENOENT);
 		}
 
-		void Read(fuse_req_t req, fuse_ino_t ino, size_t size, off_t off, struct fuse_file_info *fi)
+		void Read(fuse_req_t req, FuseId ino, size_t size, off_t off, struct fuse_file_info *fi)
 		{
 			mtp::scoped_mutex_lock l(_mutex);
-			mtp::ByteArray data = _session->GetPartialObject(ino, off, size);
+			mtp::ByteArray data = _session->GetPartialObject(FromFuse(ino), off, size);
 			FUSE_CALL(fuse_reply_buf(req, static_cast<char *>(static_cast<void *>(data.data())), data.size()));
 		}
 
-		void Write(fuse_req_t req, fuse_ino_t ino, const char *buf, size_t size, off_t off, struct fuse_file_info *fi)
+		void Write(fuse_req_t req, FuseId ino, const char *buf, size_t size, off_t off, struct fuse_file_info *fi)
 		{
 			mtp::scoped_mutex_lock l(_mutex);
 			mtp::Session::ObjectEditSessionPtr tr;
@@ -520,7 +548,7 @@ namespace
 					_openedFiles[ino] = it->second;
 				else
 				{
-					tr = mtp::Session::EditObject(_session, ino);
+					tr = mtp::Session::EditObject(_session, FromFuse(ino));
 					_openedFiles[ino] = tr;
 				}
 			}
@@ -528,23 +556,23 @@ namespace
 			FUSE_CALL(fuse_reply_write(req, size));
 		}
 
-		void MakeNode(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t mode, dev_t rdev)
+		void MakeNode(fuse_req_t req, FuseId parent, const char *name, mode_t mode, dev_t rdev)
 		{ mtp::scoped_mutex_lock l(_mutex); CreateObject(mtp::ObjectFormat::Undefined, req, parent, name, mode); }
 
-		void Create(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t mode, struct fuse_file_info *fi)
+		void Create(fuse_req_t req, FuseId parent, const char *name, mode_t mode, struct fuse_file_info *fi)
 		{ mtp::scoped_mutex_lock l(_mutex); CreateObject(mtp::ObjectFormat::Undefined, req, parent, name, mode); }
 
-		void MakeDir(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t mode)
+		void MakeDir(fuse_req_t req, FuseId parent, const char *name, mode_t mode)
 		{ mtp::scoped_mutex_lock l(_mutex); CreateObject(mtp::ObjectFormat::Association, req, parent, name, mode); }
 
-		void Open(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi)
+		void Open(fuse_req_t req, FuseId ino, struct fuse_file_info *fi)
 		{
 			mtp::scoped_mutex_lock l(_mutex);
 			mtp::ObjectFormat format;
 
 			try
 			{
-				format = static_cast<mtp::ObjectFormat>(_session->GetObjectIntegerProperty(ino, mtp::ObjectProperty::ObjectFormat));
+				format = static_cast<mtp::ObjectFormat>(_session->GetObjectIntegerProperty(FromFuse(ino), mtp::ObjectProperty::ObjectFormat));
 			}
 			catch(const std::exception &ex)
 			{ FUSE_CALL(fuse_reply_err(req, ENOENT)); return; }
@@ -557,7 +585,7 @@ namespace
 			FUSE_CALL(fuse_reply_open(req, fi));
 		}
 
-		void Release(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi)
+		void Release(fuse_req_t req, FuseId ino, struct fuse_file_info *fi)
 		{
 			mtp::scoped_mutex_lock l(_mutex);
 			auto i = _openedFiles.find(ino);
@@ -565,13 +593,13 @@ namespace
 				_openedFiles.erase(i);
 		}
 
-		void SetAttr(fuse_req_t req, fuse_ino_t ino, struct stat *attr, int to_set, struct fuse_file_info *fi)
+		void SetAttr(fuse_req_t req, FuseId ino, struct stat *attr, int to_set, struct fuse_file_info *fi)
 		{ GetAttr(req, ino, fi); }
 
-		void RemoveDir (fuse_req_t req, fuse_ino_t parent, const char *name)
+		void RemoveDir (fuse_req_t req, FuseId parent, const char *name)
 		{ Unlink(req, parent, name); }
 
-		void Unlink(fuse_req_t req, fuse_ino_t parent, const char *name)
+		void Unlink(fuse_req_t req, FuseId parent, const char *name)
 		{
 			mtp::scoped_mutex_lock l(_mutex);
 			ChildrenObjects &children = GetChildren(parent);
@@ -583,7 +611,7 @@ namespace
 			}
 
 			mtp::u32 id = i->second;
-			_openedFiles.erase(id);
+			_openedFiles.erase(ToFuse(id));
 			_objectAttrs.erase(id);
 			children.erase(i);
 
@@ -591,14 +619,14 @@ namespace
 			FUSE_CALL(fuse_reply_err(req, 0));
 		}
 
-		void StatFS(fuse_req_t req, fuse_ino_t ino)
+		void StatFS(fuse_req_t req, FuseId ino)
 		{
 			mtp::scoped_mutex_lock l(_mutex);
 			struct statvfs stat = { };
 			stat.f_namemax = 254;
 
 			mtp::u64 freeSpace = 0, capacity = 0;
-			if (ino == FUSE_ROOT_ID)
+			if (ino == FuseId::Root)
 			{
 				for(auto storage = _storages.begin(); storage != _storages.end(); ++storage)
 				{
@@ -609,11 +637,12 @@ namespace
 			}
 			else
 			{
-				auto sit = _storages.find(ino);
+				mtp::u32 id = FromFuse(ino);
+				auto sit = _storages.find(id);
 				if (sit == _storages.end()) //not a storage
-					ino = _session->GetObjectIntegerProperty(ino, mtp::ObjectProperty::StorageId);
+					id = _session->GetObjectIntegerProperty(id, mtp::ObjectProperty::StorageId);
 
-				mtp::msg::StorageInfo si = _session->GetStorageInfo(ino);
+				mtp::msg::StorageInfo si = _session->GetStorageInfo(id);
 				freeSpace = si.FreeSpaceInBytes;
 				capacity = si.MaxCapacity;
 			}
@@ -643,46 +672,46 @@ namespace
 	{ try { g_wrapper->Init(userdata, conn); } catch (const std::exception &ex) { mtp::error("init failed:", ex.what()); } }
 
 	void Lookup (fuse_req_t req, fuse_ino_t parent, const char *name)
-	{ WRAP_EX(g_wrapper->Lookup(req, parent, name)); }
+	{ WRAP_EX(g_wrapper->Lookup(req, FuseId(parent), name)); }
 
 	void ReadDir(fuse_req_t req, fuse_ino_t ino, size_t size, off_t off, struct fuse_file_info *fi)
-	{ WRAP_EX(g_wrapper->ReadDir(req, ino, size, off, fi)); }
+	{ WRAP_EX(g_wrapper->ReadDir(req, FuseId(ino), size, off, fi)); }
 
 	void GetAttr(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi)
-	{ WRAP_EX(g_wrapper->GetAttr(req, ino, fi)); }
+	{ WRAP_EX(g_wrapper->GetAttr(req, FuseId(ino), fi)); }
 
 	void SetAttr(fuse_req_t req, fuse_ino_t ino, struct stat *attr, int to_set, struct fuse_file_info *fi)
-	{ WRAP_EX(g_wrapper->SetAttr(req, ino, attr, to_set, fi)); }
+	{ WRAP_EX(g_wrapper->SetAttr(req, FuseId(ino), attr, to_set, fi)); }
 
 	void Read(fuse_req_t req, fuse_ino_t ino, size_t size, off_t off, struct fuse_file_info *fi)
-	{ WRAP_EX(g_wrapper->Read(req, ino, size, off, fi)); }
+	{ WRAP_EX(g_wrapper->Read(req, FuseId(ino), size, off, fi)); }
 
 	void Write(fuse_req_t req, fuse_ino_t ino, const char *buf, size_t size, off_t off, struct fuse_file_info *fi)
-	{ WRAP_EX(g_wrapper->Write(req, ino, buf, size, off, fi)); }
+	{ WRAP_EX(g_wrapper->Write(req, FuseId(ino), buf, size, off, fi)); }
 
 	void MakeNode(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t mode, dev_t rdev)
-	{ WRAP_EX(g_wrapper->MakeNode(req, parent, name, mode, rdev)); }
+	{ WRAP_EX(g_wrapper->MakeNode(req, FuseId(parent), name, mode, rdev)); }
 
 	void Open(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi)
-	{ WRAP_EX(g_wrapper->Open(req, ino, fi)); }
+	{ WRAP_EX(g_wrapper->Open(req, FuseId(ino), fi)); }
 
 	void Release(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi)
-	{ WRAP_EX(g_wrapper->Release(req, ino, fi)); }
+	{ WRAP_EX(g_wrapper->Release(req, FuseId(ino), fi)); }
 
 	void Create(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t mode, struct fuse_file_info *fi)
-	{ WRAP_EX(g_wrapper->Create(req, parent, name, mode, fi)); }
+	{ WRAP_EX(g_wrapper->Create(req, FuseId(parent), name, mode, fi)); }
 
 	void MakeDir(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t mode)
-	{ WRAP_EX(g_wrapper->MakeDir(req, parent, name, mode)); }
+	{ WRAP_EX(g_wrapper->MakeDir(req, FuseId(parent), name, mode)); }
 
 	void RemoveDir (fuse_req_t req, fuse_ino_t parent, const char *name)
-	{ WRAP_EX(g_wrapper->RemoveDir(req, parent, name)); }
+	{ WRAP_EX(g_wrapper->RemoveDir(req, FuseId(parent), name)); }
 
 	void Unlink(fuse_req_t req, fuse_ino_t parent, const char *name)
-	{ WRAP_EX(g_wrapper->Unlink(req, parent, name)); }
+	{ WRAP_EX(g_wrapper->Unlink(req, FuseId(parent), name)); }
 
 	void StatFS(fuse_req_t req, fuse_ino_t ino)
-	{ WRAP_EX(g_wrapper->StatFS(req, ino)); }
+	{ WRAP_EX(g_wrapper->StatFS(req, FuseId(ino))); }
 }
 
 int main(int argc, char **argv)
