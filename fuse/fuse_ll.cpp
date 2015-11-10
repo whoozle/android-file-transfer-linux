@@ -172,7 +172,7 @@ namespace
 
 		struct stat GetObjectAttr(mtp::u32 id)
 		{
-			if (id == 1)
+			if (id == FUSE_ROOT_ID)
 			{
 				struct stat attr = { };
 				attr.st_ino = id;
@@ -208,7 +208,7 @@ namespace
 
 		ChildrenObjects & GetChildren(mtp::u32 parent)
 		{
-			if (parent == 1)
+			if (parent == FUSE_ROOT_ID)
 				PopulateStorages();
 
 			{
@@ -220,7 +220,7 @@ namespace
 			ChildrenObjects & cache = _files[parent];
 
 			using namespace mtp;
-			if (parent == 1)
+			if (parent == FUSE_ROOT_ID)
 			{
 				for(const auto & i : _storagesByName) {
 					cache[i.first] = i.second;
@@ -343,7 +343,7 @@ namespace
 
 		void CreateObject(mtp::ObjectFormat format, fuse_req_t req, fuse_ino_t parentId, const char *name, mode_t mode)
 		{
-			if (parentId == 1)
+			if (parentId == FUSE_ROOT_ID)
 			{
 				FUSE_CALL(fuse_reply_err(req, EPERM)); //cannot create files in the same level with storages
 				return;
@@ -357,11 +357,11 @@ namespace
 
 		mtp::u32 GetParentObject(mtp::u32 id)
 		{
-			if (id == 1)
-				return 1;
+			if (id == FUSE_ROOT_ID)
+				return FUSE_ROOT_ID;
 
 			if (_storages.find(id) != _storages.end())
-				return 1;
+				return FUSE_ROOT_ID;
 			else
 			{
 				mtp::u64 parent = _session->GetObjectIntegerProperty(id, mtp::ObjectProperty::ParentObject);
@@ -408,7 +408,7 @@ namespace
 
 		void PopulateStorages()
 		{
-			_objectAttrs.erase(1); //drop root's cache
+			_objectAttrs.erase(FUSE_ROOT_ID); //drop root's cache
 			_storages.clear();
 			_storagesByName.clear();
 			mtp::msg::StorageIDs ids = _session->GetStorageIDs();
@@ -582,7 +582,7 @@ namespace
 			stat.f_namemax = 254;
 
 			mtp::u64 freeSpace = 0, capacity = 0;
-			if (ino == 1)
+			if (ino == FUSE_ROOT_ID)
 			{
 				for(auto storage = _storages.begin(); storage != _storages.end(); ++storage)
 				{
