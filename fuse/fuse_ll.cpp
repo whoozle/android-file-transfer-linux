@@ -684,7 +684,7 @@ namespace
 			else
 			{
 				mtp::StorageId storageId;
-				if (!IsStorage(ino))
+				if (IsStorage(ino))
 					storageId = FuseIdToStorageId(ino);
 				else
 					storageId = _session->GetObjectStorage(FromFuse(ino));
