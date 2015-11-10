@@ -54,16 +54,16 @@ namespace
 	{
 		static const FuseId Root;
 
-		fuse_ino_t Index;
+		fuse_ino_t Inode; //generation here?
 
-		explicit FuseId(fuse_ino_t index): Index(index) { }
+		explicit FuseId(fuse_ino_t inode): Inode(inode) { }
 
 		bool operator == (const FuseId &o) const
-		{ return Index == o.Index; }
+		{ return Inode == o.Inode; }
 		bool operator != (const FuseId &o) const
 		{ return !((*this) == o); }
 		bool operator < (const FuseId &o) const
-		{ return Index < o.Index; }
+		{ return Inode < o.Inode; }
 	};
 
 	const FuseId FuseId::Root(FUSE_ROOT_ID);
@@ -84,8 +84,8 @@ namespace
 
 		void SetId(FuseId id)
 		{
-			ino = id.Index;
-			attr.st_ino = id.Index;
+			ino = id.Inode;
+			attr.st_ino = id.Inode;
 		}
 
 		void SetFileMode()
@@ -175,15 +175,16 @@ namespace
 		typedef std::map<FuseId, CharArray> DirectoryCache;
 		DirectoryCache	_directoryCache;
 
+		static const size_t					MtpObjectShift = 999999 + FUSE_ROOT_ID;
 		std::map<mtp::u32, std::string>		_storages;
 		std::map<std::string, mtp::u32>		_storagesByName;
 
 	private:
 		FuseId ToFuse(mtp::u32 id)
-		{ return FuseId(id + FUSE_ROOT_ID); }
+		{ return FuseId(id + MtpObjectShift); }
 
 		mtp::u32 FromFuse(FuseId id)
-		{ return id.Index - FUSE_ROOT_ID; }
+		{ return id.Inode - MtpObjectShift; }
 
 		void GetObjectInfo(ChildrenObjects &cache, mtp::u32 id)
 		{
@@ -192,7 +193,7 @@ namespace
 			cache[oi.Filename] = id;
 
 			struct stat &attr = _objectAttrs[id];
-			attr.st_ino = ToFuse(id).Index;
+			attr.st_ino = ToFuse(id).Inode;
 			attr.st_mode = FuseEntry::GetMode(oi.ObjectFormat);
 			attr.st_atime = attr.st_mtime = mtp::ConvertDateTime(oi.ModificationDate);
 			attr.st_ctime = mtp::ConvertDateTime(oi.CaptureDate);
@@ -204,7 +205,7 @@ namespace
 			if (inode == FuseId::Root)
 			{
 				struct stat attr = { };
-				attr.st_ino = inode.Index;
+				attr.st_ino = inode.Inode;
 				attr.st_mtime = attr.st_ctime = attr.st_atime = _connectTime;
 				attr.st_mode = FuseEntry::DirectoryMode;
 				return attr;
@@ -216,7 +217,7 @@ namespace
 			if (sit != _storages.end())
 			{
 				struct stat attr = { };
-				attr.st_ino = inode.Index;
+				attr.st_ino = inode.Inode;
 				attr.st_mtime = attr.st_ctime = attr.st_atime = _connectTime;
 				attr.st_mode = FuseEntry::DirectoryMode;
 				return attr;
@@ -287,7 +288,7 @@ namespace
 						parser.Parse(data, [this](u32 objectId, mtp::ObjectFormat format)
 						{
 							struct stat & attr = _objectAttrs[objectId];
-							attr.st_ino = ToFuse(objectId).Index;
+							attr.st_ino = ToFuse(objectId).Inode;
 							attr.st_mode = FuseEntry::GetMode(format);
 						});
 					}
