@@ -342,7 +342,8 @@ namespace
 						ObjectPropertyListParser<std::string> parser;
 						parser.Parse(data, [this](ObjectId objectId, const std::string & mtime)
 						{
-							_objectAttrs[objectId].st_mtime = mtp::ConvertDateTime(mtime);
+							time_t t = mtp::ConvertDateTime(mtime);
+							_objectAttrs[objectId].st_mtime = t;
 						});
 					}
 					catch(const std::exception &ex)
@@ -353,9 +354,10 @@ namespace
 					{
 						data = _session->GetObjectPropertyList(parent, ObjectFormat::Any, ObjectProperty::DateAdded, 0, 1);
 						ObjectPropertyListParser<std::string> parser;
-						parser.Parse(data, [this](ObjectId objectId, const std::string & mtime)
+						parser.Parse(data, [this](ObjectId objectId, const std::string & ctime)
 						{
-							_objectAttrs[objectId].st_ctime = mtp::ConvertDateTime(mtime);
+							time_t t = mtp::ConvertDateTime(ctime);
+							_objectAttrs[objectId].st_ctime = t;
 						});
 					}
 					catch(const std::exception &ex)
