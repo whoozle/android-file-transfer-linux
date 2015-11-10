@@ -17,8 +17,8 @@
     If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROTOCOL_H
-#define	PROTOCOL_H
+#ifndef AFT_PTP_DEVICE
+#define AFT_PTP_DEVICE
 
 #include <mtp/usb/BulkPipe.h>
 #include <mtp/ptp/PipePacketer.h>
@@ -43,5 +43,4 @@ namespace mtp
 	};
 }
 
-#endif	/* PROTOCOL_H */
-
+#endif
