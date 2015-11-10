@@ -161,8 +161,8 @@ namespace
 		bool			_editObjectSupported;
 		time_t			_connectTime;
 
-		typedef std::map<std::string, mtp::u32> ChildrenObjects;
-		typedef std::map<mtp::u32, ChildrenObjects> Files;
+		typedef std::map<std::string, FuseId> ChildrenObjects;
+		typedef std::map<FuseId, ChildrenObjects> Files;
 		Files			_files;
 
 		typedef std::map<mtp::u32, struct stat> ObjectAttrs;
@@ -175,25 +175,50 @@ namespace
 		typedef std::map<FuseId, CharArray> DirectoryCache;
 		DirectoryCache	_directoryCache;
 
-		static const size_t					MtpObjectShift = 999999 + FUSE_ROOT_ID;
-		std::map<mtp::u32, std::string>		_storages;
-		std::map<std::string, mtp::u32>		_storagesByName;
+		static const size_t					MtpStorageShift = FUSE_ROOT_ID + 1;
+		static const size_t					MtpObjectShift = 999998 + MtpStorageShift;
+
+		std::vector<mtp::u32>				_storageIdList;
+		std::map<mtp::u32, std::string>		_storageToName;
+		std::map<std::string, mtp::u32>		_storageFromName;
 
 	private:
-		FuseId ToFuse(mtp::u32 id)
+		static FuseId ToFuse(mtp::u32 id)
 		{ return FuseId(id + MtpObjectShift); }
 
-		mtp::u32 FromFuse(FuseId id)
+		static mtp::u32 FromFuse(FuseId id)
 		{ return id.Inode - MtpObjectShift; }
+
+		static bool IsStorage(FuseId id)
+		{ return id.Inode >= MtpStorageShift && id.Inode <= MtpObjectShift; }
+
+		mtp::u32 FuseIdToStorageId(FuseId id) const
+		{
+			if (!IsStorage(id))
+				throw std::runtime_error("converting non-storage inode to storage id");
+			size_t i = id.Inode - MtpStorageShift;
+			if (i >= _storageIdList.size())
+				throw std::runtime_error("invalid storage id");
+			return _storageIdList[i];
+		}
+
+		FuseId FuseIdFromStorageId(mtp::u32 storageId) const
+		{
+			auto i = std::find(_storageIdList.begin(), _storageIdList.end(), storageId);
+			if (i == _storageIdList.end())
+				throw std::runtime_error("invalid storage id");
+			return FuseId(MtpStorageShift + std::distance(_storageIdList.begin(), i));
+		}
 
 		void GetObjectInfo(ChildrenObjects &cache, mtp::u32 id)
 		{
 			mtp::msg::ObjectInfo oi = _session->GetObjectInfo(id);
 
-			cache[oi.Filename] = id;
+			FuseId inode = ToFuse(id);
+			cache.emplace(oi.Filename, inode);
 
 			struct stat &attr = _objectAttrs[id];
-			attr.st_ino = ToFuse(id).Inode;
+			attr.st_ino = inode.Inode;
 			attr.st_mode = FuseEntry::GetMode(oi.ObjectFormat);
 			attr.st_atime = attr.st_mtime = mtp::ConvertDateTime(oi.ModificationDate);
 			attr.st_ctime = mtp::ConvertDateTime(oi.CaptureDate);
@@ -211,10 +236,7 @@ namespace
 				return attr;
 			}
 
-			mtp::u32 id = FromFuse(inode);
-
-			auto sit = _storages.find(id);
-			if (sit != _storages.end())
+			if (IsStorage(inode))
 			{
 				struct stat attr = { };
 				attr.st_ino = inode.Inode;
@@ -223,6 +245,7 @@ namespace
 				return attr;
 			}
 
+			mtp::u32 id = FromFuse(inode);
 			auto i = _objectAttrs.find(id);
 			if (i != _objectAttrs.end())
 				return i->second;
@@ -241,33 +264,47 @@ namespace
 		ChildrenObjects & GetChildren(FuseId inode)
 		{
 			if (inode == FuseId::Root)
-				PopulateStorages();
-
-			mtp::u32 parent = FromFuse(inode);
 			{
-				auto i = _files.find(parent);
+				PopulateStorages();
+				ChildrenObjects & cache = _files[inode];
+				cache.clear();
+				for(size_t i = 0; i < _storageIdList.size(); ++i)
+				{
+					mtp::u32 storageId = _storageIdList[i];
+					auto name = _storageToName.find(storageId);
+					if (name != _storageToName.end())
+						cache.emplace(name->second, FuseId(MtpStorageShift + i));
+					else
+						mtp::error("no storage name for ", storageId);
+				}
+				return cache;
+			}
+
+			{
+				auto i = _files.find(inode);
 				if (i != _files.end())
 					return i->second;
 			}
 
-			ChildrenObjects & cache = _files[parent];
+			ChildrenObjects & cache = _files[inode];
 
 			using namespace mtp;
 			if (inode == FuseId::Root)
 			{
-				for(const auto & i : _storagesByName) {
-					cache[i.first] = i.second;
-				}
 				return cache;
 			}
 
 			msg::ObjectHandles oh;
 
-			auto sit = _storages.find(parent);
-			if (sit != _storages.end())
-				oh = _session->GetObjectHandles(sit->first, mtp::ObjectFormat::Any, mtp::Session::Root);
+			if (IsStorage(inode))
+			{
+				mtp::u32 storageId = FuseIdToStorageId(inode);
+				oh = _session->GetObjectHandles(storageId, mtp::ObjectFormat::Any, mtp::Session::Root);
+			}
 			else
 			{
+				mtp::u32 parent = FromFuse(inode);
+
 				if (_session->GetObjectPropertyListSupported())
 				{
 					//populate filenames
@@ -277,7 +314,7 @@ namespace
 						ObjectPropertyListParser<std::string> parser;
 						parser.Parse(data, [&cache](u32 objectId, const std::string &name)
 						{
-							cache[name] = objectId;
+							cache.emplace(name, ToFuse(objectId));
 						});
 					}
 
@@ -347,11 +384,10 @@ namespace
 		FuseId CreateObject(FuseId parentInode, const std::string &filename, mtp::ObjectFormat format)
 		{
 			mtp::u32 parentId = FromFuse(parentInode);
-			mtp::u32 cacheParent = parentId;
 			mtp::u32 storageId;
-			if (_storages.find(parentId) != _storages.end())
+			if (IsStorage(parentInode))
 			{
-				storageId = parentId;
+				storageId = FuseIdToStorageId(parentInode);
 				parentId = mtp::Session::Root;
 			}
 			else
@@ -370,7 +406,7 @@ namespace
 				noi = _session->CreateDirectory(filename, parentId, storageId);
 
 			{ //update cache:
-				auto i = _files.find(cacheParent);
+				auto i = _files.find(parentInode);
 				if (i != _files.end())
 					GetObjectInfo(i->second, noi.ObjectId); //insert object info into cache
 				_directoryCache.erase(parentInode);
@@ -397,16 +433,17 @@ namespace
 			if (inode == FuseId::Root)
 				return inode;
 
-			mtp::u32 id = FromFuse(inode);
-			if (_storages.find(id) != _storages.end())
+			if (IsStorage(inode))
 				return FuseId::Root;
-			else
+
+			mtp::u32 id = FromFuse(inode);
+			mtp::u64 parent = _session->GetObjectIntegerProperty(id, mtp::ObjectProperty::ParentObject);
+			if (parent == 0 || parent == mtp::Session::Root) //parent == root -> storage
 			{
-				mtp::u64 parent = _session->GetObjectIntegerProperty(id, mtp::ObjectProperty::ParentObject);
-				if (parent == 0 || parent == mtp::Session::Root) //parent == root -> storage
-					parent = _session->GetObjectIntegerProperty(id, mtp::ObjectProperty::StorageId);
-				return ToFuse(parent);
+				return FuseIdFromStorageId(_session->GetObjectIntegerProperty(id, mtp::ObjectProperty::StorageId));
 			}
+			else
+				return ToFuse(parent);
 		}
 
 		bool FillEntry(FuseEntry &entry, FuseId id)
@@ -428,8 +465,6 @@ namespace
 			_files.clear();
 			_objectAttrs.clear();
 			_directoryCache.clear();
-			_storages.clear();
-			_storagesByName.clear();
 			_session.reset();
 			_device.reset();
 			_device = mtp::Device::Find();
@@ -447,9 +482,11 @@ namespace
 
 		void PopulateStorages()
 		{
-			_storages.clear();
-			_storagesByName.clear();
+			_storageIdList.clear();
+			_storageFromName.clear();
+			_storageToName.clear();
 			mtp::msg::StorageIDs ids = _session->GetStorageIDs();
+			_storageIdList.reserve(ids.StorageIDs.size());
 			for(size_t i = 0; i < ids.StorageIDs.size(); ++i)
 			{
 				mtp::u32 id = ids.StorageIDs[i];
@@ -461,8 +498,10 @@ namespace
 					snprintf(buf, sizeof(buf), "sdcard%u", (unsigned)i);
 					path = buf;
 				}
-				_storages[id] = path;
-				_storagesByName[path] = id;
+				FuseId inode(MtpStorageShift + i);
+				_storageIdList.push_back(id);
+				_storageFromName[path] = id;
+				_storageToName[id] = path;
 			}
 		}
 
@@ -484,7 +523,7 @@ namespace
 			auto it = children.find(name);
 			if (it != children.end())
 			{
-				if (FillEntry(entry, ToFuse(it->second)))
+				if (FillEntry(entry, it->second))
 				{
 					entry.Reply();
 					return;
@@ -515,7 +554,7 @@ namespace
 				dir.Add(data, "..", GetObjectAttr(GetParentObject(ino)));
 				for(auto entry : cache)
 				{
-					dir.Add(data, entry.first, GetObjectAttr(ToFuse(entry.second)));
+					dir.Add(data, entry.first, GetObjectAttr(entry.second));
 				}
 			}
 
@@ -611,8 +650,9 @@ namespace
 				return;
 			}
 
-			mtp::u32 id = i->second;
-			_openedFiles.erase(ToFuse(id));
+			FuseId inode = i->second;
+			mtp::u32 id = FromFuse(inode);
+			_openedFiles.erase(inode);
 			_objectAttrs.erase(id);
 			children.erase(i);
 
@@ -629,21 +669,22 @@ namespace
 			mtp::u64 freeSpace = 0, capacity = 0;
 			if (ino == FuseId::Root)
 			{
-				for(auto storage = _storages.begin(); storage != _storages.end(); ++storage)
+				for(auto storageId : _storageIdList)
 				{
-					mtp::msg::StorageInfo si = _session->GetStorageInfo(storage->first);
+					mtp::msg::StorageInfo si = _session->GetStorageInfo(storageId);
 					freeSpace += si.FreeSpaceInBytes;
 					capacity += si.MaxCapacity;
 				}
 			}
 			else
 			{
-				mtp::u32 id = FromFuse(ino);
-				auto sit = _storages.find(id);
-				if (sit == _storages.end()) //not a storage
-					id = _session->GetObjectIntegerProperty(id, mtp::ObjectProperty::StorageId);
+				mtp::u32 storageId;
+				if (!IsStorage(ino))
+					storageId = FuseIdToStorageId(ino);
+				else
+					storageId = _session->GetObjectIntegerProperty(FromFuse(ino), mtp::ObjectProperty::StorageId);
 
-				mtp::msg::StorageInfo si = _session->GetStorageInfo(id);
+				mtp::msg::StorageInfo si = _session->GetStorageInfo(storageId);
 				freeSpace = si.FreeSpaceInBytes;
 				capacity = si.MaxCapacity;
 			}
