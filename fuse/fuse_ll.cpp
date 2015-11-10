@@ -107,11 +107,15 @@ namespace
 
 		void Reply()
 		{
+			if (attr.st_mode == 0)
+				throw std::runtime_error("uninitialized attr in FuseEntry::Reply");
 			FUSE_CALL(fuse_reply_entry(Request, this));
 		}
 
 		void ReplyAttr()
 		{
+			if (attr.st_mode == 0)
+				throw std::runtime_error("uninitialized attr in FuseEntry::ReplyAttr");
 			FUSE_CALL(fuse_reply_attr(Request, &attr, Timeout));
 		}
 
