@@ -471,7 +471,7 @@ namespace
 			_session = _device->OpenSession(1);
 			_editObjectSupported = _session->EditObjectSupported();
 			if (!_editObjectSupported)
-				fprintf(stderr, "your device does not have android EditObject extension, mounting read-only\n");
+				mtp::error("your device does not have android EditObject extension, mounting read-only\n");
 
 			_connectTime = time(NULL);
 			PopulateStorages();
@@ -704,7 +704,7 @@ namespace
 			__VA_ARGS__ ; \
 		} \
 		catch (const std::exception &ex) \
-		{ fprintf(stderr, #__VA_ARGS__ " failed: %s\n", ex.what()); fuse_reply_err(req, EIO); } \
+		{ mtp::error(#__VA_ARGS__ " failed: ", ex.what()); fuse_reply_err(req, EIO); } \
 	} while(false)
 
 	void Init (void *userdata, struct fuse_conn_info *conn)
@@ -758,7 +758,7 @@ int main(int argc, char **argv)
 	try
 	{ g_wrapper.reset(new FuseWrapper()); }
 	catch(const std::exception &ex)
-	{ fprintf(stderr, "%s\n", ex.what()); return 1; }
+	{ mtp::error("connect failed: ", ex.what()); return 1; }
 
 	struct fuse_lowlevel_ops ops = {};
 
