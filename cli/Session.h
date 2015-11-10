@@ -36,8 +36,8 @@ namespace cli
 		mtp::DevicePtr				_device;
 		mtp::SessionPtr				_session;
 		mtp::msg::DeviceInfo		_gdi;
-		mtp::u32					_cs; //current storage
-		mtp::u32					_cd; //current directory
+		mtp::StorageId				_cs; //current storage
+		mtp::ObjectId				_cd; //current directory
 		bool						_running;
 		bool						_interactive;
 		bool						_showPrompt;
@@ -47,8 +47,10 @@ namespace cli
 
 		char ** CompletionCallback(const char *text, int start, int end);
 
-		mtp::u32 ResolvePath(const std::string &path, std::string &file);
-		mtp::u32 ResolveObjectChild(mtp::u32 parent, const std::string &entity);
+		mtp::ObjectId ResolvePath(const std::string &path, std::string &file);
+		mtp::ObjectId ResolveObjectChild(mtp::ObjectId parent, const std::string &entity);
+		mtp::ObjectId MakeOrResolveDirectory(mtp::ObjectId parentId, const std::string &dst, const LocalPath &src);
+
 		static std::string GetFilename(const std::string &path);
 		static std::string GetDirname(const std::string &path);
 		static std::string FormatTime(const std::string &timespec);
@@ -62,22 +64,22 @@ namespace cli
 		void ProcessCommand(const std::string &input);
 		void ProcessCommand(Tokens &&tokens);
 
-		mtp::u32 Resolve(const Path &path);
+		mtp::ObjectId Resolve(const Path &path);
 
 		void Help();
 		void Quit() { _running = false; }
 
 		void CompletePath(const Path &path, CompletionResult &result);
 
-		void List(mtp::u32 parent, bool extended);
+		void List(mtp::ObjectId parent, bool extended);
 
 		void ListStorages();
-		void Get(const LocalPath &dst, mtp::u32 srcId);
-		void Get(const mtp::u32 srcId);
+		void Get(const LocalPath &dst, mtp::ObjectId srcId);
+		void Get(const mtp::ObjectId srcId);
 		void Cat(const Path &path);
-		void Put(mtp::u32 parentId, const std::string &dst, const LocalPath &src);
-		void MakeDirectory(mtp::u32 parentId, const std::string & name);
-		void ListProperties(mtp::u32 id);
+		void Put(mtp::ObjectId parentId, const std::string &dst, const LocalPath &src);
+		void MakeDirectory(mtp::ObjectId parentId, const std::string & name);
+		void ListProperties(mtp::ObjectId id);
 		void ListDeviceProperties();
 
 		void ChangeDirectory(const Path &path)
@@ -96,7 +98,7 @@ namespace cli
 		void Put(const LocalPath &src, const Path &dst)
 		{
 			std::string filename;
-			mtp::u32 parent = ResolvePath(dst, filename);
+			mtp::ObjectId parent = ResolvePath(dst, filename);
 			Put(parent, filename, src);
 		}
 
@@ -109,7 +111,7 @@ namespace cli
 		void MakeDirectory(const std::string &path)
 		{
 			std::string name;
-			mtp::u32 parent = ResolvePath(path, name);
+			mtp::ObjectId parent = ResolvePath(path, name);
 			MakeDirectory(parent, name);
 		}
 

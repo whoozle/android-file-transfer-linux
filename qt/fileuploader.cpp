@@ -73,7 +73,7 @@ void FileUploader::upload(QStringList files)
 	_model->moveToThread(&_workerThread);
 	_total = 0;
 
-	mtp::u32 currentParentId = _model->parentObjectId();
+	mtp::ObjectId currentParentId = _model->parentObjectId();
 	QList<Command *> commands;
 	while(!files.empty())
 	{
@@ -126,22 +126,22 @@ void FileUploader::upload(QStringList files)
 	emit executeCommand(new FinishQueue(currentParentId));
 }
 
-void FileUploader::download(const QString &rootPath, const QVector<quint32> &objectIds)
+void FileUploader::download(const QString &rootPath, const QVector<mtp::ObjectId> &objectIds)
 {
 	_model->moveToThread(&_workerThread);
 	_total = 0;
 
-	mtp::u32 currentParentId = _model->parentObjectId();
+	mtp::ObjectId currentParentId = _model->parentObjectId();
 
-	QVector<QPair<QString, mtp::u32> > input;
+	QVector<QPair<QString, mtp::ObjectId> > input;
 	for(auto id : objectIds)
 		input.push_back(qMakePair(rootPath, id));
 
-	QVector<QPair<QString, mtp::u32> > files;
+	QVector<QPair<QString, mtp::ObjectId> > files;
 	while(!input.empty())
 	{
 		QString prefix = input.front().first;
-		mtp::u32 id = input.front().second;
+		mtp::ObjectId id = input.front().second;
 		input.pop_front();
 
 		MtpObjectsModel::ObjectInfo oi = _model->getInfoById(id);
@@ -152,7 +152,7 @@ void FileUploader::download(const QString &rootPath, const QVector<quint32> &obj
 			mtp::SessionPtr session = _model->session();
 			mtp::msg::ObjectHandles handles = session->GetObjectHandles(mtp::Session::AllStorages, mtp::ObjectFormat::Any, id);
 			qDebug() << "found " << handles.ObjectHandles.size() << " objects in " << dirPath;
-			for(mtp::u32 id : handles.ObjectHandles)
+			for(mtp::ObjectId id : handles.ObjectHandles)
 				input.push_back(qMakePair(dirPath, id));
 		}
 		else

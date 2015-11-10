@@ -34,13 +34,13 @@ MtpObjectsModel::MtpObjectsModel(QObject *parent): QAbstractListModel(parent), _
 MtpObjectsModel::~MtpObjectsModel()
 { }
 
-void MtpObjectsModel::setStorageId(mtp::u32 storageId)
+void MtpObjectsModel::setStorageId(mtp::StorageId storageId)
 {
 	_storageId = storageId;
 	setParent(mtp::Session::Root);
 }
 
-void MtpObjectsModel::setParent(mtp::u32 parentObjectId)
+void MtpObjectsModel::setParent(mtp::ObjectId parentObjectId)
 {
 	beginResetModel();
 
@@ -50,7 +50,7 @@ void MtpObjectsModel::setParent(mtp::u32 parentObjectId)
 	_rows.reserve(handles.ObjectHandles.size());
 	for(size_t i = 0; i < handles.ObjectHandles.size(); ++i)
 	{
-		mtp::u32 oid = handles.ObjectHandles[i];
+		mtp::ObjectId oid = handles.ObjectHandles[i];
 		_rows.append(Row(oid));
 	}
 
@@ -72,7 +72,7 @@ bool MtpObjectsModel::enter(int idx)
 		return false;
 }
 
-QModelIndex MtpObjectsModel::findObject(mtp::u32 objectId) const
+QModelIndex MtpObjectsModel::findObject(mtp::ObjectId objectId) const
 {
 	auto idx = std::find_if(_rows.begin(), _rows.end(), [objectId](const Row & row) { return row.ObjectId == objectId; } );
 	return idx != _rows.end()? createIndex(std::distance(_rows.begin(), idx), 0): QModelIndex();
@@ -127,7 +127,7 @@ void MtpObjectsModel::rename(int idx, const QString &fileName)
 
 void MtpObjectsModel::deleteObjects(const MtpObjectList &objects)
 {
-	for(mtp::u32 objectId: objects)
+	for(mtp::ObjectId objectId: objects)
 	{
 		qDebug() << "deleting object " << objectId;
 		_session->DeleteObject(objectId);
@@ -136,9 +136,9 @@ void MtpObjectsModel::deleteObjects(const MtpObjectList &objects)
 }
 
 
-mtp::u32 MtpObjectsModel::objectIdAt(int idx)
+mtp::ObjectId MtpObjectsModel::objectIdAt(int idx)
 {
-	return (idx >= 0 && idx < _rows.size())? _rows[idx].ObjectId: 0;
+	return (idx >= 0 && idx < _rows.size())? _rows[idx].ObjectId: mtp::ObjectId();
 }
 
 QVariant MtpObjectsModel::data(const QModelIndex &index, int role) const
@@ -162,13 +162,13 @@ QVariant MtpObjectsModel::data(const QModelIndex &index, int role) const
 	}
 }
 
-mtp::u32 MtpObjectsModel::createDirectory(const QString &name, mtp::AssociationType type)
+mtp::ObjectId MtpObjectsModel::createDirectory(const QString &name, mtp::AssociationType type)
 {
 	QModelIndex existingDir = findObject(name);
 	if (existingDir.isValid())
 		return _rows.at(existingDir.row()).ObjectId;
 
-	mtp::u32 storageId = _storageId != mtp::Session::AllStorages? _storageId: mtp::Session::Device;
+	mtp::StorageId storageId = _storageId != mtp::Session::AllStorages? _storageId: mtp::Session::AnyStorage;
 	mtp::Session::NewObjectInfo noi = _session->CreateDirectory(toUtf8(name), _parentObjectId, storageId, type);
 	beginInsertRows(QModelIndex(), _rows.size(), _rows.size());
 	_rows.push_back(Row(noi.ObjectId));
@@ -212,7 +212,7 @@ bool MtpObjectsModel::uploadFile(const QString &filePath, QString filename)
 	oi.Filename = toUtf8(filename);
 	oi.ObjectFormat = objectFormat;
 	oi.SetSize(fileInfo.size());
-	mtp::Session::NewObjectInfo noi = _session->SendObjectInfo(oi, _storageId != mtp::Session::AllStorages? _storageId: mtp::Session::Device, _parentObjectId);
+	mtp::Session::NewObjectInfo noi = _session->SendObjectInfo(oi, _storageId != mtp::Session::AllStorages? _storageId: mtp::Session::AnyStorage, _parentObjectId);
 	qDebug() << "new object id: " << noi.ObjectId << ", sending...";
 	_session->SendObject(object);
 	qDebug() << "ok";
@@ -224,7 +224,7 @@ bool MtpObjectsModel::uploadFile(const QString &filePath, QString filename)
 	return true;
 }
 
-bool MtpObjectsModel::downloadFile(const QString &filePath, mtp::u32 objectId)
+bool MtpObjectsModel::downloadFile(const QString &filePath, mtp::ObjectId objectId)
 {
 	std::shared_ptr<QtObjectOutputStream> object(new QtObjectOutputStream(filePath));
 	if (!object->Valid())
@@ -237,7 +237,7 @@ bool MtpObjectsModel::downloadFile(const QString &filePath, mtp::u32 objectId)
 	return true;
 }
 
-MtpObjectsModel::ObjectInfo MtpObjectsModel::getInfoById(mtp::u32 objectId) const
+MtpObjectsModel::ObjectInfo MtpObjectsModel::getInfoById(mtp::ObjectId objectId) const
 {
 	mtp::msg::ObjectInfo oi(_session->GetObjectInfo(objectId));
 	qint64 size = oi.ObjectCompressedSize;

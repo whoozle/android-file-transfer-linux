@@ -27,13 +27,13 @@
 
 class MtpStoragesModel : public QAbstractListModel
 {
-	QVector<QPair<mtp::u32, mtp::msg::StorageInfo> > _storages;
+	QVector<QPair<mtp::StorageId, mtp::msg::StorageInfo> > _storages;
 
 public:
 	MtpStoragesModel(QObject *parent = 0);
 	bool update(const mtp::SessionPtr &session);
 
-	mtp::u32 getStorageId(int idx) const;
+	mtp::StorageId getStorageId(int idx) const;
 	virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
 	virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
 };

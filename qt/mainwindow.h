@@ -70,7 +70,7 @@ private slots:
 	void downloadFiles();
 	void renameFile();
 	void deleteFiles();
-	void downloadFiles(const QVector<quint32> &objects);
+	void downloadFiles(const QVector<mtp::ObjectId> &objects);
 	void uploadFiles(const QStringList &files);
 	void onStorageChanged(int idx);
 	void validateClipboard();
@@ -78,7 +78,7 @@ private slots:
 	bool confirmOverwrite(const QString &file);
 
 public slots:
-	void downloadFiles(const QString & path, const QVector<quint32> &objects);
+	void downloadFiles(const QString & path, const QVector<mtp::ObjectId> &objects);
 
 private:
 	Ui::MainWindow *			_ui;
@@ -87,7 +87,7 @@ private:
 	MtpStoragesModel *			_storageModel;
 	MtpObjectsModel *			_objectModel;
 	FileUploader *				_uploader;
-	typedef QVector<QPair<QString, mtp::u32>> History;
+	typedef QVector<QPair<QString, mtp::ObjectId>> History;
 	History						_history;
 	int							_uploadAnswer;
 

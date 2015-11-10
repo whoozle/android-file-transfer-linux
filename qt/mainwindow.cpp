@@ -207,9 +207,8 @@ void MainWindow::onStorageChanged(int idx)
 {
 	if (!_storageModel)
 		return;
-	mtp::u32 storageId;
-	storageId = _storageModel->getStorageId(idx);
-	qDebug() << "switching to storage id " << storageId;
+	mtp::StorageId storageId = _storageModel->getStorageId(idx);
+	qDebug() << "switching to storage id " << storageId.Id;
 	_objectModel->setStorageId(storageId);
 	_history.clear();
 	updateActionsState();
@@ -250,7 +249,7 @@ void MainWindow::downloadFiles()
 	QItemSelectionModel *selection =_ui->listView->selectionModel();
 	QModelIndexList rows = selection->selectedRows();
 
-	QVector<quint32> objects;
+	QVector<mtp::ObjectId> objects;
 	for(QModelIndex row : rows)
 	{
 		row = mapIndex(row);
@@ -314,9 +313,10 @@ void MainWindow::back()
 {
 	if (_history.empty())
 		return;
-	mtp::u32 oldParent = _objectModel->parentObjectId();
+
+	mtp::ObjectId oldParent = _objectModel->parentObjectId();
 	_history.pop_back();
-	mtp::u32 oid = _history.empty()? mtp::Session::Root: _history.back().second;
+	mtp::ObjectId oid = _history.empty()? mtp::Session::Root: _history.back().second;
 	_objectModel->setParent(oid);
 	QModelIndex prevIndex = _objectModel->findObject(oldParent);
 	if (prevIndex.isValid())
@@ -377,7 +377,7 @@ void MainWindow::uploadFiles(const QStringList &files)
 }
 
 
-void MainWindow::downloadFiles(const QVector<quint32> &objects)
+void MainWindow::downloadFiles(const QVector<mtp::ObjectId> &objects)
 {
 	if (objects.isEmpty())
 		return;
@@ -407,7 +407,7 @@ void MainWindow::downloadFiles(const QVector<quint32> &objects)
 	downloadFiles(path, objects);
 }
 
-void MainWindow::downloadFiles(const QString & path, const QVector<quint32> &objects)
+void MainWindow::downloadFiles(const QString & path, const QVector<mtp::ObjectId> &objects)
 {
 	qDebug() << "downloading to " << path;
 	ProgressDialog progressDialog(this);
@@ -539,7 +539,7 @@ void MainWindow::uploadAlbum(QString dirPath)
 	QDir dir(dirPath);
 	qDebug() << "adding directory " << dir.dirName();
 
-	mtp::u32 dirId = _objectModel->createDirectory(dir.dirName(), mtp::AssociationType::Album);
+	mtp::ObjectId dirId = _objectModel->createDirectory(dir.dirName(), mtp::AssociationType::Album);
 	_objectModel->setParent(dirId);
 	_history.push_back(qMakePair(dir.dirName(), dirId));
 

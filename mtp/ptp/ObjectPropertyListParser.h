@@ -20,6 +20,7 @@
 #ifndef AFS_MTP_PTP_OBJECTPROPERTYLISTPARSER_H
 #define	AFS_MTP_PTP_OBJECTPROPERTYLISTPARSER_H
 
+#include <mtp/ptp/ObjectId.h>
 #include <mtp/ptp/ObjectProperty.h>
 #include <mtp/ByteArray.h>
 #include <mtp/ptp/InputStream.h>
@@ -76,14 +77,14 @@ namespace mtp
 	template<typename PropertyValueType>
 	struct ObjectPropertyListParser
 	{
-		void Parse(const ByteArray & data, const std::function<void (u32, const PropertyValueType &)> &func)
+		void Parse(const ByteArray & data, const std::function<void (ObjectId, const PropertyValueType &)> &func)
 		{
 			InputStream stream(data);
 			u32 n;
 			stream >> n;
 			while(n--)
 			{
-				u32 objectId;
+				ObjectId objectId;
 				ObjectProperty property;
 
 				stream >> objectId;

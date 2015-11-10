@@ -23,6 +23,7 @@
 #include <QObject>
 #include <QQueue>
 #include <QMap>
+#include <mtp/ptp/ObjectId.h>
 #include <mtp/ptp/ObjectFormat.h>
 
 class MtpObjectsModel;
@@ -36,8 +37,8 @@ struct Command
 
 struct FinishQueue : public Command
 {
-	quint32 DirectoryId; //return id
-	FinishQueue(quint32 id): DirectoryId(id) { }
+	mtp::ObjectId DirectoryId; //return id
+	FinishQueue(mtp::ObjectId id): DirectoryId(id) { }
 	virtual void execute(CommandQueue &queue);
 };
 
@@ -64,9 +65,9 @@ struct UploadFile : public FileCommand
 
 struct DownloadFile : public FileCommand
 {
-	quint32			ObjectId;
+	mtp::ObjectId			ObjectId;
 
-	DownloadFile(const QString &filename, quint32 objectId) : FileCommand(filename), ObjectId(objectId) { }
+	DownloadFile(const QString &filename, mtp::ObjectId objectId) : FileCommand(filename), ObjectId(objectId) { }
 	void execute(CommandQueue &queue);
 };
 
@@ -75,11 +76,11 @@ class CommandQueue: public QObject
 	Q_OBJECT
 
 private:
-	MtpObjectsModel *			_model;
-	qint64						_completedFilesSize;
-	QString						_root;
-	QMap<QString, quint32>		_directories;
-	volatile bool				_aborted;
+	MtpObjectsModel *				_model;
+	qint64							_completedFilesSize;
+	QString							_root;
+	QMap<QString, mtp::ObjectId>	_directories;
+	volatile bool					_aborted;
 
 public:
 	CommandQueue(MtpObjectsModel *model);
@@ -90,13 +91,13 @@ public:
 
 	void createDirectory(const QString &path, bool root);
 	void uploadFile(const QString &file);
-	void downloadFile(const QString &filename, quint32 objectId);
+	void downloadFile(const QString &filename, mtp::ObjectId objectId);
 
 public slots:
 	void onFileProgress(qint64, qint64);
 	void execute(Command *cmd);
 	void start(const QString &filename);
-	void finish(quint32 directoryId);
+	void finish(mtp::ObjectId directoryId);
 	void addProgress(qint64);
 	void abort();
 

@@ -23,6 +23,7 @@
 #include <mtp/ptp/InputStream.h>
 #include <mtp/ptp/OutputStream.h>
 #include <mtp/ptp/ObjectFormat.h>
+#include <mtp/ptp/ObjectId.h>
 #include <mtp/ptp/OperationCode.h>
 #include <algorithm>
 
@@ -72,7 +73,7 @@ namespace mtp { namespace msg
 
 	struct ObjectHandles
 	{
-		std::vector<u32> ObjectHandles;
+		std::vector<ObjectId> ObjectHandles;
 
 		void Read(InputStream &stream)
 		{
@@ -82,7 +83,7 @@ namespace mtp { namespace msg
 
 	struct StorageIDs
 	{
-		std::vector<u32> StorageIDs;
+		std::vector<StorageId> StorageIDs;
 
 		void Read(InputStream &stream)
 		{
@@ -117,7 +118,7 @@ namespace mtp { namespace msg
 
 	struct ObjectInfo
 	{
-		u32					StorageId;
+		mtp::StorageId		StorageId;
 		mtp::ObjectFormat	ObjectFormat;
 		u16					ProtectionStatus;
 		u32					ObjectCompressedSize;
@@ -128,7 +129,7 @@ namespace mtp { namespace msg
 		u32					ImagePixWidth;
 		u32					ImagePixHeight;
 		u32					ImageBitDepth;
-		u32					ParentObject;
+		ObjectId			ParentObject;
 		mtp::AssociationType AssociationType;
 		u32					AssociationDesc;
 		u32					SequenceNumber;

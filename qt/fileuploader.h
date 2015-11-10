@@ -28,6 +28,11 @@ class MtpObjectsModel;
 struct Command;
 class CommandQueue;
 
+namespace mtp
+{
+	struct ObjectId;
+}
+
 class FileUploader : public QObject
 {
 	Q_OBJECT
@@ -50,7 +55,7 @@ public:
 	~FileUploader();
 
 	void upload(QStringList files);
-	void download(const QString &path, const QVector<quint32> & objectIds);
+	void download(const QString &path, const QVector<mtp::ObjectId> & objectIds);
 
 public slots:
 	void abort();

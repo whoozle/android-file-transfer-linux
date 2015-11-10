@@ -25,7 +25,7 @@
 #include <QVector>
 #include <QStringList>
 
-typedef QVector<mtp::u32> MtpObjectList;
+typedef QVector<mtp::ObjectId> MtpObjectList;
 
 class MtpObjectsModel : public QAbstractListModel
 {
@@ -33,15 +33,19 @@ class MtpObjectsModel : public QAbstractListModel
 
 private:
 	mtp::SessionPtr		_session;
-	mtp::u32			_storageId;
-	mtp::u32			_parentObjectId;
+	mtp::StorageId		_storageId;
+	mtp::ObjectId		_parentObjectId;
 
 	class Row
 	{
 		mtp::msg::ObjectInfoPtr					_info;
+
 	public:
-		mtp::u32								ObjectId;
-		Row(mtp::u32 id = 0): ObjectId(id) { }
+		mtp::ObjectId							ObjectId;
+
+		Row(): ObjectId() { }
+		Row(mtp::ObjectId id): ObjectId(id) { }
+
 		void ResetInfo() { _info.reset(); }
 		mtp::msg::ObjectInfoPtr GetInfo(mtp::SessionPtr session);
 		bool IsAssociation(mtp::SessionPtr);
@@ -72,24 +76,24 @@ public:
 	mtp::SessionPtr session() const
 	{ return _session; }
 
-	void setStorageId(mtp::u32 storageId);
-	void setParent(mtp::u32 parentObjectId);
+	void setStorageId(mtp::StorageId storageId);
+	void setParent(mtp::ObjectId parentObjectId);
 	void refresh()
 	{ setParent(_parentObjectId); }
 
 	bool enter(int idx);
-	mtp::u32 objectIdAt(int idx);
-	QModelIndex findObject(mtp::u32 objectId) const;
+	mtp::ObjectId objectIdAt(int idx);
+	QModelIndex findObject(mtp::ObjectId objectId) const;
 	QModelIndex findObject(const QString &filename) const;
 
-	mtp::u32 parentObjectId() const
+	mtp::ObjectId parentObjectId() const
 	{ return _parentObjectId; }
 
-	mtp::u32 createDirectory(const QString &name, mtp::AssociationType type = mtp::AssociationType::GenericFolder);
+	mtp::ObjectId createDirectory(const QString &name, mtp::AssociationType type = mtp::AssociationType::GenericFolder);
 	bool uploadFile(const QString &filePath, QString filename = QString());
-	bool downloadFile(const QString &filePath, mtp::u32 objectId);
+	bool downloadFile(const QString &filePath, mtp::ObjectId objectId);
 	void rename(int idx, const QString &fileName);
-	ObjectInfo getInfoById(mtp::u32 objectId) const;
+	ObjectInfo getInfoById(mtp::ObjectId objectId) const;
 	void deleteObjects(const MtpObjectList &objects);
 
 	QStringList extractMimeData(const QMimeData *data);

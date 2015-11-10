@@ -22,10 +22,11 @@
 
 #include <mtp/usb/BulkPipe.h>
 #include <mtp/ptp/Messages.h>
-#include <mtp/ptp/PipePacketer.h>
 #include <mtp/ptp/DeviceProperty.h>
-#include <mtp/ptp/ObjectProperty.h>
 #include <mtp/ptp/IObjectStream.h>
+#include <mtp/ptp/ObjectId.h>
+#include <mtp/ptp/ObjectProperty.h>
+#include <mtp/ptp/PipePacketer.h>
 
 namespace mtp
 {
@@ -51,25 +52,26 @@ namespace mtp
 		int				_defaultTimeout;
 
 	public:
-		static const u32 AllStorages = 0xffffffffu;
-		static const u32 Root = 0xffffffffu;
-		static const u32 Device = 0;
+		static const StorageId AllStorages;
+		static const StorageId AnyStorage;
+		static const ObjectId Device;
+		static const ObjectId Root;
 
 		struct NewObjectInfo
 		{
-			u32		StorageId;
-			u32		ParentObjectId;
-			u32		ObjectId;
+			mtp::StorageId		StorageId;
+			mtp::ObjectId		ParentObjectId;
+			mtp::ObjectId		ObjectId;
 		};
 
 		///handles partial writes and
 		class ObjectEditSession : Noncopyable
 		{
 			SessionPtr	_session;
-			u32			_objectId;
+			ObjectId	_objectId;
 
 		public:
-			ObjectEditSession(const SessionPtr & session, u32 objectId);
+			ObjectEditSession(const SessionPtr & session, ObjectId objectId);
 			~ObjectEditSession();
 
 			void Truncate(u64 size);
@@ -83,37 +85,41 @@ namespace mtp
 		const msg::DeviceInfo & GetDeviceInfo() const
 		{ return _deviceInfo; }
 
-		msg::ObjectHandles GetObjectHandles(u32 storageId = AllStorages, ObjectFormat objectFormat = ObjectFormat::Any, u32 parent = Device, int timeout = 30000);
+		msg::ObjectHandles GetObjectHandles(StorageId storageId = AllStorages, ObjectFormat objectFormat = ObjectFormat::Any, ObjectId parent = Device, int timeout = 30000);
 		msg::StorageIDs GetStorageIDs();
-		msg::StorageInfo GetStorageInfo(u32 storageId);
+		msg::StorageInfo GetStorageInfo(StorageId storageId);
 
-		NewObjectInfo CreateDirectory(const std::string &name, mtp::u32 parentId, mtp::u32 storageId = Device, AssociationType type = AssociationType::GenericFolder);
-		msg::ObjectInfo GetObjectInfo(u32 objectId);
-		void GetObject(u32 objectId, const IObjectOutputStreamPtr &outputStream);
-		ByteArray GetPartialObject(u32 objectId, u64 offset, u32 size);
-		NewObjectInfo SendObjectInfo(const msg::ObjectInfo &objectInfo, u32 storageId = 0, u32 parentObject = 0);
+		NewObjectInfo CreateDirectory(const std::string &name, ObjectId parentId, StorageId storageId = AnyStorage, AssociationType type = AssociationType::GenericFolder);
+		msg::ObjectInfo GetObjectInfo(ObjectId objectId);
+		void GetObject(ObjectId objectId, const IObjectOutputStreamPtr &outputStream);
+		ByteArray GetPartialObject(ObjectId objectId, u64 offset, u32 size);
+		NewObjectInfo SendObjectInfo(const msg::ObjectInfo &objectInfo, StorageId storageId = AnyStorage, ObjectId parentObject = Device);
 		void SendObject(const IObjectInputStreamPtr &inputStream, int timeout = 10000);
-		void DeleteObject(u32 objectId);
+		void DeleteObject(ObjectId objectId);
 
 		bool EditObjectSupported() const
 		{ return _editObjectSupported; }
 		bool GetObjectPropertyListSupported() const
 		{ return _getObjectPropertyListSupported; }
 
-		static ObjectEditSessionPtr EditObject(const SessionPtr &session, u32 objectId)
+		static ObjectEditSessionPtr EditObject(const SessionPtr &session, ObjectId objectId)
 		{ return std::make_shared<ObjectEditSession>(session, objectId); }
 
-		msg::ObjectPropsSupported GetObjectPropsSupported(u32 objectId);
+		msg::ObjectPropsSupported GetObjectPropsSupported(ObjectId objectId);
 
-		void SetObjectProperty(u32 objectId, ObjectProperty property, const ByteArray &value);
-		void SetObjectProperty(u32 objectId, ObjectProperty property, u64 value);
-		void SetObjectProperty(u32 objectId, ObjectProperty property, const std::string &value);
+		void SetObjectProperty(ObjectId objectId, ObjectProperty property, const ByteArray &value);
+		void SetObjectProperty(ObjectId objectId, ObjectProperty property, u64 value);
+		void SetObjectProperty(ObjectId objectId, ObjectProperty property, const std::string &value);
 
-		ByteArray GetObjectProperty(u32 objectId, ObjectProperty property);
-		u64 GetObjectIntegerProperty(u32 objectId, ObjectProperty property);
-		std::string GetObjectStringProperty(u32 objectId, ObjectProperty property);
+		//common properties shortcuts
+		StorageId GetObjectStorage(ObjectId id);
+		ObjectId GetObjectParent(ObjectId id);
 
-		ByteArray GetObjectPropertyList(u32 objectId, ObjectFormat format, ObjectProperty property, u32 groupCode, u32 depth);
+		ByteArray GetObjectProperty(ObjectId objectId, ObjectProperty property);
+		u64 GetObjectIntegerProperty(ObjectId objectId, ObjectProperty property);
+		std::string GetObjectStringProperty(ObjectId objectId, ObjectProperty property);
+
+		ByteArray GetObjectPropertyList(ObjectId objectId, ObjectFormat format, ObjectProperty property, u32 groupCode, u32 depth);
 
 		ByteArray GetDeviceProperty(DeviceProperty property);
 
@@ -124,10 +130,10 @@ namespace mtp
 
 		msg::DeviceInfo GetDeviceInfoImpl();
 
-		void BeginEditObject(u32 objectId);
-		void SendPartialObject(u32 objectId, u64 offset, const ByteArray &data);
-		void TruncateObject(u32 objectId, u64 size);
-		void EndEditObject(u32 objectId);
+		void BeginEditObject(ObjectId objectId);
+		void SendPartialObject(ObjectId objectId, u64 offset, const ByteArray &data);
+		void TruncateObject(ObjectId objectId, u64 size);
+		void EndEditObject(ObjectId objectId);
 
 		ByteArray Get(u32 transaction, int timeout = 0);
 		void Send(const OperationRequest &req, int timeout = 0);

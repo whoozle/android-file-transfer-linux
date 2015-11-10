@@ -165,7 +165,7 @@ namespace
 		typedef std::map<FuseId, ChildrenObjects> Files;
 		Files			_files;
 
-		typedef std::map<mtp::u32, struct stat> ObjectAttrs;
+		typedef std::map<mtp::ObjectId, struct stat> ObjectAttrs;
 		ObjectAttrs		_objectAttrs;
 
 		typedef mtp::Session::ObjectEditSessionPtr ObjectEditSessionPtr;
@@ -178,21 +178,21 @@ namespace
 		static const size_t					MtpStorageShift = FUSE_ROOT_ID + 1;
 		static const size_t					MtpObjectShift = 999998 + MtpStorageShift;
 
-		std::vector<mtp::u32>				_storageIdList;
-		std::map<mtp::u32, std::string>		_storageToName;
-		std::map<std::string, mtp::u32>		_storageFromName;
+		std::vector<mtp::StorageId>					_storageIdList;
+		std::map<mtp::StorageId, std::string>		_storageToName;
+		std::map<std::string, mtp::StorageId>		_storageFromName;
 
 	private:
-		static FuseId ToFuse(mtp::u32 id)
-		{ return FuseId(id + MtpObjectShift); }
+		static FuseId ToFuse(mtp::ObjectId id)
+		{ return FuseId(id.Id + MtpObjectShift); }
 
-		static mtp::u32 FromFuse(FuseId id)
-		{ return id.Inode - MtpObjectShift; }
+		static mtp::ObjectId FromFuse(FuseId id)
+		{ return mtp::ObjectId(id.Inode - MtpObjectShift); }
 
 		static bool IsStorage(FuseId id)
 		{ return id.Inode >= MtpStorageShift && id.Inode <= MtpObjectShift; }
 
-		mtp::u32 FuseIdToStorageId(FuseId id) const
+		mtp::StorageId FuseIdToStorageId(FuseId id) const
 		{
 			if (!IsStorage(id))
 				throw std::runtime_error("converting non-storage inode to storage id");
@@ -202,7 +202,7 @@ namespace
 			return _storageIdList[i];
 		}
 
-		FuseId FuseIdFromStorageId(mtp::u32 storageId) const
+		FuseId FuseIdFromStorageId(mtp::StorageId storageId) const
 		{
 			auto i = std::find(_storageIdList.begin(), _storageIdList.end(), storageId);
 			if (i == _storageIdList.end())
@@ -210,7 +210,7 @@ namespace
 			return FuseId(MtpStorageShift + std::distance(_storageIdList.begin(), i));
 		}
 
-		void GetObjectInfo(ChildrenObjects &cache, mtp::u32 id)
+		void GetObjectInfo(ChildrenObjects &cache, mtp::ObjectId id)
 		{
 			mtp::msg::ObjectInfo oi = _session->GetObjectInfo(id);
 
@@ -245,7 +245,7 @@ namespace
 				return attr;
 			}
 
-			mtp::u32 id = FromFuse(inode);
+			mtp::ObjectId id = FromFuse(inode);
 			auto i = _objectAttrs.find(id);
 			if (i != _objectAttrs.end())
 				return i->second;
@@ -270,7 +270,7 @@ namespace
 				cache.clear();
 				for(size_t i = 0; i < _storageIdList.size(); ++i)
 				{
-					mtp::u32 storageId = _storageIdList[i];
+					mtp::StorageId storageId = _storageIdList[i];
 					auto name = _storageToName.find(storageId);
 					if (name != _storageToName.end())
 						cache.emplace(name->second, FuseId(MtpStorageShift + i));
@@ -298,12 +298,12 @@ namespace
 
 			if (IsStorage(inode))
 			{
-				mtp::u32 storageId = FuseIdToStorageId(inode);
+				mtp::StorageId storageId = FuseIdToStorageId(inode);
 				oh = _session->GetObjectHandles(storageId, mtp::ObjectFormat::Any, mtp::Session::Root);
 			}
 			else
 			{
-				mtp::u32 parent = FromFuse(inode);
+				mtp::ObjectId parent = FromFuse(inode);
 
 				if (_session->GetObjectPropertyListSupported())
 				{
@@ -312,7 +312,7 @@ namespace
 					{
 						data = _session->GetObjectPropertyList(parent, ObjectFormat::Any, ObjectProperty::ObjectFilename, 0, 1);
 						ObjectPropertyListParser<std::string> parser;
-						parser.Parse(data, [&cache](u32 objectId, const std::string &name)
+						parser.Parse(data, [&cache](ObjectId objectId, const std::string &name)
 						{
 							cache.emplace(name, ToFuse(objectId));
 						});
@@ -322,7 +322,7 @@ namespace
 					{
 						data = _session->GetObjectPropertyList(parent, ObjectFormat::Any, ObjectProperty::ObjectFormat, 0, 1);
 						ObjectPropertyListParser<mtp::ObjectFormat> parser;
-						parser.Parse(data, [this](u32 objectId, mtp::ObjectFormat format)
+						parser.Parse(data, [this](ObjectId objectId, mtp::ObjectFormat format)
 						{
 							struct stat & attr = _objectAttrs[objectId];
 							attr.st_ino = ToFuse(objectId).Inode;
@@ -334,7 +334,7 @@ namespace
 					{
 						data = _session->GetObjectPropertyList(parent, ObjectFormat::Any, ObjectProperty::ObjectSize, 0, 1);
 						ObjectPropertyListParser<u64> parser;
-						parser.Parse(data, [this](u32 objectId, u64 size)
+						parser.Parse(data, [this](ObjectId objectId, u64 size)
 						{
 							_objectAttrs[objectId].st_size = size;
 						});
@@ -345,7 +345,7 @@ namespace
 					{
 						data = _session->GetObjectPropertyList(parent, ObjectFormat::Any, ObjectProperty::DateModified, 0, 1);
 						ObjectPropertyListParser<std::string> parser;
-						parser.Parse(data, [this](u32 objectId, const std::string & mtime)
+						parser.Parse(data, [this](ObjectId objectId, const std::string & mtime)
 						{
 							_objectAttrs[objectId].st_mtime = mtp::ConvertDateTime(mtime);
 						});
@@ -358,7 +358,7 @@ namespace
 					{
 						data = _session->GetObjectPropertyList(parent, ObjectFormat::Any, ObjectProperty::DateAdded, 0, 1);
 						ObjectPropertyListParser<std::string> parser;
-						parser.Parse(data, [this](u32 objectId, const std::string & mtime)
+						parser.Parse(data, [this](ObjectId objectId, const std::string & mtime)
 						{
 							_objectAttrs[objectId].st_ctime = mtp::ConvertDateTime(mtime);
 						});
@@ -383,15 +383,15 @@ namespace
 
 		FuseId CreateObject(FuseId parentInode, const std::string &filename, mtp::ObjectFormat format)
 		{
-			mtp::u32 parentId = FromFuse(parentInode);
-			mtp::u32 storageId;
+			mtp::ObjectId parentId = FromFuse(parentInode);
+			mtp::StorageId storageId;
 			if (IsStorage(parentInode))
 			{
 				storageId = FuseIdToStorageId(parentInode);
 				parentId = mtp::Session::Root;
 			}
 			else
-				storageId = _session->GetObjectIntegerProperty(parentId, mtp::ObjectProperty::StorageId);
+				storageId = _session->GetObjectStorage(parentId);
 
 			mtp::Session::NewObjectInfo noi;
 			if (format != mtp::ObjectFormat::Association)
@@ -436,11 +436,11 @@ namespace
 			if (IsStorage(inode))
 				return FuseId::Root;
 
-			mtp::u32 id = FromFuse(inode);
-			mtp::u64 parent = _session->GetObjectIntegerProperty(id, mtp::ObjectProperty::ParentObject);
-			if (parent == 0 || parent == mtp::Session::Root) //parent == root -> storage
+			mtp::ObjectId id = FromFuse(inode);
+			mtp::ObjectId parent = _session->GetObjectParent(id);
+			if (parent == mtp::Session::Device || parent == mtp::Session::Root) //parent == root -> storage
 			{
-				return FuseIdFromStorageId(_session->GetObjectIntegerProperty(id, mtp::ObjectProperty::StorageId));
+				return FuseIdFromStorageId(_session->GetObjectStorage(id));
 			}
 			else
 				return ToFuse(parent);
@@ -489,7 +489,7 @@ namespace
 			_storageIdList.reserve(ids.StorageIDs.size());
 			for(size_t i = 0; i < ids.StorageIDs.size(); ++i)
 			{
-				mtp::u32 id = ids.StorageIDs[i];
+				mtp::StorageId id = ids.StorageIDs[i];
 				mtp::msg::StorageInfo si = _session->GetStorageInfo(id);
 				std::string path = (!si.StorageDescription.empty()? si.StorageDescription:  si.VolumeLabel);
 				if (path.empty())
@@ -651,7 +651,7 @@ namespace
 			}
 
 			FuseId inode = i->second;
-			mtp::u32 id = FromFuse(inode);
+			mtp::ObjectId id = FromFuse(inode);
 			_openedFiles.erase(inode);
 			_objectAttrs.erase(id);
 			children.erase(i);
@@ -678,11 +678,11 @@ namespace
 			}
 			else
 			{
-				mtp::u32 storageId;
+				mtp::StorageId storageId;
 				if (!IsStorage(ino))
 					storageId = FuseIdToStorageId(ino);
 				else
-					storageId = _session->GetObjectIntegerProperty(FromFuse(ino), mtp::ObjectProperty::StorageId);
+					storageId = _session->GetObjectStorage(FromFuse(ino));
 
 				mtp::msg::StorageInfo si = _session->GetStorageInfo(storageId);
 				freeSpace = si.FreeSpaceInBytes;

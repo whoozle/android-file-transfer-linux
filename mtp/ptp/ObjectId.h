@@ -26,8 +26,11 @@ namespace mtp
 {
 
 #define DECLARE_ID(NAME, TYPE, MEMBER) \
+	struct NAME { \
 		TYPE MEMBER; \
+		static const TYPE Canary = 0xaaaaaaaau; \
  \
+		NAME ( ): MEMBER ( Canary ) { } \
 		explicit NAME ( TYPE id ): MEMBER ( id ) { } \
  \
 		bool operator == (const NAME &o) const \
@@ -35,18 +38,16 @@ namespace mtp
 		bool operator != (const NAME &o) const \
 		{ return !((*this) == o); } \
 		bool operator < (const NAME &o) const \
-		{ return MEMBER < o.MEMBER; }
+		{ return MEMBER < o.MEMBER; } \
+	}; \
+	template <typename Stream> Stream & operator >> (Stream &stream, NAME & value) \
+	{ stream >> value. MEMBER ; return stream; } \
+	template <typename Stream> Stream & operator << (Stream &stream, const NAME &value) \
+	{ stream << value. MEMBER ; return stream; } \
 
 
-	struct ObjectId
-	{
-		DECLARE_ID(ObjectId, mtp::u32, Id);
-	};
-
-	struct StorageId
-	{
-		DECLARE_ID(StorageId, mtp::u32, Id);
-	};
+	DECLARE_ID(ObjectId, mtp::u32, Id);
+	DECLARE_ID(StorageId, mtp::u32, Id);
 
 #undef DECLARE_ID
 

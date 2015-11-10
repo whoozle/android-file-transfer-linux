@@ -269,25 +269,24 @@ namespace cli
 			print("");
 	}
 
-	mtp::u32 Session::ResolveObjectChild(mtp::u32 parent, const std::string &entity)
+	mtp::ObjectId Session::ResolveObjectChild(mtp::ObjectId parent, const std::string &entity)
 	{
-		mtp::u32 id = 0;
+		//fixme: replace with prop list!
 		auto objectList = _session->GetObjectHandles(_cs, mtp::ObjectFormat::Any, parent);
 		for(auto object : objectList.ObjectHandles)
 		{
 			std::string name = _session->GetObjectStringProperty(object, mtp::ObjectProperty::ObjectFilename);
 			if (name == entity)
 			{
-				id = object;
-				break;
+				return object;
 			}
 		}
-		return id;
+		throw std::runtime_error("could not find " + entity + " in path");
 	}
 
-	mtp::u32 Session::Resolve(const Path &path)
+	mtp::ObjectId Session::Resolve(const Path &path)
 	{
-		mtp::u32 id = BeginsWith(path, "/")? mtp::Session::Root: _cd;
+		mtp::ObjectId id = BeginsWith(path, "/")? mtp::Session::Root: _cd;
 		for(size_t p = 0; p < path.size(); )
 		{
 			size_t next = path.find('/', p);
@@ -300,16 +299,12 @@ namespace cli
 			else
 			if (entity == "..")
 			{
-				id = _session->GetObjectIntegerProperty(id, mtp::ObjectProperty::ParentObject);
-				if (id == 0)
+				id = _session->GetObjectParent(id);
+				if (id == mtp::Session::Device)
 					id = mtp::Session::Root;
 			}
 			else
-			{
 				id = ResolveObjectChild(id, entity);
-				if (!id)
-					throw std::runtime_error("could not find " + entity + " in path " + path.substr(0, p));
-			}
 			p = next + 1;
 		}
 		return id;
@@ -341,7 +336,7 @@ namespace cli
 			timespec.substr(13, 2);
 	}
 
-	mtp::u32 Session::ResolvePath(const std::string &path, std::string &file)
+	mtp::ObjectId Session::ResolvePath(const std::string &path, std::string &file)
 	{
 		size_t pos = path.rfind('/');
 		if (pos == path.npos)
@@ -359,13 +354,13 @@ namespace cli
 	void Session::CurrentDirectory()
 	{
 		std::string path;
-		mtp::u32 id = _cd;
-		while(id && id != mtp::Session::Root)
+		mtp::ObjectId id = _cd;
+		while(id != mtp::Session::Device && id != mtp::Session::Root)
 		{
 			std::string filename = _session->GetObjectStringProperty(id, mtp::ObjectProperty::ObjectFilename);
 			path = filename + "/" + path;
-			id = _session->GetObjectIntegerProperty(id, mtp::ObjectProperty::ParentObject);
-			if (id == 0)
+			id = _session->GetObjectParent(id);
+			if (id == mtp::Session::Device)
 				break;
 		}
 		path = "/" + path;
@@ -373,7 +368,7 @@ namespace cli
 	}
 
 
-	void Session::List(mtp::u32 parent, bool extended)
+	void Session::List(mtp::ObjectId parent, bool extended)
 	{
 		using namespace mtp;
 		if (!extended && _session->GetObjectPropertyListSupported())
@@ -381,7 +376,7 @@ namespace cli
 			ByteArray data = _session->GetObjectPropertyList(parent, ObjectFormat::Any, ObjectProperty::ObjectFilename, 0, 1);
 			ObjectPropertyListParser<std::string> parser;
 			//HexDump("list", data, true);
-			parser.Parse(data, [](u32 objectId, const std::string &name)
+			parser.Parse(data, [](ObjectId objectId, const std::string &name)
 			{
 				print(std::left, width(objectId, 10), " ", name);
 			});
@@ -390,7 +385,7 @@ namespace cli
 		{
 			msg::ObjectHandles handles = _session->GetObjectHandles(_cs, mtp::ObjectFormat::Any, parent);
 
-			for(u32 objectId : handles.ObjectHandles)
+			for(auto objectId : handles.ObjectHandles)
 			{
 				try
 				{
@@ -420,7 +415,7 @@ namespace cli
 	void Session::CompletePath(const Path &path, CompletionResult &result)
 	{
 		std::string filePrefix;
-		mtp::u32 parent = ResolvePath(path, filePrefix);
+		mtp::ObjectId parent = ResolvePath(path, filePrefix);
 		std::string dir = GetDirname(path);
 		auto objectList = _session->GetObjectHandles(_cs, mtp::ObjectFormat::Any, parent);
 		for(auto object : objectList.ObjectHandles)
@@ -467,7 +462,7 @@ namespace cli
 		}
 	}
 
-	void Session::Get(const LocalPath &dst, mtp::u32 srcId)
+	void Session::Get(const LocalPath &dst, mtp::ObjectId srcId)
 	{
 		mtp::ObjectFormat format = static_cast<mtp::ObjectFormat>(_session->GetObjectIntegerProperty(srcId, mtp::ObjectProperty::ObjectFormat));
 		if (format == mtp::ObjectFormat::Association)
@@ -495,7 +490,7 @@ namespace cli
 		}
 	}
 
-	void Session::Get(mtp::u32 srcId)
+	void Session::Get(mtp::ObjectId srcId)
 	{
 		auto info = _session->GetObjectInfo(srcId);
 		Get(LocalPath(info.Filename), srcId);
@@ -512,26 +507,29 @@ namespace cli
 			fputc('\n', stdout);
 	}
 
-	void Session::Put(mtp::u32 parentId, const std::string &dst, const LocalPath &src)
+	mtp::ObjectId Session::MakeOrResolveDirectory(mtp::ObjectId parentId, const std::string &dst, const LocalPath &src)
+	{
+		try
+		{ return _session->CreateDirectory(GetFilename(dst), parentId).ObjectId; }
+		catch(const std::exception & ex)
+		{ }
+
+		return ResolveObjectChild(parentId, src);
+	}
+
+	void Session::Put(mtp::ObjectId parentId, const std::string &dst, const LocalPath &src)
 	{
 		using namespace mtp;
 		struct stat st = {};
 		if (stat(src.c_str(), &st))
 			throw std::runtime_error(std::string("stat failed: ") + strerror(errno));
 
+
+		//fixme: dst path was not resolved?
+
 		if (S_ISDIR(st.st_mode))
 		{
-			mtp::u32 dirId = 0;
-
-			try
-			{ dirId = _session->CreateDirectory(GetFilename(dst), parentId).ObjectId; }
-			catch(const std::exception & ex)
-			{ }
-
-			if (!dirId)
-				dirId = ResolveObjectChild(parentId, src);
-			if (!dirId)
-				throw std::runtime_error("cannot create/resolve directory '" + GetFilename(dst) + "'");
+			mtp::ObjectId dirId = MakeOrResolveDirectory(parentId, dst, src);
 
 			DIR *dir = opendir(src.c_str());
 			if (!dir)
@@ -569,18 +567,18 @@ namespace cli
 			if (IsInteractive())
 				try { stream->SetProgressReporter(ProgressBar(dst, _terminalWidth / 3, _terminalWidth)); } catch(const std::exception &ex) { }
 
-			_session->SendObjectInfo(oi, 0, parentId);
+			_session->SendObjectInfo(oi, mtp::Session::AnyStorage, parentId);
 			_session->SendObject(stream);
 		}
 	}
 
-	void Session::MakeDirectory(mtp::u32 parentId, const std::string & name)
+	void Session::MakeDirectory(mtp::ObjectId parentId, const std::string & name)
 	{
 		using namespace mtp;
 		msg::ObjectInfo oi;
 		oi.Filename = name;
 		oi.ObjectFormat = ObjectFormat::Association;
-		_session->SendObjectInfo(oi, 0, parentId);
+		_session->SendObjectInfo(oi, mtp::Session::AnyStorage, parentId);
 	}
 
 	void Session::ShowType(const LocalPath &src)
@@ -589,7 +587,7 @@ namespace cli
 		print("mtp object format = ", hex(format, 4));
 	}
 
-	void Session::ListProperties(mtp::u32 id)
+	void Session::ListProperties(mtp::ObjectId id)
 	{
 		auto ops = _session->GetObjectPropsSupported(id);
 		std::stringstream ss;

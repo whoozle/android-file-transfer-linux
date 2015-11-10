@@ -38,7 +38,7 @@ void MakeDirectory::execute(CommandQueue &queue)
 void DownloadFile::execute(CommandQueue &queue)
 { queue.downloadFile(Filename, ObjectId); }
 
-void CommandQueue::downloadFile(const QString &filename, quint32 objectId)
+void CommandQueue::downloadFile(const QString &filename, mtp::ObjectId objectId)
 {
 	if (_aborted)
 		return;
@@ -105,7 +105,7 @@ void CommandQueue::createDirectory(const QString &srcPath, bool root)
 
 	try
 	{
-		mtp::u32 dirId = _model->createDirectory(dir.dirName());
+		mtp::ObjectId dirId = _model->createDirectory(dir.dirName());
 		_directories[path] = dirId;
 		_model->setParent(dirId);
 	} catch(const std::exception &ex)
@@ -134,7 +134,7 @@ void CommandQueue::start(const QString &filename)
 	emit started(filename);
 }
 
-void CommandQueue::finish(quint32 directoryId)
+void CommandQueue::finish(mtp::ObjectId directoryId)
 {
 	qDebug() << "finishing queue";
 	try

@@ -44,12 +44,12 @@ bool MtpStoragesModel::update(const mtp::SessionPtr &session)
 	}
 	mtp::msg::StorageInfo anyStorage;
 	anyStorage.StorageDescription = toUtf8(tr("All storages (BUGS, BEWARE)"));
-	_storages.append(qMakePair((mtp::u32)mtp::Session::AllStorages, anyStorage));
+	_storages.append(qMakePair(mtp::Session::AllStorages, anyStorage));
 	endResetModel();
 	return !storages.StorageIDs.empty();
 }
 
-mtp::u32 MtpStoragesModel::getStorageId(int idx) const
+mtp::StorageId MtpStoragesModel::getStorageId(int idx) const
 {
 	return idx >= 0 && idx < _storages.size()? _storages[idx].first: mtp::Session::AllStorages;
 }
