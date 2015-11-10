@@ -273,8 +273,11 @@ namespace mtp { namespace usb
 		{
 			r = urb->Send(inputStream);
 			urb->SetZeroPacketFlag(r != transferSize);
-			urb->SetContinuationFlag(continuation);
-			continuation = true;
+			if (_capabilities & USBDEVFS_CAP_BULK_CONTINUATION)
+			{
+				urb->SetContinuationFlag(continuation);
+				continuation = true;
+			}
 			Submit(urb, timeout);
 		}
 		while(r == transferSize);
@@ -289,8 +292,11 @@ namespace mtp { namespace usb
 		bool continuation = false;
 		do
 		{
-			urb->SetContinuationFlag(continuation);
-			continuation = true;
+			if (_capabilities & USBDEVFS_CAP_BULK_CONTINUATION)
+			{
+				urb->SetContinuationFlag(continuation);
+				continuation = true;
+			}
 			Submit(urb, timeout);
 
 			r = urb->Recv(outputStream);
