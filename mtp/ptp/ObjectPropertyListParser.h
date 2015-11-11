@@ -34,10 +34,8 @@ namespace mtp
 		template<typename PropertyType>
 		struct ObjectPropertyParser
 		{
-			static PropertyType Parse(InputStream &stream)
+			static PropertyType Parse(InputStream &stream, DataTypeCode dataType)
 			{
-				DataTypeCode dataType;
-				stream >> dataType;
 				switch(dataType)
 				{
 #define HANDLE_TYPE(TYPE, METHOD) case DataTypeCode::TYPE : { return static_cast<PropertyType> (stream . METHOD ()) ; }
@@ -59,10 +57,8 @@ namespace mtp
 		template<>
 		struct ObjectPropertyParser<std::string>
 		{
-			static std::string Parse(InputStream &stream)
+			static std::string Parse(InputStream &stream, DataTypeCode dataType)
 			{
-				DataTypeCode dataType;
-				stream >> dataType;
 				if (dataType != DataTypeCode::String)
 					throw std::runtime_error("got invalid type");
 
@@ -74,7 +70,7 @@ namespace mtp
 		};
 	}
 
-	template<typename PropertyValueType>
+	template<typename PropertyValueType, template <typename> class Parser = impl::ObjectPropertyParser>
 	struct ObjectPropertyListParser
 	{
 		void Parse(const ByteArray & data, const std::function<void (ObjectId, const PropertyValueType &)> &func)
@@ -86,10 +82,13 @@ namespace mtp
 			{
 				ObjectId objectId;
 				ObjectProperty property;
+				DataTypeCode dataType;
 
 				stream >> objectId;
 				stream >> property;
-				PropertyValueType value = impl::ObjectPropertyParser<PropertyValueType>::Parse(stream);
+				stream >> dataType;
+
+				PropertyValueType value = Parser<PropertyValueType>::Parse(stream, dataType);
 				func(objectId, value);
 			}
 		}
