@@ -73,7 +73,7 @@ namespace mtp
 	template<typename PropertyValueType, template <typename> class Parser = impl::ObjectPropertyParser>
 	struct ObjectPropertyListParser
 	{
-		void Parse(const ByteArray & data, const std::function<void (ObjectId, const PropertyValueType &)> &func)
+		void Parse(const ByteArray & data, const std::function<void (ObjectId, ObjectProperty property, const PropertyValueType &)> &func)
 		{
 			InputStream stream(data);
 			u32 n;
@@ -89,7 +89,7 @@ namespace mtp
 				stream >> dataType;
 
 				PropertyValueType value = Parser<PropertyValueType>::Parse(stream, dataType);
-				func(objectId, value);
+				func(objectId, property, value);
 			}
 		}
 	};

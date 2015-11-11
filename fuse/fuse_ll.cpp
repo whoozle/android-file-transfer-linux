@@ -270,15 +270,15 @@ namespace
 			mtp::ByteArray data = _session->GetObjectPropertyList(parent, mtp::ObjectFormat::Any, property, 0, 1);
 			mtp::ObjectPropertyListParser<PropertyValueType> parser;
 
-			parser.Parse(data, [this, &objectList, &callback, property](mtp::ObjectId objectId, const PropertyValueType & value) {
+			parser.Parse(data, [this, &objectList, &callback, property](mtp::ObjectId objectId, mtp::ObjectProperty p, const PropertyValueType & value) {
 				auto it = objectList.find(objectId);
-				if (it != objectList.end())
+				if (property == p && it != objectList.end())
 				{
 					objectList.erase(it);
 					try { callback(objectId, value); } catch(const std::exception &ex) { mtp::error("callback for property list 0x", mtp::hex(property, 4), " failed: ", ex.what()); }
 				}
 				else
-					mtp::debug("extra data returned for object ", objectId.Id, ", while querying property list 0x", mtp::hex(property, 4));
+					mtp::debug("extra property 0x", hex(p, 4), " returned for object ", objectId.Id, ", while querying property list 0x", mtp::hex(property, 4));
 			});
 
 			if (!objectList.empty())

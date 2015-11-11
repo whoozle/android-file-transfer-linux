@@ -376,7 +376,7 @@ namespace cli
 			ByteArray data = _session->GetObjectPropertyList(parent, ObjectFormat::Any, ObjectProperty::ObjectFilename, 0, 1);
 			ObjectPropertyListParser<std::string> parser;
 			//HexDump("list", data, true);
-			parser.Parse(data, [](ObjectId objectId, const std::string &name)
+			parser.Parse(data, [](ObjectId objectId, ObjectProperty property, const std::string &name)
 			{
 				print(std::left, width(objectId, 10), " ", name);
 			});
