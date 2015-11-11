@@ -645,7 +645,7 @@ namespace cli
 		using namespace mtp;
 		print("testing property 0x", hex(property, 4), "...");
 
-		std::set<ObjectId> objectList(originalObjectList);
+		std::set<ObjectId> objectList;
 		ByteArray data = _session->GetObjectPropertyList(parent, ObjectFormat::Any, property, 0, 1);
 		print("got ", data.size(), " bytes of reply");
 		HexDump("property list", data);
@@ -654,9 +654,8 @@ namespace cli
 		bool ok = true;
 
 		parser.Parse(data, [this, &objectList, property, &ok](mtp::ObjectId objectId, ObjectProperty p, const ByteArray & ) {
-			auto it = objectList.find(objectId);
-			if ((p == property || property == ObjectProperty::All) && it != objectList.end())
-				objectList.erase(it);
+			if ((p == property || property == ObjectProperty::All))
+				objectList.insert(objectId);
 			else
 			{
 				print("extra property 0x", hex(p, 4), " returned for object ", objectId.Id, ", while querying property list 0x", mtp::hex(property, 4));
@@ -664,10 +663,13 @@ namespace cli
 			}
 		});
 
-		if (!objectList.empty())
+		std::set<ObjectId> extraData;
+		std::set_difference(objectList.begin(), objectList.end(), originalObjectList.begin(), originalObjectList.end(), std::inserter(extraData, extraData.end()));
+
+		if (!extraData.empty())
 		{
 			print("inconsistent GetObjectPropertyList for property 0x", mtp::hex(property, 4));
-			for(auto objectId : objectList)
+			for(auto objectId : extraData)
 			{
 				print("missing 0x", mtp::hex(property, 4), " for object ", objectId);
 				ok = false;
