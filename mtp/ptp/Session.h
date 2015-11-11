@@ -35,7 +35,7 @@ namespace mtp
 	class Session;
 	DECLARE_PTR(Session);
 
-	class Session
+	class Session //! Main MTP interaction / object manipulation class
 	{
 		class Transaction;
 

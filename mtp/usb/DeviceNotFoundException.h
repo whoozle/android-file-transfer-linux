@@ -25,7 +25,7 @@
 namespace mtp { namespace usb
 {
 
-	struct DeviceNotFoundException : public std::runtime_error
+	struct DeviceNotFoundException : public std::runtime_error //! Exception throw when device was disconnected or was not found
 	{
 		DeviceNotFoundException(): std::runtime_error("device was disconnected") { }
 	};

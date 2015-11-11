@@ -25,7 +25,7 @@
 namespace mtp { namespace usb
 {
 
-	struct DeviceBusyException : public std::runtime_error
+	struct DeviceBusyException : public std::runtime_error //! Exception thrown when device is busy (claimed by other process)
 	{
 		DeviceBusyException(const std::string &msg = "Device is already used by another process"): std::runtime_error(msg) { }
 	};

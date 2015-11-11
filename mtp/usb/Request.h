@@ -27,7 +27,7 @@ namespace mtp { namespace usb
 	constexpr RequestType operator | (RequestType r1, RequestType r2)
 	{ return static_cast<RequestType>(static_cast<u8>(r1) | static_cast<u8>(r2)); };
 
-	class BaseRequest
+	class BaseRequest //! Base USB Standard Request
 	{
 	public:
 		static const int DefaultTimeout = 1000;
@@ -53,7 +53,7 @@ namespace mtp { namespace usb
 		OnTheGo						= 9
 	};
 
-	struct DeviceRequest : BaseRequest
+	struct DeviceRequest : BaseRequest //! USB Standard Request for Device
 	{
 		using BaseRequest::BaseRequest;
 
@@ -88,7 +88,7 @@ namespace mtp { namespace usb
 		void SetConfiguration(u8 index);
 	};
 
-	class InterfaceRequest : public BaseRequest
+	class InterfaceRequest : public BaseRequest //! USB Standard Request for Interface
 	{
 		u16 _interface;
 	public:
@@ -119,7 +119,7 @@ namespace mtp { namespace usb
 		void SetInterface(u8 alt);
 	};
 
-	class EndpointRequest : public BaseRequest
+	class EndpointRequest : public BaseRequest //! USB Standard Request for Endpoint
 	{
 		u16 _endpoint;
 

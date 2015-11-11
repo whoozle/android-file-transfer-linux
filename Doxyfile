@@ -6,7 +6,7 @@
 DOXYFILE_ENCODING      = UTF-8
 PROJECT_NAME           = "Android File Transfer for Linux (and Mac OS X)"
 PROJECT_NUMBER         = 3.0
-PROJECT_BRIEF          =
+PROJECT_BRIEF          = "Android File Transfer for Linux — reliable MTP client with minimalistic UI similar to Android File Transfer for Mac."
 PROJECT_LOGO           =
 OUTPUT_DIRECTORY       =
 CREATE_SUBDIRS         = NO
@@ -103,7 +103,7 @@ INPUT                  = mtp
 INPUT_ENCODING         = UTF-8
 FILE_PATTERNS          = *.h *.cpp
 RECURSIVE              = YES
-EXCLUDE                =
+EXCLUDE                = mtp/backend
 EXCLUDE_SYMLINKS       = NO
 EXCLUDE_PATTERNS       =
 EXCLUDE_SYMBOLS        = mtp::impl

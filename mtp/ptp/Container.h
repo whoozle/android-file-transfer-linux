@@ -28,7 +28,7 @@
 
 namespace mtp
 {
-	struct Container
+	struct Container //! MTP container for MTP message, appends type and size
 	{
 		ByteArray Data;
 

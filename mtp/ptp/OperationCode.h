@@ -24,7 +24,7 @@
 
 namespace mtp
 {
-	enum class OperationCode : u16
+	enum class OperationCode : u16 //! MTP operation code
 	{
 		GetDeviceInfo			= 0x1001,
 		OpenSession             = 0x1002,

@@ -82,7 +82,7 @@ namespace mtp
 	};
 	DECLARE_ENUM(ResponseType, u16);
 
-	struct Response
+	struct Response //! MTP Response class
 	{
 		static const size_t		Size = 8;
 
@@ -105,7 +105,7 @@ namespace mtp
 		}
 	};
 
-	struct InvalidResponseException : public std::runtime_error
+	struct InvalidResponseException : public std::runtime_error //!Invalid MTP Response Exception
 	{
 		ResponseType Type;
 		InvalidResponseException(const std::string &where, ResponseType type);

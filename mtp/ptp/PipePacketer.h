@@ -29,7 +29,7 @@ namespace mtp
 	class Device;
 	DECLARE_PTR(Device);
 
-	class PipePacketer
+	class PipePacketer //! BulkPipe high-level controller class, package all read/write operation into streams and send it to BulkPipe
 	{
 		usb::BulkPipePtr	_pipe;
 

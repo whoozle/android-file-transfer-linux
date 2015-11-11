@@ -26,19 +26,19 @@
 
 namespace mtp
 {
-	struct ICancellableStream
+	struct ICancellableStream //! interfaces for streams with cancellation functionality
 	{
 		virtual ~ICancellableStream() { }
 		virtual void Cancel() = 0;
 	};
 	DECLARE_PTR(ICancellableStream);
 
-	struct OperationCancelledException : public std::runtime_error
+	struct OperationCancelledException : public std::runtime_error //! exception thrown if stream was cancelled
 	{
 		OperationCancelledException(): std::runtime_error("operation cancelled") { }
 	};
 
-	class CancellableStream : public virtual ICancellableStream
+	class CancellableStream : public virtual ICancellableStream //! default implementation of \ref ICancellableStream
 	{
 		std::atomic_bool _cancelled;
 
@@ -57,14 +57,14 @@ namespace mtp
 		}
 	};
 
-	struct IObjectInputStream : public virtual ICancellableStream
+	struct IObjectInputStream : public virtual ICancellableStream //! Basic input stream interface
 	{
 		virtual u64 GetSize() const = 0;
 		virtual size_t Read(u8 *data, size_t size) = 0;
 	};
 	DECLARE_PTR(IObjectInputStream);
 
-	struct IObjectOutputStream : public virtual ICancellableStream
+	struct IObjectOutputStream : public virtual ICancellableStream //! Basic output stream interface
 	{
 		virtual size_t Write(const u8 *data, size_t size) = 0;
 	};

@@ -41,42 +41,45 @@ namespace mtp
 		return stream;
 	}
 
-	template<typename T, bool Hex>
-	struct Format
+	namespace impl
 	{
-		T			Value;
-		unsigned	Width;
-		Format(const T & value, unsigned width = 0): Value(value), Width(width) { }
-
-		template<typename Stream>
-		Stream & operator >> (Stream & stream) const
+		template<typename T, bool Hex>
+		struct Format
 		{
-			std::ios::fmtflags oldFlags = stream.flags();
-			char oldFill = stream.fill();
-			if (Hex)
-				stream << std::setw(Width) << std::setfill('0') << std::hex << Value;
-			else
-				stream << std::setw(Width) << std::setfill(' ') << Value;
-			stream.flags(oldFlags);
-			stream.fill(oldFill);
-			return stream;
-		}
-	};
+			T			Value;
+			unsigned	Width;
+			Format(const T & value, unsigned width = 0): Value(value), Width(width) { }
+
+			template<typename Stream>
+			Stream & operator >> (Stream & stream) const
+			{
+				std::ios::fmtflags oldFlags = stream.flags();
+				char oldFill = stream.fill();
+				if (Hex)
+					stream << std::setw(Width) << std::setfill('0') << std::hex << Value;
+				else
+					stream << std::setw(Width) << std::setfill(' ') << Value;
+				stream.flags(oldFlags);
+				stream.fill(oldFill);
+				return stream;
+			}
+		};
+	}
 
 	template<typename Stream, typename T, bool H>
-	Stream & operator << (Stream &stream, const Format<T, H> &format)
+	Stream & operator << (Stream &stream, const impl::Format<T, H> &format)
 	{
 		format >> stream;
 		return stream;
 	}
 
 	template<typename T>
-	Format<T, true> hex(const T & value, unsigned width = 0)
-	{ return Format<T, true>(value, width); }
+	impl::Format<T, true> hex(const T & value, unsigned width = 0)
+	{ return impl::Format<T, true>(value, width); }
 
 	template<typename T>
-	Format<T, false> width(const T & value, unsigned width)
-	{ return Format<T, false>(value, width); }
+	impl::Format<T, false> width(const T & value, unsigned width)
+	{ return impl::Format<T, false>(value, width); }
 
 	inline void print()
 	{ std::cout << std::endl; }

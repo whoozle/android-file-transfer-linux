@@ -27,9 +27,9 @@
 
 namespace mtp
 {
-	struct RequestBase
+	struct RequestBase //! base class for Operation and Data requests
 	{
-		ByteArray					Data;
+		ByteArray					Data; //!< resulting data
 
 		RequestBase(OperationCode opcode, u32 transaction)
 		{
@@ -45,7 +45,7 @@ namespace mtp
 		}
 	};
 
-	struct OperationRequest : RequestBase
+	struct OperationRequest : RequestBase //! Operation (Command) class, constructs operation request data in \ref Data
 	{
 		static const ContainerType	Type = ContainerType::Command;
 
@@ -94,7 +94,7 @@ namespace mtp
 		}
 	};
 
-	struct DataRequest : RequestBase
+	struct DataRequest : RequestBase //! MTP Data request
 	{
 		static const ContainerType	Type = ContainerType::Data;
 

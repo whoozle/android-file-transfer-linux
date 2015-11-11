@@ -24,6 +24,7 @@
 
 namespace mtp
 {
+	//! Token, base class for ref counted objects which hold some resources while they are alive
 	struct IToken : Noncopyable
 	{
 		virtual ~IToken() { }

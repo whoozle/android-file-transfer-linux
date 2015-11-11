@@ -37,7 +37,7 @@ namespace mtp { namespace usb
 	class BulkPipe;
 	DECLARE_PTR(BulkPipe);
 
-	class BulkPipe
+	class BulkPipe //! USB BulkPipe, incapsulate three (in, out, interrupt) endpoints, allowing easier data transfer
 	{
 		std::mutex				_mutex;
 		DevicePtr				_device;

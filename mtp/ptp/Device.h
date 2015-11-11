@@ -27,7 +27,7 @@
 
 namespace mtp
 {
-	class Device
+	class Device //! Generic MTP Device class representing physical device, creates \ref Session
 	{
 		PipePacketer	_packeter;
 

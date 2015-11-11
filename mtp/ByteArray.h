@@ -25,8 +25,9 @@
 
 namespace mtp
 {
-	typedef std::vector<u8> ByteArray;
+	typedef std::vector<u8> ByteArray; //! \typedef ByteArray : vector of bytes
 
+	//! output hex dump to debug channel
 	void HexDump(const std::string &prefix, const ByteArray &data, bool force = false);
 }
 

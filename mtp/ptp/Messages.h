@@ -30,7 +30,7 @@
 
 namespace mtp { namespace msg
 {
-	struct DeviceInfo
+	struct DeviceInfo //! MTP DeviceInfo message
 	{
 		u16							StandardVersion;
 		u32							VendorExtensionId;
@@ -72,7 +72,7 @@ namespace mtp { namespace msg
 		}
 	};
 
-	struct ObjectHandles
+	struct ObjectHandles //! MTP ObjectHandles message
 	{
 		std::vector<ObjectId> ObjectHandles;
 
@@ -82,7 +82,7 @@ namespace mtp { namespace msg
 		}
 	};
 
-	struct StorageIDs
+	struct StorageIDs //! MTP StorageIDs message
 	{
 		std::vector<StorageId> StorageIDs;
 
@@ -92,7 +92,7 @@ namespace mtp { namespace msg
 		}
 	};
 
-	struct StorageInfo
+	struct StorageInfo //! MTP StorageInfo message
 	{
 		u16			StorageType;
 		u16			FilesystemType;
@@ -117,7 +117,7 @@ namespace mtp { namespace msg
 		}
 	};
 
-	struct ObjectInfo
+	struct ObjectInfo //! MTP ObjectInfo message
 	{
 		mtp::StorageId		StorageId;
 		mtp::ObjectFormat	ObjectFormat;
@@ -199,7 +199,7 @@ namespace mtp { namespace msg
 	};
 	DECLARE_PTR(ObjectInfo);
 
-	struct ObjectPropertiesSupported
+	struct ObjectPropertiesSupported  //! MTP ObjectPropSupported message
 	{
 		std::vector<ObjectProperty>		ObjectPropertyCodes;
 

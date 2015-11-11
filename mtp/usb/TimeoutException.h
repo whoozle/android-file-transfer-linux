@@ -25,7 +25,7 @@
 namespace mtp { namespace usb
 {
 
-	struct TimeoutException : public std::runtime_error
+	struct TimeoutException : public std::runtime_error //! Exception throw if USB URB transfer timeout occured
 	{
 		TimeoutException(const std::string &msg): std::runtime_error(msg) { }
 	};

@@ -26,7 +26,7 @@
 namespace mtp
 {
 
-	class OutputStream
+	class OutputStream //! MTP format encoding output stream
 	{
 		ByteArray	& _data;
 

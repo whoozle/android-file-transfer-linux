@@ -26,7 +26,7 @@
 namespace mtp
 {
 
-	class InputStream
+	class InputStream //! MTP data decoding input stream
 	{
 		const ByteArray &	_data;
 		size_t				_offset;

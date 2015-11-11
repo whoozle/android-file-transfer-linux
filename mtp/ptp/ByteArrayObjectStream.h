@@ -25,7 +25,8 @@
 
 namespace mtp
 {
-	class ByteArrayObjectInputStream : public IObjectInputStream, public CancellableStream
+
+	class ByteArrayObjectInputStream : public IObjectInputStream, public CancellableStream //! stream constructed from \ref ByteArray data
 	{
 		ByteArray	_data;
 		size_t		_offset;
@@ -51,7 +52,7 @@ namespace mtp
 	};
 	DECLARE_PTR(ByteArrayObjectInputStream);
 
-	class ByteArrayObjectOutputStream : public IObjectOutputStream, public CancellableStream
+	class ByteArrayObjectOutputStream : public IObjectOutputStream, public CancellableStream //! stream inserting into \ref ByteArray
 	{
 		ByteArray	_data;
 
@@ -70,7 +71,7 @@ namespace mtp
 	};
 	DECLARE_PTR(ByteArrayObjectOutputStream);
 
-	class FixedSizeByteArrayObjectOutputStream : public IObjectOutputStream, public CancellableStream
+	class FixedSizeByteArrayObjectOutputStream : public IObjectOutputStream, public CancellableStream //! stream writing into fixed size \ref ByteArray
 	{
 		ByteArray	_data;
 		size_t		_offset;
