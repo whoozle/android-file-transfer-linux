@@ -605,8 +605,6 @@ namespace cli
 		using namespace mtp;
 		for(u16 code : _gdi.DevicePropertiesSupported)
 		{
-			if ((code & 0xff00) != 0x5000 )
-				continue;
 			print("property code: ", hex(code, 4));
 			ByteArray data = _session->GetDeviceProperty((mtp::DeviceProperty)code);
 			HexDump("value", data, true);
