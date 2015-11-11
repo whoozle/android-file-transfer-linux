@@ -334,9 +334,13 @@ namespace
 					{
 						data = _session->GetObjectPropertyList(parent, ObjectFormat::Any, ObjectProperty::ObjectSize, 0, 1);
 						ObjectPropertyListParser<u64> parser;
-						parser.Parse(data, [this](ObjectId objectId, u64 size)
+						parser.Parse(data, [this, parent](ObjectId objectId, u64 size)
 						{
-							_objectAttrs[objectId].st_size = size;
+							auto i = _objectAttrs.find(objectId);
+							if (i != _objectAttrs.end())
+								i->second.st_size = size;
+							else
+								mtp::error("GetObjectPropertyList: inconsistent values for ObjectFormat/ObjectSize property, ", parent.Id, " ", objectId.Id);
 						});
 					}
 
@@ -345,10 +349,16 @@ namespace
 					{
 						data = _session->GetObjectPropertyList(parent, ObjectFormat::Any, ObjectProperty::DateModified, 0, 1);
 						ObjectPropertyListParser<std::string> parser;
-						parser.Parse(data, [this](ObjectId objectId, const std::string & mtime)
+						parser.Parse(data, [this, parent](ObjectId objectId, const std::string & mtime)
 						{
-							time_t t = mtp::ConvertDateTime(mtime);
-							_objectAttrs[objectId].st_mtime = t;
+							auto i = _objectAttrs.find(objectId);
+							if (i != _objectAttrs.end())
+							{
+								time_t t = mtp::ConvertDateTime(mtime);
+								i->second.st_mtime = t;
+							}
+							else
+								mtp::error("GetObjectPropertyList: inconsistent values for ObjectFormat/DateModified property, ", parent.Id, " ", objectId.Id);
 						});
 					}
 					catch(const std::exception &ex)
@@ -359,10 +369,16 @@ namespace
 					{
 						data = _session->GetObjectPropertyList(parent, ObjectFormat::Any, ObjectProperty::DateAdded, 0, 1);
 						ObjectPropertyListParser<std::string> parser;
-						parser.Parse(data, [this](ObjectId objectId, const std::string & ctime)
+						parser.Parse(data, [this, parent](ObjectId objectId, const std::string & ctime)
 						{
-							time_t t = mtp::ConvertDateTime(ctime);
-							_objectAttrs[objectId].st_ctime = t;
+							auto i = _objectAttrs.find(objectId);
+							if (i != _objectAttrs.end())
+							{
+								time_t t = mtp::ConvertDateTime(ctime);
+								i->second.st_ctime = t;
+							}
+							else
+								mtp::error("GetObjectPropertyList: inconsistent values for ObjectFormat/DateAdded property, ", parent.Id, " ", objectId.Id);
 						});
 					}
 					catch(const std::exception &ex)
