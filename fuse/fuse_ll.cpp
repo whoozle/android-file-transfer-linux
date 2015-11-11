@@ -367,14 +367,14 @@ namespace
 
 					//size
 					GetObjectPropertyList<mtp::u64>(parent, objects, mtp::ObjectProperty::ObjectSize,
-						[this, parent](ObjectId objectId, mtp::u64 size)
+						[this](ObjectId objectId, mtp::u64 size)
 						{ _objectAttrs[objectId].st_size = size; });
 
 					//mtime
 					try
 					{
 						GetObjectPropertyList<std::string>(parent, objects, mtp::ObjectProperty::DateModified,
-						[this, parent](ObjectId objectId, const std::string & mtime)
+						[this](ObjectId objectId, const std::string & mtime)
 						{ _objectAttrs[objectId].st_mtime = mtp::ConvertDateTime(mtime); });
 					}
 					catch(const std::exception &ex)
@@ -384,7 +384,7 @@ namespace
 					try
 					{
 						GetObjectPropertyList<std::string>(parent, objects, mtp::ObjectProperty::DateAdded,
-						[this, parent](ObjectId objectId, const std::string & ctime)
+						[this](ObjectId objectId, const std::string & ctime)
 						{ _objectAttrs[objectId].st_ctime = mtp::ConvertDateTime(ctime); });
 					}
 					catch(const std::exception &ex)
