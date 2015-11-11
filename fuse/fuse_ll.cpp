@@ -29,6 +29,7 @@
 #include <mtp/log.h>
 
 #include <map>
+#include <set>
 #include <string>
 
 namespace
@@ -261,6 +262,44 @@ namespace
 				throw std::runtime_error("no such object");
 		}
 
+		template<typename PropertyValueType>
+		void GetObjectPropertyList(mtp::ObjectId parent, const std::set<mtp::ObjectId> &originalObjectList, const mtp::ObjectProperty property,
+			const std::function<void (mtp::ObjectId, const PropertyValueType &)> &callback)
+		{
+			std::set<mtp::ObjectId> objectList(originalObjectList);
+			mtp::ByteArray data = _session->GetObjectPropertyList(parent, mtp::ObjectFormat::Any, property, 0, 1);
+			mtp::ObjectPropertyListParser<PropertyValueType> parser;
+
+			parser.Parse(data, [this, &objectList, &callback, property](mtp::ObjectId objectId, const PropertyValueType & value) {
+				auto it = objectList.find(objectId);
+				if (it != objectList.end())
+				{
+					objectList.erase(it);
+					try { callback(objectId, value); } catch(const std::exception &ex) { mtp::error("callback for property list 0x", mtp::hex(property, 4), " failed: ", ex.what()); }
+				}
+				else
+					mtp::debug("extra data returned for object ", objectId.Id, ", while querying property list 0x", mtp::hex(property, 4));
+			});
+
+			if (!objectList.empty())
+			{
+				mtp::error("inconsistent GetObjectPropertyList for property 0x", mtp::hex(property, 4));
+				for(auto objectId : objectList)
+				{
+					mtp::debug("querying property 0x", mtp::hex(property, 4), " for object ", objectId);
+					try
+					{
+						mtp::ByteArray data = _session->GetObjectProperty(objectId, property);
+						mtp::InputStream stream(data);
+						PropertyValueType value = PropertyValueType();
+						stream >> value;
+						callback(objectId, value);
+					}
+					catch(const std::exception &ex) { mtp::error("fallback query/callback for property 0x", mtp::hex(property, 4), " failed: ", ex.what()); }
+				}
+			}
+		}
+
 		ChildrenObjects & GetChildren(FuseId inode)
 		{
 			if (inode == FuseId::Root)
@@ -304,62 +343,39 @@ namespace
 			else
 			{
 				mtp::ObjectId parent = FromFuse(inode);
+				oh = _session->GetObjectHandles(mtp::Session::AllStorages, mtp::ObjectFormat::Any, parent);
 
 				if (_getObjectPropertyListSupported)
 				{
+					std::set<mtp::ObjectId> objects;
+					for(auto id : oh.ObjectHandles)
+						objects.insert(id);
+
 					//populate filenames
-					ByteArray data;
-					{
-						data = _session->GetObjectPropertyList(parent, ObjectFormat::Any, ObjectProperty::ObjectFilename, 0, 1);
-						ObjectPropertyListParser<std::string> parser;
-						parser.Parse(data, [&cache](ObjectId objectId, const std::string &name)
-						{
-							cache.emplace(name, ToFuse(objectId));
-						});
-					}
+					GetObjectPropertyList<std::string>(parent, objects, mtp::ObjectProperty::ObjectFilename,
+						[&cache](ObjectId objectId, const std::string &name)
+						{ cache.emplace(name, ToFuse(objectId)); });
 
 					//format
-					{
-						data = _session->GetObjectPropertyList(parent, ObjectFormat::Any, ObjectProperty::ObjectFormat, 0, 1);
-						ObjectPropertyListParser<mtp::ObjectFormat> parser;
-						parser.Parse(data, [this](ObjectId objectId, mtp::ObjectFormat format)
+					GetObjectPropertyList<mtp::ObjectFormat>(parent, objects, mtp::ObjectProperty::ObjectFormat,
+						[this](ObjectId objectId, mtp::ObjectFormat format)
 						{
 							struct stat & attr = _objectAttrs[objectId];
 							attr.st_ino = ToFuse(objectId).Inode;
 							attr.st_mode = FuseEntry::GetMode(format);
 						});
-					}
 
 					//size
-					{
-						data = _session->GetObjectPropertyList(parent, ObjectFormat::Any, ObjectProperty::ObjectSize, 0, 1);
-						ObjectPropertyListParser<u64> parser;
-						parser.Parse(data, [this, parent](ObjectId objectId, u64 size)
-						{
-							auto i = _objectAttrs.find(objectId);
-							if (i != _objectAttrs.end())
-								i->second.st_size = size;
-							else
-								mtp::error("GetObjectPropertyList: inconsistent values for ObjectFormat/ObjectSize property, ", parent.Id, " ", objectId.Id);
-						});
-					}
+					GetObjectPropertyList<mtp::u64>(parent, objects, mtp::ObjectProperty::ObjectSize,
+						[this, parent](ObjectId objectId, mtp::u64 size)
+						{ _objectAttrs[objectId].st_size = size; });
 
 					//mtime
 					try
 					{
-						data = _session->GetObjectPropertyList(parent, ObjectFormat::Any, ObjectProperty::DateModified, 0, 1);
-						ObjectPropertyListParser<std::string> parser;
-						parser.Parse(data, [this, parent](ObjectId objectId, const std::string & mtime)
-						{
-							auto i = _objectAttrs.find(objectId);
-							if (i != _objectAttrs.end())
-							{
-								time_t t = mtp::ConvertDateTime(mtime);
-								i->second.st_mtime = t;
-							}
-							else
-								mtp::error("GetObjectPropertyList: inconsistent values for ObjectFormat/DateModified property, ", parent.Id, " ", objectId.Id);
-						});
+						GetObjectPropertyList<std::string>(parent, objects, mtp::ObjectProperty::DateModified,
+						[this, parent](ObjectId objectId, const std::string & mtime)
+						{ _objectAttrs[objectId].st_mtime = mtp::ConvertDateTime(mtime); });
 					}
 					catch(const std::exception &ex)
 					{ }
@@ -367,25 +383,17 @@ namespace
 					//ctime
 					try
 					{
-						data = _session->GetObjectPropertyList(parent, ObjectFormat::Any, ObjectProperty::DateAdded, 0, 1);
-						ObjectPropertyListParser<std::string> parser;
-						parser.Parse(data, [this, parent](ObjectId objectId, const std::string & ctime)
-						{
-							auto i = _objectAttrs.find(objectId);
-							if (i != _objectAttrs.end())
-							{
-								time_t t = mtp::ConvertDateTime(ctime);
-								i->second.st_ctime = t;
-							}
-							else
-								mtp::error("GetObjectPropertyList: inconsistent values for ObjectFormat/DateAdded property, ", parent.Id, " ", objectId.Id);
-						});
+						GetObjectPropertyList<std::string>(parent, objects, mtp::ObjectProperty::DateAdded,
+						[this, parent](ObjectId objectId, const std::string & ctime)
+						{ _objectAttrs[objectId].st_ctime = mtp::ConvertDateTime(ctime); });
 					}
 					catch(const std::exception &ex)
 					{ }
+
+
+
 					return cache;
 				}
-				oh = _session->GetObjectHandles(mtp::Session::AllStorages, mtp::ObjectFormat::Any, parent);
 			}
 
 			for(auto id : oh.ObjectHandles)
