@@ -34,6 +34,12 @@ namespace mtp
 	public:
 		InputStream(const ByteArray & data, size_t offset = 0): _data(data), _offset(offset) { }
 
+		size_t GetOffset() const
+		{ return _offset; }
+
+		void Skip(size_t size)
+		{ _offset += size; }
+
 		const ByteArray & GetData() const
 		{ return _data; }
 

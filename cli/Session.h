@@ -28,6 +28,7 @@
 
 #include <functional>
 #include <map>
+#include <set>
 
 namespace cli
 {
@@ -55,6 +56,7 @@ namespace cli
 		static std::string GetDirname(const std::string &path);
 		static std::string FormatTime(const std::string &timespec);
 
+		void GetObjectPropertyList(mtp::ObjectId parent, const std::set<mtp::ObjectId> &originalObjectList, const mtp::ObjectProperty property);
 	public:
 		Session(const mtp::DevicePtr &device, bool showPrompt);
 
@@ -81,6 +83,7 @@ namespace cli
 		void MakeDirectory(mtp::ObjectId parentId, const std::string & name);
 		void ListProperties(mtp::ObjectId id);
 		void ListDeviceProperties();
+		void TestObjectPropertyList(const Path &path);
 
 		void ChangeDirectory(const Path &path)
 		{ _cd = Resolve(path); }

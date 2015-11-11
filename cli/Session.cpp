@@ -36,6 +36,7 @@
 #include <dirent.h>
 #include <unistd.h>
 #include <errno.h>
+#include <set>
 
 namespace
 {
@@ -118,6 +119,9 @@ namespace cli
 			make_function([this](const Path &path) -> void { ListProperties(path); }));
 		AddCommand("device-properties", "shows device's MTP properties",
 			make_function([this]() -> void { ListDeviceProperties(); }));
+
+		AddCommand("test-property-list", "test GetObjectPropList on given object",
+			make_function([this](const Path &path) -> void { TestObjectPropertyList(path); }));
 #if 0
 		auto test = [](const std::string &input)
 		{
@@ -609,6 +613,87 @@ namespace cli
 			ByteArray data = _session->GetDeviceProperty((mtp::DeviceProperty)code);
 			HexDump("value", data, true);
 		}
+	}
+
+	namespace
+	{
+		template<typename>
+		struct DummyPropertyListParser
+		{
+			static mtp::ByteArray Parse(mtp::InputStream &stream, mtp::DataTypeCode dataType)
+			{
+				switch(dataType)
+				{
+#define CASE(BITS) \
+					case mtp::DataTypeCode::Uint##BITS: \
+					case mtp::DataTypeCode::Int##BITS: \
+						stream.Skip(BITS / 8); break
+					CASE(8); CASE(16); CASE(32); CASE(64); CASE(128);
+#undef CASE
+					case mtp::DataTypeCode::String:
+						stream.ReadString(); break;
+					default:
+						throw std::runtime_error("got invalid data type code");
+				}
+				return mtp::ByteArray();
+			}
+		};
+	}
+
+	void Session::GetObjectPropertyList(mtp::ObjectId parent, const std::set<mtp::ObjectId> &originalObjectList, const mtp::ObjectProperty property)
+	{
+		using namespace mtp;
+		print("testing property 0x", hex(property, 4), "...");
+
+		std::set<ObjectId> objectList(originalObjectList);
+		ByteArray data = _session->GetObjectPropertyList(parent, ObjectFormat::Any, property, 0, 1);
+		print("got ", data.size(), " bytes of reply");
+		HexDump("property list", data);
+		ObjectPropertyListParser<ByteArray, DummyPropertyListParser> parser;
+
+		bool ok = true;
+
+		parser.Parse(data, [this, &objectList, property, &ok](mtp::ObjectId objectId, ObjectProperty p, const ByteArray & ) {
+			auto it = objectList.find(objectId);
+			if ((p == property || property == ObjectProperty::All) && it != objectList.end())
+				objectList.erase(it);
+			else
+			{
+				print("extra property 0x", hex(p, 4), " returned for object ", objectId.Id, ", while querying property list 0x", mtp::hex(property, 4));
+				ok = false;
+			}
+		});
+
+		if (!objectList.empty())
+		{
+			print("inconsistent GetObjectPropertyList for property 0x", mtp::hex(property, 4));
+			for(auto objectId : objectList)
+			{
+				print("missing 0x", mtp::hex(property, 4), " for object ", objectId);
+				ok = false;
+			}
+		}
+		print("getting object property list of type 0x", hex(property, 4), " ", ok? "PASSED": "FAILED");
+	}
+
+
+	void Session::TestObjectPropertyList(const Path &path)
+	{
+		using namespace mtp;
+		ObjectId id = Resolve(path);
+		msg::ObjectHandles oh = _session->GetObjectHandles(mtp::Session::AllStorages, ObjectFormat::Any, id);
+
+		std::set<ObjectId> objectList;
+		for(auto id : oh.ObjectHandles)
+			objectList.insert(id);
+
+		print("GetObjectHandles ", id, " returns ", oh.ObjectHandles.size(), " objects, ", objectList.size(), " unique");
+		GetObjectPropertyList(id, objectList, ObjectProperty::ObjectFilename);
+		GetObjectPropertyList(id, objectList, ObjectProperty::ObjectFormat);
+		GetObjectPropertyList(id, objectList, ObjectProperty::ObjectSize);
+		GetObjectPropertyList(id, objectList, ObjectProperty::DateModified);
+		GetObjectPropertyList(id, objectList, ObjectProperty::DateAdded);
+		GetObjectPropertyList(id, objectList, ObjectProperty::All);
 	}
 
 }
