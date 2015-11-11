@@ -86,7 +86,8 @@ namespace mtp
 		Subject						= 0xdce2,
 		Priority					= 0xdce3,
 
-		MediaGUID					= 0xdd72
+		MediaGUID					= 0xdd72,
+		All							= 0xffff
 	};
 	DECLARE_ENUM(ObjectProperty, u16);
 

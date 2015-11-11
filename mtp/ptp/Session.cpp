@@ -394,7 +394,7 @@ namespace mtp
 			objectId = Device;
 		scoped_mutex_lock l(_mutex);
 		Transaction transaction(this);
-		Send(OperationRequest(OperationCode::GetObjectPropList, transaction.Id, objectId.Id, (u32)format, (u32)property, groupCode, depth));
+		Send(OperationRequest(OperationCode::GetObjectPropList, transaction.Id, objectId.Id, (u32)format, property != ObjectProperty::All? (u32)property: 0xffffffffu, groupCode, depth));
 		return Get(transaction.Id);
 	}
 
