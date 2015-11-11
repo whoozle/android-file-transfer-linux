@@ -864,17 +864,21 @@ int main(int argc, char **argv)
 	struct fuse_chan *ch;
 	char *mountpoint;
 	int err = -1;
+	int multithreaded = 0, foreground = 0;
 
-	if (fuse_parse_cmdline(&args, &mountpoint, NULL, NULL) != -1 &&
+	if (fuse_parse_cmdline(&args, &mountpoint, &multithreaded, &foreground) != -1 &&
 	    (ch = fuse_mount(mountpoint, &args)) != NULL) {
 		struct fuse_session *se;
 
 		se = fuse_lowlevel_new(&args, &ops,
 				       sizeof(ops), NULL);
 		if (se != NULL) {
-			if (fuse_set_signal_handlers(se) != -1) {
+			if (fuse_set_signal_handlers(se) != -1)
+			{
 				fuse_session_add_chan(se, ch);
-				err = fuse_session_loop(se);
+				if (fuse_daemonize(foreground) == -1)
+					perror("fuse_daemonize");
+				err = (multithreaded? fuse_session_loop_mt: fuse_session_loop)(se);
 				fuse_remove_signal_handlers(se);
 				fuse_session_remove_chan(ch);
 			}
