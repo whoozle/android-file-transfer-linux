@@ -29,6 +29,12 @@ include(CheckIncludeFiles)
 find_package ( Threads )
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+	option(BUILD_FUSE "Build fuse mount helper" ON)
+else()
+	set(BUILD_FUSE OFF)
+endif()
+
+if (BUILD_FUSE)
 	pkg_check_modules ( FUSE fuse )
 endif()
 
