@@ -680,6 +680,13 @@ namespace
 				_openedFiles.erase(i);
 		}
 
+		void Rename(fuse_req_t req, FuseId parent, const char *name, FuseId newparent, const char *newname)
+		{
+			mtp::ObjectId parentId = FromFuse(parent);
+			mtp::ObjectId newParentId = FromFuse(newparent);
+			fuse_reply_err(req, EIO);
+		}
+
 		void SetAttr(fuse_req_t req, FuseId inode, struct stat *attr, int to_set, struct fuse_file_info *fi)
 		{
 			mtp::scoped_mutex_lock l(_mutex);
@@ -812,6 +819,9 @@ namespace
 	void Open(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi)
 	{ mtp::debug("   Open ", ino); WRAP_EX(g_wrapper->Open(req, FuseId(ino), fi)); }
 
+	void Rename(fuse_req_t req, fuse_ino_t parent, const char *name, fuse_ino_t newparent, const char *newname)
+	{ mtp::debug("   Rename ", parent, " ", name, " -> ", newparent, " ", newname); WRAP_EX(g_wrapper->Rename(req, FuseId(parent), name, FuseId(newparent), newname)); }
+
 	void Release(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi)
 	{ mtp::debug("   Release ", ino); WRAP_EX(g_wrapper->Release(req, FuseId(ino), fi)); }
 
@@ -855,6 +865,7 @@ int main(int argc, char **argv)
 	ops.read		= &Read;
 	ops.write		= &Write;
 	ops.mkdir		= &MakeDir;
+	ops.rename		= &Rename;
 	ops.release		= &Release;
 	ops.rmdir		= &RemoveDir;
 	ops.unlink		= &Unlink;
