@@ -1,7 +1,15 @@
 project(mtp-qt)
 
-find_package(Qt5Widgets QUIET)
-find_package(Qt4 QUIET)
+if(DESIRED_QT_VERSION)
+	if(DESIRED_QT_VERSION MATCHES 4)
+		find_package(Qt4 QUIET)
+	else()
+		find_package(Qt5Widgets QUIET)
+	endif()
+else()
+	find_package(Qt5Widgets QUIET)
+	find_package(Qt4 QUIET)
+endif()
 
 set(SOURCES main.cpp
 	mainwindow.cpp
