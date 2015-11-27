@@ -682,9 +682,7 @@ namespace
 
 		void Rename(fuse_req_t req, FuseId parent, const char *name, FuseId newparent, const char *newname)
 		{
-			mtp::ObjectId parentId = FromFuse(parent);
-			mtp::ObjectId newParentId = FromFuse(newparent);
-			fuse_reply_err(req, EIO);
+			fuse_reply_err(req, EXDEV); //return cross-device link, so user space should re-create file and copy it
 		}
 
 		void SetAttr(fuse_req_t req, FuseId inode, struct stat *attr, int to_set, struct fuse_file_info *fi)
