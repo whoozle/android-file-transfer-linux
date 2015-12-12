@@ -59,8 +59,8 @@ namespace mtp { namespace usb
 
 		enum struct Type : u8
 		{
-			DeviceOut	= RequestType::HostToDevice | RequestType::Standard | RequestType::Device,
-			DeviceIn	= RequestType::DeviceToHost | RequestType::Standard | RequestType::Device
+			DeviceOut	= static_cast<u8>(RequestType::HostToDevice | RequestType::Standard | RequestType::Device),
+			DeviceIn	= static_cast<u8>(RequestType::DeviceToHost | RequestType::Standard | RequestType::Device)
 		};
 
 		enum struct Request : u8
@@ -95,8 +95,8 @@ namespace mtp { namespace usb
 
 		enum struct Type : u8
 		{
-			InterfaceOut	= RequestType::HostToDevice | RequestType::Standard | RequestType::Interface,
-			InterfaceIn		= RequestType::DeviceToHost | RequestType::Standard | RequestType::Interface
+			InterfaceOut	= static_cast<u8>(RequestType::HostToDevice | RequestType::Standard | RequestType::Interface),
+			InterfaceIn		= static_cast<u8>(RequestType::DeviceToHost | RequestType::Standard | RequestType::Interface)
 		};
 
 		enum struct Request : u8
@@ -126,8 +126,8 @@ namespace mtp { namespace usb
 	public:
 		enum struct Type : u8
 		{
-			EnpointOut		= RequestType::HostToDevice | RequestType::Standard | RequestType::Endpoint,
-			EnpointIn		= RequestType::DeviceToHost | RequestType::Standard | RequestType::Endpoint
+			EnpointOut		= static_cast<u8>(RequestType::HostToDevice | RequestType::Standard | RequestType::Endpoint),
+			EnpointIn		= static_cast<u8>(RequestType::DeviceToHost | RequestType::Standard | RequestType::Endpoint)
 		};
 
 		enum struct Request : u8

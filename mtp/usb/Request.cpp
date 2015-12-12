@@ -30,7 +30,7 @@ namespace mtp { namespace usb
 	{
 		ByteArray data(255);
 		_device->ReadControl((u8)Type::DeviceIn, (u8)Request::GetDescriptor, ((u16)type << 8) | index, lang, data, _timeout);
-		return std::move(data);
+		return data;
 	}
 
 	void DeviceRequest::SetDescriptor(DescriptorType type, u8 index, u16 lang, const ByteArray &data)
