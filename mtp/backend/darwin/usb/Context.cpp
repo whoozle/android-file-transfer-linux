@@ -71,7 +71,7 @@ namespace mtp { namespace usb
 		{
 			try { _devices.push_back(std::make_shared<DeviceDescriptor>(service)); }
 			catch(const std::exception &ex)
-			{ error(ex.what()); }
+			{ fprintf(stderr, "%s\n", ex.what()); }
 
 			IOObjectRelease(service);
 		}
