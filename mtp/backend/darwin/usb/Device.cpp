@@ -22,6 +22,7 @@
 #include <usb/Interface.h>
 #include <usb/call.h>
 #include <mtp/ByteArray.h>
+#include <mtp/log.h>
 
 #include <usb/call.h>
 
