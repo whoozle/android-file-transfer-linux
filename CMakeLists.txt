@@ -9,7 +9,8 @@ set(CPACK_PACKAGE_DIRECTORY ${CMAKE_SOURCE_DIR}/build/packages)
 set(CPACK_PACKAGE_ICON ${CMAKE_SOURCE_DIR}/osx/android-file-transfer.icns)
 set(CPACK_PACKAGE_DESCRIPTION_FILE ${CMAKE_SOURCE_DIR}/README.md)
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Android File Transfer for Linux (and Mac OS X) - open source implementation of MTP protocol used on every modern android device")
-set(CPACK_SET_DESTDIR ON)
+set(CPACK_MONOLITHIC_INSTALL ON)
+set(CMAKE_INSTALL_LOCAL_ONLY ON)
 
 set(MTP_LIBRARIES mtp-ng-static)
 
@@ -17,6 +18,7 @@ message(STATUS "building for ${CMAKE_SYSTEM_NAME}")
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 	set(USB_BACKEND_DARWIN TRUE)
+  set(CMAKE_INSTALL_PREFIX "/tmp")
   set(CPACK_BUNDLE_NAME ${CPACK_PACKAGE_FILE_NAME})
   set(CPACK_BUNDLE_PLIST ${CMAKE_SOURCE_DIR}/osx/Info.plist)
   set(CPACK_BUNDLE_ICON ${CPACK_PACKAGE_ICON})
