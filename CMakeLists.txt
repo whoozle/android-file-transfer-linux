@@ -1,11 +1,15 @@
-project(mtp)
+project(android-file-transfer)
 
 set(CPACK_PACKAGE_VERSION "2.5")
 set(CPACK_PACKAGE_VERSION_MAJOR 2)
 set(CPACK_PACKAGE_VERSION_MAJOR 5)
 set(CPACK_RESOURCE_FILE_LICENSE ${CMAKE_SOURCE_DIR}/LICENSE)
+set(CPACK_PACKAGE_FILE_NAME "Android File Transfer")
+set(CPACK_PACKAGE_DIRECTORY ${CMAKE_SOURCE_DIR}/build/packages)
+set(CPACK_PACKAGE_ICON ${CMAKE_SOURCE_DIR}/osx/android-file-transfer.icns)
 set(CPACK_PACKAGE_DESCRIPTION_FILE ${CMAKE_SOURCE_DIR}/README.md)
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Android File Transfer for Linux (and Mac OS X) - open source implementation of MTP protocol used on every modern android device")
+set(CPACK_SET_DESTDIR ON)
 
 set(MTP_LIBRARIES mtp-ng-static)
 
@@ -13,7 +17,11 @@ message(STATUS "building for ${CMAKE_SYSTEM_NAME}")
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 	set(USB_BACKEND_DARWIN TRUE)
-	#set(CPACK_GENERATOR Bundle)
+  set(CPACK_BUNDLE_NAME ${CPACK_PACKAGE_FILE_NAME})
+  set(CPACK_BUNDLE_PLIST ${CMAKE_SOURCE_DIR}/osx/Info.plist)
+  set(CPACK_BUNDLE_ICON ${CPACK_PACKAGE_ICON})
+  set(CPACK_BUNDLE_STARTUP_COMMAND ${CMAKE_SOURCE_DIR}/build/qt/android-file-transfer)
+  set(CPACK_GENERATOR Bundle)
 endif()
 
 include(CPack)
