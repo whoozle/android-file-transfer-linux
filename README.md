@@ -58,6 +58,17 @@ make
 ./qt/android-file-transfer
 ```
 
+### Building dmg package on Mac OS X
+
+```shell
+mkdir build
+cd build
+cmake ..
+make package
+
+open ./packages/Android\ File\ Transfer.dmg
+```
+
 ### Installation
 
 `sudo ninja install` or `sudo make install` will install program into cmake prefix/bin directory (usually /usr/local/bin)
