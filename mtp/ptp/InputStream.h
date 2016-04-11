@@ -43,6 +43,9 @@ namespace mtp
 		const ByteArray & GetData() const
 		{ return _data; }
 
+		bool AtEnd() const
+		{ return _offset >= _data.size(); }
+
 		u8 Read8()
 		{ return _data.at(_offset++); }
 
@@ -99,6 +102,9 @@ namespace mtp
 		std::vector<ElementType> ReadArray()
 		{
 			std::vector<ElementType> array;
+			if (AtEnd())
+				return array;
+
 			u32 size = Read32();
 			while(size--)
 			{
