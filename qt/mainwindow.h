@@ -92,6 +92,7 @@ private:
 	int							_uploadAnswer;
 
 	mtp::DevicePtr				_device;
+	mtp::SessionPtr				_session;
 };
 
 #endif // MAINWINDOW_H

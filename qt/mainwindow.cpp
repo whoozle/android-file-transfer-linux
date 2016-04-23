@@ -119,7 +119,9 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 bool MainWindow::reconnectToDevice()
 {
+	_session.reset();
 	_device.reset();
+
 	try
 	{ _device = mtp::Device::Find(); }
 	catch(const mtp::usb::DeviceBusyException &ex)
@@ -132,6 +134,33 @@ bool MainWindow::reconnectToDevice()
 	{
 		QMessageBox::critical(this, tr("No MTP device found"), tr("No MTP device found"));
 		return false;
+	}
+
+	qDebug() << "device found, opening session...";
+	static const int MaxAttempts = 3;
+	for(int attempt = 0; attempt < MaxAttempts; ++attempt)
+	{
+		try
+		{
+			_session = _device->OpenSession(1);
+			mtp::msg::DeviceInfo di = _session->GetDeviceInfo();
+			qDebug() << "device info" << fromUtf8(di.Manufacturer) << " " << fromUtf8(di.Model);
+			break;
+		}
+		catch(const mtp::usb::TimeoutException &ex)
+		{
+			qDebug() << "timed out getting device info: " << fromUtf8(ex.what()) << ", retrying...";
+			if (attempt + 1 == MaxAttempts)
+			{
+				QMessageBox::critical(this, tr("MTP"), tr("MTP device does not respond"));
+				_device.reset();
+				return false;
+			}
+		}
+		catch(const mtp::usb::DeviceNotFoundException &ex)
+		{
+			qDebug() << "device disconnected, retrying...";
+		}
 	}
 	return true;
 }
@@ -148,27 +177,13 @@ void MainWindow::showEvent(QShowEvent *)
 		restoreGeometry("main-window", *this);
 		restoreState(settings.value("state/main-window").toByteArray());
 
-		qDebug() << "device found, opening session...";
-		mtp::SessionPtr session;
-		static const int MaxAttempts = 3;
-		for(int attempt = 0; attempt < MaxAttempts; ++attempt)
+		_storageModel = new MtpStoragesModel(this);
+		while (true)
 		{
 			try
 			{
-				session = _device->OpenSession(1);
-				mtp::msg::DeviceInfo di = session->GetDeviceInfo();
-				qDebug() << "device info" << fromUtf8(di.Manufacturer) << " " << fromUtf8(di.Model);
-				break;
-			}
-			catch(const mtp::usb::TimeoutException &ex)
-			{
-				qDebug() << "timed out getting device info: " << fromUtf8(ex.what()) << ", retrying...";
-				if (attempt + 1 == MaxAttempts)
-				{
-					QMessageBox::critical(this, tr("MTP"), tr("MTP device does not respond"));
-					_device.reset();
-					return;
-				}
+				if (_storageModel->update(_session))
+					break;
 			}
 			catch(const mtp::usb::DeviceNotFoundException &ex)
 			{
@@ -176,22 +191,22 @@ void MainWindow::showEvent(QShowEvent *)
 				if (!reconnectToDevice())
 					return;
 			}
-		}
 
-		_storageModel = new MtpStoragesModel(this);
-		while (!_storageModel->update(session))
-		{
 			int r = QMessageBox::warning(this, tr("No MTP Storages"),
 				tr("No MTP storage found, your device might be locked.\nPlease unlock and press Retry to continue or Abort to exit."),
 				QMessageBox::Retry | QMessageBox::Abort);
+
 			if (r & QMessageBox::Abort)
 			{
 				_device.reset();
 				return;
 			}
+
+			if (!reconnectToDevice())
+				return;
 		}
 		_ui->storageList->setModel(_storageModel);
-		_objectModel->setSession(session);
+		_objectModel->setSession(_session);
 		onStorageChanged(_ui->storageList->currentIndex());
 		qDebug() << "session opened, starting";
 		_proxyModel->setSourceModel(_objectModel);
