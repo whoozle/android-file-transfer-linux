@@ -34,15 +34,20 @@ namespace cli
 
 	bool CommandLine::ReadLine(const std::string &prompt, std::string &input)
 	{
-		char buf[1024];
 		fputs(prompt.c_str(), stdout);
 		fflush(stdout);
-		char *line = fgets(buf, sizeof(buf), stdin);
-		if (!line)
-			return false;
+		return ReadRawLine(input);
+	}
 
-		input.assign(line);
-		return true;
+	bool CommandLine::ReadRawLine(std::string &input)
+	{
+		char buf[4096];
+		char *r = fgets(buf, sizeof(buf), stdin);
+		if (r)
+			input.assign(r);
+		else
+			input.clear();
+		return r;
 	}
 
 	std::string CommandLine::GetLineBuffer() const
