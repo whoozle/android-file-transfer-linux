@@ -52,7 +52,9 @@ namespace mtp
 		int				_defaultTimeout;
 
 	public:
-		static const unsigned DefaultTimeout = 10000;
+		static const int DefaultTimeout		= 10000;
+		static const int LongTimeout		= 30000;
+
 		static const StorageId AllStorages;
 		static const StorageId AnyStorage;
 		static const ObjectId Device;
@@ -86,7 +88,7 @@ namespace mtp
 		const msg::DeviceInfo & GetDeviceInfo() const
 		{ return _deviceInfo; }
 
-		msg::ObjectHandles GetObjectHandles(StorageId storageId = AllStorages, ObjectFormat objectFormat = ObjectFormat::Any, ObjectId parent = Device, int timeout = 30000);
+		msg::ObjectHandles GetObjectHandles(StorageId storageId = AllStorages, ObjectFormat objectFormat = ObjectFormat::Any, ObjectId parent = Device, int timeout = LongTimeout);
 		msg::StorageIDs GetStorageIDs();
 		msg::StorageInfo GetStorageInfo(StorageId storageId);
 
@@ -95,7 +97,7 @@ namespace mtp
 		void GetObject(ObjectId objectId, const IObjectOutputStreamPtr &outputStream);
 		ByteArray GetPartialObject(ObjectId objectId, u64 offset, u32 size);
 		NewObjectInfo SendObjectInfo(const msg::ObjectInfo &objectInfo, StorageId storageId = AnyStorage, ObjectId parentObject = Device);
-		void SendObject(const IObjectInputStreamPtr &inputStream, int timeout = 10000);
+		void SendObject(const IObjectInputStreamPtr &inputStream, int timeout = LongTimeout);
 		void DeleteObject(ObjectId objectId);
 
 		bool EditObjectSupported() const
