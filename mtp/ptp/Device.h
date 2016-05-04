@@ -37,7 +37,7 @@ namespace mtp
 	public:
 		Device(usb::BulkPipePtr pipe);
 
-		SessionPtr OpenSession(u32 sessionId, int timeout = 3000);
+		SessionPtr OpenSession(u32 sessionId, int timeout = Session::DefaultTimeout);
 
 		static DevicePtr Find(); //fixme: returns first device only
 	};

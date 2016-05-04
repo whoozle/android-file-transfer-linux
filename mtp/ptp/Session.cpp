@@ -42,7 +42,7 @@ namespace mtp
 } while(false)
 
 	Session::Session(usb::BulkPipePtr pipe, u32 sessionId):
-		_packeter(pipe), _sessionId(sessionId), _nextTransactionId(1), _transaction(), _defaultTimeout(10000)
+		_packeter(pipe), _sessionId(sessionId), _nextTransactionId(1), _transaction(), _defaultTimeout(DefaultTimeout)
 	{
 		_deviceInfo = GetDeviceInfoImpl();
 		_getPartialObject64Supported = _deviceInfo.Supports(OperationCode::GetPartialObject64);

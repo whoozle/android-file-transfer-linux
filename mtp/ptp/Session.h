@@ -52,6 +52,7 @@ namespace mtp
 		int				_defaultTimeout;
 
 	public:
+		static const unsigned DefaultTimeout = 10000;
 		static const StorageId AllStorages;
 		static const StorageId AnyStorage;
 		static const ObjectId Device;
