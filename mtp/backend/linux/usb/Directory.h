@@ -20,8 +20,8 @@
 #ifndef DIRECTORY_H
 #define	DIRECTORY_H
 
-#include <usb/Exception.h>
 #include <mtp/ByteArray.h>
+#include <Exception.h>
 #include <vector>
 #include <sys/types.h>
 #include <dirent.h>
@@ -39,7 +39,7 @@ namespace mtp { namespace usb
 		File(const std::string &path) : _f(fopen(path.c_str(), "rb"))
 		{
 			if (!_f)
-				throw Exception("open " + path);
+				throw posix::Exception("open " + path);
 		}
 
 		~File()
@@ -52,7 +52,7 @@ namespace mtp { namespace usb
 		{
 			std::vector<char> buf(bufSize);
 			if (!fgets(buf.data(), buf.size(), _f))
-				throw Exception("fgets");
+				throw posix::Exception("fgets");
 			return buf.data();
 		}
 
@@ -97,7 +97,7 @@ namespace mtp { namespace usb
 		Directory(const std::string &path): _dir(opendir(path.c_str()))
 		{
 			if (!_dir)
-				throw Exception("opendir");
+				throw posix::Exception("opendir");
 
 			long name_max = pathconf(path.c_str(), _PC_NAME_MAX);
 			if (name_max == -1)         /* Limit not defined, or error */
@@ -112,7 +112,7 @@ namespace mtp { namespace usb
 			dirent *entry = 0;
 			int r = readdir_r(_dir, buffer, &entry);
 			if (r)
-				throw Exception("readdir_r", r);
+				throw posix::Exception("readdir_r", r);
 			return entry? entry->d_name: "";
 		}
 

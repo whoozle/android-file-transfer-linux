@@ -18,7 +18,7 @@
  */
 
 #include <usb/Device.h>
-#include <usb/Exception.h>
+#include <Exception.h>
 #include <mtp/usb/TimeoutException.h>
 #include <mtp/usb/DeviceBusyException.h>
 #include <mtp/usb/DeviceNotFoundException.h>
@@ -41,7 +41,7 @@
 		else if (errno == ENODEV) \
 			throw DeviceNotFoundException(); \
 		else \
-			throw Exception("ioctl(" #__VA_ARGS__ ")"); \
+			throw posix::Exception("ioctl(" #__VA_ARGS__ ")"); \
 	} \
 } while(false)
 
@@ -178,7 +178,7 @@ namespace mtp { namespace usb
 	{
 		timeval started = {};
 		if (gettimeofday(&started, NULL) == -1)
-			throw usb::Exception("gettimeofday");
+			throw posix::Exception("gettimeofday");
 
 		pollfd fd = {};
 		fd.fd		= _fd.Get();
@@ -187,10 +187,10 @@ namespace mtp { namespace usb
 
 		timeval now = {};
 		if (gettimeofday(&now, NULL) == -1)
-			throw usb::Exception("gettimeofday");
+			throw posix::Exception("gettimeofday");
 
 		if (r < 0)
-			throw Exception("poll");
+			throw posix::Exception("poll");
 
 		if (r == 0 && timeout > 0)
 		{
@@ -205,7 +205,7 @@ namespace mtp { namespace usb
 		else if (errno == EAGAIN)
 			throw TimeoutException("timeout reaping usb urb");
 		else
-			throw Exception("ioctl");
+			throw posix::Exception("ioctl");
 	}
 
 	void Device::ClearHalt(const EndpointPtr & ep)
@@ -338,7 +338,7 @@ namespace mtp { namespace usb
 		else if (errno == EAGAIN)
 			throw TimeoutException("timeout sending control transfer");
 		else
-			throw Exception("ioctl");
+			throw posix::Exception("ioctl");
 	}
 
 	void Device::WriteControl(u8 type, u8 req, u16 value, u16 index, const ByteArray &data, int timeout)
@@ -361,7 +361,7 @@ namespace mtp { namespace usb
 		else if (errno == EAGAIN)
 			throw TimeoutException("timeout sending control transfer");
 		else
-			throw Exception("ioctl");
+			throw posix::Exception("ioctl");
 	}
 
 }}

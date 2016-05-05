@@ -17,12 +17,12 @@
     If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MTP_EXCEPTION_H
-#define	MTP_EXCEPTION_H
+#ifndef MTP_POSIX_EXCEPTION_H
+#define	MTP_POSIX_EXCEPTION_H
 
 #include <stdexcept>
 
-namespace mtp { namespace usb
+namespace mtp { namespace posix
 {
 	class Exception : public std::runtime_error
 	{

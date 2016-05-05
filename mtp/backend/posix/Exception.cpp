@@ -17,13 +17,13 @@
     If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <usb/Exception.h>
+#include <Exception.h>
 #include <string>
 
 #include <string.h>
 #include <errno.h>
 
-namespace mtp { namespace usb
+namespace mtp { namespace posix
 {
 
 	Exception::Exception(const std::string &what) throw() : std::runtime_error(what + ": " + GetErrorMessage(errno))

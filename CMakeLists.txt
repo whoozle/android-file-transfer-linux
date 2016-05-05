@@ -96,6 +96,7 @@ set(SOURCES
 	mtp/usb/Request.cpp
 
 	mtp/backend/posix/FileHandler.cpp
+	mtp/backend/posix/Exception.cpp
 )
 
 if (USB_BACKEND_LIBUSB)
@@ -127,7 +128,6 @@ else()
 	include_directories(mtp/backend/linux)
 	list(APPEND SOURCES
 		mtp/backend/linux/usb/Endpoint.cpp
-		mtp/backend/linux/usb/Exception.cpp
 		mtp/backend/linux/usb/Context.cpp
 		mtp/backend/linux/usb/Device.cpp
 		mtp/backend/linux/usb/Interface.cpp
