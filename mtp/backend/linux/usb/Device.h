@@ -25,6 +25,7 @@
 #include <usb/Interface.h>
 #include <mtp/ptp/IObjectStream.h>
 #include <mtp/Token.h>
+#include <FileHandler.h>
 #include <map>
 #include <queue>
 
@@ -32,18 +33,6 @@ namespace mtp { namespace usb
 {
 	class Context;
 	DECLARE_PTR(Context);
-
-	class FileHandler : Noncopyable
-	{
-		int _fd;
-
-	public:
-		FileHandler(int fd): _fd(fd) { }
-		~FileHandler();
-
-		int Get() const
-		{ return _fd; }
-	};
 
 	class InterfaceToken : public IToken
 	{
@@ -59,7 +48,7 @@ namespace mtp { namespace usb
 	{
 	private:
 		std::mutex					_mutex;
-		FileHandler					_fd;
+		posix::FileHandler			_fd;
 		u32							_capabilities;
 		EndpointPtr					_controlEp;
 

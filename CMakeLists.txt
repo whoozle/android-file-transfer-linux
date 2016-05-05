@@ -81,6 +81,7 @@ if (CMAKE_BUILD_TYPE STREQUAL Debug)
 endif()
 
 include_directories(. ${CMAKE_SOURCE_DIR})
+include_directories(mtp/backend/posix)
 
 set(SOURCES
 	mtp/log.cpp
@@ -93,6 +94,8 @@ set(SOURCES
 
 	mtp/usb/BulkPipe.cpp
 	mtp/usb/Request.cpp
+
+	mtp/backend/posix/FileHandler.cpp
 )
 
 if (USB_BACKEND_LIBUSB)

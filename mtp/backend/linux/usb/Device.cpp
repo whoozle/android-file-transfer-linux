@@ -25,7 +25,6 @@
 #include <mtp/ByteArray.h>
 #include <mtp/log.h>
 
-#include <unistd.h>
 #include <sys/ioctl.h>
 #include <poll.h>
 #include <sys/time.h>
@@ -48,9 +47,6 @@
 
 namespace mtp { namespace usb
 {
-
-	FileHandler::~FileHandler()
-	{ close(_fd); }
 
 	InterfaceToken::InterfaceToken(int fd, unsigned interfaceNumber): _fd(fd), _interfaceNumber(interfaceNumber)
 	{
