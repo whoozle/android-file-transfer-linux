@@ -24,6 +24,7 @@
 #include <QBrush>
 #include <QColor>
 #include <QFile>
+#include <QFont>
 #include <QFileInfo>
 #include <QMimeData>
 #include <QUrl>
@@ -154,8 +155,13 @@ QVariant MtpObjectsModel::data(const QModelIndex &index, int role) const
 	case Qt::DisplayRole:
 		return fromUtf8(row.GetInfo(_session)->Filename);
 
-	case Qt::ForegroundRole:
-		return row.IsAssociation(_session)? QBrush(QColor(0, 0, 128)): QBrush(Qt::black);
+	case Qt::FontRole:
+		{
+			QFont font;
+			if (row.IsAssociation(_session))
+				font.setBold(true);
+			return font;
+		}
 
 	default:
 		return QVariant();
