@@ -264,10 +264,6 @@ namespace mtp
 
 	void Session::BeginEditObject(ObjectId objectId)
 	{
-		try
-		{ EndEditObject(objectId); }
-		catch(const std::exception &ex)
-		{ }
 		scoped_mutex_lock l(_mutex);
 		Transaction transaction(this);
 		Send(OperationRequest(OperationCode::BeginEditObject, transaction.Id, objectId.Id));
