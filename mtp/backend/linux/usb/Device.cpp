@@ -48,6 +48,36 @@
 
 namespace mtp { namespace usb
 {
+	namespace
+	{
+		class SignalHandler
+		{
+			int					_signo;
+			struct sigaction	_old;
+
+		private:
+			static void Handler(int, siginfo_t *, void *)
+			{ }
+
+		public:
+			SignalHandler(int signo): _signo(signo), _old()
+			{
+				struct sigaction sa = { };
+				sa.sa_sigaction = &Handler; //no SA_RESTART
+				if (sigaction(signo, &sa, &_old))
+					perror("sigaction");
+			}
+
+			~SignalHandler()
+			{
+				if (sigaction(_signo, &_old, NULL))
+					perror("sigaction");
+			}
+		};
+
+		static const int Signal = SIGRTMIN;
+
+	}
 
 	InterfaceToken::InterfaceToken(int fd, unsigned interfaceNumber): _fd(fd), _interfaceNumber(interfaceNumber)
 	{
@@ -69,6 +99,8 @@ namespace mtp { namespace usb
 
 	Device::Device(int fd, const EndpointPtr &controlEp): _fd(fd), _capabilities(0), _controlEp(controlEp)
 	{
+		static SignalHandler _handler(Signal);
+
 		try { IOCTL(_fd.Get(), USBDEVFS_GET_CAPABILITIES, &_capabilities); }
 		catch(const std::exception &ex)
 		{ error("get usbfs capabilities failed: ", ex.what()); }
@@ -112,6 +144,7 @@ namespace mtp { namespace usb
 		Urb(int fd, u8 type, const EndpointPtr & ep): Fd(fd), PacketSize(ep->GetMaxPacketSize()), Buffer(std::max(PacketSize, MaxBufferSize / PacketSize * PacketSize)), KernelUrb()
 		{
 			KernelUrb.type			= type;
+			KernelUrb.signr			= Signal;
 			KernelUrb.endpoint		= ep->GetAddress();
 			KernelUrb.buffer		= Buffer.data();
 			KernelUrb.buffer_length = Buffer.size();
