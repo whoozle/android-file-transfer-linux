@@ -26,8 +26,9 @@
 #include <mtp/log.h>
 
 #include <sys/ioctl.h>
-#include <poll.h>
 #include <sys/time.h>
+#include <poll.h>
+#include <signal.h>
 
 #include "linux/usbdevice_fs.h"
 
