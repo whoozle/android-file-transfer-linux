@@ -134,9 +134,9 @@ namespace mtp { namespace usb
 			}
 		}
 
-		size_t Send(const IObjectInputStreamPtr &inputStream)
+		size_t Send(const IObjectInputStreamPtr &inputStream, size_t size)
 		{
-			size_t r = inputStream->Read(Buffer.data(), Buffer.size());
+			size_t r = inputStream->Read(Buffer.data(), size);
 			//HexDump("write", ByteArray(Buffer.data(), Buffer.data() + r), true);
 			KernelUrb.buffer_length = r;
 			return r;
@@ -268,7 +268,7 @@ namespace mtp { namespace usb
 		bool continuation = false;
 		do
 		{
-			r = urb->Send(inputStream);
+			r = urb->Send(inputStream, transferSize);
 
 			if (_capabilities & USBDEVFS_CAP_ZERO_PACKET)
 				urb->SetZeroPacketFlag(r != transferSize);
