@@ -606,6 +606,7 @@ namespace
 		void Read(fuse_req_t req, FuseId ino, size_t size, off_t begin, struct fuse_file_info *fi)
 		{
 			mtp::scoped_mutex_lock l(_mutex);
+			ReleaseTransaction(ino);
 			struct stat attr = GetObjectAttr(ino);
 			off_t rsize = std::min<off_t>(attr.st_size - begin, size);
 			mtp::ByteArray data;
@@ -676,12 +677,17 @@ namespace
 			FUSE_CALL(fuse_reply_open(req, fi));
 		}
 
-		void Release(fuse_req_t req, FuseId ino, struct fuse_file_info *fi)
+		void ReleaseTransaction(FuseId ino)
 		{
-			mtp::scoped_mutex_lock l(_mutex);
 			auto i = _openedFiles.find(ino);
 			if (i != _openedFiles.end())
 				_openedFiles.erase(i);
+		}
+
+		void Release(fuse_req_t req, FuseId ino, struct fuse_file_info *fi)
+		{
+			mtp::scoped_mutex_lock l(_mutex);
+			ReleaseTransaction(ino);
 		}
 
 		void Rename(fuse_req_t req, FuseId parent, const char *name, FuseId newparent, const char *newname)
