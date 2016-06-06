@@ -603,18 +603,6 @@ namespace
 				entry.ReplyError(ENOENT);
 		}
 
-		void Read(fuse_req_t req, FuseId ino, size_t size, off_t begin, struct fuse_file_info *fi)
-		{
-			mtp::scoped_mutex_lock l(_mutex);
-			ReleaseTransaction(ino);
-			struct stat attr = GetObjectAttr(ino);
-			off_t rsize = std::min<off_t>(attr.st_size - begin, size);
-			mtp::ByteArray data;
-			if (rsize > 0)
-				data = _session->GetPartialObject(FromFuse(ino), begin, rsize);
-			FUSE_CALL(fuse_reply_buf(req, static_cast<char *>(static_cast<void *>(data.data())), data.size()));
-		}
-
 		mtp::Session::ObjectEditSessionPtr GetTransaction(FuseId inode)
 		{
 			mtp::Session::ObjectEditSessionPtr tr;
@@ -629,6 +617,18 @@ namespace
 				}
 			}
 			return NOT_NULL(tr);
+		}
+
+		void Read(fuse_req_t req, FuseId ino, size_t size, off_t begin, struct fuse_file_info *fi)
+		{
+			mtp::scoped_mutex_lock l(_mutex);
+			ReleaseTransaction(ino);
+			struct stat attr = GetObjectAttr(ino);
+			off_t rsize = std::min<off_t>(attr.st_size - begin, size);
+			mtp::ByteArray data;
+			if (rsize > 0)
+				data = _session->GetPartialObject(FromFuse(ino), begin, rsize);
+			FUSE_CALL(fuse_reply_buf(req, static_cast<char *>(static_cast<void *>(data.data())), data.size()));
 		}
 
 		void Write(fuse_req_t req, FuseId inode, const char *buf, size_t size, off_t off, struct fuse_file_info *fi)
