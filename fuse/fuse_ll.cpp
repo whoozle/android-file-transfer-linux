@@ -625,9 +625,11 @@ namespace
 			ReleaseTransaction(ino);
 			struct stat attr = GetObjectAttr(ino);
 			off_t rsize = std::min<off_t>(attr.st_size - begin, size);
+			mtp::debug("reading ", rsize, " bytes");
 			mtp::ByteArray data;
 			if (rsize > 0)
 				data = _session->GetPartialObject(FromFuse(ino), begin, rsize);
+			mtp::debug("read", data.size(), "bytes of data");
 			FUSE_CALL(fuse_reply_buf(req, static_cast<char *>(static_cast<void *>(data.data())), data.size()));
 		}
 
@@ -643,6 +645,7 @@ namespace
 			off_t newSize = off + size;
 			if (newSize > attr.st_size)
 			{
+				mtp::debug("truncating file to ", newSize);
 				tr->Truncate(newSize);
 				_objectAttrs[objectId].st_size = newSize;
 			}
