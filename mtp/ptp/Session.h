@@ -122,7 +122,7 @@ namespace mtp
 		u64 GetObjectIntegerProperty(ObjectId objectId, ObjectProperty property);
 		std::string GetObjectStringProperty(ObjectId objectId, ObjectProperty property);
 
-		ByteArray GetObjectPropertyList(ObjectId objectId, ObjectFormat format, ObjectProperty property, u32 groupCode, u32 depth);
+		ByteArray GetObjectPropertyList(ObjectId objectId, ObjectFormat format, ObjectProperty property, u32 groupCode, u32 depth, int timeout = LongTimeout);
 
 		ByteArray GetDeviceProperty(DeviceProperty property);
 

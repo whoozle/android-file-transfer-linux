@@ -384,14 +384,14 @@ namespace mtp
 		return value;
 	}
 
-	ByteArray Session::GetObjectPropertyList(ObjectId objectId, ObjectFormat format, ObjectProperty property, u32 groupCode, u32 depth)
+	ByteArray Session::GetObjectPropertyList(ObjectId objectId, ObjectFormat format, ObjectProperty property, u32 groupCode, u32 depth, int timeout)
 	{
 		if (objectId == Root) //ffffffff -> 0
 			objectId = Device;
 		scoped_mutex_lock l(_mutex);
 		Transaction transaction(this);
-		Send(OperationRequest(OperationCode::GetObjectPropList, transaction.Id, objectId.Id, (u32)format, property != ObjectProperty::All? (u32)property: 0xffffffffu, groupCode, depth));
-		return Get(transaction.Id);
+		Send(OperationRequest(OperationCode::GetObjectPropList, transaction.Id, objectId.Id, (u32)format, property != ObjectProperty::All? (u32)property: 0xffffffffu, groupCode, depth), timeout);
+		return Get(transaction.Id, timeout);
 	}
 
 	void Session::DeleteObject(ObjectId objectId)
