@@ -64,6 +64,9 @@ namespace mtp { namespace usb
 
 		int GetEndpointsCount() const
 		{ return _interface.bNumEndpoints; }
+
+		std::string GetName() const
+		{ return _interface.iInterface? _device->GetString(_interface.iInterface): std::string(); }
 	};
 	DECLARE_PTR(Interface);
 

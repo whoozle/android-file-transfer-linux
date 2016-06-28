@@ -104,6 +104,7 @@ if (USB_BACKEND_LIBUSB)
 	pkg_check_modules(LIBUSB libusb-1.0 REQUIRED)
 	include_directories(${LIBUSB_INCLUDE_DIRS})
 	include_directories(mtp/backend/libusb)
+	add_definitions(-DUSB_BACKEND_LIBUSB)
 
 	list(APPEND SOURCES
 		mtp/backend/libusb/usb/Context.cpp

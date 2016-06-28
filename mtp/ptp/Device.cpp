@@ -96,6 +96,9 @@ namespace mtp
 					usb::InterfaceTokenPtr token = device->ClaimInterface(iface);
 					debug(i, ':', j, ", index: ", iface->GetIndex(), ", enpoints: ", iface->GetEndpointsCount());
 
+#ifdef USB_BACKEND_LIBUSB
+					std::string name = iface->GetName();
+#else
 					ByteArray data = usb::DeviceRequest(device).GetDescriptor(usb::DescriptorType::String, 0, 0);
 					HexDump("languages", data);
 					if (data.size() < 4 || data[1] != (u8)usb::DescriptorType::String)
@@ -111,6 +114,7 @@ namespace mtp
 					u8 len = data[0];
 					InputStream stream(data, 2);
 					std::string name = stream.ReadString((len - 2) / 2);
+#endif
 					if (name == "MTP")
 					{
 						//device->SetConfiguration(configuration->GetIndex());

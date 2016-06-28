@@ -89,4 +89,13 @@ namespace mtp { namespace usb
 		USB_CALL(libusb_control_transfer(_handle, type, req, value, index, const_cast<u8 *>(data.data()), data.size(), timeout));
 	}
 
+	std::string Device::GetString(int idx) const
+	{
+			unsigned char buffer[4096];
+			int r = libusb_get_string_descriptor_ascii(_handle, idx, buffer, sizeof(buffer));
+			if (r < 0)
+					throw Exception("libusb_get_string_descriptor_ascii", r);
+			return std::string(buffer, buffer + r);
+	}
+
 }}
