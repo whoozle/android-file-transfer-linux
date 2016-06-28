@@ -59,21 +59,6 @@ namespace mtp { namespace usb
 
 	void Device::WriteBulk(const EndpointPtr & ep, const IObjectInputStreamPtr &inputStream, int timeout)
 	{
-#if 0
-		//triggers short read exception on first write.
-		size_t transferSize = ep->GetMaxPacketSize() * 1024;
-		size_t r;
-		do
-		{
-			ByteArray data(transferSize);
-			r = inputStream->Read(data.data(), data.size());
-			int tr = 0;
-			USB_CALL(libusb_bulk_transfer(_handle, ep->GetAddress(), data.data(), r, &tr, timeout));
-			if (tr != (int)r)
-				throw std::runtime_error("short write");
-		}
-		while(r == transferSize);
-#endif
 		ByteArray data(inputStream->GetSize());
 		inputStream->Read(data.data(), data.size());
 		int tr = 0;
