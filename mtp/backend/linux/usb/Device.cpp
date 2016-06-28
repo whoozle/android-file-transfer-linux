@@ -136,6 +136,8 @@ namespace mtp { namespace usb
 
 		size_t Send(const IObjectInputStreamPtr &inputStream, size_t size)
 		{
+			if (size > Buffer.size())
+				throw std::logic_error("invalid size passed to Send");
 			size_t r = inputStream->Read(Buffer.data(), size);
 			//HexDump("write", ByteArray(Buffer.data(), Buffer.data() + r), true);
 			KernelUrb.buffer_length = r;
