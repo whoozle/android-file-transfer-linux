@@ -52,9 +52,6 @@ namespace mtp { namespace usb
 	{ libusb_unref_device(_dev); }
 
 	ByteArray DeviceDescriptor::GetDescriptor() const
-	{
-#warning not implemented
-		ByteArray stub; return stub;
-	}
+	{ throw std::runtime_error("not possible with libusb"); }
 
 }}
