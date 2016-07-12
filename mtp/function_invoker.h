@@ -35,13 +35,13 @@ namespace mtp
 		struct function_invoker
 		{
 			std::tuple<Args...> params;
-			std::function<void(Args...)> func;
+			std::function<R (Args...)> func;
 
-			void dispatch()
+			R dispatch()
 			{ return call(typename gens<sizeof...(Args)>::type()); }
 
 			template<int ...S>
-			void call(seq<S...>)
+			R call(seq<S...>)
 			{ return func(std::get<S>(params) ...); }
 		};
 	}
