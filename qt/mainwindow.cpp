@@ -426,6 +426,7 @@ void MainWindow::downloadFiles(const QString & path, const QVector<mtp::ObjectId
 {
 	qDebug() << "downloading to " << path;
 	ProgressDialog progressDialog(this);
+	progressDialog.setWindowTitle(tr("Download Progress"));
 	progressDialog.show();
 
 	connect(_uploader, SIGNAL(uploadProgress(float)), &progressDialog, SLOT(setValue(float)));
