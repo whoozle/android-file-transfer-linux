@@ -24,6 +24,12 @@ If you're suffering from crashes, missing tags and album covers, usb freezes and
 * Available as static/shared library.
 * Command line tool (aft-mtp-cli)
 
+## Support
+If you want to help me with development, click on the following badge and follow the instructions. I'm developing AFTL in my spare time and try to fix everything as fast as possible, sometimes adding features in realtime (more than 100 tickes closed by now).
+Any amount would help relieving pain of using MTP. :D
+
+[![Click here to lend your support to: Android File Transfer for Linux and make a donation at pledgie.com !](https://pledgie.com/campaigns/32353.png?skin_name=chrome' border='0')](https://pledgie.com/campaigns/32353)
+
 ## Building instructions
 
 ### Prerequisites
