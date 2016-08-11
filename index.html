@@ -7,6 +7,7 @@
 
     <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="stylesheet" href="stylesheets/github-light.css">
+    <script src="javascripts/scale.fix.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -15,24 +16,25 @@
   <body>
     <div class="wrapper">
       <header>
-        <h1>Android-file-transfer-linux</h1>
-        <p>Android File Transfer for Linux</p>
-
-        <p class="view"><a href="https://github.com/whoozle/android-file-transfer-linux">View the Project on GitHub <small>whoozle/android-file-transfer-linux</small></a></p>
-
+        <h1 class="header">Android-file-transfer-linux</h1>
+        <p class="header">Android File Transfer for Linux</p>
 
         <ul>
-          <li><a href="https://github.com/whoozle/android-file-transfer-linux/zipball/master">Download <strong>ZIP File</strong></a></li>
-          <li><a href="https://github.com/whoozle/android-file-transfer-linux/tarball/master">Download <strong>TAR Ball</strong></a></li>
-          <li><a href="https://github.com/whoozle/android-file-transfer-linux">View On <strong>GitHub</strong></a></li>
+          <li class="download"><a class="buttons" href="https://github.com/whoozle/android-file-transfer-linux/zipball/master">Download ZIP</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/whoozle/android-file-transfer-linux/tarball/master">Download TAR</a></li>
+          <li><a class="buttons github" href="https://github.com/whoozle/android-file-transfer-linux">View On GitHub</a></li>
         </ul>
+
+        <p class="header">This project is maintained by <a class="header name" href="https://github.com/whoozle">whoozle</a></p>
+
+
       </header>
       <section>
         <h1>
-<a id="android-file-transfer-for-linux-and-mac-os-x" class="anchor" href="#android-file-transfer-for-linux-and-mac-os-x" aria-hidden="true"><span class="octicon octicon-link"></span></a>Android File Transfer For Linux (and Mac OS X!)</h1>
+<a id="android-file-transfer-for-linux-and-mac-os-x" class="anchor" href="#android-file-transfer-for-linux-and-mac-os-x" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Android File Transfer For Linux (and Mac OS X!)</h1>
 
 <p><a href="https://github.com/whoozle/android-file-transfer-linux/blob/master/LICENSE"><img src="http://img.shields.io/:license-GPLv3-blue.svg" alt="License"></a>
-<a href="https://github.com/whoozle/android-file-transfer-linux"><img src="http://img.shields.io/:version-2.4-red.svg" alt="Version"></a>
+<a href="https://github.com/whoozle/android-file-transfer-linux"><img src="http://img.shields.io/:version-3.0-green.svg" alt="Version"></a>
 <a href="https://travis-ci.org/whoozle/android-file-transfer-linux"><img src="https://travis-ci.org/whoozle/android-file-transfer-linux.svg?branch=master" alt="Build Status"></a></p>
 
 <p>Android File Transfer for Linux — reliable MTP client with minimalistic UI similar to <a href="https://www.android.com/intl/en_us/filetransfer/">Android File Transfer for Mac</a>.</p>
@@ -40,14 +42,14 @@
 <p>It just works™.</p>
 
 <h2>
-<a id="do-i-need-it" class="anchor" href="#do-i-need-it" aria-hidden="true"><span class="octicon octicon-link"></span></a>Do I need it?</h2>
+<a id="do-i-need-it" class="anchor" href="#do-i-need-it" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Do I need it?</h2>
 
 <p>If you're happy with <code>gmtp</code>/<code>gvfs</code>/<code>mtpfs</code> or any other mtp software, you might not need this software (but give it a try!).</p>
 
 <p>If you're suffering from crashes, missing tags and album covers, usb freezes and corrupted files, this software is right for you.</p>
 
 <h2>
-<a id="features" class="anchor" href="#features" aria-hidden="true"><span class="octicon octicon-link"></span></a>Features</h2>
+<a id="features" class="anchor" href="#features" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Features</h2>
 
 <ul>
 <li>Simple Qt UI with progress dialogs.</li>
@@ -60,23 +62,31 @@
 </ul>
 
 <h2>
-<a id="building-instructions" class="anchor" href="#building-instructions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Building instructions</h2>
+<a id="support" class="anchor" href="#support" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Support</h2>
+
+<p>If you want to help me with development, click on the following badge and follow the instructions. I'm developing AFTL in my spare time and try to fix everything as fast as possible, sometimes adding features in realtime (more than 100 tickes closed by now).
+Any amount would help relieving pain of using MTP. :D</p>
+
+<p><a href="https://pledgie.com/campaigns/32353"><img src="https://pledgie.com/campaigns/32353.png?skin_name=chrome'%20border='0'" alt="Click here to lend your support to: Android File Transfer for Linux and make a donation at pledgie.com !"></a></p>
+
+<h2>
+<a id="building-instructions" class="anchor" href="#building-instructions" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Building instructions</h2>
 
 <h3>
-<a id="prerequisites" class="anchor" href="#prerequisites" aria-hidden="true"><span class="octicon octicon-link"></span></a>Prerequisites</h3>
+<a id="prerequisites" class="anchor" href="#prerequisites" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Prerequisites</h3>
 
 <ul>
 <li>You will need qt libraries for building ui program. If you want to use only library (<em>Qt is not needed</em>), you could turn the option <code>BUILD_QT_UI</code> off.</li>
 <li>
 <p>For ubuntu and other debian-based distros use the following command:</p>
 
-<div class="highlight highlight-source-shell"><pre>sudo apt-get install build-essential cmake libqt4-dev ninja-build libfuse-dev</pre></div>
+<div class="highlight highlight-source-shell"><pre>sudo apt-get install build-essential cmake libqt4-dev ninja-build libfuse-dev libreadline-dev</pre></div>
 </li>
 <li>Basically, you need <code>libqtX-dev</code> for UI, <code>libfuse-dev</code> for FUSE interface, <code>cmake</code>, <code>ninja</code> or <code>make</code> for building the project. You could use libqt5-dev as well.</li>
 </ul>
 
 <h3>
-<a id="building-with-ninja" class="anchor" href="#building-with-ninja" aria-hidden="true"><span class="octicon octicon-link"></span></a>Building with ninja</h3>
+<a id="building-with-ninja" class="anchor" href="#building-with-ninja" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Building with ninja</h3>
 
 <div class="highlight highlight-source-shell"><pre>mkdir build
 <span class="pl-c1">cd</span> build
@@ -86,7 +96,7 @@ ninja
 ./qt/android-file-transfer</pre></div>
 
 <h3>
-<a id="building-with-make" class="anchor" href="#building-with-make" aria-hidden="true"><span class="octicon octicon-link"></span></a>Building with make</h3>
+<a id="building-with-make" class="anchor" href="#building-with-make" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Building with make</h3>
 
 <div class="highlight highlight-source-shell"><pre>mkdir build
 <span class="pl-c1">cd</span> build
@@ -96,15 +106,25 @@ make
 ./qt/android-file-transfer</pre></div>
 
 <h3>
-<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h3>
+<a id="building-dmg-package-on-mac-os-x" class="anchor" href="#building-dmg-package-on-mac-os-x" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Building dmg package on Mac OS X</h3>
+
+<div class="highlight highlight-source-shell"><pre>mkdir build
+<span class="pl-c1">cd</span> build
+cmake ..
+make package
+
+open ./packages/Android<span class="pl-cce">\ </span>File<span class="pl-cce">\ </span>Transfer.dmg</pre></div>
+
+<h3>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installation</h3>
 
 <p><code>sudo ninja install</code> or <code>sudo make install</code> will install program into cmake prefix/bin directory (usually /usr/local/bin)</p>
 
 <h2>
-<a id="how-to-use" class="anchor" href="#how-to-use" aria-hidden="true"><span class="octicon octicon-link"></span></a>How to use</h2>
+<a id="how-to-use" class="anchor" href="#how-to-use" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>How to use</h2>
 
 <h3>
-<a id="fuse-interface" class="anchor" href="#fuse-interface" aria-hidden="true"><span class="octicon octicon-link"></span></a>FUSE interface</h3>
+<a id="fuse-interface" class="anchor" href="#fuse-interface" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>FUSE interface</h3>
 
 <div class="highlight highlight-source-shell"><pre>mkdir <span class="pl-k">~</span>/my-device
 ./aft-mtp-mount <span class="pl-k">~</span>/my-device</pre></div>
@@ -113,7 +133,7 @@ make
 Also, note that fuse could be 7-8 times slower than ui/cli file transfer.</p>
 
 <h3>
-<a id="qt-user-interface" class="anchor" href="#qt-user-interface" aria-hidden="true"><span class="octicon octicon-link"></span></a>QT user interface</h3>
+<a id="qt-user-interface" class="anchor" href="#qt-user-interface" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>QT user interface</h3>
 
 <ol>
 <li><p>Start application, choose destination folder and click any button on toolbar.</p></li>
@@ -123,7 +143,7 @@ The latter two are self-explanatory. <code>Upload album</code> tries searching s
 </ol>
 
 <h3>
-<a id="known-problems" class="anchor" href="#known-problems" aria-hidden="true"><span class="octicon octicon-link"></span></a>Known problems</h3>
+<a id="known-problems" class="anchor" href="#known-problems" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Known problems</h3>
 
 <ul>
 <li>Samsung removed android extensions from MTP, so fuse will be available readonly, sorry. Feel free to post your complaints to <a href="http://developer.samsung.com/forum/en">http://developer.samsung.com/forum/en</a>
@@ -137,32 +157,31 @@ The latter two are self-explanatory. <code>Upload album</code> tries searching s
 <p>The actual list of all known problems and bugs available <a href="https://github.com/whoozle/android-file-transfer-linux/issues">here</a></p>
 
 <h2>
-<a id="contacts" class="anchor" href="#contacts" aria-hidden="true"><span class="octicon octicon-link"></span></a>Contacts</h2>
+<a id="contacts" class="anchor" href="#contacts" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Contacts</h2>
 
 <p>Please do not hesitate to contact me if you have any further questions, my email address is <a href="mailto:vladimir.menshakov@gmail.com">vladimir.menshakov@gmail.com</a>.</p>
 
 <h2>
-<a id="special-thanks" class="anchor" href="#special-thanks" aria-hidden="true"><span class="octicon octicon-link"></span></a>Special thanks</h2>
+<a id="special-thanks" class="anchor" href="#special-thanks" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Special thanks</h2>
 
 <ul>
 <li>All who filed bugs on github and wrote emails, many features appeared only because of your feedback. Thanks!</li>
-<li>Alexey <a href="https://github.com/gazay">gazay</a> Gaziev for useful suggestions, ssh on his MacBook and continuous support.</li>
+<li>Alexey <a href="https://github.com/gazay">gazay</a> Gaziev for useful suggestions, support and invaluable help with MacBook and MacOSX port.</li>
 </ul>
 
 <h2>
-<a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h2>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>License</h2>
 
 <p>Android File Transfer for Linux is released under <a href="https://github.com/whoozle/android-file-transfer-linux/blob/master/LICENSE">GNU GPLv3 License</a>.</p>
 
 <p>Copyright © 2015 Vladimir Menshakov</p>
       </section>
       <footer>
-        <p>This project is maintained by <a href="https://github.com/whoozle">whoozle</a></p>
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
       </footer>
     </div>
-    <script src="javascripts/scale.fix.js"></script>
-              <script type="text/javascript">
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+		          <script type="text/javascript">
             var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
             document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
           </script>
