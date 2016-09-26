@@ -42,7 +42,12 @@ namespace
 		static std::string GetErrorMessage(int returnCode)
 		{
 			char buf[1024];
+#ifdef _GNU_SOURCE
 			std::string text(strerror_r(returnCode, buf, sizeof(buf)));
+#else
+			int r = strerror_r(returnCode, buf, sizeof(buf));
+			std::string text(r == 0? buf: "strerror_r() failed");
+#endif
 			return text;
 		}
 	};
