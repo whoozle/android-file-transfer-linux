@@ -38,11 +38,14 @@ include(CheckIncludeFiles)
 
 find_package ( Threads )
 
-if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-	option(BUILD_FUSE "Build fuse mount helper" ON)
+# Don't mistake osx for unix
+if(UNIX AND NOT APPLE)
+  set(UNIX_SYS ON)
 else()
-	set(BUILD_FUSE OFF)
+  set(UNIX_SYS OFF)
 endif()
+
+option(BUILD_FUSE "Build fuse mount helper" ${UNIX_SYS})
 
 if (BUILD_FUSE)
 	pkg_check_modules ( FUSE fuse )
