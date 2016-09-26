@@ -19,6 +19,7 @@
 
 #include <usb/Exception.h>
 #include <libusb.h>
+#include <string>
 
 namespace mtp { namespace usb
 {

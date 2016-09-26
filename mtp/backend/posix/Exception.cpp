@@ -35,11 +35,11 @@ namespace mtp { namespace posix
 	std::string Exception::GetErrorMessage(int returnCode)
 	{
 		char buf[1024];
-#if defined(__APPLE__) || ((_POSIX_C_SOURCE >= 200112L || _XOPEN_SOURCE >= 600) && ! _GNU_SOURCE)
+#ifdef _GNU_SOURCE
+		std::string text(strerror_r(returnCode, buf, sizeof(buf)));
+#else
 		int r = strerror_r(returnCode, buf, sizeof(buf));
 		std::string text(r == 0? buf: "strerror_r() failed");
-#else
-		std::string text(strerror_r(returnCode, buf, sizeof(buf)));
 #endif
 		return text;
 	}
