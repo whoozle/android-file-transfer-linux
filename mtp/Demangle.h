@@ -21,6 +21,7 @@
 #define AFS_MTP_DEMANGLE_H
 
 #include <cxxabi.h>
+#include <stdlib.h>
 
 namespace mtp
 {
