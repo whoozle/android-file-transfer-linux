@@ -118,6 +118,13 @@ namespace
 			FUSE_CALL(fuse_reply_entry(Request, this));
 		}
 
+		void ReplyCreate(fuse_file_info *fi)
+		{
+			if (attr.st_mode == 0)
+				throw std::runtime_error("uninitialized attr in FuseEntry::Reply");
+			FUSE_CALL(fuse_reply_create(Request, this, fi));
+		}
+
 		void ReplyAttr()
 		{
 			if (attr.st_mode == 0)
@@ -448,7 +455,7 @@ namespace
 			return ToFuse(noi.ObjectId);
 		}
 
-		void CreateObject(mtp::ObjectFormat format, fuse_req_t req, FuseId parentId, const char *name, mode_t mode)
+		void CreateObject(mtp::ObjectFormat format, fuse_req_t req, FuseId parentId, const char *name, mode_t mode, fuse_file_info *createInfo = NULL)
 		{
 			if (parentId == FuseId::Root)
 			{
@@ -459,7 +466,11 @@ namespace
 			FuseEntry entry(req);
 			entry.SetId(objectId);
 			entry.attr = GetObjectAttr(objectId);
-			entry.Reply();
+
+			if (createInfo)
+				entry.ReplyCreate(createInfo);
+			else
+				entry.Reply();
 		}
 
 		FuseId GetParentObject(FuseId inode)
@@ -659,6 +670,9 @@ namespace
 			FUSE_CALL(fuse_reply_write(req, size));
 		}
 
+		void Create(fuse_req_t req, FuseId parent, const char *name, mode_t mode, struct fuse_file_info *fi)
+		{ mtp::scoped_mutex_lock l(_mutex); CreateObject(mtp::ObjectFormat::Undefined, req, parent, name, mode, fi); }
+
 		void MakeNode(fuse_req_t req, FuseId parent, const char *name, mode_t mode, dev_t rdev)
 		{ mtp::scoped_mutex_lock l(_mutex); CreateObject(mtp::ObjectFormat::Undefined, req, parent, name, mode); }
 
@@ -838,6 +852,9 @@ namespace
 	void MakeNode(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t mode, dev_t rdev)
 	{ mtp::debug("   MakeNode ", parent, " ", name, " 0x", mtp::hex(mode, 8)); WRAP_EX(g_wrapper->MakeNode(req, FuseId(parent), name, mode, rdev)); }
 
+	void Create(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t mode, struct fuse_file_info *fi)
+	{ mtp::debug("   Create ", parent, " ", name, " 0x", mtp::hex(mode, 8)); WRAP_EX(g_wrapper->Create(req, FuseId(parent), name, mode, fi)); }
+
 	void Open(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi)
 	{ mtp::debug("   Open ", ino); WRAP_EX(g_wrapper->Open(req, FuseId(ino), fi)); }
 
@@ -884,6 +901,7 @@ int main(int argc, char **argv)
 	ops.setattr		= &SetAttr;
 	ops.mknod		= &MakeNode;
 	ops.open		= &Open;
+	ops.create		= &Create;
 	ops.read		= &Read;
 	ops.write		= &Write;
 	ops.mkdir		= &MakeDir;
