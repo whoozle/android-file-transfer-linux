@@ -512,9 +512,10 @@ namespace
 			_directoryCache.clear();
 			_session.reset();
 			_device.reset();
-			_device = mtp::Device::Find();
-			if (!_device)
+			auto devices = mtp::Device::Find();
+			if (devices.empty())
 				throw std::runtime_error("no MTP device found");
+			_device = devices.front();
 
 			_session = _device->OpenSession(1);
 			_editObjectSupported = _session->EditObjectSupported();

@@ -122,19 +122,21 @@ bool MainWindow::reconnectToDevice()
 	_session.reset();
 	_device.reset();
 
+	std::list<mtp::DevicePtr> devices;
 	try
-	{ _device = mtp::Device::Find(); }
+	{  devices = mtp::Device::Find();}
 	catch(const mtp::usb::DeviceBusyException &ex)
 	{
 		QMessageBox::critical(this, tr("Device is busy"), tr("Device is busy, maybe another process is using it. Close other MTP applications and restart Android File Transfer."));
 		return false;
 	}
 
-	if (!_device)
+	if (devices.empty())
 	{
 		QMessageBox::critical(this, tr("No MTP device found"), tr("No MTP device found"));
 		return false;
 	}
+	_device = devices.front();
 
 	qDebug() << "device found, opening session...";
 	static const int MaxAttempts = 3;

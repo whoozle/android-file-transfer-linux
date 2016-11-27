@@ -71,8 +71,10 @@ namespace mtp
 		throw std::runtime_error("no interface descriptor found");
 	}
 
-	DevicePtr Device::Find()
+	std::list<DevicePtr> Device::Find()
 	{
+		std::list<DevicePtr> foundDevices;
+
 		using namespace mtp;
 		usb::ContextPtr ctx(new usb::Context);
 
@@ -119,12 +121,12 @@ namespace mtp
 					{
 						//device->SetConfiguration(configuration->GetIndex());
 						usb::BulkPipePtr pipe = usb::BulkPipe::Create(device, conf, iface, token);
-						return std::make_shared<Device>(pipe);
+						foundDevices.push_back(std::make_shared<Device>(pipe));
 					}
 					if (iface->GetClass() == 6 && iface->GetSubclass() == 1)
 					{
 						usb::BulkPipePtr pipe = usb::BulkPipe::Create(device, conf, iface, token);
-						return std::make_shared<Device>(pipe);
+						foundDevices.push_back(std::make_shared<Device>(pipe));
 					}
 				}
 			}
@@ -132,7 +134,7 @@ namespace mtp
 		catch(const std::exception &ex)
 		{ error("Device::Find", ex.what()); }
 
-		return nullptr;
+		return foundDevices;
 	}
 
 }

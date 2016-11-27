@@ -82,12 +82,13 @@ int main(int argc, char **argv)
 		exit(0);
 	}
 
-	DevicePtr mtp(Device::Find());
-	if (!mtp)
+	auto mtpDevices = Device::Find();
+	if (mtpDevices.empty())
 	{
 		error("no mtp device found");
 		exit(1);
 	}
+	auto mtp = mtpDevices.front();
 
 	try
 	{
