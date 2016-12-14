@@ -17,153 +17,27 @@
     If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <fuse_lowlevel.h>
-#include <stdio.h>
-#include <string.h>
-#include <fcntl.h>
+#include <fuse/Exception.h>
+#include <fuse/FuseId.h>
+#include <fuse/FuseEntry.h>
+#include <fuse/FuseDirectory.h>
 
-#include <mtp/ptp/Device.h>
 #include <mtp/ptp/ByteArrayObjectStream.h>
-#include <mtp/usb/DeviceNotFoundException.h>
+#include <mtp/ptp/Device.h>
 #include <mtp/ptp/ObjectPropertyListParser.h>
+
+#include <mtp/usb/DeviceNotFoundException.h>
+
 #include <mtp/log.h>
 
-#include <map>
 #include <set>
-#include <string>
+#include <vector>
+
+#include <fuse_lowlevel.h>
 
 namespace
 {
-	class Exception : public std::runtime_error
-	{
-	public:
-		Exception(const std::string &what) throw() : std::runtime_error(what + ": " + GetErrorMessage(errno)) { }
-		Exception(const std::string &what, int returnCode) throw() : std::runtime_error(what + ": " + GetErrorMessage(returnCode)) { }
-		static std::string GetErrorMessage(int returnCode)
-		{
-			char buf[1024];
-#ifdef _GNU_SOURCE
-			std::string text(strerror_r(returnCode, buf, sizeof(buf)));
-#else
-			int r = strerror_r(returnCode, buf, sizeof(buf));
-			std::string text(r == 0? buf: "strerror_r() failed");
-#endif
-			return text;
-		}
-	};
-
-#define FUSE_CALL(...) do { int _r = __VA_ARGS__ ; if (_r < 0) throw Exception(#__VA_ARGS__ " failed", -_r); } while(false)
-
-	typedef std::vector<char> CharArray;
-
-	struct FuseId
-	{
-		static const FuseId Root;
-
-		fuse_ino_t Inode; //generation here?
-
-		explicit FuseId(fuse_ino_t inode): Inode(inode) { }
-
-		bool operator == (const FuseId &o) const
-		{ return Inode == o.Inode; }
-		bool operator != (const FuseId &o) const
-		{ return !((*this) == o); }
-		bool operator < (const FuseId &o) const
-		{ return Inode < o.Inode; }
-	};
-
-	const FuseId FuseId::Root(FUSE_ROOT_ID);
-
-	struct FuseEntry : fuse_entry_param
-	{
-		static constexpr const double	Timeout = 60.0;
-		static constexpr unsigned 		FileMode 		= S_IFREG | 0444;
-		static constexpr unsigned 		DirectoryMode	= S_IFDIR | 0755;
-
-		fuse_req_t Request;
-
-		FuseEntry(fuse_req_t req): fuse_entry_param(), Request(req)
-		{
-			generation = 1;
-			attr_timeout = entry_timeout = Timeout;
-		};
-
-		void SetId(FuseId id)
-		{
-			ino = id.Inode;
-			attr.st_ino = id.Inode;
-		}
-
-		void SetFileMode()
-		{ attr.st_mode = FileMode; }
-
-		void SetDirectoryMode()
-		{ attr.st_mode = DirectoryMode; }
-
-		static mode_t GetMode(mtp::ObjectFormat format)
-		{
-			switch(format)
-			{
-			case mtp::ObjectFormat::Association:
-				return DirectoryMode;
-			default:
-				return FileMode;
-			}
-		}
-
-		void Reply()
-		{
-			if (attr.st_mode == 0)
-				throw std::runtime_error("uninitialized attr in FuseEntry::Reply");
-			FUSE_CALL(fuse_reply_entry(Request, this));
-		}
-
-		void ReplyCreate(fuse_file_info *fi)
-		{
-			if (attr.st_mode == 0)
-				throw std::runtime_error("uninitialized attr in FuseEntry::Reply");
-			FUSE_CALL(fuse_reply_create(Request, this, fi));
-		}
-
-		void ReplyAttr()
-		{
-			if (attr.st_mode == 0)
-				throw std::runtime_error("uninitialized attr in FuseEntry::ReplyAttr");
-			FUSE_CALL(fuse_reply_attr(Request, &attr, Timeout));
-		}
-
-		void ReplyError(int err)
-		{
-			FUSE_CALL(fuse_reply_err(Request, err));
-		}
-	};
-
-	struct FuseDirectory
-	{
-		fuse_req_t			Request;
-
-		FuseDirectory(fuse_req_t request): Request(request) { }
-
-		void Add(CharArray & data, const std::string &name, const struct stat & entry)
-		{
-			if (data.empty())
-				data.reserve(4096);
-			size_t size = fuse_add_direntry(Request, NULL, 0, name.c_str(), NULL, 0);
-			size_t offset = data.size();
-			data.resize(data.size() + size);
-			fuse_add_direntry(Request, data.data() + offset, size, name.c_str(), &entry, data.size()); //request is not used inside fuse here, so we could cache resulting dirent data
-		}
-
-		static void Reply(fuse_req_t req, const CharArray &data, off_t off, size_t size)
-		{
-			if (off >= (off_t)data.size())
-				FUSE_CALL(fuse_reply_buf(req, NULL, 0));
-			else
-			{
-				FUSE_CALL(fuse_reply_buf(req, data.data() + off, std::min<size_t>(size, data.size() - off)));
-			}
-		}
-	};
+	using namespace mtp::fuse;
 
 	class FuseWrapper
 	{
