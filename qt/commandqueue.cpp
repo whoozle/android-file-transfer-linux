@@ -81,6 +81,9 @@ void CommandQueue::uploadFile(const QString &filename)
 	}
 	try
 	{
+		if (_model->parentObjectId() != parent.value()) //needed for overwrite protection
+			_model->setParent(parent.value());
+
 		_model->uploadFile(parent.value(), filename);
 	} catch(const std::exception &ex)
 	{ qDebug() << "uploading file " << filename << " failed: " << fromUtf8(ex.what()); }
