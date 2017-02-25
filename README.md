@@ -1,7 +1,7 @@
 # Android File Transfer For Linux (and Mac OS X!)
 
 [![License](http://img.shields.io/:license-GPLv3-blue.svg)](https://github.com/whoozle/android-file-transfer-linux/blob/master/LICENSE)
-[![Version](http://img.shields.io/:version-3.1-green.svg)](https://github.com/whoozle/android-file-transfer-linux)
+[![Version](http://img.shields.io/:version-3.2-green.svg)](https://github.com/whoozle/android-file-transfer-linux)
 [![Build Status](https://travis-ci.org/whoozle/android-file-transfer-linux.svg?branch=master)](https://travis-ci.org/whoozle/android-file-transfer-linux)
 
 Android File Transfer for Linux — reliable MTP client with minimalistic UI similar to [Android File Transfer for Mac](https://www.android.com/intl/en_us/filetransfer/).
