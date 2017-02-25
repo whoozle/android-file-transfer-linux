@@ -78,7 +78,6 @@ class CommandQueue: public QObject
 private:
 	MtpObjectsModel *				_model;
 	qint64							_completedFilesSize;
-	QString							_root;
 	QMap<QString, mtp::ObjectId>	_directories;
 	volatile bool					_aborted;
 
