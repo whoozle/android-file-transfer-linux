@@ -108,11 +108,13 @@ namespace mtp { namespace usb
 
 		std::string Read()
 		{
+			dirent *entry;
+#if 0
 			dirent *buffer = static_cast<dirent *>(static_cast<void *>(_buffer.data()));
-			dirent *entry = 0;
+			//thread safety is not in posix yet, but those shitheads already deprecated it
 			int r = readdir_r(_dir, buffer, &entry);
-			if (r)
-				throw posix::Exception("readdir_r", r);
+#endif
+			entry = readdir(_dir);
 			return entry? entry->d_name: "";
 		}
 

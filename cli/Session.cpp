@@ -541,12 +541,9 @@ namespace cli
 				perror("opendir");
 				return;
 			}
-			dirent entry = {};
 			while(true)
 			{
-				dirent *result = NULL;
-				if (readdir_r(dir, &entry, &result) != 0)
-					throw std::runtime_error(std::string("readdir failed: ") + strerror(errno));
+				dirent *result = readdir(dir);
 				if (!result)
 					break;
 
