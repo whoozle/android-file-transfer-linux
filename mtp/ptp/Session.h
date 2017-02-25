@@ -98,7 +98,7 @@ namespace mtp
 		ByteArray GetPartialObject(ObjectId objectId, u64 offset, u32 size);
 		NewObjectInfo SendObjectInfo(const msg::ObjectInfo &objectInfo, StorageId storageId = AnyStorage, ObjectId parentObject = Device);
 		void SendObject(const IObjectInputStreamPtr &inputStream, int timeout = LongTimeout);
-		void DeleteObject(ObjectId objectId);
+		void DeleteObject(ObjectId objectId, int timeout = LongTimeout);
 
 		bool EditObjectSupported() const
 		{ return _editObjectSupported; }

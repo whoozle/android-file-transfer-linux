@@ -394,11 +394,11 @@ namespace mtp
 		return Get(transaction.Id, timeout);
 	}
 
-	void Session::DeleteObject(ObjectId objectId)
+	void Session::DeleteObject(ObjectId objectId, int timeout)
 	{
 		scoped_mutex_lock l(_mutex);
 		Transaction transaction(this);
-		Send(OperationRequest(OperationCode::DeleteObject, transaction.Id, objectId.Id, 0));
+		Send(OperationRequest(OperationCode::DeleteObject, transaction.Id, objectId.Id, 0), timeout);
 		Get(transaction.Id);
 	}
 
