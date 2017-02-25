@@ -168,21 +168,24 @@ QVariant MtpObjectsModel::data(const QModelIndex &index, int role) const
 	}
 }
 
-mtp::ObjectId MtpObjectsModel::createDirectory(const QString &name, mtp::AssociationType type)
+mtp::ObjectId MtpObjectsModel::createDirectory(mtp::ObjectId parentObjectId, const QString &name, mtp::AssociationType type)
 {
 	QModelIndex existingDir = findObject(name);
 	if (existingDir.isValid())
 		return _rows.at(existingDir.row()).ObjectId;
 
 	mtp::StorageId storageId = _storageId != mtp::Session::AllStorages? _storageId: mtp::Session::AnyStorage;
-	mtp::Session::NewObjectInfo noi = _session->CreateDirectory(toUtf8(name), _parentObjectId, storageId, type);
-	beginInsertRows(QModelIndex(), _rows.size(), _rows.size());
-	_rows.push_back(Row(noi.ObjectId));
-	endInsertRows();
+	mtp::Session::NewObjectInfo noi = _session->CreateDirectory(toUtf8(name), parentObjectId, storageId, type);
+	if (parentObjectId == _parentObjectId)
+	{
+		beginInsertRows(QModelIndex(), _rows.size(), _rows.size());
+		_rows.push_back(Row(noi.ObjectId));
+		endInsertRows();
+	}
 	return noi.ObjectId;
 }
 
-bool MtpObjectsModel::uploadFile(const QString &filePath, QString filename)
+bool MtpObjectsModel::uploadFile(mtp::ObjectId parentObjectId, const QString &filePath, QString filename)
 {
 	QFileInfo fileInfo(filePath);
 	mtp::ObjectFormat objectFormat = mtp::ObjectFormatFromFilename(toUtf8(filePath));
@@ -202,7 +205,7 @@ bool MtpObjectsModel::uploadFile(const QString &filePath, QString filename)
 			return false;
 		}
 		_session->DeleteObject(_rows.at(existingObject.row()).ObjectId);
-		needReset = true;
+		needReset = parentObjectId == _parentObjectId;
 	}
 
 	std::shared_ptr<QtObjectInputStream> object(new QtObjectInputStream(filePath));
@@ -218,13 +221,16 @@ bool MtpObjectsModel::uploadFile(const QString &filePath, QString filename)
 	oi.Filename = toUtf8(filename);
 	oi.ObjectFormat = objectFormat;
 	oi.SetSize(fileInfo.size());
-	mtp::Session::NewObjectInfo noi = _session->SendObjectInfo(oi, _storageId != mtp::Session::AllStorages? _storageId: mtp::Session::AnyStorage, _parentObjectId);
+	mtp::Session::NewObjectInfo noi = _session->SendObjectInfo(oi, _storageId != mtp::Session::AllStorages? _storageId: mtp::Session::AnyStorage, parentObjectId);
 	qDebug() << "new object id: " << noi.ObjectId << ", sending...";
 	_session->SendObject(object);
 	qDebug() << "ok";
-	beginInsertRows(QModelIndex(), _rows.size(), _rows.size());
-	_rows.push_back(Row(noi.ObjectId));
-	endInsertRows();
+	if (parentObjectId == _parentObjectId)
+	{
+		beginInsertRows(QModelIndex(), _rows.size(), _rows.size());
+		_rows.push_back(Row(noi.ObjectId));
+		endInsertRows();
+	}
 	if (needReset)
 		refresh();
 	return true;

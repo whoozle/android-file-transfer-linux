@@ -89,8 +89,13 @@ public:
 	mtp::ObjectId parentObjectId() const
 	{ return _parentObjectId; }
 
-	mtp::ObjectId createDirectory(const QString &name, mtp::AssociationType type = mtp::AssociationType::GenericFolder);
-	bool uploadFile(const QString &filePath, QString filename = QString());
+	mtp::ObjectId createDirectory(mtp::ObjectId parentObjectId, const QString &name, mtp::AssociationType type = mtp::AssociationType::GenericFolder);
+	mtp::ObjectId createDirectory(const QString &name, mtp::AssociationType type = mtp::AssociationType::GenericFolder)
+	{ return createDirectory(_parentObjectId, name, type); }
+
+	bool uploadFile(mtp::ObjectId parentObjectId, const QString &filePath, QString filename = QString());
+	bool uploadFile(const QString &filePath, QString filename = QString())
+	{ return uploadFile(_parentObjectId, filePath, filename); }
 	bool downloadFile(const QString &filePath, mtp::ObjectId objectId);
 	void rename(int idx, const QString &fileName);
 	ObjectInfo getInfoById(mtp::ObjectId objectId) const;

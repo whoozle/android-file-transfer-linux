@@ -33,7 +33,7 @@ void UploadFile::execute(CommandQueue &queue)
 { queue.uploadFile(Filename); }
 
 void MakeDirectory::execute(CommandQueue &queue)
-{ queue.createDirectory(Filename, Root); }
+{ queue.createDirectory(Filename); }
 
 void DownloadFile::execute(CommandQueue &queue)
 { queue.downloadFile(Filename, ObjectId); }
@@ -64,23 +64,26 @@ void CommandQueue::uploadFile(const QString &filename)
 	qDebug() << "uploading file " << filename;
 
 	QFileInfo fi(filename);
+	QString parentPath = fi.dir().path();
 	if (_directories.empty())
-		_directories[fi.dir().path()] = _model->parentObjectId();
+		_directories[parentPath] = _model->parentObjectId();
 	start(fi.fileName());
-	auto parent = _directories.find(fi.dir().path());
-	Q_ASSERT(parent != _directories.end());
+	auto parent = _directories.find(parentPath);
+	if (parent == _directories.end())
+	{
+		qWarning() << "invalid parent " << parentPath;
+		return;
+	}
 	try
 	{
-		if (_model->parentObjectId() != parent.value())
-			_model->setParent(parent.value());
-		_model->uploadFile(filename);
+		_model->uploadFile(parent.value(), filename);
 	} catch(const std::exception &ex)
 	{ qDebug() << "uploading file " << filename << " failed: " << fromUtf8(ex.what()); }
 
 	addProgress(fi.size());
 }
 
-void CommandQueue::createDirectory(const QString &srcPath, bool root)
+void CommandQueue::createDirectory(const QString &srcPath)
 {
 	if (_aborted)
 		return;
@@ -92,22 +95,20 @@ void CommandQueue::createDirectory(const QString &srcPath, bool root)
 	Q_ASSERT(parentDir.cdUp());
 	QString parentPath = parentDir.path();
 	qDebug() << "parent: " << parentPath << ", dir: " << dir.dirName();
-
-	if (!root)
-	{
-		auto parent = _directories.find(parentPath);
-		Q_ASSERT(parent != _directories.end());
-		if (_model->parentObjectId() != parent.value())
-			_model->setParent(parent.value());
-	}
-	else
+	if (_directories.empty())
 		_directories[parentPath] = _model->parentObjectId();
+
+	auto parent = _directories.find(parentPath);
+	if (parent == _directories.end())
+	{
+		qWarning() << "invalid parent " << parentPath;
+		return;
+	}
 
 	try
 	{
-		mtp::ObjectId dirId = _model->createDirectory(dir.dirName());
+		mtp::ObjectId dirId = _model->createDirectory(parent.value(), dir.dirName());
 		_directories[path] = dirId;
-		_model->setParent(dirId);
 	} catch(const std::exception &ex)
 	{ qDebug() << "creating directory" << path << "failed: " << fromUtf8(ex.what()); return; }
 }

@@ -83,7 +83,7 @@ void FileUploader::upload(QStringList files)
 		if (currentFileInfo.isDir())
 		{
 			qDebug() << "adding subdirectory" << currentFile;
-			commands.push_back(new MakeDirectory(currentFile, true));
+			commands.push_back(new MakeDirectory(currentFile));
 			QDirIterator it(currentFile, QDirIterator::Subdirectories);
 			while(it.hasNext())
 			{

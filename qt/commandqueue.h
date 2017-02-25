@@ -51,9 +51,8 @@ struct FileCommand : public Command
 
 struct MakeDirectory : public FileCommand
 {
-	bool					Root;
-	MakeDirectory(const QString &filename, bool root = false) :
-		FileCommand(filename), Root(root) { }
+	MakeDirectory(const QString &filename) :
+		FileCommand(filename) { }
 	void execute(CommandQueue &queue);
 };
 
@@ -88,7 +87,7 @@ public:
 	MtpObjectsModel *model() const
 	{ return _model; }
 
-	void createDirectory(const QString &path, bool root);
+	void createDirectory(const QString &path);
 	void uploadFile(const QString &file);
 	void downloadFile(const QString &filename, mtp::ObjectId objectId);
 
