@@ -61,12 +61,17 @@ void CommandQueue::uploadFile(const QString &filename)
 	if (_aborted)
 		return;
 
-	qDebug() << "uploading file " << filename;
-
 	QFileInfo fi(filename);
 	QString parentPath = fi.dir().path();
+
+	qDebug() << "uploading file " << filename << ", parent: " << parentPath;
+
 	if (_directories.empty())
+	{
+		qDebug() << "adding first parent path";
 		_directories[parentPath] = _model->parentObjectId();
+		qDebug() << "directories[0]: " << parentPath << " -> " << _model->parentObjectId().Id;
+	}
 	start(fi.fileName());
 	auto parent = _directories.find(parentPath);
 	if (parent == _directories.end())
@@ -88,15 +93,15 @@ void CommandQueue::createDirectory(const QString &srcPath)
 	if (_aborted)
 		return;
 
-	QDir dir(srcPath);
-	QString path = dir.path();
-	qDebug() << "making directory" << path;
-	QDir parentDir(path);
-	Q_ASSERT(parentDir.cdUp());
-	QString parentPath = parentDir.path();
-	qDebug() << "parent: " << parentPath << ", dir: " << dir.dirName();
+	QFileInfo fi(srcPath);
+	QString parentPath = fi.dir().path();
+	qDebug() << "making directory" << srcPath << ", parent: " << parentPath << ", dir: " << fi.fileName();
 	if (_directories.empty())
+	{
+		qDebug() << "adding first parent path";
 		_directories[parentPath] = _model->parentObjectId();
+		qDebug() << "directories[0]: " << parentPath << " -> " << _model->parentObjectId().Id;
+	}
 
 	auto parent = _directories.find(parentPath);
 	if (parent == _directories.end())
@@ -107,10 +112,11 @@ void CommandQueue::createDirectory(const QString &srcPath)
 
 	try
 	{
-		mtp::ObjectId dirId = _model->createDirectory(parent.value(), dir.dirName());
-		_directories[path] = dirId;
+		mtp::ObjectId dirId = _model->createDirectory(parent.value(), fi.fileName());
+		_directories[srcPath] = dirId;
+		qDebug() << "directories[]: " << srcPath << " -> " << dirId.Id;
 	} catch(const std::exception &ex)
-	{ qDebug() << "creating directory" << path << "failed: " << fromUtf8(ex.what()); return; }
+	{ qDebug() << "creating directory" << srcPath << "failed: " << fromUtf8(ex.what()); return; }
 }
 
 CommandQueue::CommandQueue(MtpObjectsModel *model): _model(model), _completedFilesSize(0), _aborted(false)
