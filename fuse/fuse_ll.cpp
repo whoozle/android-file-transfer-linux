@@ -30,8 +30,10 @@
 
 #include <mtp/log.h>
 
+#include <map>
 #include <set>
 #include <vector>
+#include <stdio.h>
 
 #include <fuse_lowlevel.h>
 
