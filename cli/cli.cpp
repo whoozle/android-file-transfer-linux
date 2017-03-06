@@ -38,6 +38,7 @@ int main(int argc, char **argv)
 	bool showHelp = false;
 	bool showPrompt = true;
 	bool showVersion = false;
+	bool claimInterface = true;
 	if (!isatty(STDIN_FILENO))
 		showPrompt = false;
 
@@ -48,13 +49,14 @@ int main(int argc, char **argv)
 		{"batch",			no_argument,		0,	'b' },
 		{"help",			no_argument,		0,	'h' },
 		{"version",			no_argument,		0,	'V' },
+		{"no-claim",		no_argument,		0,	'C' },
 		{0,					0,					0,	 0	}
 	};
 
 	while(true)
 	{
 		int optionIndex = 0; //index of matching option
-		int c = getopt_long(argc, argv, "ibhvV", long_options, &optionIndex);
+		int c = getopt_long(argc, argv, "ibhvVC", long_options, &optionIndex);
 		if (c == -1)
 			break;
 		switch(c)
@@ -69,6 +71,9 @@ int main(int argc, char **argv)
 			break;
 		case 'V':
 			showVersion = true;
+			break;
+		case 'C':
+			claimInterface = false;
 			break;
 		case '?':
 		case 'h':
@@ -95,7 +100,7 @@ int main(int argc, char **argv)
 		exit(0);
 	}
 
-	auto mtpDevices = Device::Find();
+	auto mtpDevices = Device::Find(claimInterface);
 	if (mtpDevices.empty())
 	{
 		error("no mtp device found");

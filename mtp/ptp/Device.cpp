@@ -71,7 +71,7 @@ namespace mtp
 		throw std::runtime_error("no interface descriptor found");
 	}
 
-	std::list<DevicePtr> Device::Find()
+	std::list<DevicePtr> Device::Find(bool claimInterface)
 	{
 		std::list<DevicePtr> foundDevices;
 
@@ -95,7 +95,7 @@ namespace mtp
 				for(int j = 0; j < interfaces; ++j)
 				{
 					usb::InterfacePtr iface = conf->GetInterface(device, conf, j, 0);
-					usb::InterfaceTokenPtr token = device->ClaimInterface(iface);
+					usb::InterfaceTokenPtr token = claimInterface? device->ClaimInterface(iface): nullptr;
 					debug(i, ':', j, ", index: ", iface->GetIndex(), ", enpoints: ", iface->GetEndpointsCount());
 
 #ifdef USB_BACKEND_LIBUSB
