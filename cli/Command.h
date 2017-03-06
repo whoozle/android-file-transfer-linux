@@ -38,6 +38,14 @@ namespace cli
 	struct LocalPath : public std::string	{ LocalPath(const std::string &path = std::string()): std::string(path) { } };
 	struct StoragePath : public std::string	{ StoragePath(const std::string &path = std::string()): std::string(path) { } };
 
+	inline std::string EscapePath(std::string name)
+	{
+		if (name.find(' ') != name.npos)
+			return '"' + name +'"';
+		else
+			return name;
+	}
+
 	typedef std::list<std::string> CompletionResult;
 	struct CompletionContext
 	{

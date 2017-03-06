@@ -445,10 +445,7 @@ namespace cli
 				if (format == mtp::ObjectFormat::Association)
 					name += '/';
 
-				if (name.find(' ') != name.npos)
-					result.push_back('"' + name +'"');
-				else
-					result.push_back(name);
+				result.push_back(EscapePath(name));
 			}
 		}
 	}
@@ -465,9 +462,9 @@ namespace cli
 			if (BeginsWith(idStr, path))
 				result.push_back(idStr);
 			if (BeginsWith(si.VolumeLabel, path))
-				result.push_back(si.VolumeLabel);
+				result.push_back(EscapePath(si.VolumeLabel));
 			if (BeginsWith(si.StorageDescription, path))
-				result.push_back(si.StorageDescription);
+				result.push_back(EscapePath(si.StorageDescription));
 		}
 	}
 
