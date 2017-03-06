@@ -492,6 +492,7 @@ namespace cli
 				break;
 			}
 		}
+		throw std::runtime_error("storage " + path + " could not be found");
 	}
 
 	void Session::Help()
