@@ -26,6 +26,7 @@
 #include <cli/Session.h>
 
 #include <mtp/log.h>
+#include <mtp/version.h>
 
 #include <getopt.h>
 #include <unistd.h>
@@ -36,6 +37,7 @@ int main(int argc, char **argv)
 	bool forceInteractive = false;
 	bool showHelp = false;
 	bool showPrompt = true;
+	bool showVersion = false;
 	if (!isatty(STDIN_FILENO))
 		showPrompt = false;
 
@@ -45,13 +47,14 @@ int main(int argc, char **argv)
 		{"interactive",		no_argument,		0,	'i' },
 		{"batch",			no_argument,		0,	'b' },
 		{"help",			no_argument,		0,	'h' },
+		{"version",			no_argument,		0,	'V' },
 		{0,					0,					0,	 0	}
 	};
 
 	while(true)
 	{
 		int optionIndex = 0; //index of matching option
-		int c = getopt_long(argc, argv, "ibhv", long_options, &optionIndex);
+		int c = getopt_long(argc, argv, "ibhvV", long_options, &optionIndex);
 		if (c == -1)
 			break;
 		switch(c)
@@ -63,6 +66,9 @@ int main(int argc, char **argv)
 			break;
 		case 'v':
 			g_debug = true;
+			break;
+		case 'V':
+			showVersion = true;
 			break;
 		case '?':
 		case 'h':
@@ -77,8 +83,15 @@ int main(int argc, char **argv)
 			"usage:\n"
 			"-h\tshow this help\n"
 			"-v\tshow debug output\n"
-			"-i\tforce interactive mode"
+			"-i\tforce interactive mode\n"
+			"-V\tshow version information"
 			);
+		exit(0);
+	}
+
+	if (showVersion)
+	{
+		print(GetVersion());
 		exit(0);
 	}
 
