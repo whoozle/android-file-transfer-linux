@@ -477,7 +477,22 @@ namespace cli
 	}
 
 	void Session::ChangeStorage(const StoragePath &path)
-	{ }
+	{
+		using namespace mtp;
+		msg::StorageIDs list = _session->GetStorageIDs();
+		for(size_t i = 0; i < list.StorageIDs.size(); ++i)
+		{
+			auto id = list.StorageIDs[i];
+			msg::StorageInfo si = _session->GetStorageInfo(id);
+			auto idStr = std::to_string(id.Id);
+			if (idStr == path || si.StorageDescription == path || si.VolumeLabel == path)
+			{
+				_cs = id;
+				print("selected storage ", _cs.Id, " ", si.VolumeLabel, " ", si.StorageDescription);
+				break;
+			}
+		}
+	}
 
 	void Session::Help()
 	{
