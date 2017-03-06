@@ -27,6 +27,7 @@
 #include <mtp/ptp/ByteArrayObjectStream.h>
 #include <mtp/ptp/ObjectPropertyListParser.h>
 #include <mtp/log.h>
+#include <mtp/version.h>
 
 #include <sstream>
 
@@ -240,6 +241,7 @@ namespace cli
 		using namespace mtp;
 		if (_interactive && _showPrompt)
 		{
+			print("android file transfer for linux version ", GetVersion());
 			print(_gdi.Manufacturer, " ", _gdi.Model, " ", _gdi.DeviceVersion);
 			print("extensions: ", _gdi.VendorExtensionDesc);
 			//print(_gdi.SerialNumber); //non-secure

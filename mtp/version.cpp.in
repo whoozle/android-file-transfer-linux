@@ -1,0 +1,7 @@
+#include <mtp/version.h>
+
+namespace mtp
+{
+	std::string GetVersion()
+	{ return std::string(${AFT_VERSION}); }
+}

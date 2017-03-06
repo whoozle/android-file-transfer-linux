@@ -102,6 +102,11 @@ set(SOURCES
 	mtp/backend/posix/Exception.cpp
 )
 
+set(VERSION_SRC ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/version.cpp)
+configure_file(mtp/version.cpp.in ${VERSION_SRC})
+
+list(APPEND SOURCES ${VERSION_SRC})
+
 if (USB_BACKEND_LIBUSB)
 
 	pkg_check_modules(LIBUSB libusb-1.0 REQUIRED)
