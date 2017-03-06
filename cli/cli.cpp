@@ -89,6 +89,8 @@ int main(int argc, char **argv)
 			"-h\tshow this help\n"
 			"-v\tshow debug output\n"
 			"-i\tforce interactive mode\n"
+			"-b\tbatch command processing\n"
+			"-C\tno usb interface claim\n"
 			"-V\tshow version information"
 			);
 		exit(0);
