@@ -38,10 +38,12 @@ namespace cli
 		mtp::SessionPtr				_session;
 		mtp::msg::DeviceInfo		_gdi;
 		mtp::StorageId				_cs; //current storage
+		std::string					_csName; //current storage name
 		mtp::ObjectId				_cd; //current directory
 		bool						_running;
 		bool						_interactive;
 		bool						_showPrompt;
+		std::string					_prompt;
 		unsigned					_terminalWidth;
 
 		std::multimap<std::string, ICommandPtr> _commands;
@@ -60,6 +62,7 @@ namespace cli
 	public:
 		Session(const mtp::DevicePtr &device, bool showPrompt);
 
+		void UpdatePrompt();
 		bool IsInteractive() const
 		{ return _interactive; }
 		void InteractiveInput();

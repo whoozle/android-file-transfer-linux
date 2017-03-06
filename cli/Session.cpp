@@ -227,6 +227,14 @@ namespace cli
 		cmd->second->Execute(tokens);
 	}
 
+	void Session::UpdatePrompt()
+	{
+		if (_showPrompt)
+			_prompt = _gdi.Manufacturer + " " + _gdi.Model + (!_csName.empty()? ":" + _csName: std::string()) + "> ";
+		else
+			_prompt.clear();
+	}
+
 	void Session::InteractiveInput()
 	{
 		using namespace mtp;
@@ -251,10 +259,11 @@ namespace cli
 			debug(ss.str());
 		}
 
-		std::string prompt(_showPrompt? _gdi.Manufacturer + " " + _gdi.Model + "> ": std::string()), input;
 		cli::CommandLine::Get().SetCallback([this](const char *text, int start, int end) -> char ** { return CompletionCallback(text, start, end); });
+		UpdatePrompt();
 
-		while (_showPrompt? cli::CommandLine::Get().ReadLine(prompt, input): cli::CommandLine::Get().ReadRawLine(input))
+		std::string input;
+		while (_showPrompt? cli::CommandLine::Get().ReadLine(_prompt, input): cli::CommandLine::Get().ReadRawLine(input))
 		{
 			try
 			{
@@ -479,6 +488,13 @@ namespace cli
 	void Session::ChangeStorage(const StoragePath &path)
 	{
 		using namespace mtp;
+		if (path == "All" || path == "all" || path == "*")
+		{
+			_cs = mtp::Session::AllStorages;
+			_csName.clear();
+			UpdatePrompt();
+			return;
+		}
 		msg::StorageIDs list = _session->GetStorageIDs();
 		for(size_t i = 0; i < list.StorageIDs.size(); ++i)
 		{
@@ -488,7 +504,9 @@ namespace cli
 			if (idStr == path || si.StorageDescription == path || si.VolumeLabel == path)
 			{
 				_cs = id;
+				_csName = si.GetName();
 				print("selected storage ", _cs.Id, " ", si.VolumeLabel, " ", si.StorageDescription);
+				UpdatePrompt();
 				break;
 			}
 		}
