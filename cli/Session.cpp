@@ -388,7 +388,7 @@ namespace cli
 	void Session::List(mtp::ObjectId parent, bool extended)
 	{
 		using namespace mtp;
-		if (!extended && _session->GetObjectPropertyListSupported())
+		if (!extended && _cs == mtp::Session::AllStorages && _session->GetObjectPropertyListSupported())
 		{
 			ByteArray data = _session->GetObjectPropertyList(parent, ObjectFormat::Any, ObjectProperty::ObjectFilename, 0, 1);
 			ObjectPropertyListParser<std::string> parser;
