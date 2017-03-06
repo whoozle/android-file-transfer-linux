@@ -44,6 +44,7 @@ namespace
 	class FuseWrapper
 	{
 		std::mutex		_mutex;
+		bool			_claimInterface;
 		mtp::DevicePtr	_device;
 		mtp::SessionPtr	_session;
 		bool			_editObjectSupported;
@@ -375,7 +376,7 @@ namespace
 		}
 
 	public:
-		FuseWrapper()
+		FuseWrapper(bool claimInterface): _claimInterface(claimInterface)
 		{ Connect(); }
 
 		void Connect()
@@ -388,7 +389,7 @@ namespace
 			_directoryCache.clear();
 			_session.reset();
 			_device.reset();
-			auto devices = mtp::Device::Find();
+			auto devices = mtp::Device::Find(_claimInterface);
 			if (devices.empty())
 				throw std::runtime_error("no MTP device found");
 			_device = devices.front();
@@ -756,8 +757,11 @@ namespace
 
 int main(int argc, char **argv)
 {
+	bool claimInterface = true;
 	for(int i = 1; i < argc; ++i)
 	{
+		if (strcmp(argv[i], "-C") == 0)
+			claimInterface = false;
 		if (strcmp(argv[i], "-d") == 0 || strcmp(argv[i], "-odebug") == 0)
 			mtp::g_debug = true;
 		if (i + 1 < argc && strcmp(argv[i], "-o") == 0 && strcmp(argv[i + 1], "debug") == 0)
@@ -765,7 +769,7 @@ int main(int argc, char **argv)
 	}
 
 	try
-	{ g_wrapper.reset(new FuseWrapper()); }
+	{ g_wrapper.reset(new FuseWrapper(claimInterface)); }
 	catch(const std::exception &ex)
 	{ mtp::error("connect failed: ", ex.what()); return 1; }
 
