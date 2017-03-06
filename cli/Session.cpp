@@ -507,7 +507,7 @@ namespace cli
 				_csName = si.GetName();
 				print("selected storage ", _cs.Id, " ", si.VolumeLabel, " ", si.StorageDescription);
 				UpdatePrompt();
-				break;
+				return;
 			}
 		}
 		throw std::runtime_error("storage " + path + " could not be found");
