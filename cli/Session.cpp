@@ -104,6 +104,8 @@ namespace cli
 
 		AddCommand("cd", "<path> change directory to <path>",
 			make_function([this](const Path &path) -> void { ChangeDirectory(path); }));
+		AddCommand("storage", "<storage-name>",
+			make_function([this](const StoragePath &path) -> void { ChangeStorage(path); }));
 		AddCommand("pwd", "resolved current object directory",
 			make_function([this]() -> void { CurrentDirectory(); }));
 		AddCommand("rm", "<path> removes object (WARNING: RECURSIVE, be careful!)",
@@ -442,6 +444,24 @@ namespace cli
 		}
 	}
 
+	void Session::CompleteStoragePath(const StoragePath &path, CompletionResult &result)
+	{
+		using namespace mtp;
+		msg::StorageIDs list = _session->GetStorageIDs();
+		for(size_t i = 0; i < list.StorageIDs.size(); ++i)
+		{
+			auto id = list.StorageIDs[i];
+			msg::StorageInfo si = _session->GetStorageInfo(id);
+			auto idStr = std::to_string(id.Id);
+			if (BeginsWith(idStr, path))
+				result.push_back(idStr);
+			if (BeginsWith(si.VolumeLabel, path))
+				result.push_back(si.VolumeLabel);
+			if (BeginsWith(si.StorageDescription, path))
+				result.push_back(si.StorageDescription);
+		}
+	}
+
 	void Session::ListStorages()
 	{
 		using namespace mtp;
@@ -455,6 +475,9 @@ namespace cli
 				", description: ", si.StorageDescription);
 		}
 	}
+
+	void Session::ChangeStorage(const StoragePath &path)
+	{ }
 
 	void Session::Help()
 	{

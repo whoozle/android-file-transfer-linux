@@ -36,6 +36,7 @@ namespace cli
 
 	struct Path : public std::string		{ Path(const std::string &path = std::string()): std::string(path) { } };
 	struct LocalPath : public std::string	{ LocalPath(const std::string &path = std::string()): std::string(path) { } };
+	struct StoragePath : public std::string	{ StoragePath(const std::string &path = std::string()): std::string(path) { } };
 
 	typedef std::list<std::string> CompletionResult;
 	struct CompletionContext
@@ -65,6 +66,13 @@ namespace cli
 			{ return text; }
 		};
 
+		template<>
+		struct ValueConverter<StoragePath>
+		{
+			static StoragePath Convert(const Path &text)
+			{ return text; }
+		};
+
 		template<typename Type>
 		struct Completer
 		{
@@ -77,6 +85,11 @@ namespace cli
 			static void Complete(CompletionContext & ctx);
 		};
 
+		template<>
+		struct Completer<StoragePath>
+		{
+			static void Complete(CompletionContext & ctx);
+		};
 
 		template<typename ... Tail>
 		struct CompletionForwarder

@@ -72,10 +72,12 @@ namespace cli
 		void Quit() { _running = false; }
 
 		void CompletePath(const Path &path, CompletionResult &result);
+		void CompleteStoragePath(const StoragePath &path, CompletionResult &result);
 
 		void List(mtp::ObjectId parent, bool extended);
 
 		void ListStorages();
+		void ChangeStorage(const StoragePath &path);
 		void Get(const LocalPath &dst, mtp::ObjectId srcId);
 		void Get(const mtp::ObjectId srcId);
 		void Cat(const Path &path);

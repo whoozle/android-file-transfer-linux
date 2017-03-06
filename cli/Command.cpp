@@ -26,4 +26,7 @@ namespace cli
 	void impl::Completer<Path>::Complete(CompletionContext & ctx)
 	{ ctx.Session.CompletePath(ctx.Prefix, ctx.Result); }
 
+	void impl::Completer<StoragePath>::Complete(CompletionContext & ctx)
+	{ ctx.Session.CompleteStoragePath(ctx.Prefix, ctx.Result); }
+
 }
