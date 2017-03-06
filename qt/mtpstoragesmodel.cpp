@@ -66,8 +66,8 @@ QVariant MtpStoragesModel::data(const QModelIndex &index, int role) const
 	{
 	case Qt::DisplayRole:
 		{
-			const std::string & title = !si.StorageDescription.empty()? si.StorageDescription:  si.VolumeLabel;
-			return fromUtf8(title);
+			auto name = si.GetName();
+			return fromUtf8(name);
 		}
 	default:
 		return QVariant();

@@ -103,6 +103,8 @@ namespace mtp { namespace msg
 		std::string	StorageDescription;
 		std::string	VolumeLabel;
 
+		std::string GetName() const
+		{ return !StorageDescription.empty()? StorageDescription: VolumeLabel; }
 
 		void Read(InputStream &stream)
 		{

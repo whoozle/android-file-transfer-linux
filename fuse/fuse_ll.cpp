@@ -416,7 +416,7 @@ namespace
 			{
 				mtp::StorageId id = ids.StorageIDs[i];
 				mtp::msg::StorageInfo si = _session->GetStorageInfo(id);
-				std::string path = (!si.StorageDescription.empty()? si.StorageDescription:  si.VolumeLabel);
+				std::string path = si.GetName();
 				if (path.empty())
 				{
 					char buf[64];
