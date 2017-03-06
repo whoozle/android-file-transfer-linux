@@ -59,6 +59,10 @@ namespace cli
 		static std::string FormatTime(const std::string &timespec);
 
 		void GetObjectPropertyList(mtp::ObjectId parent, const std::set<mtp::ObjectId> &originalObjectList, const mtp::ObjectProperty property);
+
+		mtp::StorageId GetUploadStorageId()
+		{ return _cs == mtp::Session::AllStorages? mtp::Session::AnyStorage: _cs; }
+
 	public:
 		Session(const mtp::DevicePtr &device, bool showPrompt);
 

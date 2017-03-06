@@ -625,7 +625,7 @@ namespace cli
 			if (IsInteractive())
 				try { stream->SetProgressReporter(ProgressBar(dst, _terminalWidth / 3, _terminalWidth)); } catch(const std::exception &ex) { }
 
-			_session->SendObjectInfo(oi, mtp::Session::AnyStorage, parentId);
+			_session->SendObjectInfo(oi, GetUploadStorageId(), parentId);
 			_session->SendObject(stream);
 		}
 	}
@@ -636,7 +636,7 @@ namespace cli
 		msg::ObjectInfo oi;
 		oi.Filename = name;
 		oi.ObjectFormat = ObjectFormat::Association;
-		_session->SendObjectInfo(oi, mtp::Session::AnyStorage, parentId);
+		_session->SendObjectInfo(oi, GetUploadStorageId(), parentId);
 	}
 
 	void Session::ShowType(const LocalPath &src)
