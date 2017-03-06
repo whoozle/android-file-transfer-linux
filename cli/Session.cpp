@@ -411,6 +411,7 @@ namespace cli
 						print(
 							std::left,
 							width(objectId, 10), " ",
+							width(info.StorageId.Id, 10), " ",
 							std::right,
 							hex(info.ObjectFormat, 4), " ",
 							width(info.ObjectCompressedSize, 10), " ",
