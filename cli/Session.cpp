@@ -718,7 +718,7 @@ namespace cli
 	{
 		using namespace mtp;
 		ObjectId id = Resolve(path);
-		msg::ObjectHandles oh = _session->GetObjectHandles(mtp::Session::AllStorages, ObjectFormat::Any, id);
+		msg::ObjectHandles oh = _session->GetObjectHandles(_cs, ObjectFormat::Any, id);
 
 		std::set<ObjectId> objectList;
 		for(auto id : oh.ObjectHandles)
