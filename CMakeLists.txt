@@ -102,6 +102,9 @@ set(SOURCES
 	mtp/backend/posix/Exception.cpp
 )
 
+exec_program(git ARGS describe --tags OUTPUT_VARIABLE AFT_VERSION)
+message(STATUS "version: ${AFT_VERSION}")
+
 set(VERSION_SRC ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/version.cpp)
 configure_file(mtp/version.cpp.in ${VERSION_SRC})
 
