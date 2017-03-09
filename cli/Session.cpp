@@ -614,7 +614,16 @@ namespace cli
 		{
 			std::string name = GetFilename(src.back() == '/'? src.substr(0, src.size() - 1): static_cast<const std::string &>(src));
 			try
-			{ parentId = ResolveObjectChild(parentId, name); }
+			{
+				mtp::ObjectId existingObject = ResolveObjectChild(parentId, name);
+				ObjectFormat format = ObjectFormat(_session->GetObjectIntegerProperty(existingObject, ObjectProperty::ObjectFormat));
+				if (format != ObjectFormat::Association)
+				{
+					_session->DeleteObject(existingObject);
+					throw std::runtime_error("target is not a directory");
+				}
+				parentId = existingObject;
+			}
 			catch(const std::exception &ex)
 			{ parentId = MakeDirectory(parentId, name); }
 
