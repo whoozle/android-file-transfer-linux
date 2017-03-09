@@ -432,7 +432,7 @@ namespace cli
 						print(std::left, width(objectId, 10), " ", prefix + info.Filename);
 
 					if (recursive && info.ObjectFormat == mtp::ObjectFormat::Association)
-						List(objectId, extended, recursive, info.Filename + "/");
+						List(objectId, extended, recursive, prefix + info.Filename + "/");
 				}
 				catch(const std::exception &ex)
 				{
