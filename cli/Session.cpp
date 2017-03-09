@@ -660,8 +660,6 @@ namespace cli
 		using namespace mtp;
 		msg::ObjectInfo oi;
 		oi.Filename = name;
-		if (_cs != mtp::Session::AllStorages)
-			oi.StorageId = _cs;
 		oi.ObjectFormat = ObjectFormat::Association;
 		auto noi = _session->SendObjectInfo(oi, GetUploadStorageId(), parentId);
 		return noi.ObjectId;
