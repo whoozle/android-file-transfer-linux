@@ -613,7 +613,6 @@ namespace cli
 
 		if (S_ISDIR(st.st_mode))
 		{
-			print(src, " is dir");
 			std::string name = GetFilename(src.back() == '/'? src.substr(0, src.size() - 1): static_cast<const std::string &>(src));
 			parentId = MakeDirectory(parentId, name);
 			DIR *dir = opendir(src.c_str());

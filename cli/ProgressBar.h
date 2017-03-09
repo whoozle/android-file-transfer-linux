@@ -41,7 +41,6 @@ namespace cli
 			_maxWidth = max - _width - Junk;
 			if (_maxWidth < 1)
 				throw std::runtime_error("insufficient space for progress bar");
-			printf("config %d %d %d\n", _width, _maxWidth, max);
 
 			int titleSize = mtp::OutputStream::Utf8Length(title);
 			if (titleSize > _maxWidth)
