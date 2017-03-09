@@ -593,30 +593,18 @@ namespace cli
 			fputc('\n', stdout);
 	}
 
-	mtp::ObjectId Session::MakeOrResolveDirectory(mtp::ObjectId parentId, const std::string &dst, const LocalPath &src)
-	{
-		try
-		{ return _session->CreateDirectory(GetFilename(dst), parentId).ObjectId; }
-		catch(const std::exception & ex)
-		{ }
-
-		return ResolveObjectChild(parentId, src);
-	}
-
-	void Session::Put(mtp::ObjectId parentId, const std::string &dst, const LocalPath &src)
+	void Session::Put(mtp::ObjectId parentId, const LocalPath &src)
 	{
 		using namespace mtp;
 		struct stat st = {};
 		if (stat(src.c_str(), &st))
 			throw std::runtime_error(std::string("stat failed: ") + strerror(errno));
 
-
-		//fixme: dst path was not resolved?
-
 		if (S_ISDIR(st.st_mode))
 		{
-			mtp::ObjectId dirId = MakeOrResolveDirectory(parentId, dst, src);
-
+			print(src, " is dir");
+			std::string name = GetFilename(src.back() == '/'? src.substr(0, src.size() - 1): static_cast<const std::string &>(src));
+			parentId = MakeDirectory(parentId, name);
 			DIR *dir = opendir(src.c_str());
 			if (!dir)
 			{
@@ -633,26 +621,32 @@ namespace cli
 					continue;
 
 				std::string fname = result->d_name;
-				Put(dirId, dst + "/" + fname, src + "/" + fname);
+				Put(parentId, src + "/" + fname);
 			}
 			closedir(dir);
 		}
 		else
 		{
+			print(src, " is file");
 			auto stream = std::make_shared<ObjectInputStream>(src);
 			stream->SetTotal(stream->GetSize());
 
 			msg::ObjectInfo oi;
-			oi.Filename = GetFilename(dst);
+			oi.Filename = GetFilename(src);
 			oi.ObjectFormat = ObjectFormatFromFilename(src);
 			oi.SetSize(stream->GetSize());
 
 			if (IsInteractive())
-				try { stream->SetProgressReporter(ProgressBar(dst, _terminalWidth / 3, _terminalWidth)); } catch(const std::exception &ex) { }
+				try { stream->SetProgressReporter(ProgressBar(src, _terminalWidth / 3, _terminalWidth)); } catch(const std::exception &ex) { }
 
 			_session->SendObjectInfo(oi, GetUploadStorageId(), parentId);
 			_session->SendObject(stream);
 		}
+	}
+
+	void Session::Put(const LocalPath &src, const Path &dst)
+	{
+		Put(Resolve(dst, true), src); //fixme: fix put <file> <path/file> case
 	}
 
 	mtp::ObjectId Session::MakeDirectory(mtp::ObjectId parentId, const std::string & name)

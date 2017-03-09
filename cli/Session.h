@@ -52,7 +52,6 @@ namespace cli
 
 		mtp::ObjectId ResolvePath(const std::string &path, std::string &file);
 		mtp::ObjectId ResolveObjectChild(mtp::ObjectId parent, const std::string &entity);
-		mtp::ObjectId MakeOrResolveDirectory(mtp::ObjectId parentId, const std::string &dst, const LocalPath &src);
 
 		static std::string GetFilename(const std::string &path);
 		static std::string GetDirname(const std::string &path);
@@ -88,7 +87,8 @@ namespace cli
 		void Get(const LocalPath &dst, mtp::ObjectId srcId);
 		void Get(const mtp::ObjectId srcId);
 		void Cat(const Path &path);
-		void Put(mtp::ObjectId parentId, const std::string &dst, const LocalPath &src);
+		void Put(mtp::ObjectId parentId, const LocalPath &src);
+		void Put(const LocalPath &src, const Path &dst);
 		mtp::ObjectId MakeDirectory(mtp::ObjectId parentId, const std::string & name);
 		void ListProperties(mtp::ObjectId id);
 		void ListDeviceProperties();
@@ -105,14 +105,7 @@ namespace cli
 		{ return List(Resolve(path), extended, recursive); }
 
 		void Put(const LocalPath &src)
-		{ Put(_cd, GetFilename(src), src); }
-
-		void Put(const LocalPath &src, const Path &dst)
-		{
-			std::string filename;
-			mtp::ObjectId parent = ResolvePath(dst, filename);
-			Put(parent, filename, src);
-		}
+		{ Put(_cd, src); }
 
 		void Get(const Path &src)
 		{ Get(Resolve(src)); }
