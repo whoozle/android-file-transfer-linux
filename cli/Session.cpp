@@ -627,7 +627,6 @@ namespace cli
 		}
 		else
 		{
-			print(src, " is file");
 			auto stream = std::make_shared<ObjectInputStream>(src);
 			stream->SetTotal(stream->GetSize());
 
