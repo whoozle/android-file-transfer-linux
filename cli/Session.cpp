@@ -34,6 +34,7 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/ioctl.h>
 #include <dirent.h>
 #include <unistd.h>
 #include <errno.h>
@@ -63,13 +64,23 @@ namespace cli
 		_cd(mtp::Session::Root),
 		_running(true),
 		_interactive(isatty(STDOUT_FILENO)),
-		_showPrompt(showPrompt)
+		_showPrompt(showPrompt),
+		_terminalWidth(80)
 	{
 		using namespace mtp;
 		using namespace std::placeholders;
 		{
 			const char *cols = getenv("COLUMNS");
 			_terminalWidth = cols? atoi(cols): 80;
+#ifdef TIOCGSIZE
+			struct ttysize ts;
+			ioctl(STDIN_FILENO, TIOCGSIZE, &ts);
+			_terminalWidth = ts.ts_cols;
+#elif defined(TIOCGWINSZ)
+			struct winsize ts;
+			ioctl(STDIN_FILENO, TIOCGWINSZ, &ts);
+			_terminalWidth = ts.ws_col;
+#endif
 		}
 
 		AddCommand("help", "shows this help",

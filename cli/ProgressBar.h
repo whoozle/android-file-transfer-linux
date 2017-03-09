@@ -32,18 +32,26 @@ namespace cli
 		static const unsigned Junk = 9;
 
 		std::string _title;
-		unsigned	_width;
-		unsigned	_maxWidth;
+		int			_width;
+		int			_maxWidth;
 
 	public:
-		ProgressBar(const std::string & title, unsigned w, unsigned max): _title(title), _width(w), _maxWidth(max)
+		ProgressBar(const std::string & title, int w, int max): _width(w)
 		{
-			if (_maxWidth < Junk + _width)
+			_maxWidth = max - _width - Junk;
+			if (_maxWidth < 1)
+				throw std::runtime_error("insufficient space for progress bar");
+			printf("config %d %d %d\n", _width, _maxWidth, max);
+
+			int titleSize = mtp::OutputStream::Utf8Length(title);
+			if (titleSize > _maxWidth)
 			{
-				if (_width < Junk)
-					throw std::runtime_error("insufficient space for progress bar");
-				_maxWidth = _width - Junk;
+				int chompLeft = _maxWidth / 2; //utf unaware, fixme
+				int chompRight = _maxWidth - chompLeft;
+				_title = title.substr(0, chompLeft) + "…" + title.substr(title.size() - chompRight);
 			}
+			else
+				_title = title;
 		}
 
 		void operator()(mtp::u64 current, mtp::u64 total)
@@ -57,18 +65,7 @@ namespace cli
 			while(spaces--)
 				fputc(' ', stdout);
 
-			unsigned maxTitleSize = _maxWidth - Junk;
-			unsigned titleSize = mtp::OutputStream::Utf8Length(_title);
-			std::string title;
-			if (titleSize > maxTitleSize)
-			{
-				unsigned chompLeft = maxTitleSize / 2; //utf unaware, fixme
-				unsigned chompRight = maxTitleSize - chompLeft;
-				title = _title.substr(0, chompLeft) + "…" + _title.substr(chompRight);
-			}
-			else
-				title = _title;
-			printf("] %s\n\033[1A\033[2K", title.c_str());
+			printf("] %s\n\033[1A\033[2K", _title.c_str());
 		}
 	};
 }
