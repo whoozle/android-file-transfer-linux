@@ -426,8 +426,7 @@ namespace cli
 							hex(info.ObjectFormat, 4), " ",
 							width(info.ObjectCompressedSize, 10), " ",
 							FormatTime(info.CaptureDate), " ",
-							info.Filename, " ",
-							info.ImagePixWidth, "x", info.ImagePixHeight, " "
+							prefix + info.Filename, " "
 						);
 					else
 						print(std::left, width(objectId, 10), " ", prefix + info.Filename);
