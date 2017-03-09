@@ -81,7 +81,7 @@ namespace cli
 		void CompletePath(const Path &path, CompletionResult &result);
 		void CompleteStoragePath(const StoragePath &path, CompletionResult &result);
 
-		void List(mtp::ObjectId parent, bool extended);
+		void List(mtp::ObjectId parent, bool extended, bool recursive, const std::string &prefix = std::string());
 
 		void ListStorages();
 		void ChangeStorage(const StoragePath &path);
@@ -98,11 +98,11 @@ namespace cli
 		{ _cd = Resolve(path); }
 		void CurrentDirectory();
 
-		void List(bool extended)
-		{ return List(_cd, extended); }
+		void List(bool extended, bool recursive)
+		{ return List(_cd, extended, recursive); }
 
-		void List(const Path &path, bool extended)
-		{ return List(Resolve(path), extended); }
+		void List(const Path &path, bool extended, bool recursive)
+		{ return List(Resolve(path), extended, recursive); }
 
 		void Put(const LocalPath &src)
 		{ Put(_cd, GetFilename(src), src); }
@@ -120,7 +120,7 @@ namespace cli
 		void Get(const LocalPath &dst, const Path &src)
 		{ Get(dst, Resolve(src)); }
 
-		void MakeDirectory(const std::string &path)
+		void MakeDirectory(const Path &path)
 		{
 			std::string name;
 			mtp::ObjectId parent = ResolvePath(path, name);

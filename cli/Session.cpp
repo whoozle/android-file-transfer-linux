@@ -76,14 +76,24 @@ namespace cli
 			make_function([this]() -> void { Help(); }));
 
 		AddCommand("ls", "lists current directory",
-			make_function([this]() -> void { List(false); }));
+			make_function([this]() -> void { List(false, false); }));
 		AddCommand("ls", "<path> lists objects in <path>",
-			make_function([this](const Path &path) -> void { List(path, false); }));
+			make_function([this](const Path &path) -> void { List(path, false, false); }));
+
+		AddCommand("ls-r", "lists current directory [recursive]",
+			make_function([this]() -> void { List(false, true); }));
+		AddCommand("ls-r", "<path> lists objects in <path> [recursive]",
+			make_function([this](const Path &path) -> void { List(path, false, true); }));
 
 		AddCommand("lsext", "lists current directory [extended info]",
-			make_function([this]() -> void { List(true); }));
+			make_function([this]() -> void { List(true, false); }));
 		AddCommand("lsext", "<path> lists objects in <path> [extended info]",
-			make_function([this](const Path &path) -> void { List(path, true); }));
+			make_function([this](const Path &path) -> void { List(path, true, false); }));
+
+		AddCommand("lsext-r", "lists current directory [extended info, recursive]",
+			make_function([this]() -> void { List(true, true); }));
+		AddCommand("lsext-r", "<path> lists objects in <path> [extended info, recursive]",
+			make_function([this](const Path &path) -> void { List(path, true, true); }));
 
 		AddCommand("put", "<file> uploads file",
 			make_function([this](const LocalPath &path) -> void { Put(path); }));
@@ -385,17 +395,17 @@ namespace cli
 	}
 
 
-	void Session::List(mtp::ObjectId parent, bool extended)
+	void Session::List(mtp::ObjectId parent, bool extended, bool recursive, const std::string &prefix)
 	{
 		using namespace mtp;
-		if (!extended && _cs == mtp::Session::AllStorages && _session->GetObjectPropertyListSupported())
+		if (!extended && !recursive && _cs == mtp::Session::AllStorages && _session->GetObjectPropertyListSupported())
 		{
 			ByteArray data = _session->GetObjectPropertyList(parent, ObjectFormat::Any, ObjectProperty::ObjectFilename, 0, 1);
 			ObjectPropertyListParser<std::string> parser;
 			//HexDump("list", data, true);
-			parser.Parse(data, [](ObjectId objectId, ObjectProperty property, const std::string &name)
+			parser.Parse(data, [&prefix](ObjectId objectId, ObjectProperty property, const std::string &name)
 			{
-				print(std::left, width(objectId, 10), " ", name);
+				print(std::left, width(objectId, 10), " ", prefix + name);
 			});
 		}
 		else
@@ -420,7 +430,10 @@ namespace cli
 							info.ImagePixWidth, "x", info.ImagePixHeight, " "
 						);
 					else
-						print(std::left, width(objectId, 10), " ", info.Filename);
+						print(std::left, width(objectId, 10), " ", prefix + info.Filename);
+
+					if (recursive && info.ObjectFormat == mtp::ObjectFormat::Association)
+						List(objectId, extended, recursive, info.Filename + "/");
 				}
 				catch(const std::exception &ex)
 				{
