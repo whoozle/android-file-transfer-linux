@@ -614,7 +614,11 @@ namespace cli
 		if (S_ISDIR(st.st_mode))
 		{
 			std::string name = GetFilename(src.back() == '/'? src.substr(0, src.size() - 1): static_cast<const std::string &>(src));
-			parentId = MakeDirectory(parentId, name);
+			try
+			{ parentId = ResolveObjectChild(parentId, name); }
+			catch(const std::exception &ex)
+			{ parentId = MakeDirectory(parentId, name); }
+
 			DIR *dir = opendir(src.c_str());
 			if (!dir)
 			{
@@ -637,11 +641,20 @@ namespace cli
 		}
 		else
 		{
+			std::string filename = GetFilename(src);
+			try
+			{
+				mtp::ObjectId objectId = ResolveObjectChild(parentId, filename);
+				_session->DeleteObject(objectId);
+			}
+			catch(const std::exception &ex)
+			{ }
+
 			auto stream = std::make_shared<ObjectInputStream>(src);
 			stream->SetTotal(stream->GetSize());
 
 			msg::ObjectInfo oi;
-			oi.Filename = GetFilename(src);
+			oi.Filename = filename;
 			oi.ObjectFormat = ObjectFormatFromFilename(src);
 			oi.SetSize(stream->GetSize());
 
