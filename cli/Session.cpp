@@ -106,11 +106,10 @@ namespace cli
 		AddCommand("lsext-r", "<path> lists objects in <path> [extended info, recursive]",
 			make_function([this](const Path &path) -> void { List(path, true, true); }));
 
-		AddCommand("put", "<file> uploads file",
-			make_function([this](const LocalPath &path) -> void { Put(path); }));
-
 		AddCommand("put", "put <file> <dir> uploads file to directory",
 			make_function([this](const LocalPath &path, const Path &dst) -> void { Put(path, dst); }));
+		AddCommand("put", "<file> uploads file",
+			make_function([this](const LocalPath &path) -> void { Put(path); }));
 
 		AddCommand("get", "<file> downloads file",
 			make_function([this](const Path &path) -> void { Get(path); }));
