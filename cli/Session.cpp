@@ -639,7 +639,7 @@ namespace cli
 			}
 			closedir(dir);
 		}
-		else
+		else if (S_ISREG(st.st_mode))
 		{
 			std::string filename = GetFilename(src);
 			try
