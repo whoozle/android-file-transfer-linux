@@ -73,7 +73,7 @@ namespace cli
 		void ProcessCommand(const std::string &input);
 		void ProcessCommand(Tokens &&tokens);
 
-		mtp::ObjectId Resolve(const Path &path);
+		mtp::ObjectId Resolve(const Path &path, bool create = false);
 
 		void Help();
 		void Quit() { _running = false; }
@@ -89,7 +89,7 @@ namespace cli
 		void Get(const mtp::ObjectId srcId);
 		void Cat(const Path &path);
 		void Put(mtp::ObjectId parentId, const std::string &dst, const LocalPath &src);
-		void MakeDirectory(mtp::ObjectId parentId, const std::string & name);
+		mtp::ObjectId MakeDirectory(mtp::ObjectId parentId, const std::string & name);
 		void ListProperties(mtp::ObjectId id);
 		void ListDeviceProperties();
 		void TestObjectPropertyList(const Path &path);
@@ -126,6 +126,9 @@ namespace cli
 			mtp::ObjectId parent = ResolvePath(path, name);
 			MakeDirectory(parent, name);
 		}
+
+		void MakePath(const Path &path)
+		{ Resolve(path, true); }
 
 		void Delete(const Path &path)
 		{ _session->DeleteObject(Resolve(path)); }

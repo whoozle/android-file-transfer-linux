@@ -123,6 +123,8 @@ namespace cli
 			make_function([this](const LocalPath &path) -> void { Delete(path); }));
 		AddCommand("mkdir", "<path> makes directory",
 			make_function([this](const Path &path) -> void { MakeDirectory(path); }));
+		AddCommand("mkpath", "<path> create directory structure specified in path",
+			make_function([this](const Path &path) -> void { MakePath(path); }));
 		AddCommand("type", "<path> shows type of file (recognized by libmagic/extension)",
 			make_function([this](const LocalPath &path) -> void { ShowType(path); }));
 
@@ -311,7 +313,7 @@ namespace cli
 		throw std::runtime_error("could not find " + entity + " in path");
 	}
 
-	mtp::ObjectId Session::Resolve(const Path &path)
+	mtp::ObjectId Session::Resolve(const Path &path, bool create)
 	{
 		mtp::ObjectId id = BeginsWith(path, "/")? mtp::Session::Root: _cd;
 		for(size_t p = 0; p < path.size(); )
@@ -331,7 +333,18 @@ namespace cli
 					id = mtp::Session::Root;
 			}
 			else
-				id = ResolveObjectChild(id, entity);
+			{
+				try
+				{
+					id = ResolveObjectChild(id, entity);
+				}
+				catch(const std::exception &ex)
+				{
+					if (!create)
+						throw;
+					id = MakeDirectory(id, entity);
+				}
+			}
 			p = next + 1;
 		}
 		return id;
@@ -642,13 +655,16 @@ namespace cli
 		}
 	}
 
-	void Session::MakeDirectory(mtp::ObjectId parentId, const std::string & name)
+	mtp::ObjectId Session::MakeDirectory(mtp::ObjectId parentId, const std::string & name)
 	{
 		using namespace mtp;
 		msg::ObjectInfo oi;
 		oi.Filename = name;
+		if (_cs != mtp::Session::AllStorages)
+			oi.StorageId = _cs;
 		oi.ObjectFormat = ObjectFormat::Association;
-		_session->SendObjectInfo(oi, GetUploadStorageId(), parentId);
+		auto noi = _session->SendObjectInfo(oi, GetUploadStorageId(), parentId);
+		return noi.ObjectId;
 	}
 
 	void Session::ShowType(const LocalPath &src)
