@@ -604,7 +604,7 @@ namespace cli
 			fputc('\n', stdout);
 	}
 
-	void Session::Put(mtp::ObjectId parentId, const LocalPath &src)
+	void Session::Put(mtp::ObjectId parentId, const LocalPath &src, const std::string &targetFilename)
 	{
 		using namespace mtp;
 		struct stat st = {};
@@ -641,7 +641,7 @@ namespace cli
 		}
 		else if (S_ISREG(st.st_mode))
 		{
-			std::string filename = GetFilename(src);
+			std::string filename = targetFilename.empty()? GetFilename(src): targetFilename;
 			try
 			{
 				mtp::ObjectId objectId = ResolveObjectChild(parentId, filename);

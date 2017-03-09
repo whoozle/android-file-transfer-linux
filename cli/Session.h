@@ -87,7 +87,7 @@ namespace cli
 		void Get(const LocalPath &dst, mtp::ObjectId srcId);
 		void Get(const mtp::ObjectId srcId);
 		void Cat(const Path &path);
-		void Put(mtp::ObjectId parentId, const LocalPath &src);
+		void Put(mtp::ObjectId parentId, const LocalPath &src, const std::string &targetFilename = std::string());
 		void Put(const LocalPath &src, const Path &dst);
 		mtp::ObjectId MakeDirectory(mtp::ObjectId parentId, const std::string & name);
 		void ListProperties(mtp::ObjectId id);
