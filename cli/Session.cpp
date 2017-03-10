@@ -602,13 +602,21 @@ namespace cli
 		if (text.empty() || text[text.size() - 1] == '\n')
 			fputc('\n', stdout);
 	}
+	namespace
+	{
+		struct stat Stat(const std::string &path)
+		{
+			struct stat st = {};
+			if (stat(path.c_str(), &st))
+				throw std::runtime_error(std::string("stat failed: ") + strerror(errno));
+			return st;
+		}
+	}
 
 	void Session::Put(mtp::ObjectId parentId, const LocalPath &src, const std::string &targetFilename)
 	{
 		using namespace mtp;
-		struct stat st = {};
-		if (stat(src.c_str(), &st))
-			throw std::runtime_error(std::string("stat failed: ") + strerror(errno));
+		struct stat st = Stat(src);
 
 		if (S_ISDIR(st.st_mode))
 		{
@@ -676,7 +684,39 @@ namespace cli
 
 	void Session::Put(const LocalPath &src, const Path &dst)
 	{
-		Put(Resolve(dst, true), src); //fixme: fix put <file> <path/file> case
+		using namespace mtp;
+		std::string targetFilename;
+		//handle put <file> <file> case:
+		try
+		{
+			ObjectId parentDir;
+			struct stat st = Stat(src);
+			if (S_ISREG(st.st_mode))
+			{
+				std::string filename;
+				parentDir = ResolvePath(dst, filename);
+				try
+				{
+					auto objectId = ResolveObjectChild(parentDir, filename);
+					ObjectFormat format = ObjectFormat(_session->GetObjectIntegerProperty(objectId, ObjectProperty::ObjectFormat));
+					print("format ", hex((int)format));
+					if (format != ObjectFormat::Association)
+						targetFilename = filename; //path exists and it's not directory
+				}
+				catch(const std::exception &ex)
+				{
+					targetFilename = filename; 	//target object does not exists
+				}
+			}
+			if (!targetFilename.empty())
+			{
+				Put(parentDir, src, targetFilename);
+				return;
+			}
+		}
+		catch(const std::exception &ex)
+		{ }
+		Put(Resolve(dst, true), src, targetFilename); //upload to folder
 	}
 
 	mtp::ObjectId Session::MakeDirectory(mtp::ObjectId parentId, const std::string & name)
