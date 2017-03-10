@@ -243,11 +243,23 @@ namespace cli
 
 		std::string cmdName = tokens.front();
 		tokens.pop_front();
-		auto cmd = _commands.find(cmdName);
-		if (cmd == _commands.end())
+		auto b = _commands.lower_bound(cmdName);
+		auto e = _commands.upper_bound(cmdName);
+		if (b == e)
 			throw std::runtime_error("invalid command " + cmdName);
 
-		cmd->second->Execute(tokens);
+		size_t args = tokens.size();
+		for(auto i = b; i != e; ++i)
+		{
+			ICommandPtr cmd = i->second;
+
+			if (i->second->GetArgumentCount() == args)
+			{
+				cmd->Execute(tokens);
+				return;
+			}
+		}
+		throw std::runtime_error("invalid argument count (" + std::to_string(args) + ")");
 	}
 
 	void Session::UpdatePrompt()
