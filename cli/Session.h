@@ -128,6 +128,7 @@ namespace cli
 
 		void ListProperties(const Path &path)
 		{ ListProperties(Resolve(path)); }
+		void DisplayDeviceInfo();
 
 		static void ShowType(const LocalPath &src);
 

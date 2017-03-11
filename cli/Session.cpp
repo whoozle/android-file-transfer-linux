@@ -144,6 +144,8 @@ namespace cli
 			make_function([this](const Path &path) -> void { ListProperties(path); }));
 		AddCommand("device-properties", "shows device's MTP properties",
 			make_function([this]() -> void { ListDeviceProperties(); }));
+		AddCommand("device-info", "displays device's information",
+			make_function([this]() -> void { DisplayDeviceInfo(); }));
 
 		AddCommand("test-property-list", "test GetObjectPropList on given object",
 			make_function([this](const Path &path) -> void { TestObjectPropertyList(path); }));
@@ -852,6 +854,16 @@ namespace cli
 		GetObjectPropertyList(id, objectList, ObjectProperty::DateModified);
 		GetObjectPropertyList(id, objectList, ObjectProperty::DateAdded);
 		GetObjectPropertyList(id, objectList, ObjectProperty::All);
+	}
+
+	void Session::DisplayDeviceInfo()
+	{
+		using namespace mtp;
+		print(_gdi.Manufacturer);
+		print(_gdi.Model);
+		print(_gdi.DeviceVersion);
+		print(_gdi.SerialNumber);
+		print(_gdi.VendorExtensionDesc);
 	}
 
 }
