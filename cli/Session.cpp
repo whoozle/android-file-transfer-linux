@@ -146,6 +146,8 @@ namespace cli
 			make_function([this]() -> void { ListDeviceProperties(); }));
 		AddCommand("device-info", "displays device's information",
 			make_function([this]() -> void { DisplayDeviceInfo(); }));
+		AddCommand("storage-info", "<storage-id> displays storage information",
+			make_function([this](const StoragePath &path) -> void { DisplayStorageInfo(path); }));
 
 		AddCommand("test-property-list", "test GetObjectPropList on given object",
 			make_function([this](const Path &path) -> void { TestObjectPropertyList(path); }));
@@ -534,10 +536,10 @@ namespace cli
 		}
 	}
 
-	mtp::StorageId Session::GetStorageByPath(const StoragePath &path, mtp::msg::StorageInfo &si)
+	mtp::StorageId Session::GetStorageByPath(const StoragePath &path, mtp::msg::StorageInfo &si, bool allowAll)
 	{
 		using namespace mtp;
-		if (path == "All" || path == "all" || path == "*")
+		if (allowAll && (path == "All" || path == "all" || path == "*"))
 			return mtp::Session::AllStorages;
 
 		msg::StorageIDs list = _session->GetStorageIDs();
@@ -556,7 +558,7 @@ namespace cli
 	{
 		using namespace mtp;
 		msg::StorageInfo si;
-		auto storageId = GetStorageByPath(path, si);
+		auto storageId = GetStorageByPath(path, si, true);
 		_cs = storageId;
 		if (storageId != mtp::Session::AllStorages)
 		{
@@ -871,6 +873,16 @@ namespace cli
 		print(_gdi.DeviceVersion);
 		print(_gdi.SerialNumber);
 		print(_gdi.VendorExtensionDesc);
+	}
+
+	void Session::DisplayStorageInfo(const StoragePath &path)
+	{
+		using namespace mtp;
+		msg::StorageInfo si;
+		GetStorageByPath(path, si, false);
+		s64 usedBytes = si.MaxCapacity - si.FreeSpaceInBytes;
+		int usedPercents = (1.0 * usedBytes / si.MaxCapacity) * 100;
+		print("used ", usedBytes, " (", usedPercents, "%), free ", si.FreeSpaceInBytes, " bytes of ", si.MaxCapacity);
 	}
 
 }
