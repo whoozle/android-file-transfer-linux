@@ -534,32 +534,39 @@ namespace cli
 		}
 	}
 
-	void Session::ChangeStorage(const StoragePath &path)
+	mtp::StorageId Session::GetStorageByPath(const StoragePath &path, mtp::msg::StorageInfo &si)
 	{
 		using namespace mtp;
 		if (path == "All" || path == "all" || path == "*")
-		{
-			_cs = mtp::Session::AllStorages;
-			_csName.clear();
-			UpdatePrompt();
-			return;
-		}
+			return mtp::Session::AllStorages;
+
 		msg::StorageIDs list = _session->GetStorageIDs();
 		for(size_t i = 0; i < list.StorageIDs.size(); ++i)
 		{
 			auto id = list.StorageIDs[i];
-			msg::StorageInfo si = _session->GetStorageInfo(id);
+			si = _session->GetStorageInfo(id);
 			auto idStr = std::to_string(id.Id);
 			if (idStr == path || si.StorageDescription == path || si.VolumeLabel == path)
-			{
-				_cs = id;
-				_csName = si.GetName();
-				print("selected storage ", _cs.Id, " ", si.VolumeLabel, " ", si.StorageDescription);
-				UpdatePrompt();
-				return;
-			}
+				return id;
 		}
 		throw std::runtime_error("storage " + path + " could not be found");
+	}
+
+	void Session::ChangeStorage(const StoragePath &path)
+	{
+		using namespace mtp;
+		msg::StorageInfo si;
+		auto storageId = GetStorageByPath(path, si);
+		_cs = storageId;
+		if (storageId != mtp::Session::AllStorages)
+		{
+			_csName = si.GetName();
+			print("selected storage ", _cs.Id, " ", si.VolumeLabel, " ", si.StorageDescription);
+		}
+		else
+			_csName.clear();
+
+		UpdatePrompt();
 	}
 
 	void Session::Help()

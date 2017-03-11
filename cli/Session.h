@@ -80,8 +80,8 @@ namespace cli
 		void CompletePath(const Path &path, CompletionResult &result);
 		void CompleteStoragePath(const StoragePath &path, CompletionResult &result);
 
+		mtp::StorageId GetStorageByPath(const StoragePath &path, mtp::msg::StorageInfo &si);
 		void List(mtp::ObjectId parent, bool extended, bool recursive, const std::string &prefix = std::string());
-
 		void ListStorages();
 		void ChangeStorage(const StoragePath &path);
 		void Get(const LocalPath &dst, mtp::ObjectId srcId);
