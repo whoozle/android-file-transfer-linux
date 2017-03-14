@@ -390,6 +390,9 @@ namespace cli
 
 	std::string Session::FormatTime(const std::string &timespec)
 	{
+		if (timespec.empty())
+			return "????" "-??" "-?? ??:??:??"; //bloody trigraphs, abomination of the 70s
+
 		if (timespec.size() != 15 || timespec[8] != 'T')
 			return timespec;
 
@@ -464,7 +467,8 @@ namespace cli
 							std::right,
 							hex(info.ObjectFormat, 4), " ",
 							width(info.ObjectCompressedSize, 10), " ",
-							FormatTime(info.CaptureDate), " ",
+							std::left,
+							width(!info.CaptureDate.empty()? FormatTime(info.CaptureDate): FormatTime(info.ModificationDate), 20), " ",
 							prefix + info.Filename, " "
 						);
 					else
