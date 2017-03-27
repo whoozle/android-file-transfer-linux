@@ -34,7 +34,7 @@ Any amount would help relieving pain of using MTP. :D
 
 ### Prerequisites
 
-* You will need qt libraries for building ui program. If you want to use only library (*Qt is not needed*), you could turn the option ```BUILD_QT_UI``` off.
+* You will need Qt libraries for building ui program. If you want to use only library (*Qt is not needed*), you could turn the option ```BUILD_QT_UI``` off.
 * For ubuntu and other debian-based distros use the following command:
 
   ```shell
@@ -91,7 +91,7 @@ mkdir ~/my-device
 Remember, if you want album art to be displayed, it must be named 'albumart.xxx' and placed *first* in the destination folder. Then copy other files.
 Also, note that fuse could be 7-8 times slower than ui/cli file transfer.
 
-### QT user interface
+### Qt user interface
 
 1. Start application, choose destination folder and click any button on toolbar.
 
