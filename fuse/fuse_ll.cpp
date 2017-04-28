@@ -799,6 +799,7 @@ int main(int argc, char **argv)
 	int multithreaded = 0, foreground = 0;
 
 	if (fuse_parse_cmdline(&args, &mountpoint, &multithreaded, &foreground) != -1 &&
+	    mountpoint != NULL &&
 	    (ch = fuse_mount(mountpoint, &args)) != NULL) {
 		struct fuse_session *se;
 
