@@ -20,6 +20,8 @@
 #ifndef MTP_FUNCTION_INVOKER_H
 #define MTP_FUNCTION_INVOKER_H
 
+#include <functional>
+
 namespace mtp
 {
 
