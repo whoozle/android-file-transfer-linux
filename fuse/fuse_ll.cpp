@@ -33,6 +33,7 @@
 #include <map>
 #include <set>
 #include <vector>
+#include <functional>
 #include <stdio.h>
 
 #include <fuse_lowlevel.h>

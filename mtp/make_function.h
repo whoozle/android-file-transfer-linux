@@ -20,6 +20,8 @@
 #ifndef AFT_CLI_MAKE_FUNCTION_H
 #define AFT_CLI_MAKE_FUNCTION_H
 
+#include <functional>
+
 namespace mtp
 {
 

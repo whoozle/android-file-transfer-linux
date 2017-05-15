@@ -28,6 +28,7 @@
 #include <FileHandler.h>
 #include <map>
 #include <queue>
+#include <functional>
 
 namespace mtp { namespace usb
 {
