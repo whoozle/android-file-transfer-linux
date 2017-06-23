@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright 2015 Vladimir Menshakov <vladimir.menshakov@gmail.com> -->
+<!-- Copyright 2015-2017 Vladimir Menshakov <vladimir.menshakov@gmail.com> -->
 <application>
   <id type="desktop">android-file-transfer.desktop</id>
   <metadata_license>CC0-1.0</metadata_license>
