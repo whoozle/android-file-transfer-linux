@@ -102,7 +102,12 @@ set(SOURCES
 	mtp/backend/posix/Exception.cpp
 )
 
-exec_program(git ARGS describe --tags OUTPUT_VARIABLE AFT_VERSION)
+exec_program(git ARGS describe --tags OUTPUT_VARIABLE AFT_VERSION RETURN_VALUE GIT_STATUS)
+if (GIT_STATUS GREATER 0)
+	file(READ ${CMAKE_SOURCE_DIR}/README.md README_MD)
+	string(REGEX MATCH "version-([0-9a-fA-F.]+)-" _VERSION ${README_MD})
+	set(AFT_VERSION "v${CMAKE_MATCH_1}-snapshot")
+endif()
 message(STATUS "version: ${AFT_VERSION}")
 
 set(VERSION_SRC ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/version.cpp)
