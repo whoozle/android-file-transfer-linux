@@ -81,6 +81,8 @@ namespace mtp { namespace usb
 			PRINT_CAP(USBDEVFS_CAP_NO_PACKET_SIZE_LIM, "<no-packet-size-limit>");
 			PRINT_CAP(USBDEVFS_CAP_BULK_SCATTER_GATHER, "<bulk-scatter-gather>");
 			PRINT_CAP(USBDEVFS_CAP_REAP_AFTER_DISCONNECT, "<reap-after-disconnect>");
+			PRINT_CAP(USBDEVFS_CAP_MMAP, "<mmap>");
+			PRINT_CAP(USBDEVFS_CAP_DROP_PRIVILEGES, "<drop-privileges>");
 			if (capabilities)
 				debug("<unknown capability 0x", hex(capabilities, 2), ">");
 		}
