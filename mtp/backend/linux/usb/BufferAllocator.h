@@ -10,107 +10,111 @@
 
 namespace mtp { namespace usb
 {
-	struct IBuffer
+	class BufferAllocator;
+	class Buffer
 	{
-		virtual ~IBuffer() { }
+		friend class BufferAllocator;
 
-		virtual u8 * GetData() = 0;
-		virtual size_t GetSize() = 0;
-	};
-	DECLARE_PTR(IBuffer);
-
-	class ByteArrayBuffer : private ByteArray, public IBuffer
-	{
-	public:
-		ByteArrayBuffer(size_t size): ByteArray(size)
-		{ }
-
-		~ByteArrayBuffer()
-		{ }
-
-		virtual u8 * GetData() override
-		{ return data(); }
-		virtual size_t GetSize() override
-		{ return size(); }
-	};
-
-	class MappedBuffer : public IBuffer
-	{
-		u8 *		_data;
-		size_t		_size;
+		BufferAllocator *	_parent;
+		u8 *				_data;
+		size_t				_size;
 
 	public:
-		MappedBuffer(u8 *data, size_t size): _data(data), _size(size)
+		Buffer(BufferAllocator *parent, u8 *data, size_t size): _parent(parent), _data(data), _size(size)
 		{ }
-		virtual u8 * GetData() override
+		~Buffer();
+
+		u8 * GetData() const
 		{ return _data; }
-		virtual size_t GetSize() override
+		size_t GetSize() const
 		{ return _size; }
 	};
-	using MappedBufferWeakPtr = std::weak_ptr<MappedBuffer>;
-	DECLARE_PTR(MappedBuffer);
 
-	class BufferAllocator
+	class BufferAllocator : Noncopyable
 	{
-		static constexpr size_t Buffers = 2;
+		static constexpr size_t Buffers		= 16; //for parallel endpoint access
+		static constexpr size_t BufferSize	= 64 * 1024;
 
 		int			_fd;
 		long		_pageSize;
 		u8 *		_buffer;
 		size_t		_bufferSize;
+		ByteArray	_normalBuffer;
 
-		std::array<MappedBufferWeakPtr, Buffers> _buffers;
+		std::array<bool, Buffers> _bufferAllocated;
+
+		void AllocateNormalBuffer()
+		{
+			_fd = -1;
+			_normalBuffer.resize(Buffers * BufferSize);
+			_buffer = _normalBuffer.data();
+			_bufferSize = _normalBuffer.size();
+		}
 
 	public:
-		BufferAllocator(int fd): _fd(fd), _pageSize(sysconf(_SC_PAGESIZE)), _buffer(nullptr), _bufferSize(0)
+		BufferAllocator(int fd): _fd(fd), _pageSize(sysconf(_SC_PAGESIZE)), _buffer(nullptr), _bufferSize(0), _bufferAllocated()
 		{
 			if (_pageSize <= 0)
 				throw posix::Exception("sysconf(_SC_PAGESIZE)");
 			debug("page size = ", _pageSize);
 		}
+
 		~BufferAllocator()
 		{
 			if (_fd >= 0)
 				munmap(_buffer, _bufferSize);
 		}
 
-		IBufferPtr Allocate(size_t size)
+		void Free(Buffer &buffer)
 		{
-			if (_fd < 0)
-				return std::make_shared<ByteArrayBuffer>(size);
+			size_t index = (buffer._data - _buffer) / BufferSize;
+			_bufferAllocated.at(index) = false;
+		}
 
+		Buffer Allocate(size_t size)
+		{
 			if (!_buffer)
 			{
-				_bufferSize = (size + _pageSize - 1) / _pageSize * _pageSize;
-				try
+				_bufferSize = (BufferSize + _pageSize - 1) / _pageSize * _pageSize;
+				if (_fd >= 0)
 				{
-					auto buffer = static_cast<u8 *>(mmap(nullptr, _bufferSize * Buffers, PROT_READ | PROT_WRITE, MAP_SHARED, _fd, 0));
-					if (buffer == MAP_FAILED)
-						throw posix::Exception("mmap failed");
+					try
+					{
+						auto buffer = static_cast<u8 *>(mmap(nullptr, _bufferSize * Buffers, PROT_READ | PROT_WRITE, MAP_SHARED, _fd, 0));
+						if (buffer == MAP_FAILED)
+							throw posix::Exception("mmap failed");
 
-					_buffer = buffer;
-					debug("mapped buffer of ", _bufferSize * Buffers, " bytes to ", static_cast<void *>(_buffer));
+						_buffer = buffer;
+						debug("mapped buffer of ", _bufferSize * Buffers, " bytes to ", static_cast<void *>(_buffer));
+					}
+					catch(const std::exception &ex)
+					{
+						error("zerocopy allocator failed: ", ex.what());
+						AllocateNormalBuffer();
+					}
 				}
-				catch(const std::exception &ex)
-				{
-					error("zerocopy allocator failed: ", ex.what());
-					_fd = -1;
-					return std::make_shared<ByteArrayBuffer>(size);
-				}
+				else
+					AllocateNormalBuffer();
 			}
-			for(size_t i = 0; i < _buffers.size(); ++i)
+			if (size > BufferSize)
+				size = BufferSize;
+
+			for(size_t i = 0; i < _bufferAllocated.size(); ++i)
 			{
-				IBufferPtr ptr = _buffers[i].lock();
-				if (!ptr)
+				if (!_bufferAllocated[i])
 				{
-					auto buffer = std::make_shared<MappedBuffer>(_buffer + i * _bufferSize, size);
-					_buffers[i] = buffer;
-					return buffer;
+					_bufferAllocated[i] = true;
+					return Buffer(this, _buffer + BufferSize * i, size);
 				}
 			}
 			throw std::runtime_error("BufferAllocator::Allocate: out of mapped memory");
 		}
 	};
+
+	Buffer::~Buffer()
+	{
+		_parent->Free(*this);
+	}
 
 }}
 

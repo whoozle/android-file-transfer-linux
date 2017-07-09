@@ -112,23 +112,23 @@ namespace mtp { namespace usb
 		static const int 		MaxBufferSize = 4096;
 		int						Fd;
 		int						PacketSize;
-		IBufferPtr				Buffer;
+		Buffer					DataBuffer;
 		usbdevfs_urb			KernelUrb;
 
 		Urb(BufferAllocatorPtr allocator, int fd, u8 type, const EndpointPtr & ep):
 			Fd(fd),
 			PacketSize(ep->GetMaxPacketSize()),
-			Buffer(allocator->Allocate(std::max(PacketSize, MaxBufferSize / PacketSize * PacketSize))),
+			DataBuffer(allocator->Allocate(std::max(PacketSize, MaxBufferSize / PacketSize * PacketSize))),
 			KernelUrb()
 		{
 			KernelUrb.type			= type;
 			KernelUrb.endpoint		= ep->GetAddress();
-			KernelUrb.buffer		= Buffer->GetData();
-			KernelUrb.buffer_length = Buffer->GetSize();
+			KernelUrb.buffer		= DataBuffer.GetData();
+			KernelUrb.buffer_length = DataBuffer.GetSize();
 		}
 
 		size_t GetTransferSize() const
-		{ return Buffer->GetSize(); }
+		{ return DataBuffer.GetSize(); }
 
 		void Submit()
 		{
@@ -146,9 +146,9 @@ namespace mtp { namespace usb
 
 		size_t Send(const IObjectInputStreamPtr &inputStream, size_t size)
 		{
-			if (size > Buffer->GetSize())
+			if (size > DataBuffer.GetSize())
 				throw std::logic_error("invalid size passed to Send");
-			auto data = Buffer->GetData();
+			auto data = DataBuffer.GetData();
 			size_t r = inputStream->Read(data, size);
 			//HexDump("write", ByteArray(data, data + r), true);
 			KernelUrb.buffer_length = r;
@@ -157,15 +157,15 @@ namespace mtp { namespace usb
 
 		size_t Send(const ByteArray &inputData)
 		{
-			size_t r = std::min(Buffer->GetSize(), inputData.size());
-			std::copy(inputData.data(), inputData.data() + r, Buffer->GetData());
+			size_t r = std::min(DataBuffer.GetSize(), inputData.size());
+			std::copy(inputData.data(), inputData.data() + r, DataBuffer.GetData());
 			KernelUrb.buffer_length = r;
 			return r;
 		}
 
 		size_t Recv(const IObjectOutputStreamPtr &outputStream)
 		{
-			auto data = Buffer->GetData();
+			auto data = DataBuffer.GetData();
 			//HexDump("read", ByteArray(data, data + KernelUrb.actual_length), true);
 			return outputStream->Write(data, KernelUrb.actual_length);
 		}
