@@ -34,9 +34,10 @@ signals:
 private:
 	QFile		_file;
 	qint64		_size;
+	int			_progress;
 
 public:
-	QtObjectInputStream(const QString &file) : _file(file), _size(_file.size()) {
+	QtObjectInputStream(const QString &file) : _file(file), _size(_file.size()), _progress(-1) {
 		_file.open(QFile::ReadOnly);
 	}
 
@@ -52,7 +53,13 @@ public:
 		qint64 r = _file.read(static_cast<char *>(static_cast<void *>(data)), size);
 		if (r < 0)
 			throw std::runtime_error(_file.errorString().toStdString());
-		emit positionChanged(_file.pos(), _size);
+
+		int progress = _file.pos() * 1000L / _size;
+		if (progress != _progress) //throttle events a bit
+		{
+			_progress = progress;
+			emit positionChanged(_file.pos(), _size);
+		}
 		return r;
 	}
 };
