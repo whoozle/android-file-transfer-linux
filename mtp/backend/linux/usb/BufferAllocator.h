@@ -68,6 +68,11 @@ namespace mtp { namespace usb
 				throw posix::Exception("sysconf(_SC_PAGESIZE)");
 			debug("page size = ", _pageSize);
 		}
+		~BufferAllocator()
+		{
+			if (_fd >= 0)
+				munmap(_buffer, _bufferSize);
+		}
 
 		IBufferPtr Allocate(size_t size)
 		{
