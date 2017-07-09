@@ -17,6 +17,7 @@
     If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <usb/BufferAllocator.h>
 #include <usb/Device.h>
 #include <Exception.h>
 #include <mtp/usb/TimeoutException.h>
@@ -73,7 +74,8 @@ namespace mtp { namespace usb
 		catch(const std::exception &ex)
 		{ error("get usbfs capabilities failed: ", ex.what()); }
 		debug("capabilities = 0x", hex(_capabilities, 8));
-		_mmap = _capabilities & USBDEVFS_CAP_MMAP;
+		bool mmap = _capabilities & USBDEVFS_CAP_MMAP;
+		_bufferAllocator = std::make_shared<BufferAllocator>(mmap? fd: -1);
 
 		if (_capabilities)
 		{
@@ -91,7 +93,7 @@ namespace mtp { namespace usb
 		else
 			debug("[none]\n");
 
-		if (_mmap)
+		if (mmap)
 			debug("using usb zero copy");
 		else
 			debug("not using usb zero copy");
@@ -115,19 +117,23 @@ namespace mtp { namespace usb
 		static const int 		MaxBufferSize = 4096;
 		int						Fd;
 		int						PacketSize;
-		ByteArray				Buffer;
+		IBufferPtr				Buffer;
 		usbdevfs_urb			KernelUrb;
 
-		Urb(int fd, u8 type, const EndpointPtr & ep): Fd(fd), PacketSize(ep->GetMaxPacketSize()), Buffer(std::max(PacketSize, MaxBufferSize / PacketSize * PacketSize)), KernelUrb()
+		Urb(BufferAllocatorPtr allocator, int fd, u8 type, const EndpointPtr & ep):
+			Fd(fd),
+			PacketSize(ep->GetMaxPacketSize()),
+			Buffer(allocator->Allocate(std::max(PacketSize, MaxBufferSize / PacketSize * PacketSize))),
+			KernelUrb()
 		{
 			KernelUrb.type			= type;
 			KernelUrb.endpoint		= ep->GetAddress();
-			KernelUrb.buffer		= Buffer.data();
-			KernelUrb.buffer_length = Buffer.size();
+			KernelUrb.buffer		= Buffer->GetData();
+			KernelUrb.buffer_length = Buffer->GetSize();
 		}
 
 		size_t GetTransferSize() const
-		{ return Buffer.size(); }
+		{ return Buffer->GetSize(); }
 
 		void Submit()
 		{
@@ -145,30 +151,29 @@ namespace mtp { namespace usb
 
 		size_t Send(const IObjectInputStreamPtr &inputStream, size_t size)
 		{
-			if (size > Buffer.size())
+			if (size > Buffer->GetSize())
 				throw std::logic_error("invalid size passed to Send");
-			size_t r = inputStream->Read(Buffer.data(), size);
-			//HexDump("write", ByteArray(Buffer.data(), Buffer.data() + r), true);
+			auto data = Buffer->GetData();
+			size_t r = inputStream->Read(data, size);
+			//HexDump("write", ByteArray(data, data + r), true);
 			KernelUrb.buffer_length = r;
 			return r;
 		}
 
 		size_t Send(const ByteArray &inputData)
 		{
-			size_t r = std::min(Buffer.size(), inputData.size());
-			std::copy(inputData.data(), inputData.data() + r, Buffer.data());
+			size_t r = std::min(Buffer->GetSize(), inputData.size());
+			std::copy(inputData.data(), inputData.data() + r, Buffer->GetData());
 			KernelUrb.buffer_length = r;
 			return r;
 		}
 
 		size_t Recv(const IObjectOutputStreamPtr &outputStream)
 		{
-			//HexDump("read", ByteArray(Buffer.data(), Buffer.data() + KernelUrb.actual_length), true);
-			return outputStream->Write(Buffer.data(), KernelUrb.actual_length);
+			auto data = Buffer->GetData();
+			//HexDump("read", ByteArray(data, data + KernelUrb.actual_length), true);
+			return outputStream->Write(data, KernelUrb.actual_length);
 		}
-
-		ByteArray Recv()
-		{ return ByteArray(Buffer.begin(), Buffer.begin() + KernelUrb.actual_length); }
 
 		template<unsigned Flag>
 		void SetFlag(bool value)
@@ -272,7 +277,7 @@ namespace mtp { namespace usb
 
 	void Device::WriteBulk(const EndpointPtr & ep, const IObjectInputStreamPtr &inputStream, int timeout)
 	{
-		UrbPtr urb = std::make_shared<Urb>(_fd.Get(), USBDEVFS_URB_TYPE_BULK, ep);
+		UrbPtr urb = std::make_shared<Urb>(_bufferAllocator, _fd.Get(), USBDEVFS_URB_TYPE_BULK, ep);
 		size_t transferSize = urb->GetTransferSize();
 
 		size_t r;
@@ -296,7 +301,7 @@ namespace mtp { namespace usb
 
 	void Device::ReadBulk(const EndpointPtr & ep, const IObjectOutputStreamPtr &outputStream, int timeout)
 	{
-		UrbPtr urb = std::make_shared<Urb>(_fd.Get(), USBDEVFS_URB_TYPE_BULK, ep);
+		UrbPtr urb = std::make_shared<Urb>(_bufferAllocator, _fd.Get(), USBDEVFS_URB_TYPE_BULK, ep);
 		size_t transferSize = urb->GetTransferSize();
 
 		size_t r;

@@ -34,6 +34,8 @@ namespace mtp { namespace usb
 {
 	class Context;
 	DECLARE_PTR(Context);
+	class BufferAllocator;
+	DECLARE_PTR(BufferAllocator);
 
 	class InterfaceToken : public IToken
 	{
@@ -52,7 +54,7 @@ namespace mtp { namespace usb
 		posix::FileHandler			_fd;
 		u32							_capabilities;
 		EndpointPtr					_controlEp;
-		bool                        _mmap;
+		BufferAllocatorPtr			_bufferAllocator;
 
 		struct Urb;
 		DECLARE_PTR(Urb);
