@@ -20,6 +20,7 @@ If you're suffering from crashes, missing tags and album covers, usb freezes and
 * FUSE wrapper (If you'd prefer mounting your device), supporting partial read/writes, allowing instant access to your files.
 * No file size limits.
 * Automatically renames album cover to make it visible from media player.
+* USB 'Zerocopy' support found in recent Linux kernel (no user/kernel data copying)
 * No extra dependencies (e.g. `libptp`/`libmtp`).
 * Available as static/shared library.
 * Command line tool (aft-mtp-cli)
