@@ -79,7 +79,7 @@ namespace mtp { namespace usb
 				_bufferSize = (size + _pageSize - 1) / _pageSize * _pageSize;
 				try
 				{
-					auto buffer = static_cast<u8 *>(mmap(nullptr, _bufferSize * Buffers, PROT_READ | PROT_WRITE, MAP_PRIVATE, _fd, 0));
+					auto buffer = static_cast<u8 *>(mmap(nullptr, _bufferSize * Buffers, PROT_READ | PROT_WRITE, MAP_SHARED, _fd, 0));
 					if (buffer == MAP_FAILED)
 						throw posix::Exception("mmap failed");
 
