@@ -92,11 +92,6 @@ namespace mtp { namespace usb
 		}
 		else
 			debug("[none]\n");
-
-		if (mmap)
-			debug("using usb zero copy");
-		else
-			debug("not using usb zero copy");
 	}
 
 	Device::~Device()
