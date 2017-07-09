@@ -35,6 +35,7 @@ namespace mtp { namespace usb
 		static constexpr size_t Buffers		= 16; //for parallel endpoint access
 		static constexpr size_t BufferSize	= 64 * 1024;
 
+		std::mutex	_mutex;
 		int			_fd;
 		long		_pageSize;
 		u8 *		_buffer;
@@ -67,12 +68,14 @@ namespace mtp { namespace usb
 
 		void Free(Buffer &buffer)
 		{
+			scoped_mutex_lock l(_mutex);
 			size_t index = (buffer._data - _buffer) / BufferSize;
 			_bufferAllocated.at(index) = false;
 		}
 
 		Buffer Allocate(size_t size)
 		{
+			scoped_mutex_lock l(_mutex);
 			if (!_buffer)
 			{
 				_bufferSize = (BufferSize + _pageSize - 1) / _pageSize * _pageSize;
