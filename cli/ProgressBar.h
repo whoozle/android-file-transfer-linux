@@ -34,9 +34,10 @@ namespace cli
 		std::string _title;
 		int			_width;
 		int			_maxWidth;
+		unsigned	_percentage;
 
 	public:
-		ProgressBar(const std::string & title, int w, int max): _width(w)
+		ProgressBar(const std::string & title, int w, int max): _width(w), _percentage(-1)
 		{
 			_maxWidth = max - _width - Junk;
 			if (_maxWidth < 1)
@@ -56,15 +57,19 @@ namespace cli
 		void operator()(mtp::u64 current, mtp::u64 total)
 		{
 			unsigned percentage = current * 100 / total;
-			printf("%3u%% [", percentage );
-			unsigned width = current * _width / total;
-			unsigned spaces = _width - width;
-			while(width--)
-				fputc('=', stdout);
-			while(spaces--)
-				fputc(' ', stdout);
+			if (_percentage != percentage)
+			{
+				_percentage = percentage;
+				printf("%3u%% [", percentage );
+				unsigned width = current * _width / total;
+				unsigned spaces = _width - width;
+				while(width--)
+					fputc('=', stdout);
+				while(spaces--)
+					fputc(' ', stdout);
 
-			printf("] %s\n\033[1A\033[2K", _title.c_str());
+				printf("] %s\n\033[1A\033[2K", _title.c_str());
+			}
 		}
 	};
 }
