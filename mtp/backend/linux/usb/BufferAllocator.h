@@ -71,7 +71,7 @@ namespace mtp { namespace usb
 
 		IBufferPtr Allocate(size_t size)
 		{
-			//if (_fd < 0)
+			if (_fd < 0)
 				return std::make_shared<ByteArrayBuffer>(size);
 
 			if (!_buffer)
