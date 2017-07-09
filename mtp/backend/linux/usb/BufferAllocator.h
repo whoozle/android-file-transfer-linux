@@ -62,7 +62,7 @@ namespace mtp { namespace usb
 		std::array<MappedBufferWeakPtr, Buffers> _buffers;
 
 	public:
-		BufferAllocator(int fd): _pageSize(sysconf(_SC_PAGESIZE)), _buffer(nullptr), _bufferSize(0)
+		BufferAllocator(int fd): _fd(fd), _pageSize(sysconf(_SC_PAGESIZE)), _buffer(nullptr), _bufferSize(0)
 		{
 			if (_pageSize <= 0)
 				throw posix::Exception("sysconf(_SC_PAGESIZE)");
