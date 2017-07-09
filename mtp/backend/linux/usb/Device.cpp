@@ -110,15 +110,17 @@ namespace mtp { namespace usb
 	struct Device::Urb : Noncopyable
 	{
 		static const int 		MaxBufferSize = 4096;
+		BufferAllocator &		Allocator;
 		int						Fd;
 		int						PacketSize;
 		Buffer					DataBuffer;
 		usbdevfs_urb			KernelUrb;
 
-		Urb(BufferAllocatorPtr allocator, int fd, u8 type, const EndpointPtr & ep):
+		Urb(BufferAllocator & allocator, int fd, u8 type, const EndpointPtr & ep):
+			Allocator(allocator),
 			Fd(fd),
 			PacketSize(ep->GetMaxPacketSize()),
-			DataBuffer(allocator->Allocate(std::max(PacketSize, MaxBufferSize / PacketSize * PacketSize))),
+			DataBuffer(Allocator.Allocate(std::max(PacketSize, MaxBufferSize / PacketSize * PacketSize))),
 			KernelUrb()
 		{
 			KernelUrb.type			= type;
@@ -126,6 +128,9 @@ namespace mtp { namespace usb
 			KernelUrb.buffer		= DataBuffer.GetData();
 			KernelUrb.buffer_length = DataBuffer.GetSize();
 		}
+
+		~Urb()
+		{ Allocator.Free(DataBuffer); }
 
 		size_t GetTransferSize() const
 		{ return DataBuffer.GetSize(); }
@@ -272,7 +277,7 @@ namespace mtp { namespace usb
 
 	void Device::WriteBulk(const EndpointPtr & ep, const IObjectInputStreamPtr &inputStream, int timeout)
 	{
-		Urb urb(_bufferAllocator, _fd.Get(), USBDEVFS_URB_TYPE_BULK, ep);
+		Urb urb(*_bufferAllocator, _fd.Get(), USBDEVFS_URB_TYPE_BULK, ep);
 		size_t transferSize = urb.GetTransferSize();
 
 		size_t r;
@@ -296,7 +301,7 @@ namespace mtp { namespace usb
 
 	void Device::ReadBulk(const EndpointPtr & ep, const IObjectOutputStreamPtr &outputStream, int timeout)
 	{
-		Urb urb(_bufferAllocator, _fd.Get(), USBDEVFS_URB_TYPE_BULK, ep);
+		Urb urb(*_bufferAllocator, _fd.Get(), USBDEVFS_URB_TYPE_BULK, ep);
 		size_t transferSize = urb.GetTransferSize();
 
 		size_t r;

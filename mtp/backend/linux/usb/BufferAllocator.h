@@ -13,16 +13,12 @@ namespace mtp { namespace usb
 	class BufferAllocator;
 	class Buffer
 	{
-		friend class BufferAllocator;
-
-		BufferAllocator *	_parent;
 		u8 *				_data;
 		size_t				_size;
 
 	public:
-		Buffer(BufferAllocator *parent, u8 *data, size_t size): _parent(parent), _data(data), _size(size)
+		Buffer(u8 *data, size_t size): _data(data), _size(size)
 		{ }
-		~Buffer();
 
 		u8 * GetData() const
 		{ return _data; }
@@ -69,7 +65,7 @@ namespace mtp { namespace usb
 		void Free(Buffer &buffer)
 		{
 			scoped_mutex_lock l(_mutex);
-			size_t index = (buffer._data - _buffer) / BufferSize;
+			size_t index = (buffer.GetData() - _buffer) / BufferSize;
 			_bufferAllocated.at(index) = false;
 		}
 
@@ -107,17 +103,12 @@ namespace mtp { namespace usb
 				if (!_bufferAllocated[i])
 				{
 					_bufferAllocated[i] = true;
-					return Buffer(this, _buffer + BufferSize * i, size);
+					return Buffer(_buffer + BufferSize * i, size);
 				}
 			}
 			throw std::runtime_error("BufferAllocator::Allocate: out of mapped memory");
 		}
 	};
-
-	Buffer::~Buffer()
-	{
-		_parent->Free(*this);
-	}
 
 }}
 
