@@ -71,16 +71,27 @@ namespace mtp { namespace usb
 
 		IBufferPtr Allocate(size_t size)
 		{
-//			if (_fd < 0)
+			if (_fd < 0)
 				return std::make_shared<ByteArrayBuffer>(size);
 
 			if (!_buffer)
 			{
 				_bufferSize = (size + _pageSize - 1) / _pageSize * _pageSize;
-				_buffer = static_cast<u8 *>(mmap(NULL, _bufferSize * Buffers, PROT_READ | PROT_WRITE, MAP_SHARED, _fd, 0));
-				if (_buffer == MAP_FAILED)
-					throw posix::Exception("mmap failed");
-				debug("mapped buffer of ", _bufferSize * Buffers, " bytes to", static_cast<void *>(_buffer));
+				try
+				{
+					auto buffer = static_cast<u8 *>(mmap(NULL, _bufferSize * Buffers, PROT_READ | PROT_WRITE, MAP_PRIVATE, _fd, 0));
+					if (buffer == MAP_FAILED)
+						throw posix::Exception("mmap failed");
+
+					_buffer = buffer;
+					debug("mapped buffer of ", _bufferSize * Buffers, " bytes to", static_cast<void *>(_buffer));
+				}
+				catch(const std::exception &ex)
+				{
+					error("zerocopy allocator failed: ", ex.what());
+					_fd = -1;
+					return std::make_shared<ByteArrayBuffer>(size);
+				}
 			}
 			for(size_t i = 0; i < _buffers.size(); ++i)
 			{
