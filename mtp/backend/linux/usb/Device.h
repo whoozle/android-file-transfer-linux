@@ -57,8 +57,8 @@ namespace mtp { namespace usb
 		BufferAllocatorPtr			_bufferAllocator;
 
 		struct Urb;
-		DECLARE_PTR(Urb);
-		std::map<void *, UrbPtr>			_urbs;
+		//DECLARE_PTR(Urb);
+		std::map<void *, Urb *>				_urbs;
 		std::queue<std::function<void ()>>	_controls;
 
 	public:
@@ -81,7 +81,7 @@ namespace mtp { namespace usb
 	private:
 		static u8 TransactionType(const EndpointPtr &ep);
 		void * Reap(int timeout);
-		void Submit(const UrbPtr &urb, int timeout);
+		void Submit(Urb *urb, int timeout);
 	};
 	DECLARE_PTR(Device);
 }}

@@ -229,7 +229,7 @@ namespace mtp { namespace usb
 	}
 
 
-	void Device::Submit(const UrbPtr &urb, int timeout)
+	void Device::Submit(Urb *urb, int timeout)
 	{
 		urb->Submit();
 		{
@@ -240,7 +240,7 @@ namespace mtp { namespace usb
 		{
 			while(true)
 			{
-				UrbPtr completedUrb;
+				Urb* completedUrb;
 				{
 					void *completedKernelUrb = Reap(timeout);
 					scoped_mutex_lock l(_mutex);
@@ -272,32 +272,32 @@ namespace mtp { namespace usb
 
 	void Device::WriteBulk(const EndpointPtr & ep, const IObjectInputStreamPtr &inputStream, int timeout)
 	{
-		UrbPtr urb = std::make_shared<Urb>(_bufferAllocator, _fd.Get(), USBDEVFS_URB_TYPE_BULK, ep);
-		size_t transferSize = urb->GetTransferSize();
+		Urb urb(_bufferAllocator, _fd.Get(), USBDEVFS_URB_TYPE_BULK, ep);
+		size_t transferSize = urb.GetTransferSize();
 
 		size_t r;
 		bool continuation = false;
 		do
 		{
-			r = urb->Send(inputStream, transferSize);
+			r = urb.Send(inputStream, transferSize);
 
 			if (_capabilities & USBDEVFS_CAP_ZERO_PACKET)
-				urb->SetZeroPacketFlag(r != transferSize);
+				urb.SetZeroPacketFlag(r != transferSize);
 
 			if (_capabilities & USBDEVFS_CAP_BULK_CONTINUATION)
 			{
-				urb->SetContinuationFlag(continuation);
+				urb.SetContinuationFlag(continuation);
 				continuation = true;
 			}
-			Submit(urb, timeout);
+			Submit(&urb, timeout);
 		}
 		while(r == transferSize);
 	}
 
 	void Device::ReadBulk(const EndpointPtr & ep, const IObjectOutputStreamPtr &outputStream, int timeout)
 	{
-		UrbPtr urb = std::make_shared<Urb>(_bufferAllocator, _fd.Get(), USBDEVFS_URB_TYPE_BULK, ep);
-		size_t transferSize = urb->GetTransferSize();
+		Urb urb(_bufferAllocator, _fd.Get(), USBDEVFS_URB_TYPE_BULK, ep);
+		size_t transferSize = urb.GetTransferSize();
 
 		size_t r;
 		bool continuation = false;
@@ -305,12 +305,12 @@ namespace mtp { namespace usb
 		{
 			if (_capabilities & USBDEVFS_CAP_BULK_CONTINUATION)
 			{
-				urb->SetContinuationFlag(continuation);
+				urb.SetContinuationFlag(continuation);
 				continuation = true;
 			}
-			Submit(urb, timeout);
+			Submit(&urb, timeout);
 
-			r = urb->Recv(outputStream);
+			r = urb.Recv(outputStream);
 		}
 		while(r == transferSize);
 	}
