@@ -107,27 +107,29 @@ namespace mtp { namespace usb
 		error("SetConfiguration(", idx, "): not implemented");
 	}
 
-	struct Device::Urb : Noncopyable
+	struct Device::Urb : usbdevfs_urb, Noncopyable
 	{
 		static const int 		MaxBufferSize = 4096;
 		BufferAllocator &		Allocator;
 		int						Fd;
 		int						PacketSize;
 		Buffer					DataBuffer;
-		usbdevfs_urb			KernelUrb;
 
-		Urb(BufferAllocator & allocator, int fd, u8 type, const EndpointPtr & ep):
+		Urb(BufferAllocator & allocator, int fd, u8 urbType, const EndpointPtr & ep):
+			usbdevfs_urb(),
 			Allocator(allocator),
 			Fd(fd),
 			PacketSize(ep->GetMaxPacketSize()),
-			DataBuffer(Allocator.Allocate(std::max(PacketSize, MaxBufferSize / PacketSize * PacketSize))),
-			KernelUrb()
+			DataBuffer(Allocator.Allocate(std::max(PacketSize, MaxBufferSize / PacketSize * PacketSize)))
 		{
-			KernelUrb.type			= type;
-			KernelUrb.endpoint		= ep->GetAddress();
-			KernelUrb.buffer		= DataBuffer.GetData();
-			KernelUrb.buffer_length = DataBuffer.GetSize();
+			type			= urbType;
+			endpoint		= ep->GetAddress();
+			buffer			= DataBuffer.GetData();
+			buffer_length	= DataBuffer.GetSize();
 		}
+
+		usbdevfs_urb *GetKernelUrb()
+		{ return static_cast<usbdevfs_urb *>(this); }
 
 		~Urb()
 		{ Allocator.Free(DataBuffer); }
@@ -137,12 +139,12 @@ namespace mtp { namespace usb
 
 		void Submit()
 		{
-			IOCTL(Fd, USBDEVFS_SUBMITURB, &KernelUrb);
+			IOCTL(Fd, USBDEVFS_SUBMITURB, GetKernelUrb());
 		}
 
 		void Discard()
 		{
-			int r = ioctl(Fd, USBDEVFS_DISCARDURB, &KernelUrb);
+			int r = ioctl(Fd, USBDEVFS_DISCARDURB, GetKernelUrb());
 			if (r != 0)
 			{
 				perror("ioctl(USBDEVFS_DISCARDURB)");
@@ -156,7 +158,7 @@ namespace mtp { namespace usb
 			auto data = DataBuffer.GetData();
 			size_t r = inputStream->Read(data, size);
 			//HexDump("write", ByteArray(data, data + r), true);
-			KernelUrb.buffer_length = r;
+			buffer_length = r;
 			return r;
 		}
 
@@ -164,7 +166,7 @@ namespace mtp { namespace usb
 		{
 			size_t r = std::min(DataBuffer.GetSize(), inputData.size());
 			std::copy(inputData.data(), inputData.data() + r, DataBuffer.GetData());
-			KernelUrb.buffer_length = r;
+			buffer_length = r;
 			return r;
 		}
 
@@ -172,16 +174,16 @@ namespace mtp { namespace usb
 		{
 			auto data = DataBuffer.GetData();
 			//HexDump("read", ByteArray(data, data + KernelUrb.actual_length), true);
-			return outputStream->Write(data, KernelUrb.actual_length);
+			return outputStream->Write(data, actual_length);
 		}
 
 		template<unsigned Flag>
 		void SetFlag(bool value)
 		{
 			if (value)
-				KernelUrb.flags |= Flag;
+				flags |= Flag;
 			else
-				KernelUrb.flags &= ~Flag;
+				flags &= ~Flag;
 		}
 
 		void SetContinuationFlag(bool continuation)
@@ -233,32 +235,20 @@ namespace mtp { namespace usb
 		{ error("clearing halt status for ep ", hex(ep->GetAddress(), 2), ": ", ex.what()); }
 	}
 
-
 	void Device::Submit(Urb *urb, int timeout)
 	{
 		urb->Submit();
-		{
-			scoped_mutex_lock l(_mutex);
-			_urbs.insert(std::make_pair(&urb->KernelUrb, urb));
-		}
 		try
 		{
 			while(true)
 			{
-				Urb* completedUrb;
+				usbdevfs_urb * completedKernelUrb = static_cast<usbdevfs_urb *>(Reap(timeout));
+				if (urb->GetKernelUrb() != completedKernelUrb)
 				{
-					void *completedKernelUrb = Reap(timeout);
-					scoped_mutex_lock l(_mutex);
-					auto urbIt = _urbs.find(completedKernelUrb);
-					if (urbIt == _urbs.end())
-					{
-						error("got unknown urb: ", completedKernelUrb);
-						continue;
-					}
-					completedUrb = urbIt->second;
-					_urbs.erase(urbIt);
+					error("got unknown urb: ", completedKernelUrb);
+					continue;
 				}
-				if (completedUrb == urb)
+				else
 					break;
 			}
 		}

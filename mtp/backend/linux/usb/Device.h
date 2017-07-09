@@ -50,7 +50,6 @@ namespace mtp { namespace usb
 	class Device : Noncopyable
 	{
 	private:
-		std::mutex					_mutex;
 		posix::FileHandler			_fd;
 		u32							_capabilities;
 		EndpointPtr					_controlEp;
@@ -58,7 +57,6 @@ namespace mtp { namespace usb
 
 		struct Urb;
 		//DECLARE_PTR(Urb);
-		std::map<void *, Urb *>				_urbs;
 		std::queue<std::function<void ()>>	_controls;
 
 	public:
