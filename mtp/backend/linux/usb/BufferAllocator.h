@@ -84,7 +84,7 @@ namespace mtp { namespace usb
 						throw posix::Exception("mmap failed");
 
 					_buffer = buffer;
-					debug("mapped buffer of ", _bufferSize * Buffers, " bytes to", static_cast<void *>(_buffer));
+					debug("mapped buffer of ", _bufferSize * Buffers, " bytes to ", static_cast<void *>(_buffer));
 				}
 				catch(const std::exception &ex)
 				{
