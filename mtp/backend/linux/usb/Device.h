@@ -52,6 +52,7 @@ namespace mtp { namespace usb
 		posix::FileHandler			_fd;
 		u32							_capabilities;
 		EndpointPtr					_controlEp;
+		bool                        _mmap;
 
 		struct Urb;
 		DECLARE_PTR(Urb);

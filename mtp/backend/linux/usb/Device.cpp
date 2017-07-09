@@ -73,6 +73,8 @@ namespace mtp { namespace usb
 		catch(const std::exception &ex)
 		{ error("get usbfs capabilities failed: ", ex.what()); }
 		debug("capabilities = 0x", hex(_capabilities, 8));
+		_mmap = _capabilities & USBDEVFS_CAP_MMAP;
+
 		if (_capabilities)
 		{
 			u32 capabilities = _capabilities;
@@ -88,6 +90,11 @@ namespace mtp { namespace usb
 		}
 		else
 			debug("[none]\n");
+
+		if (_mmap)
+			debug("using usb zero copy");
+		else
+			debug("not using usb zero copy");
 	}
 
 	Device::~Device()
