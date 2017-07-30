@@ -589,6 +589,7 @@ namespace
 		{
 			mtp::scoped_mutex_lock l(_mutex);
 			ReleaseTransaction(ino);
+			FUSE_CALL(fuse_reply_err(req, 0));
 		}
 
 		void Rename(fuse_req_t req, FuseId parent, const char *name, FuseId newparent, const char *newname)
