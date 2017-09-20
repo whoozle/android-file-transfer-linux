@@ -12,8 +12,6 @@ set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Android File Transfer for Linux (and Mac 
 set(CPACK_MONOLITHIC_INSTALL ON)
 set(CMAKE_INSTALL_LOCAL_ONLY ON)
 
-set(MTP_LIBRARIES mtp-ng-static)
-
 message(STATUS "building for ${CMAKE_SYSTEM_NAME}")
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
@@ -63,6 +61,7 @@ if (HAVE_MAGIC_H AND HAVE_LIBMAGIC)
 	message(STATUS "libmagic found")
 	add_definitions(-DHAVE_LIBMAGIC)
 	list(APPEND MTP_LIBRARIES magic)
+	list(APPEND MTP_SHARED_LIBRARIES magic)
 endif()
 
 option(BUILD_QT_UI "Build reference Qt application" ON)
@@ -153,14 +152,20 @@ else()
 endif()
 
 
-add_library(mtp-ng-static STATIC ${SOURCES})
 if (BUILD_SHARED_LIB)
 	add_library(mtp-ng SHARED ${SOURCES})
-	target_link_libraries(mtp-ng ${CMAKE_THREAD_LIBS_INIT})
+	target_link_libraries(mtp-ng ${CMAKE_THREAD_LIBS_INIT} ${MTP_SHARED_LIBRARIES})
 
 	if (USB_BACKEND_LIBUSB)
 		target_link_libraries(mtp-ng ${LIBUSB_LIBRARIES})
 	endif()
+
+	list(APPEND MTP_LIBRARIES mtp-ng)
+	install(TARGETS mtp-ng LIBRARY DESTINATION "lib${LIB_SUFFIX}" ARCHIVE DESTINATION "lib${LIB_SUFFIX}")
+else (BUILD_SHARED_LIB)
+	add_library(mtp-ng-static STATIC ${SOURCES})
+	list(APPEND MTP_LIBRARIES mtp-ng-static)
+	install(TARGETS mtp-ng-static LIBRARY DESTINATION "lib${LIB_SUFFIX}" ARCHIVE DESTINATION "lib${LIB_SUFFIX}")
 endif (BUILD_SHARED_LIB)
 
 add_definitions(-D_LARGEFILE_SOURCE=1 -D_FILE_OFFSET_BITS=64)
