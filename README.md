@@ -41,6 +41,10 @@ Any amount would help relieving pain of using MTP. :D
   ```shell
   sudo apt-get install build-essential cmake libqt4-dev ninja-build libfuse-dev libreadline-dev
   ```
+  For Fedora:
+  ```
+  dnf install make automake gcc gcc-c++ kernel-devel cmake fuse fuse-devel qt-devel readline-devel
+  ```
 * Basically, you need `libqtX-dev` for UI, `libfuse-dev` for FUSE interface, `cmake`, `ninja` or `make` for building the project. You could use libqt5-dev as well.
 
 ### Building with ninja
