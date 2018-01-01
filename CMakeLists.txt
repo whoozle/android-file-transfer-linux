@@ -179,3 +179,5 @@ endif()
 if (BUILD_QT_UI)
 	add_subdirectory(qt)
 endif()
+
+add_custom_target(uninstall COMMAND xargs rm < install_manifest.txt)
