@@ -9,7 +9,7 @@
   <description>
     <p>
       -Simple Qt UI with progress dialogs.
-      -FUSE wrapper (If you'd prefer mounting your device), 
+      -FUSE wrapper (If you'd prefer mounting your device),
        supporting partial read/writes, allowing instant access to your files.
       -No file size limits.
       -Automatically renames album cover to make it visible from media player.
