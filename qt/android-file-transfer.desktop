@@ -6,4 +6,4 @@ Icon=android-file-transfer
 StartupNotify=false
 Terminal=false
 Type=Application
-Categories=Utility;FileTools;Filesystem;Qt;
+Categories=Utility;System;FileTools;Filesystem;Qt;
