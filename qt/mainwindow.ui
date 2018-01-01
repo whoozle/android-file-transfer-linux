@@ -94,6 +94,7 @@
    </attribute>
    <addaction name="actionBack"/>
    <addaction name="actionGo_Down"/>
+   <addaction name="actionRefresh"/>
    <addaction name="actionCreateDirectory"/>
    <addaction name="actionUpload_Album"/>
    <addaction name="actionUploadDirectory"/>
@@ -111,8 +112,7 @@
   <action name="actionCreateDirectory">
    <property name="icon">
     <iconset theme="folder-new">
-     <normaloff/>
-    </iconset>
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>&amp;CreateDirectory</string>
@@ -129,8 +129,7 @@
   <action name="actionBack">
    <property name="icon">
     <iconset theme="go-previous">
-     <normaloff/>
-    </iconset>
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>&amp;Back</string>
@@ -142,8 +141,7 @@
   <action name="actionGo_Down">
    <property name="icon">
     <iconset theme="go-next">
-     <normaloff/>
-    </iconset>
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>&amp;Go Down</string>
@@ -160,8 +158,7 @@
   <action name="actionRename">
    <property name="icon">
     <iconset theme="edit-rename">
-     <normaloff/>
-    </iconset>
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>&amp;Rename</string>
@@ -173,8 +170,7 @@
   <action name="actionDelete">
    <property name="icon">
     <iconset theme="edit-delete">
-     <normaloff/>
-    </iconset>
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>D&amp;elete</string>
@@ -186,8 +182,7 @@
   <action name="actionDownload">
    <property name="icon">
     <iconset theme="download">
-     <normaloff/>
-    </iconset>
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>&amp;Download</string>
@@ -207,8 +202,7 @@
   <action name="actionRefresh">
    <property name="icon">
     <iconset theme="view-refresh">
-     <normaloff/>
-    </iconset>
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>Re&amp;fresh</string>
