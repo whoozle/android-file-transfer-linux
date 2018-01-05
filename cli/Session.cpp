@@ -610,9 +610,10 @@ namespace cli
 					try { stream->SetProgressReporter(ProgressBar(dst, _terminalWidth / 3, _terminalWidth)); } catch(const std::exception &ex) { }
 			}
 			_session->GetObject(srcId, stream);
+			stream.reset();
 			try
 			{
-				stream->SetModificationTime(_session->GetObjectModificationTime(srcId));
+				cli::ObjectOutputStream::SetModificationTime(dst, _session->GetObjectModificationTime(srcId));
 			}
 			catch(const std::exception &ex)
 			{ mtp::debug("GetObjectModificationTime failed: ", ex.what()); }

@@ -29,6 +29,8 @@
 #include <QMimeData>
 #include <QUrl>
 
+#include <cli/PosixStreams.h> //for mtime
+
 MtpObjectsModel::MtpObjectsModel(QObject *parent): QAbstractListModel(parent), _storageId(mtp::Session::AllStorages), _parentObjectId(mtp::Session::Root)
 { }
 
@@ -238,7 +240,7 @@ bool MtpObjectsModel::uploadFile(mtp::ObjectId parentObjectId, const QString &fi
 
 bool MtpObjectsModel::downloadFile(const QString &filePath, mtp::ObjectId objectId)
 {
-	std::shared_ptr<QtObjectOutputStream> object(new QtObjectOutputStream(filePath));
+	auto object = std::make_shared<QtObjectOutputStream>(filePath);
 	if (!object->Valid())
 	{
 		qWarning() << "cannot open file " << filePath;
@@ -246,6 +248,8 @@ bool MtpObjectsModel::downloadFile(const QString &filePath, mtp::ObjectId object
 	}
 	connect(object.get(), SIGNAL(positionChanged(qint64,qint64)), this, SIGNAL(filePositionChanged(qint64,qint64)));
 	_session->GetObject(objectId, object);
+	object.reset();
+	cli::ObjectOutputStream::SetModificationTime(filePath.toStdString(), _session->GetObjectModificationTime(objectId));
 	return true;
 }
 

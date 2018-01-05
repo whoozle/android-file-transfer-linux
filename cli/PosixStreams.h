@@ -20,15 +20,16 @@
 #ifndef AFT_CLI_POSIXSTREAMS_H
 #define AFT_CLI_POSIXSTREAMS_H
 
+#include <mtp/ptp/IObjectStream.h>
+
+#include <functional>
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <unistd.h>
-
-#include <mtp/ptp/IObjectStream.h>
-
-#include <functional>
+#include <utime.h>
 
 namespace cli
 {
@@ -69,10 +70,8 @@ namespace cli
 		ObjectInputStream(const std::string &fname) : _fd(open(fname.c_str(), O_RDONLY))
 		{
 			if (_fd < 0)
-			{
-				perror("open");
 				throw std::runtime_error("cannot open file: " + fname);
-			}
+
 			struct stat st;
 			if (stat(fname.c_str(), &st) != 0)
 				throw std::runtime_error("stat failed");
@@ -103,13 +102,11 @@ namespace cli
 		int		_fd;
 
 	public:
-		ObjectOutputStream(const std::string &fname) : _fd(open(fname.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644))
+		ObjectOutputStream(const std::string &fname) :
+			_fd(open(fname.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644))
 		{
 			if (_fd < 0)
-			{
-				perror("open");
 				throw std::runtime_error("cannot open file: " + fname);
-			}
 		}
 
 		~ObjectOutputStream()
@@ -125,14 +122,13 @@ namespace cli
 			return r;
 		}
 
-		void SetModificationTime(time_t mtime)
+		static void SetModificationTime(const std::string &fname, time_t mtime)
 		{
-			struct timespec times[2] = { };
-			times[0].tv_nsec = UTIME_OMIT;
-			times[1].tv_sec = mtime;
-			times[1].tv_nsec = 0;
-			if (futimens(_fd, times) != 0)
-				throw mtp::system_error("futimens");
+			struct utimbuf buf = {};
+			buf.actime = time(nullptr);
+			buf.modtime = mtime;
+			if (utime(fname.c_str(), &buf) != 0)
+				throw mtp::system_error("utime");
 		}
 	};
 
