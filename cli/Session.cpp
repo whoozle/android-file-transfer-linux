@@ -30,15 +30,15 @@
 #include <mtp/version.h>
 
 #include <sstream>
+#include <set>
 
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/ioctl.h>
 #include <dirent.h>
-#include <unistd.h>
 #include <errno.h>
-#include <set>
+#include <unistd.h>
 
 namespace
 {
@@ -610,6 +610,12 @@ namespace cli
 					try { stream->SetProgressReporter(ProgressBar(dst, _terminalWidth / 3, _terminalWidth)); } catch(const std::exception &ex) { }
 			}
 			_session->GetObject(srcId, stream);
+			try
+			{
+				stream->SetModificationTime(_session->GetObjectModificationTime(srcId));
+			}
+			catch(const std::exception &ex)
+			{ mtp::debug("GetObjectModificationTime failed: ", ex.what()); }
 		}
 	}
 

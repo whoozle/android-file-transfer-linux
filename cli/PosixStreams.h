@@ -124,6 +124,16 @@ namespace cli
 			Report(r);
 			return r;
 		}
+
+		void SetModificationTime(time_t mtime)
+		{
+			struct timespec times[2] = { };
+			times[0].tv_nsec = UTIME_OMIT;
+			times[1].tv_sec = mtime;
+			times[1].tv_nsec = 0;
+			if (futimens(_fd, times) != 0)
+				throw mtp::system_error("futimens");
+		}
 	};
 
 }
