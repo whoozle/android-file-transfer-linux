@@ -23,6 +23,7 @@
 #include <mtp/ptp/OperationRequest.h>
 #include <mtp/ptp/ByteArrayObjectStream.h>
 #include <mtp/ptp/JoinedObjectStream.h>
+#include <mtp/log.h>
 #include <usb/Device.h>
 #include <limits>
 #include <array>
@@ -42,7 +43,9 @@ namespace mtp
 } while(false)
 
 	Session::Session(usb::BulkPipePtr pipe, u32 sessionId):
-		_packeter(pipe), _sessionId(sessionId), _nextTransactionId(1), _transaction(), _defaultTimeout(DefaultTimeout)
+		_packeter(pipe), _sessionId(sessionId), _nextTransactionId(1), _transaction(),
+		_getObjectModificationTimeBuggy(false),
+		_defaultTimeout(DefaultTimeout)
 	{
 		_deviceInfo = GetDeviceInfoImpl();
 		_getPartialObject64Supported = _deviceInfo.Supports(OperationCode::GetPartialObject64);
@@ -382,6 +385,27 @@ namespace mtp
 		std::string value;
 		s >> value;
 		return value;
+	}
+
+	time_t Session::GetObjectModificationTime(ObjectId id)
+	{
+		if (!_getObjectModificationTimeBuggy)
+		{
+			try
+			{
+				auto mtimeStr = GetObjectStringProperty(id, mtp::ObjectProperty::DateModified);
+				auto mtime = mtp::ConvertDateTime(mtimeStr);
+				if (mtime != 0) //long standing Android bug
+					return mtime;
+			}
+			catch(const std::exception &ex)
+			{
+				debug("exception while getting mtime: ", ex.what());
+			}
+			_getObjectModificationTimeBuggy = true;
+		}
+		auto oi = GetObjectInfo(id);
+		return mtp::ConvertDateTime(oi.ModificationDate);
 	}
 
 	ByteArray Session::GetObjectPropertyList(ObjectId objectId, ObjectFormat format, ObjectProperty property, u32 groupCode, u32 depth, int timeout)

@@ -27,6 +27,7 @@
 #include <mtp/ptp/ObjectId.h>
 #include <mtp/ptp/ObjectProperty.h>
 #include <mtp/ptp/PipePacketer.h>
+#include <time.h>
 
 namespace mtp
 {
@@ -49,6 +50,7 @@ namespace mtp
 		bool			_getPartialObject64Supported;
 		bool			_editObjectSupported;
 		bool			_getObjectPropertyListSupported;
+		bool			_getObjectModificationTimeBuggy;
 		int				_defaultTimeout;
 
 	public:
@@ -113,6 +115,7 @@ namespace mtp
 		void SetObjectProperty(ObjectId objectId, ObjectProperty property, const ByteArray &value);
 		void SetObjectProperty(ObjectId objectId, ObjectProperty property, u64 value);
 		void SetObjectProperty(ObjectId objectId, ObjectProperty property, const std::string &value);
+		time_t GetObjectModificationTime(ObjectId id);
 
 		//common properties shortcuts
 		StorageId GetObjectStorage(ObjectId id);
