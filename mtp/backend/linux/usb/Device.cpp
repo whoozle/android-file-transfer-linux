@@ -80,7 +80,7 @@ namespace mtp { namespace usb
 		if (_capabilities)
 		{
 			u32 capabilities = _capabilities;
-			PRINT_CAP(USBDEVFS_CAP_ZERO_PACKET, "<zero>");
+			PRINT_CAP(USBDEVFS_CAP_ZERO_PACKET, "<zero-packet>");
 			PRINT_CAP(USBDEVFS_CAP_BULK_CONTINUATION, "<bulk-continuation>");
 			PRINT_CAP(USBDEVFS_CAP_NO_PACKET_SIZE_LIM, "<no-packet-size-limit>");
 			PRINT_CAP(USBDEVFS_CAP_BULK_SCATTER_GATHER, "<bulk-scatter-gather>");
