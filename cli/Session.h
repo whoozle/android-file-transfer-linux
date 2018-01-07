@@ -45,6 +45,7 @@ namespace cli
 		bool						_showPrompt;
 		std::string					_prompt;
 		unsigned					_terminalWidth;
+		bool						_batterySupported;
 
 		std::multimap<std::string, ICommandPtr> _commands;
 

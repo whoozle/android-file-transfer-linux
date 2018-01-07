@@ -65,7 +65,8 @@ namespace cli
 		_running(true),
 		_interactive(isatty(STDOUT_FILENO)),
 		_showPrompt(showPrompt),
-		_terminalWidth(80)
+		_terminalWidth(80),
+		_batterySupported(false)
 	{
 		using namespace mtp;
 		using namespace std::placeholders;
@@ -269,7 +270,19 @@ namespace cli
 	void Session::UpdatePrompt()
 	{
 		if (_showPrompt)
-			_prompt = _gdi.Manufacturer + " " + _gdi.Model + (!_csName.empty()? ":" + _csName: std::string()) + "> ";
+		{
+			std::stringstream ss;
+			ss << _gdi.Manufacturer << " " << _gdi.Model;
+			if (_batterySupported)
+			{
+				auto level = _session->GetDeviceIntegerProperty(mtp::DeviceProperty::BatteryLevel);
+				ss <<  " [" << level << "%]";
+			}
+			if (!_csName.empty())
+				ss << ":" << _csName;
+			ss << "> ";
+			_prompt = ss.str();
+		}
 		else
 			_prompt.clear();
 	}
@@ -294,6 +307,8 @@ namespace cli
 			for(u16 code : _gdi.DevicePropertiesSupported)
 			{
 				ss << hex(code, 4) << " ";
+				if (mtp::DeviceProperty(code) == mtp::DeviceProperty::BatteryLevel)
+					_batterySupported = true;
 			}
 			ss << "\n";
 			debug(ss.str());
@@ -319,6 +334,9 @@ namespace cli
 			}
 			catch(const std::exception &ex)
 			{ error("error: ", ex.what()); }
+
+			if (_batterySupported)
+				UpdatePrompt();
 		}
 		if (_showPrompt)
 			print("");
