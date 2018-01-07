@@ -21,6 +21,8 @@
 #include <mtp/log.h>
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <sys/stat.h>
 #include <readline/readline.h>
 #include <readline/history.h>
 
@@ -30,6 +32,21 @@ namespace cli
 	{
 		rl_readline_name = const_cast<char *>("AFT");
 		rl_attempted_completion_function = &CommandLine::CompletionCallback;
+		char *home = getenv("HOME");
+		if (home)
+		{
+			_historyPath = std::string(home) + "/.config";
+			mkdir(_historyPath.c_str(), 0700);
+			_historyPath += "/whoozle.github.io";
+			mkdir(_historyPath.c_str(), 0700);
+			_historyPath += "/aft-linux-cli.history";
+			read_history(_historyPath.c_str());
+		}
+	}
+
+	CommandLine::~CommandLine()
+	{
+		write_history(_historyPath.c_str());
 	}
 
 	CommandLine & CommandLine::Get()

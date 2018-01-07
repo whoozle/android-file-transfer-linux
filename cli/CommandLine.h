@@ -32,12 +32,14 @@ namespace cli
 
 	protected:
 		CommandLine();
+		~CommandLine();
 
 	private:
 		static char ** CompletionCallback(const char *text, int start, int end);
 		static char * CompletionGenerator(const char *text, int state);
 
-		Callback _callback;
+		std::string _historyPath;
+		Callback	_callback;
 
 	public:
 		static CommandLine & Get();

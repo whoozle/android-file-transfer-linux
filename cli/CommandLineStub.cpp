@@ -26,6 +26,9 @@ namespace cli
 	CommandLine::CommandLine()
 	{ }
 
+	CommandLine::~CommandLine()
+	{ }
+
 	CommandLine & CommandLine::Get()
 	{
 		static CommandLine cmd;
