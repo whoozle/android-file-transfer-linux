@@ -1,6 +1,6 @@
 /*
     This file is part of Android File Transfer For Linux.
-    Copyright (C) 2015-2017  Vladimir Menshakov
+    Copyright (C) 2015-2018  Vladimir Menshakov
 
     Android File Transfer For Linux is free software: you can redistribute
     it and/or modify it under the terms of the GNU General Public License
