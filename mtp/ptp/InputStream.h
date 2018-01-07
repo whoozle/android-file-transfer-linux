@@ -135,6 +135,27 @@ namespace mtp
 	inline InputStream & operator >> (InputStream &stream, std::vector<ElementType> &value)
 	{ value = stream.template ReadArray<ElementType>(); return stream; }
 
+	inline u64 ReadSingleInteger(const ByteArray &data)
+	{
+		InputStream s(data);
+		switch(data.size())
+		{
+		case 8: return s.Read64();
+		case 4: return s.Read32();
+		case 2: return s.Read16();
+		case 1: return s.Read8();
+		default:
+			throw std::runtime_error("unexpected length for numeric property");
+		}
+	}
+
+	inline std::string ReadSingleString(const ByteArray &data)
+	{
+		InputStream s(data);
+		std::string value;
+		s >> value;
+		return value;
+	}
 }
 
 

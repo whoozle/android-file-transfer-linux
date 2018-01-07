@@ -348,17 +348,7 @@ namespace mtp
 
 	u64 Session::GetObjectIntegerProperty(ObjectId objectId, ObjectProperty property)
 	{
-		ByteArray data = GetObjectProperty(objectId, property);
-		InputStream s(data);
-		switch(data.size())
-		{
-		case 8: return s.Read64();
-		case 4: return s.Read32();
-		case 2: return s.Read16();
-		case 1: return s.Read8();
-		default:
-			throw std::runtime_error("unexpected length for numeric property");
-		}
+		return ReadSingleInteger(GetObjectProperty(objectId, property));
 	}
 
 	void Session::SetObjectProperty(ObjectId objectId, ObjectProperty property, u64 value)
@@ -380,11 +370,7 @@ namespace mtp
 
 	std::string Session::GetObjectStringProperty(ObjectId objectId, ObjectProperty property)
 	{
-		ByteArray data = GetObjectProperty(objectId, property);
-		InputStream s(data);
-		std::string value;
-		s >> value;
-		return value;
+		return ReadSingleString(GetObjectProperty(objectId, property));
 	}
 
 	time_t Session::GetObjectModificationTime(ObjectId id)
@@ -406,6 +392,16 @@ namespace mtp
 		}
 		auto oi = GetObjectInfo(id);
 		return mtp::ConvertDateTime(oi.ModificationDate);
+	}
+
+	u64 Session::GetDeviceIntegerProperty(DeviceProperty property)
+	{
+		return ReadSingleInteger(GetDeviceProperty(property));
+	}
+
+	std::string Session::GetDeviceStringProperty(DeviceProperty property)
+	{
+		return ReadSingleString(GetDeviceProperty(property));
 	}
 
 	ByteArray Session::GetObjectPropertyList(ObjectId objectId, ObjectFormat format, ObjectProperty property, u32 groupCode, u32 depth, int timeout)

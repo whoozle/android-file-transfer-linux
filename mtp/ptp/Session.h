@@ -128,6 +128,8 @@ namespace mtp
 		ByteArray GetObjectPropertyList(ObjectId objectId, ObjectFormat format, ObjectProperty property, u32 groupCode, u32 depth, int timeout = LongTimeout);
 
 		ByteArray GetDeviceProperty(DeviceProperty property);
+		u64 GetDeviceIntegerProperty(DeviceProperty property);
+		std::string GetDeviceStringProperty(DeviceProperty property);
 
 		void AbortCurrentTransaction(int timeout);
 
