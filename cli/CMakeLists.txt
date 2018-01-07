@@ -29,7 +29,7 @@ int main(int argc, char **argv) {
 		list(APPEND CMAKE_REQUIRED_LIBRARIES ${CURSES_LIBRARY})
 		check_c_source_compiles("${READLINE_TEST_SRC}" READLINE_CURSES_TEST)
 		if (READLINE_CURSES_TEST)
-			list(APPEND Readline_LIBRARY ${CURSES_LIBRARY})
+			list(APPEND Readline_LIBRARY ${CURSES_LIBRARIES})
 		else()
 			set(READLINE_FOUND FALSE) #disabling readline completely
 		endif()
