@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
 	QApplication app(argc, argv);
 	Q_INIT_RESOURCE(android_file_transfer);
 
-	QCoreApplication::setApplicationName("mtp-ng-qt");
+	QCoreApplication::setApplicationName("aft-linux-qt");
 	QCoreApplication::setOrganizationDomain("whoozle.github.io");
 	QCoreApplication::setOrganizationName("whoozle.github.io");
 
