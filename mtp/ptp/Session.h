@@ -69,7 +69,7 @@ namespace mtp
 			mtp::ObjectId		ObjectId;
 		};
 
-		///handles partial writes and
+		///sub-session object which handles partial writes and truncation
 		class ObjectEditSession : Noncopyable
 		{
 			SessionPtr	_session;
