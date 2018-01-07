@@ -1,4 +1,5 @@
 find_package(Readline)
+include(CheckCSourceCompiles)
 
 set(CLI_SOURCES
 	Command.cpp
@@ -8,11 +9,41 @@ set(CLI_SOURCES
 	cli.cpp)
 
 if (READLINE_FOUND)
+	set(CMAKE_REQUIRED_LIBRARIES ${Readline_LIBRARY})
+	set(READLINE_TEST_SRC "
+#include <stdio.h>
+#include <readline/readline.h>
+
+int main(int argc, char **argv) {
+	char *line = readline(\">\");
+	return 0;
+}
+")
+	check_c_source_compiles("${READLINE_TEST_SRC}" READLINE_NO_CURSES_TEST)
+	if (NOT READLINE_NO_CURSES_TEST)
+		message(STATUS "readline test failed - some systems expect you to link with termcap or curses libraries")
+		message(STATUS "please find an example there: https://bugzilla.redhat.com/show_bug.cgi?id=499837")
+		message(STATUS "trying to find and link curses library...")
+#		set(CURSES_NEED_NCURSES TRUE)
+		include(FindCurses)
+		list(APPEND CMAKE_REQUIRED_LIBRARIES ${CURSES_LIBRARY})
+		check_c_source_compiles("${READLINE_TEST_SRC}" READLINE_CURSES_TEST)
+		if (READLINE_CURSES_TEST)
+			list(APPEND Readline_LIBRARY ${CURSES_LIBRARY})
+		else()
+			set(READLINE_FOUND FALSE) #disabling readline completely
+		endif()
+	endif()
+
+	set(CMAKE_REQUIRED_LIBRARIES)
+endif()
+
+if (READLINE_FOUND)
 	list(APPEND CLI_SOURCES CommandLine.cpp)
 	list(APPEND CLI_LIBRARIES ${Readline_LIBRARY})
 else()
 	list(APPEND CLI_SOURCES CommandLineStub.cpp)
-	message(WARNING "no readline library found")
+	message(WARNING "no readline library found, using stub")
 endif()
 
 add_executable(aft-mtp-cli ${CLI_SOURCES})
