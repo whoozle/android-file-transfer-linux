@@ -1,33 +1,62 @@
 language: cpp
-compiler: gcc
-sudo: require
+
+sudo: required
 dist: trusty
 
+matrix:
+    include:
+        - os: linux
+          compiler: gcc
+        - os: osx
+          compiler: clang
+
 before_install:
-  - sudo add-apt-repository ppa:beineri/opt-qt592-trusty -y
-  - sudo apt-get update -qq
+  - |
+    if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
+      sudo add-apt-repository ppa:beineri/opt-qt592-trusty -y &&
+      sudo apt-get update -qq
+    fi
 
 install:
-  - sudo apt-get -y install qt59base libfuse-dev
-  - source /opt/qt*/bin/qt*-env.sh
+  - |
+    if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
+      sudo apt-get -y install qt59base libfuse-dev &&
+      source /opt/qt*/bin/qt*-env.sh
+    elif [ "${TRAVIS_OS_NAME}" = "osx" ]; then
+      brew install qt5
+    fi
 
 script:
-  - cmake . -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr
-  - make -j$(nproc)
-  - make DESTDIR=appdir -j$(nproc) install ; find appdir/
-  - sed -i -e 's|^Name=.*|Name=Android File Transfer|g' appdir/usr/share/applications/android-file-transfer.desktop
-  - wget -c -q "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
-  - chmod a+x linuxdeployqt-continuous-x86_64.AppImage
-  - unset QTDIR; unset QT_PLUGIN_PATH ; unset LD_LIBRARY_PATH
-  - export VERSION=$(git rev-parse --short HEAD) # linuxdeployqt uses this for naming the file
-  - ./linuxdeployqt-continuous-x86_64.AppImage appdir/usr/share/applications/*.desktop -bundle-non-qt-libs
-  - ./linuxdeployqt-continuous-x86_64.AppImage appdir/usr/share/applications/*.desktop -appimage
+  - |
+    if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
+      cmake . -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr &&
+      make -j$(nproc) &&
+      make DESTDIR=appdir -j$(nproc) install ; find appdir/ &&
+      sed -i -e 's|^Name=.*|Name=Android File Transfer|g' appdir/usr/share/applications/android-file-transfer.desktop &&
+      wget -c -q "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage" &&
+      chmod a+x linuxdeployqt-continuous-x86_64.AppImage &&
+      unset QTDIR; unset QT_PLUGIN_PATH ; unset LD_LIBRARY_PATH &&
+      export VERSION=$(git rev-parse --short HEAD) &&
+      ./linuxdeployqt-continuous-x86_64.AppImage appdir/usr/share/applications/*.desktop -bundle-non-qt-libs &&
+      ./linuxdeployqt-continuous-x86_64.AppImage appdir/usr/share/applications/*.desktop -appimage
+    elif [ "${TRAVIS_OS_NAME}" = "osx" ]; then
+      mkdir build &&
+      cd build &&
+      cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/usr/local/opt/qt5 &&
+      make -j$(sysctl -n hw.ncpu)
+      make package
+    fi
 
 after_success:
-  - find ./appdir -executable -type f -exec ldd {} \; | grep " => /usr" | cut -d " " -f 2-3 | sort | uniq
-  - # curl --upload-file ./Android*.AppImage https://transfer.sh/APPNAME-git.$(git rev-parse --short HEAD)-x86_64.AppImage
   - wget -c https://github.com/probonopd/uploadtool/raw/master/upload.sh
-  - bash upload.sh ./Android*.AppImage*
+  - |
+    if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
+      find ./appdir -executable -type f -exec ldd {} \; | grep " => /usr" | cut -d " " -f 2-3 | sort | uniq &&
+      bash upload.sh ./Android*.AppImage*
+    elif [ "${TRAVIS_OS_NAME}" = "osx" ]; then
+      mv packages/Android\ File\ Transfer.dmg packages/Android_File_Transfer.dmg &&
+      bash upload.sh packages/Android_File_Transfer.dmg
+    fi
 
 branches:
   except:
