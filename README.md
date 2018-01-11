@@ -72,15 +72,18 @@ make
 ./qt/android-file-transfer
 ```
 
-### Building dmg package on Mac OS X
+### Building app package on OS X / macOS
+
+You'll need Qt installed to build the GUI app. Here are the build instructions with qt5 from homebrew (`brew install qt5`):
 
 ```shell
 mkdir build
 cd build
-cmake ..
-make package
+cmake .. -DCMAKE_INSTALL_PREFIX=~/Applications -DCMAKE_PREFIX_PATH=/usr/local/opt/qt5
+make
+make install
 
-open ./packages/Android\ File\ Transfer.dmg
+open ~/Applications/android-file-transfer.app
 ```
 
 ### Installation
