@@ -45,10 +45,10 @@ script:
       cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/usr/local/opt/qt5 -DCMAKE_INSTALL_PREFIX=$(pwd)/installdir &&
       make -j$(sysctl -n hw.ncpu) &&
       make install &&
-      mv installdir/android-file-transfer.app installdir/Android\ File\ Transfer.app &&
+      mv installdir/android-file-transfer.app installdir/Android\ File\ Transfer\ for\ Linux.app &&
       git clone https://github.com/andreyvit/create-dmg.git &&
       cd create-dmg &&
-      ./create-dmg --volicon "../../osx/android-file-transfer.icns" --icon-size 96 --icon "Android File Transfer" 110 100 --app-drop-link 380 100 AndroidFileTransfer.dmg ../installdir/Android\ File\ Transfer.app
+      ./create-dmg --volicon "../../osx/android-file-transfer.icns" --icon-size 96 --icon "Android File Transfer for Linux" 110 100 --app-drop-link 380 100 AndroidFileTransferForLinux.dmg ../installdir/Android\ File\ Transfer\ for\ Linux.app
     fi
 
 after_success:
@@ -58,7 +58,7 @@ after_success:
       find ./appdir -executable -type f -exec ldd {} \; | grep " => /usr" | cut -d " " -f 2-3 | sort | uniq &&
       bash upload.sh ./Android*.AppImage*
     elif [ "${TRAVIS_OS_NAME}" = "osx" ]; then
-      bash upload.sh AndroidFileTransfer.dmg
+      bash upload.sh AndroidFileTransferForLinux.dmg
     fi
 
 branches:
