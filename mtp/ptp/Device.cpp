@@ -81,6 +81,7 @@ namespace mtp
 		for (usb::DeviceDescriptorPtr desc : ctx->GetDevices())
 		try
 		{
+			debug("probing device ", hex(desc->GetVendorId(), 4), ":", hex(desc->GetProductId(), 4));
 			usb::DevicePtr device = desc->TryOpen(ctx);
 			if (!device)
 				continue;
@@ -96,7 +97,7 @@ namespace mtp
 				{
 					usb::InterfacePtr iface = conf->GetInterface(device, conf, j, 0);
 					usb::InterfaceTokenPtr token = claimInterface? device->ClaimInterface(iface): nullptr;
-					debug(i, ':', j, ", index: ", iface->GetIndex(), ", enpoints: ", iface->GetEndpointsCount());
+					debug("Device usb interface: ", i, ':', j, ", index: ", iface->GetIndex(), ", enpoints: ", iface->GetEndpointsCount());
 
 #ifdef USB_BACKEND_LIBUSB
 					std::string name = iface->GetName();
@@ -132,7 +133,7 @@ namespace mtp
 			}
 		}
 		catch(const std::exception &ex)
-		{ error("Device::Find", ex.what()); }
+		{ error("Device::Find failed:", ex.what()); }
 
 		return foundDevices;
 	}

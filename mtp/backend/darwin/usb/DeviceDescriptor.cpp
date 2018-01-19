@@ -82,10 +82,13 @@ namespace mtp { namespace usb
 		if (GetVendorId() == kIOUSBVendorIDAppleComputer)
 			wakeup = false;
 #if defined (kIOUSBInterfaceInterfaceID500)
-		UInt32 info = 0;
-		int r = (*_dev)->GetUSBDeviceInformation (_dev, &info);
-		if (r == kIOReturnSuccess && (info & (1 << kUSBInformationDeviceIsSuspendedBit)) == 0)
-			wakeup = false;
+		if (wakeup)
+		{
+			UInt32 info = 0;
+			int r = (*_dev)->GetUSBDeviceInformation (_dev, &info);
+			if (r == kIOReturnSuccess && (info & (1 << kUSBInformationDeviceIsSuspendedBit)) == 0)
+				wakeup = false;
+		}
 #endif
 		if (wakeup)
 		{
