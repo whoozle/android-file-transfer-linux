@@ -2,7 +2,7 @@ title: Android-file-transfer-linux
 description: Android File Transfer for Linux
 google_analytics: UA-15578013-1
 show_downloads: true
-theme: jekyll-theme-slate
+theme: jekyll-theme-cayman
 
 gems:
   - jekyll-mentions
