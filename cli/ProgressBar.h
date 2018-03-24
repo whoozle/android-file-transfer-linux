@@ -56,12 +56,12 @@ namespace cli
 
 		void operator()(mtp::u64 current, mtp::u64 total)
 		{
-			unsigned percentage = current * 100 / total;
+			unsigned percentage = total? current * 100 / total: 100;
 			if (_percentage != percentage)
 			{
 				_percentage = percentage;
 				printf("%3u%% [", percentage );
-				unsigned width = current * _width / total;
+				unsigned width = total? current * _width / total: _width;
 				unsigned spaces = _width - width;
 				while(width--)
 					fputc('=', stdout);
