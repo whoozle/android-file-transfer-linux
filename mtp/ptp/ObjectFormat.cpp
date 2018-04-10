@@ -28,8 +28,6 @@
 
 namespace mtp
 {
-
-#ifdef HAVE_LIBMAGIC
 	namespace
 	{
 		std::string GetExtension(const std::string &filename)
@@ -39,7 +37,11 @@ namespace mtp
 			std::transform(ext.begin(), ext.end(), ext.begin(), tolower);
 			return ext;
 		}
+	}
 
+#ifdef HAVE_LIBMAGIC
+	namespace
+	{
 		class Magic
 		{
 			magic_t								_magic;
