@@ -32,6 +32,14 @@ namespace mtp
 #ifdef HAVE_LIBMAGIC
 	namespace
 	{
+		std::string GetExtension(const std::string &filename)
+		{
+			size_t extPos = filename.rfind('.');
+			std::string ext = (extPos != filename.npos)? filename.substr(extPos + 1): std::string();
+			std::transform(ext.begin(), ext.end(), ext.begin(), tolower);
+			return ext;
+		}
+
 		class Magic
 		{
 			magic_t								_magic;
@@ -56,6 +64,7 @@ namespace mtp
 				MAP_TYPE("audio/audio/x-wav",	ObjectFormat::Aiff);
 				MAP_TYPE("video/x-ms-asf",		ObjectFormat::Asf);
 				MAP_TYPE("audio/mp4",			ObjectFormat::Mp4);
+				MAP_TYPE("application/x-mpegurl", ObjectFormat::M3u);
 #undef MAP_TYPE
 			}
 
@@ -86,6 +95,11 @@ namespace mtp
 
 	ObjectFormat ObjectFormatFromFilename(const std::string &filename)
 	{
+		//libmagic missing mime type for m3u files
+		auto ext = GetExtension(filename);
+		if (ext == "m3u")
+			return mtp::ObjectFormat::M3u;
+
 		static Magic magic;
 		{
 			ObjectFormat magicType = magic.GetType(filename);
@@ -93,12 +107,6 @@ namespace mtp
 				return magicType;
 		}
 
-		size_t extPos = filename.rfind('.');
-		if (extPos == filename.npos)
-			return ObjectFormat::Undefined;
-
-		std::string ext = filename.substr(extPos + 1);
-		std::transform(ext.begin(), ext.end(), ext.begin(), tolower);
 		if (ext == "mp3")
 			return mtp::ObjectFormat::Mp3;
 		else if (ext == "txt")
@@ -129,8 +137,6 @@ namespace mtp
 			return mtp::ObjectFormat::_3gp;
 		else if (ext == "asf")
 			return mtp::ObjectFormat::Asf;
-		else if (ext == "m3u")
-			return mtp::ObjectFormat::M3u;
 		else
 			return ObjectFormat::Undefined;
 	}
