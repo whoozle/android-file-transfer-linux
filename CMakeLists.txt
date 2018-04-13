@@ -150,7 +150,7 @@ if (BUILD_SHARED_LIB)
 	install(TARGETS mtp-ng LIBRARY DESTINATION "lib${LIB_SUFFIX}" ARCHIVE DESTINATION "lib${LIB_SUFFIX}")
 else (BUILD_SHARED_LIB)
 	add_library(mtp-ng-static STATIC ${SOURCES})
-	list(APPEND MTP_LIBRARIES mtp-ng-static)
+	target_link_libraries(mtp-ng-static ${MTP_LIBRARIES})
 	install(TARGETS mtp-ng-static LIBRARY DESTINATION "lib${LIB_SUFFIX}" ARCHIVE DESTINATION "lib${LIB_SUFFIX}")
 endif (BUILD_SHARED_LIB)
 
