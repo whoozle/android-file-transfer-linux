@@ -54,7 +54,7 @@ public:
 		if (r < 0)
 			throw std::runtime_error(_file.errorString().toStdString());
 
-		int progress = _file.pos() * 1000L / _size;
+		int progress = _size > 0? _file.pos() * 1000L / _size: 0;
 		if (progress != _progress) //throttle events a bit
 		{
 			_progress = progress;

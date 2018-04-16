@@ -74,7 +74,11 @@ void ProgressDialog::setValue(float current)
 	float currentAnimated = _animation->currentValue().toFloat();
 	if (_duration <= 0)
 		return;
+
 	float currentSpeed = current * 1000 / _duration;
+	if (currentSpeed <= 0)
+		return;
+
 	int estimate = 1000 / currentSpeed;
 	int duration = estimate - _duration;
 	if (duration < 100)
@@ -88,9 +92,9 @@ void ProgressDialog::setValue(float current)
 
 void ProgressDialog::setSpeed(qint64 speed)
 {
-	static const double Kb = 1000;
-	static const double Mb = 1000 * Kb; //haha
-	static const double Gb = 1000 * Mb;
+	static constexpr double Kb = 1000;
+	static constexpr double Mb = 1000 * Kb; //haha
+	static constexpr double Gb = 1000 * Mb;
 	if (speed < 2 * Mb)
 		ui->speedLabel->setText(tr("Speed: ") + QString().sprintf("%.1f", speed / Kb) + tr(" Kb/s"));
 	else if (speed < 2 * Gb)

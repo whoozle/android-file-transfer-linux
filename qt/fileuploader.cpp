@@ -52,9 +52,11 @@ void FileUploader::onProgress(qint64 current)
 {
 	//qDebug() << "progress " << current << " of " << _total;
 	qint64 secs = _startedAt.secsTo(QDateTime::currentDateTime());
-	if (secs)
+	if (secs > 0)
 		emit uploadSpeed(current / secs);
-	emit uploadProgress(1.0 * current / _total);
+
+	if (_total > 0)
+		emit uploadProgress(1.0 * current / _total);
 }
 
 void FileUploader::onStarted(const QString &file)
