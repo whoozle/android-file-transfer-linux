@@ -146,11 +146,12 @@ if (BUILD_SHARED_LIB)
 		target_link_libraries(mtp-ng ${LIBUSB_LIBRARIES})
 	endif()
 
-	list(APPEND MTP_LIBRARIES mtp-ng)
+	list(INSERT MTP_LIBRARIES 0 mtp-ng)
 	install(TARGETS mtp-ng LIBRARY DESTINATION "lib${LIB_SUFFIX}" ARCHIVE DESTINATION "lib${LIB_SUFFIX}")
 else (BUILD_SHARED_LIB)
 	add_library(mtp-ng-static STATIC ${SOURCES})
 	target_link_libraries(mtp-ng-static ${MTP_LIBRARIES})
+	list(INSERT MTP_LIBRARIES 0 mtp-ng-static)
 	install(TARGETS mtp-ng-static LIBRARY DESTINATION "lib${LIB_SUFFIX}" ARCHIVE DESTINATION "lib${LIB_SUFFIX}")
 endif (BUILD_SHARED_LIB)
 
