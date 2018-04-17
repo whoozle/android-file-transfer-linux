@@ -79,11 +79,11 @@ if (BUILD_QT_UI)
     set(APPLICATION_ICON "")
   endif()
 
-	add_definitions(${QT_DEFINITIONS})
-	include_directories(${CMAKE_CURRENT_BINARY_DIR})
+  add_definitions(${QT_DEFINITIONS})
+  include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
   add_executable("${APP_NAME}" MACOSX_BUNDLE ${APPLICATION_ICON} ${SOURCES} ${HEADERS_MOC} ${FORMS_HEADERS} ${RESOURCES})
-  target_link_libraries("${APP_NAME}" ${EXTRA_QT_LINK} mtp-ng-static)
+  target_link_libraries("${APP_NAME}" ${EXTRA_QT_LINK} ${MTP_LIBRARIES})
 
   install(TARGETS ${APP_NAME}
           RUNTIME DESTINATION bin

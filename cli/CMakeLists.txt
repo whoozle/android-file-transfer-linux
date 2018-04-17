@@ -47,5 +47,5 @@ else()
 endif()
 
 add_executable(aft-mtp-cli ${CLI_SOURCES})
-target_link_libraries(aft-mtp-cli mtp-ng-static ${CLI_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(aft-mtp-cli ${MTP_LIBRARIES} ${CLI_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 install(TARGETS aft-mtp-cli RUNTIME DESTINATION bin)
