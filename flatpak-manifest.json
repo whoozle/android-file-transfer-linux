@@ -1,5 +1,5 @@
 {
-  "id": "io.github.whoozle.AndroidFileTransferLinux",
+  "id": "io.github.whoozle.android-file-transfer-linux",
 
   "runtime": "org.kde.Platform",
   "runtime-version": "5.10",
