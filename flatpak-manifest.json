@@ -1,0 +1,20 @@
+{
+  "id": "io.github.whoozle.AndroidFileTransferLinux",
+
+  "runtime": "org.kde.Platform",
+  "runtime-version": "5.10",
+
+  "sdk": "org.kde.Sdk",
+
+  "modules" : [
+    {
+      "name": "android-file-transfer-linux",
+      "buildsystem": "cmake",
+      "config-opts": [ "-DCMAKE_BUILD_TYPE=Release" ],
+      "sources": [{
+        "type": "git",
+        "url": "https://github.com/whoozle/android-file-transfer-linux.git"
+      }]
+    }
+  ]
+}
