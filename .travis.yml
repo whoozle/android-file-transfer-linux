@@ -52,16 +52,21 @@ script:
     fi
 
 after_success:
-  - wget -c https://github.com/probonopd/uploadtool/raw/master/upload.sh
   - |
     if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
       find ./appdir -executable -type f -exec ldd {} \; | grep " => /usr" | cut -d " " -f 2-3 | sort | uniq &&
-      bash upload.sh ./Android*.AppImage*
+      wget https://github.com/d1vanov/ciuploadtool/releases/download/continuous-master/ciuploadtool_linux.zip &&
+      unzip ciuploadtool_linux.zip &&
+      chmod 755 ciuploadtool &&
+      ./ciuploadtool ./Android*.AppImage*
     elif [ "${TRAVIS_OS_NAME}" = "osx" ]; then
-      bash upload.sh AndroidFileTransferForLinux.dmg
+      wget https://github.com/d1vanov/ciuploadtool/releases/download/continuous-master/ciuploadtool_mac.zip &&
+      unzip ciuploadtool_mac.zip &&
+      chmod 755 ciuploadtool &&
+      ./ciuploadtool AndroidFileTransferForLinux.dmg
     fi
 
 branches:
-  except:
-    - # Do not build tags that we create when we upload to GitHub Releases
-    - /^(?i:continuous)/
+  only:
+    - master
+    - /^v\d+\.\d+$/
