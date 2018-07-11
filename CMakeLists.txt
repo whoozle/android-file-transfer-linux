@@ -140,6 +140,7 @@ endif()
 
 if (BUILD_SHARED_LIB)
 	add_library(mtp-ng SHARED ${SOURCES})
+	set_target_properties(mtp-ng PROPERTIES SOVERSION 1)
 	target_link_libraries(mtp-ng ${CMAKE_THREAD_LIBS_INIT} ${MTP_SHARED_LIBRARIES})
 
 	if (USB_BACKEND_LIBUSB)
