@@ -1,6 +1,13 @@
 # FAQ
-## You're getting «ioctl(_fd, USBDEVFS_CLAIMINTERFACE, &interfaceNumber): Device or resource busy» or «Device is already used by another process» exception/message box right after you started the application. This clearly indicates that some other process is accessing MTP device right now.
-You could do the following steps to find it:
+
+## How to unmount my device?
+
+Run
+```fusermount -u <path>```
+
+
+## I'm getting «ioctl(_fd, USBDEVFS_CLAIMINTERFACE, &interfaceNumber): Device or resource busy» or «Device is already used by another process» exception/message box right after you started the application. This clearly indicates that some other process is accessing MTP device right now.
+You could do the following steps to find the offending process:
 * Open you console emulator (gnome-terminal, konsole, whatever) and type: ```lsusb``` (sudo apt-get install usbutils if it did not start) and find your device in its output, for example
 ```
 Bus 006 Device 070: ID 18d1:4ee2 Google Inc. Nexus 4 (debug)
