@@ -34,6 +34,9 @@ namespace mtp { namespace usb
 		std::vector<ProcessDescriptor> Processes;
 
 		DeviceBusyException(int fd = -1, const std::string &msg = "Device is already used by another process");
+
+		void Kill();
+		static void Kill(ProcessDescriptor desc);
 	};
 
 }}

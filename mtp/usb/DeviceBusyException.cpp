@@ -2,6 +2,7 @@
 #include <mtp/log.h>
 #ifdef __linux__
 #	include <fcntl.h>
+#	include <signal.h>
 #	include <unistd.h>
 #	include <linux/limits.h>
 
@@ -99,5 +100,29 @@ namespace mtp { namespace usb
 		} catch(const std::exception &ex)
 		{ debug("DeviceBusyException error: ", ex.what()); }
 	}
+
+	void DeviceBusyException::Kill()
+	{
+		for(auto desc : Processes)
+		{
+			try
+			{ Kill(desc); }
+			catch(const std::exception & ex)
+			{ error("Kill: ", ex.what()); }
+		}
+	}
+
+	void DeviceBusyException::Kill(ProcessDescriptor desc)
+	{
+#ifdef __linux__
+		if (kill(desc, SIGTERM) != 0)
+			throw posix::Exception("kill(" + std::to_string(desc) + ", SIGTERM)");
+		sleep(1);
+		kill(desc, SIGKILL); //assuming we can do it
+#else
+		throw std::runtime_error("not implemented");
+#endif
+	}
+
 
 }}
