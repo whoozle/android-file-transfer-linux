@@ -22,6 +22,7 @@
 
 #include <stdexcept>
 #include <vector>
+#include <string>
 
 namespace mtp { namespace usb
 {
