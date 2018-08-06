@@ -29,7 +29,11 @@ namespace mtp { namespace usb
 
 	struct DeviceBusyException : public std::runtime_error //! Exception thrown when device is busy (claimed by other process)
 	{
-		using ProcessDescriptor = unsigned;
+		struct ProcessDescriptor
+		{
+			int Id;
+			std::string Name;
+		};
 
 		std::vector<ProcessDescriptor> Processes;
 

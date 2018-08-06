@@ -87,7 +87,8 @@ namespace mtp { namespace usb
 						if (fdTarget == filePath)
 						{
 							debug("process ", pid, " is holding file descriptor to ", filePath);
-							Processes.push_back(pid);
+							auto image = ReadLink("/proc/" + pidPath + "/exe");
+							Processes.push_back({ pid, image });
 						}
 					}
 				}
@@ -115,10 +116,10 @@ namespace mtp { namespace usb
 	void DeviceBusyException::Kill(ProcessDescriptor desc)
 	{
 #ifdef __linux__
-		if (kill(desc, SIGTERM) != 0)
-			throw posix::Exception("kill(" + std::to_string(desc) + ", SIGTERM)");
+		if (kill(desc.Id, SIGTERM) != 0)
+			throw posix::Exception("kill(" + std::to_string(desc.Id) + " (" + desc.Name + "), SIGTERM)");
 		sleep(1);
-		kill(desc, SIGKILL); //assuming we can do it
+		kill(desc.Id, SIGKILL); //assuming we can do it
 #else
 		throw std::runtime_error("not implemented");
 #endif
