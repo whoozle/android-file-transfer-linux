@@ -80,6 +80,7 @@ set(SOURCES
 	mtp/ptp/Response.cpp
 	mtp/ptp/Session.cpp
 
+	mtp/usb/DeviceBusyException.cpp
 	mtp/usb/BulkPipe.cpp
 	mtp/usb/Request.cpp
 

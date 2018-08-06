@@ -33,13 +33,13 @@
 
 #include "linux/usbdevice_fs.h"
 
-#define IOCTL(...) do \
+#define IOCTL(FD, ...) do \
 { \
-	int r = ioctl(__VA_ARGS__); \
+	int r = ioctl(FD, __VA_ARGS__); \
 	if (r < 0) \
 	{ \
 		if (errno == EBUSY) \
-			throw DeviceBusyException(); \
+			throw DeviceBusyException(FD); \
 		else if (errno == ENODEV) \
 			throw DeviceNotFoundException(); \
 		else \

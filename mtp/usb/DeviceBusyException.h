@@ -21,13 +21,18 @@
 #define USB_DEVICEBUSYEXCEPTION_H
 
 #include <stdexcept>
+#include <vector>
 
 namespace mtp { namespace usb
 {
 
 	struct DeviceBusyException : public std::runtime_error //! Exception thrown when device is busy (claimed by other process)
 	{
-		DeviceBusyException(const std::string &msg = "Device is already used by another process"): std::runtime_error(msg) { }
+		using ProcessDescriptor = unsigned;
+
+		std::vector<ProcessDescriptor> Processes;
+
+		DeviceBusyException(int fd = -1, const std::string &msg = "Device is already used by another process");
 	};
 
 }}
