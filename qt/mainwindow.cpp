@@ -125,19 +125,41 @@ bool MainWindow::reconnectToDevice()
 
 	mtp::usb::ContextPtr ctx(new mtp::usb::Context);
 
-	for (auto desc : ctx->GetDevices())
-	try
+	auto devices = ctx->GetDevices();
+	for (auto desc = devices.begin(); desc != devices.end();)
 	{
-		auto device = mtp::Device::Open(ctx, desc);
-		if (device)
-			_device = device;
+		qDebug("probing device...");
+		try
+		{
+			_device = mtp::Device::Open(ctx, *desc);
+			++desc;
+		}
+		catch(const mtp::usb::DeviceBusyException &ex)
+		{
+			auto r = QMessageBox::warning(this,
+				tr("Device is busy"),
+				tr("Device is busy, maybe another process is using it. Close other MTP applications and restart Android File Transfer.\nPress Abort to kill them or Ignore to try next device."),
+				QMessageBox::Abort | QMessageBox::Ignore
+				);
+
+			if ((r & QMessageBox::Abort) == QMessageBox::Abort)
+			{
+				qDebug("kill'em all");
+				ex.Kill();
+				qDebug("retrying..."); //do not increment desc, retry device
+			}
+			if ((r & QMessageBox::Ignore) == QMessageBox::Ignore)
+				++desc;
+		}
+		catch(const std::exception &ex)
+		{
+			++desc;
+			qWarning("Device::Find failed: %s", ex.what());
+		}
+
+		if (_device)
+			break;
 	}
-	catch(const mtp::usb::DeviceBusyException &ex)
-	{
-		QMessageBox::critical(this, tr("Device is busy"), tr("Device is busy, maybe another process is using it. Close other MTP applications and restart Android File Transfer."));
-	}
-	catch(const std::exception &ex)
-	{ qWarning("Device::Find failed: %s", ex.what()); }
 
 	if (!_device)
 	{
