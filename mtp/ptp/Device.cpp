@@ -71,66 +71,73 @@ namespace mtp
 		throw std::runtime_error("no interface descriptor found");
 	}
 
+	DevicePtr Device::Open(usb::ContextPtr ctx, usb::DeviceDescriptorPtr desc, bool claimInterface)
+	{
+		debug("probing device ", hex(desc->GetVendorId(), 4), ":", hex(desc->GetProductId(), 4));
+		usb::DevicePtr device = desc->TryOpen(ctx);
+		if (!device)
+			return nullptr;
+		int confs = desc->GetConfigurationsCount();
+		//debug("configurations: ", confs);
+
+		for(int i = 0; i < confs; ++i)
+		{
+			usb::ConfigurationPtr conf = desc->GetConfiguration(i);
+			int interfaces = conf->GetInterfaceCount();
+			//debug("interfaces: ", interfaces);
+			for(int j = 0; j < interfaces; ++j)
+			{
+				usb::InterfacePtr iface = conf->GetInterface(device, conf, j, 0);
+				usb::InterfaceTokenPtr token = claimInterface? device->ClaimInterface(iface): nullptr;
+				debug("Device usb interface: ", i, ':', j, ", index: ", iface->GetIndex(), ", enpoints: ", iface->GetEndpointsCount());
+
+#ifdef USB_BACKEND_LIBUSB
+				std::string name = iface->GetName();
+#else
+				ByteArray data = usb::DeviceRequest(device).GetDescriptor(usb::DescriptorType::String, 0, 0);
+				HexDump("languages", data);
+				if (data.size() < 4 || data[1] != (u8)usb::DescriptorType::String)
+					continue;
+
+				int interfaceStringIndex = GetInterfaceStringIndex(desc, j);
+				u16 langId = data[2] | ((u16)data[3] << 8);
+				data = usb::DeviceRequest(device).GetDescriptor(usb::DescriptorType::String, interfaceStringIndex, langId);
+				HexDump("interface name", data);
+				if (data.size() < 4 || data[1] != (u8)usb::DescriptorType::String)
+					continue;
+
+				u8 len = data[0];
+				InputStream stream(data, 2);
+				std::string name = stream.ReadString((len - 2) / 2);
+#endif
+				if (name == "MTP")
+				{
+					//device->SetConfiguration(configuration->GetIndex());
+					usb::BulkPipePtr pipe = usb::BulkPipe::Create(device, conf, iface, token);
+					return std::make_shared<Device>(pipe);
+				}
+				if (iface->GetClass() == 6 && iface->GetSubclass() == 1)
+				{
+					usb::BulkPipePtr pipe = usb::BulkPipe::Create(device, conf, iface, token);
+					return std::make_shared<Device>(pipe);
+				}
+			}
+		}
+		return nullptr;
+	}
+
 	std::list<DevicePtr> Device::Find(bool claimInterface)
 	{
 		std::list<DevicePtr> foundDevices;
 
-		using namespace mtp;
 		usb::ContextPtr ctx(new usb::Context);
 
 		for (usb::DeviceDescriptorPtr desc : ctx->GetDevices())
 		try
 		{
-			debug("probing device ", hex(desc->GetVendorId(), 4), ":", hex(desc->GetProductId(), 4));
-			usb::DevicePtr device = desc->TryOpen(ctx);
-			if (!device)
-				continue;
-			int confs = desc->GetConfigurationsCount();
-			//debug("configurations: ", confs);
-
-			for(int i = 0; i < confs; ++i)
-			{
-				usb::ConfigurationPtr conf = desc->GetConfiguration(i);
-				int interfaces = conf->GetInterfaceCount();
-				//debug("interfaces: ", interfaces);
-				for(int j = 0; j < interfaces; ++j)
-				{
-					usb::InterfacePtr iface = conf->GetInterface(device, conf, j, 0);
-					usb::InterfaceTokenPtr token = claimInterface? device->ClaimInterface(iface): nullptr;
-					debug("Device usb interface: ", i, ':', j, ", index: ", iface->GetIndex(), ", enpoints: ", iface->GetEndpointsCount());
-
-#ifdef USB_BACKEND_LIBUSB
-					std::string name = iface->GetName();
-#else
-					ByteArray data = usb::DeviceRequest(device).GetDescriptor(usb::DescriptorType::String, 0, 0);
-					HexDump("languages", data);
-					if (data.size() < 4 || data[1] != (u8)usb::DescriptorType::String)
-						continue;
-
-					int interfaceStringIndex = GetInterfaceStringIndex(desc, j);
-					u16 langId = data[2] | ((u16)data[3] << 8);
-					data = usb::DeviceRequest(device).GetDescriptor(usb::DescriptorType::String, interfaceStringIndex, langId);
-					HexDump("interface name", data);
-					if (data.size() < 4 || data[1] != (u8)usb::DescriptorType::String)
-						continue;
-
-					u8 len = data[0];
-					InputStream stream(data, 2);
-					std::string name = stream.ReadString((len - 2) / 2);
-#endif
-					if (name == "MTP")
-					{
-						//device->SetConfiguration(configuration->GetIndex());
-						usb::BulkPipePtr pipe = usb::BulkPipe::Create(device, conf, iface, token);
-						foundDevices.push_back(std::make_shared<Device>(pipe));
-					}
-					if (iface->GetClass() == 6 && iface->GetSubclass() == 1)
-					{
-						usb::BulkPipePtr pipe = usb::BulkPipe::Create(device, conf, iface, token);
-						foundDevices.push_back(std::make_shared<Device>(pipe));
-					}
-				}
-			}
+			auto device = Open(ctx, desc, claimInterface);
+			if (device)
+				foundDevices.push_back(device);
 		}
 		catch(const std::exception &ex)
 		{ error("Device::Find failed:", ex.what()); }
