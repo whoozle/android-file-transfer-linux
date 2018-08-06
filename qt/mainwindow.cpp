@@ -136,11 +136,29 @@ bool MainWindow::reconnectToDevice()
 		}
 		catch(const mtp::usb::DeviceBusyException &ex)
 		{
-			auto r = QMessageBox::warning(this,
+			bool canKill = !ex.Processes.empty();
+			QString processList;
+			for (auto & desc : ex.Processes)
+			{
+				processList += QString("%1 (pid: %2)\n").arg(fromUtf8(desc.Name)).arg(desc.Id);
+			}
+			if (canKill)
+				processList = tr("The following processes are keeping file descriptors for your device:\n") + processList;
+
+			QMessageBox dialog(
+				QMessageBox::Warning,
 				tr("Device is busy"),
-				tr("Device is busy, maybe another process is using it. Close other MTP applications and restart Android File Transfer.\nPress Abort to kill them or Ignore to try next device."),
-				QMessageBox::Abort | QMessageBox::Ignore
+				tr("Device is busy, maybe another process is using it.\n\n") +
+				processList +
+				tr("Close other MTP applications and restart Android File Transfer.\n"
+				"\nPress Abort to kill them or Ignore to try next device."),
+				(canKill? QMessageBox::Abort: QMessageBox::StandardButton(0)) | QMessageBox::Ignore,
+				this
 				);
+
+			dialog.setDefaultButton(QMessageBox::Ignore);
+			dialog.setEscapeButton(QMessageBox::Ignore);
+			auto r = dialog.exec();
 
 			if ((r & QMessageBox::Abort) == QMessageBox::Abort)
 			{
