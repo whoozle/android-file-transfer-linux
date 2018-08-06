@@ -24,7 +24,6 @@
 #include <mtp/ptp/PipePacketer.h>
 #include <mtp/ptp/Session.h>
 #include <usb/DeviceDescriptor.h>
-#include <list>
 
 namespace mtp
 {
@@ -41,7 +40,7 @@ namespace mtp
 		SessionPtr OpenSession(u32 sessionId, int timeout = Session::DefaultTimeout);
 
 		static DevicePtr Open(usb::ContextPtr context, usb::DeviceDescriptorPtr desc, bool claimInterface = true);
-		static std::list<DevicePtr> Find(bool claimInterface = true);
+		static DevicePtr FindFirst(bool claimInterface = true);
 	};
 }
 

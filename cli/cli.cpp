@@ -102,13 +102,12 @@ int main(int argc, char **argv)
 		exit(0);
 	}
 
-	auto mtpDevices = Device::Find(claimInterface);
-	if (mtpDevices.empty())
+	auto mtp = Device::FindFirst(claimInterface);
+	if (!mtp)
 	{
 		error("no mtp device found");
 		exit(1);
 	}
-	auto mtp = mtpDevices.front();
 
 	try
 	{

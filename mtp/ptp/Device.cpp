@@ -126,10 +126,8 @@ namespace mtp
 		return nullptr;
 	}
 
-	std::list<DevicePtr> Device::Find(bool claimInterface)
+	DevicePtr Device::FindFirst(bool claimInterface)
 	{
-		std::list<DevicePtr> foundDevices;
-
 		usb::ContextPtr ctx(new usb::Context);
 
 		for (usb::DeviceDescriptorPtr desc : ctx->GetDevices())
@@ -137,12 +135,12 @@ namespace mtp
 		{
 			auto device = Open(ctx, desc, claimInterface);
 			if (device)
-				foundDevices.push_back(device);
+				return device;
 		}
 		catch(const std::exception &ex)
 		{ error("Device::Find failed:", ex.what()); }
 
-		return foundDevices;
+		return nullptr;
 	}
 
 }

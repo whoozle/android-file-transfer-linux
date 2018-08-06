@@ -390,10 +390,9 @@ namespace
 			_directoryCache.clear();
 			_session.reset();
 			_device.reset();
-			auto devices = mtp::Device::Find(_claimInterface);
-			if (devices.empty())
+			_device = mtp::Device::FindFirst(_claimInterface);
+			if (!_device)
 				throw std::runtime_error("no MTP device found");
-			_device = devices.front();
 
 			_session = _device->OpenSession(1);
 			_editObjectSupported = _session->EditObjectSupported();
