@@ -106,7 +106,7 @@ namespace mtp { namespace usb
 		{ debug("DeviceBusyException error: ", ex.what()); }
 	}
 
-	void DeviceBusyException::Kill()
+	void DeviceBusyException::Kill() const
 	{
 		for(auto desc : Processes)
 		{
@@ -117,7 +117,7 @@ namespace mtp { namespace usb
 		}
 	}
 
-	void DeviceBusyException::Kill(ProcessDescriptor desc)
+	void DeviceBusyException::Kill(const ProcessDescriptor & desc)
 	{
 #ifdef __linux__
 		if (kill(desc.Id, SIGTERM) != 0)
