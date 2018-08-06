@@ -37,6 +37,7 @@ namespace mtp { namespace usb
 		{
 //only linux for now
 #ifdef __linux__
+		auto myPid = getpid();
 		do
 		{
 			if (fd < 0)
@@ -65,6 +66,9 @@ namespace mtp { namespace usb
 
 				int pid;
 				if (sscanf(pidPath.c_str(), "%d", &pid) != 1)
+					continue;
+
+				if (pid == myPid)
 					continue;
 
 				debug("got process dir ", pidPath);
