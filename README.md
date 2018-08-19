@@ -12,7 +12,7 @@ It just works™.
 
 If you're happy with `gmtp`/`gvfs`/`mtpfs` or any other mtp software, you might not need this software (but give it a try!).
 
-If you're suffering from crashes, missing tags and album covers, usb freezes and corrupted files, this software is right for you.
+If you're suffering from crashes, missing tags, album covers, usb freezes and corrupted files, this software is right for you.
 
 ## Features
 
