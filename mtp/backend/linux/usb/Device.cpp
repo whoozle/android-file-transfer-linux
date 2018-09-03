@@ -173,7 +173,7 @@ namespace mtp { namespace usb
 		size_t Recv(const IObjectOutputStreamPtr &outputStream)
 		{
 			auto data = DataBuffer.GetData();
-			//HexDump("read", ByteArray(data, data + KernelUrb.actual_length), true);
+			//HexDump("read", ByteArray(data, data + actual_length), true);
 			return outputStream->Write(data, actual_length);
 		}
 
