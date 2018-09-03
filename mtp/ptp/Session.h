@@ -97,6 +97,7 @@ namespace mtp
 		NewObjectInfo CreateDirectory(const std::string &name, ObjectId parentId, StorageId storageId = AnyStorage, AssociationType type = AssociationType::GenericFolder);
 		msg::ObjectInfo GetObjectInfo(ObjectId objectId);
 		void GetObject(ObjectId objectId, const IObjectOutputStreamPtr &outputStream);
+		void GetThumb(ObjectId objectId, const IObjectOutputStreamPtr &outputStream);
 		ByteArray GetPartialObject(ObjectId objectId, u64 offset, u32 size);
 		NewObjectInfo SendObjectInfo(const msg::ObjectInfo &objectInfo, StorageId storageId = AnyStorage, ObjectId parentObject = Device);
 		void SendObject(const IObjectInputStreamPtr &inputStream, int timeout = LongTimeout);

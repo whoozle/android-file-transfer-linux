@@ -87,8 +87,11 @@ namespace cli
 		void ListStorages();
 		void ChangeStorage(const StoragePath &path);
 		void DisplayStorageInfo(const StoragePath &path);
-		void Get(const LocalPath &dst, mtp::ObjectId srcId);
+		void Get(const LocalPath &dst, mtp::ObjectId srcId, bool thumb = false);
 		void Get(const mtp::ObjectId srcId);
+		void GetThumb(const mtp::ObjectId srcId);
+		void GetThumb(const LocalPath &dst, mtp::ObjectId srcId)
+		{ Get(dst, srcId, true); }
 		void Cat(const Path &path);
 		void Put(mtp::ObjectId parentId, const LocalPath &src, const std::string &targetFilename = std::string());
 		void Put(const LocalPath &src, const Path &dst);
@@ -115,6 +118,12 @@ namespace cli
 
 		void Get(const LocalPath &dst, const Path &src)
 		{ Get(dst, Resolve(src)); }
+
+		void GetThumb(const Path &src)
+		{ GetThumb(Resolve(src)); }
+
+		void GetThumb(const LocalPath &dst, const Path &src)
+		{ GetThumb(dst, Resolve(src)); }
 
 		void MakeDirectory(const Path &path)
 		{

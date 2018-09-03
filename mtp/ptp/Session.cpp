@@ -209,6 +209,17 @@ namespace mtp
 		CHECK_RESPONSE(responseCode);
 	}
 
+	void Session::GetThumb(ObjectId objectId, const IObjectOutputStreamPtr &outputStream)
+	{
+		scoped_mutex_lock l(_mutex);
+		Transaction transaction(this);
+		Send(OperationRequest(OperationCode::GetThumb, transaction.Id, objectId.Id));
+		ByteArray response;
+		ResponseType responseCode;
+		_packeter.Read(transaction.Id, outputStream, responseCode, response, _defaultTimeout);
+		CHECK_RESPONSE(responseCode);
+	}
+
 	ByteArray Session::GetPartialObject(ObjectId objectId, u64 offset, u32 size)
 	{
 		scoped_mutex_lock l(_mutex);

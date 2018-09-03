@@ -116,6 +116,12 @@ namespace cli
 			make_function([this](const Path &path) -> void { Get(path); }));
 		AddCommand("get", "<file> <dst> downloads file to <dst>",
 			make_function([this](const Path &path, const LocalPath &dst) -> void { Get(dst, path); }));
+
+		AddCommand("get-thumb", "<file> downloads thumbnail for file",
+			make_function([this](const Path &path) -> void { GetThumb(path); }));
+		AddCommand("get-thumb", "<file> <dst> downloads thumbnail to <dst>",
+			make_function([this](const Path &path, const LocalPath &dst) -> void { GetThumb(dst, path); }));
+
 		AddCommand("cat", "<file> outputs file",
 			make_function([this](const Path &path) -> void { Cat(path); }));
 
@@ -603,7 +609,7 @@ namespace cli
 		}
 	}
 
-	void Session::Get(const LocalPath &dst, mtp::ObjectId srcId)
+	void Session::Get(const LocalPath &dst, mtp::ObjectId srcId, bool thumb)
 	{
 		mtp::ObjectFormat format = static_cast<mtp::ObjectFormat>(_session->GetObjectIntegerProperty(srcId, mtp::ObjectProperty::ObjectFormat));
 		if (format == mtp::ObjectFormat::Association)
@@ -627,7 +633,10 @@ namespace cli
 				if (IsInteractive())
 					try { stream->SetProgressReporter(ProgressBar(dst, _terminalWidth / 3, _terminalWidth)); } catch(const std::exception &ex) { }
 			}
-			_session->GetObject(srcId, stream);
+			if (thumb)
+				_session->GetThumb(srcId, stream);
+			else
+				_session->GetObject(srcId, stream);
 			stream.reset();
 			try
 			{
@@ -642,6 +651,12 @@ namespace cli
 	{
 		auto info = _session->GetObjectInfo(srcId);
 		Get(LocalPath(info.Filename), srcId);
+	}
+
+	void Session::GetThumb(mtp::ObjectId srcId)
+	{
+		auto info = _session->GetObjectInfo(srcId);
+		GetThumb(LocalPath(info.Filename), srcId);
 	}
 
 	void Session::Cat(const Path &path)
