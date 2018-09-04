@@ -22,10 +22,12 @@
 
 #include <mtp/types.h>
 #include <vector>
+#include <memory>
 
 namespace mtp
 {
 	typedef std::vector<u8> ByteArray; //! \typedef ByteArray : vector of bytes
+	DECLARE_PTR(ByteArray);
 
 	//! output hex dump to debug channel
 	void HexDump(const std::string &prefix, const ByteArray &data, bool force = false);
