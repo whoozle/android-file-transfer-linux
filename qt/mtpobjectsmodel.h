@@ -36,13 +36,15 @@ private:
 	mtp::SessionPtr		_session;
 	mtp::StorageId		_storageId;
 	mtp::ObjectId		_parentObjectId;
-	bool				_enableThumnails;
+	bool				_enableThumbnails;
 	QSize				_maxThumbnailSize;
+
+	using ThumbnailPtr = std::shared_ptr<QPixmap>;
 
 	class Row
 	{
 		mtp::msg::ObjectInfoPtr					_info;
-		mtp::ByteArrayPtr						_thumbnail;
+		ThumbnailPtr							_thumbnail;
 
 	public:
 		mtp::ObjectId							ObjectId;
@@ -51,7 +53,7 @@ private:
 
 		void ResetInfo() { _info.reset(); }
 		mtp::msg::ObjectInfoPtr GetInfo(mtp::SessionPtr session);
-		mtp::ByteArrayPtr GetThumbnail(mtp::SessionPtr session);
+		ThumbnailPtr GetThumbnail(mtp::SessionPtr session);
 		bool IsAssociation(mtp::SessionPtr);
 	};
 
@@ -78,7 +80,7 @@ public:
 
 	void enableThumbnail(bool enable, QSize maxSize)
 	{
-		_enableThumnails = enable;
+		_enableThumbnails = enable;
 		_maxThumbnailSize = maxSize;
 	}
 
