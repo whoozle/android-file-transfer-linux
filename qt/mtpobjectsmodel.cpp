@@ -119,7 +119,7 @@ mtp::msg::ObjectInfoPtr MtpObjectsModel::Row::GetInfo(mtp::SessionPtr session)
 	return _info;
 }
 
-MtpObjectsModel::ThumbnailPtr MtpObjectsModel::Row::GetThumbnail(mtp::SessionPtr session)
+MtpObjectsModel::ThumbnailPtr MtpObjectsModel::Row::GetThumbnail(mtp::SessionPtr session, QSize maxSize)
 {
 	if (!_thumbnail)
 	{
@@ -131,7 +131,11 @@ MtpObjectsModel::ThumbnailPtr MtpObjectsModel::Row::GetThumbnail(mtp::SessionPtr
 			session->GetThumb(ObjectId, stream);
 
 			auto data = stream->GetData();
-			_thumbnail->loadFromData(data->data(), data->size());
+			QPixmap pixmap;
+			if (!pixmap.loadFromData(data->data(), data->size()))
+				return _thumbnail;
+
+			*_thumbnail = pixmap.scaled(maxSize, Qt::KeepAspectRatio);
 
 			qDebug() << "loaded " << data->size() << " bytes of thumbnail data";
 		}
@@ -194,7 +198,7 @@ QVariant MtpObjectsModel::data(const QModelIndex &index, int role) const
 
 	case Qt::DecorationRole:
 		if (_enableThumbnails)
-			return *row.GetThumbnail(_session);
+			return *row.GetThumbnail(_session, _maxThumbnailSize);
 		else
 			return QVariant();
 

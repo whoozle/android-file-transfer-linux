@@ -53,7 +53,7 @@ private:
 
 		void ResetInfo() { _info.reset(); }
 		mtp::msg::ObjectInfoPtr GetInfo(mtp::SessionPtr session);
-		ThumbnailPtr GetThumbnail(mtp::SessionPtr session);
+		ThumbnailPtr GetThumbnail(mtp::SessionPtr session, QSize maxSize);
 		bool IsAssociation(mtp::SessionPtr);
 	};
 
