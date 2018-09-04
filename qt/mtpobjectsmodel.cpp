@@ -341,3 +341,13 @@ Qt::ItemFlags MtpObjectsModel::flags(const QModelIndex &index) const
 	Qt::ItemFlags defaultFlags = QAbstractListModel::flags(index);
 	return defaultFlags | Qt::ItemIsDropEnabled;
 }
+
+void MtpObjectsModel::enableThumbnail(bool enable, QSize maxSize)
+{
+	beginResetModel();
+
+	_enableThumbnails = enable;
+	_maxThumbnailSize = maxSize;
+
+	endResetModel();
+}

@@ -78,11 +78,7 @@ public:
 	MtpObjectsModel(QObject *parent = 0);
 	~MtpObjectsModel();
 
-	void enableThumbnail(bool enable, QSize maxSize)
-	{
-		_enableThumbnails = enable;
-		_maxThumbnailSize = maxSize;
-	}
+	void enableThumbnail(bool enable, QSize maxSize);
 
 	void setSession(mtp::SessionPtr session);
 	mtp::SessionPtr session() const
