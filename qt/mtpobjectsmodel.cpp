@@ -29,9 +29,14 @@
 #include <QMimeData>
 #include <QUrl>
 
+#include <mtp/ptp/MemoryObjectStream.h>
 #include <cli/PosixStreams.h> //for mtime
 
-MtpObjectsModel::MtpObjectsModel(QObject *parent): QAbstractListModel(parent), _storageId(mtp::Session::AllStorages), _parentObjectId(mtp::Session::Root)
+MtpObjectsModel::MtpObjectsModel(QObject *parent):
+	QAbstractListModel(parent),
+	_storageId(mtp::Session::AllStorages),
+	_parentObjectId(mtp::Session::Root),
+	_enableThumnails(false)
 { }
 
 MtpObjectsModel::~MtpObjectsModel()
@@ -114,6 +119,24 @@ mtp::msg::ObjectInfoPtr MtpObjectsModel::Row::GetInfo(mtp::SessionPtr session)
 	return _info;
 }
 
+mtp::ByteArrayPtr MtpObjectsModel::Row::GetThumbnail(mtp::SessionPtr session)
+{
+	if (!_thumbnail)
+	{
+		auto stream = std::make_shared<mtp::MemoryObjectOutputStream>();
+		_thumbnail = stream->GetData();
+		try
+		{
+			qDebug() << "requesting thumbnail for " << ObjectId.Id;
+			session->GetThumb(ObjectId, stream);
+			qDebug() << "loaded " << _thumbnail->size() << " bytes of thumbnail data";
+		}
+		catch(const std::exception &ex)
+		{ qDebug() << "failed to get thumbnail" << fromUtf8(ex.what()); }
+	}
+	return _thumbnail;
+}
+
 bool MtpObjectsModel::Row::IsAssociation(mtp::SessionPtr session)
 {
 	mtp::ObjectFormat format = GetInfo(session)->ObjectFormat;
@@ -163,6 +186,18 @@ QVariant MtpObjectsModel::data(const QModelIndex &index, int role) const
 			if (row.IsAssociation(_session))
 				font.setBold(true);
 			return font;
+		}
+	case Qt::DecorationRole:
+		if (!_enableThumnails)
+			return QVariant();
+		{
+			auto data = row.GetThumbnail(_session);
+			if (!data || data->empty())
+				return QVariant();
+
+			QPixmap bitmap;
+			bitmap.loadFromData(data->data(), data->size());
+			return bitmap;
 		}
 
 	default:

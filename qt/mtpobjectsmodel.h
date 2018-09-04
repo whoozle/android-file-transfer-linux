@@ -22,6 +22,7 @@
 
 #include <qabstractitemmodel.h>
 #include <mtp/ptp/Device.h>
+#include <QSize>
 #include <QVector>
 #include <QStringList>
 
@@ -35,19 +36,22 @@ private:
 	mtp::SessionPtr		_session;
 	mtp::StorageId		_storageId;
 	mtp::ObjectId		_parentObjectId;
+	bool				_enableThumnails;
+	QSize				_maxThumbnailSize;
 
 	class Row
 	{
 		mtp::msg::ObjectInfoPtr					_info;
+		mtp::ByteArrayPtr						_thumbnail;
 
 	public:
 		mtp::ObjectId							ObjectId;
 
-		Row(): ObjectId() { }
-		Row(mtp::ObjectId id): ObjectId(id) { }
+		Row(mtp::ObjectId id = mtp::ObjectId()): ObjectId(id) { }
 
 		void ResetInfo() { _info.reset(); }
 		mtp::msg::ObjectInfoPtr GetInfo(mtp::SessionPtr session);
+		mtp::ByteArrayPtr GetThumbnail(mtp::SessionPtr session);
 		bool IsAssociation(mtp::SessionPtr);
 	};
 
@@ -71,6 +75,12 @@ public:
 
 	MtpObjectsModel(QObject *parent = 0);
 	~MtpObjectsModel();
+
+	void enableThumbnail(bool enable, QSize maxSize)
+	{
+		_enableThumnails = enable;
+		_maxThumbnailSize = maxSize;
+	}
 
 	void setSession(mtp::SessionPtr session);
 	mtp::SessionPtr session() const

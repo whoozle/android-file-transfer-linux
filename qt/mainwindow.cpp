@@ -670,14 +670,11 @@ bool MainWindow::confirmOverwrite(const QString &file)
 
 void MainWindow::showThumbnails(bool enable)
 {
+	QSize maxSize;
 	if (enable)
-	{
-		_ui->listView->setGridSize(QSize(100, 100));
-		_ui->listView->setWrapping(true);
-	}
-	else
-	{
-		_ui->listView->setGridSize(QSize());
-		_ui->listView->setWrapping(false);
-	}
+		maxSize = QSize(100, 100);
+
+	_objectModel->enableThumbnail(enable, maxSize);
+	_ui->listView->setGridSize(maxSize);
+	_ui->listView->setWrapping(true);
 }
