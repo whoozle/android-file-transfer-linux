@@ -677,4 +677,5 @@ void MainWindow::showThumbnails(bool enable)
 	_objectModel->enableThumbnail(enable, maxSize);
 	_ui->listView->setGridSize(maxSize);
 	_ui->listView->setWrapping(true);
+	_ui->listView->setFlow(enable? QListView::LeftToRight: QListView::TopToBottom);
 }
