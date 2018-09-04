@@ -10,17 +10,21 @@ namespace mtp
 		public IObjectOutputStream,
 		public CancellableStream
 	{
-		ByteArray _data;
+		ByteArrayPtr _data;
+
+	public:
+		MemoryObjectOutputStream(): _data(new ByteArray()) { }
 
 		size_t Write(const u8 *data, size_t size) override
 		{
-			auto offset = _data.size();
-			_data.resize(offset + size);
-			std::copy(data, data + size, _data.data() + offset);
+			auto & storage = *_data;
+			auto offset = storage.size();
+			storage.resize(offset + size);
+			std::copy(data, data + size, storage.data() + offset);
 			return size;
 		}
 
-		const ByteArray & GetData() const
+		const ByteArrayPtr & GetData() const
 		{ return _data; }
 	};
 }
