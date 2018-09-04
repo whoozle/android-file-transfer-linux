@@ -74,6 +74,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(_ui->storageList, SIGNAL(activated(int)), SLOT(onStorageChanged(int)));
 	connect(_ui->actionRefresh, SIGNAL(triggered()), SLOT(refresh()));
 	connect(_ui->actionPaste, SIGNAL(triggered()), SLOT(pasteFromClipboard()));
+	connect(_ui->actionShowThumbnails, SIGNAL(triggered(bool)), SLOT(showThumbnails(bool)));
 
 	connect(_objectModel, SIGNAL(onFilesDropped(QStringList)), SLOT(uploadFiles(QStringList)));
 	connect(_objectModel, SIGNAL(existingFileOverwrite(QString)), SLOT(confirmOverwrite(QString)), Qt::BlockingQueuedConnection);
@@ -664,5 +665,19 @@ bool MainWindow::confirmOverwrite(const QString &file)
 		return false;
 	default:
 		return false;
+	}
+}
+
+void MainWindow::showThumbnails(bool enable)
+{
+	if (enable)
+	{
+		_ui->listView->setGridSize(QSize(100, 100));
+		_ui->listView->setWrapping(true);
+	}
+	else
+	{
+		_ui->listView->setGridSize(QSize());
+		_ui->listView->setWrapping(false);
 	}
 }

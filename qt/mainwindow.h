@@ -76,6 +76,7 @@ private slots:
 	void validateClipboard();
 	void pasteFromClipboard();
 	bool confirmOverwrite(const QString &file);
+	void showThumbnails(bool enable);
 
 public slots:
 	void downloadFiles(const QString & path, const QVector<mtp::ObjectId> &objects);
