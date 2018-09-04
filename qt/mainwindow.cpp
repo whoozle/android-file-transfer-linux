@@ -672,7 +672,7 @@ void MainWindow::showThumbnails(bool enable)
 {
 	QSize maxSize;
 	if (enable)
-		maxSize = QSize(100, 100);
+		maxSize = QSize(128, 128);
 
 	_ui->listView->setGridSize(maxSize);
 	_ui->listView->setWrapping(enable);
