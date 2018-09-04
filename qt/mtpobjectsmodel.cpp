@@ -135,7 +135,7 @@ MtpObjectsModel::ThumbnailPtr MtpObjectsModel::Row::GetThumbnail(mtp::SessionPtr
 			if (!pixmap.loadFromData(data->data(), data->size()))
 				return _thumbnail;
 
-			*_thumbnail = pixmap.scaled(maxSize, Qt::KeepAspectRatio);
+			*_thumbnail = pixmap.scaled(maxSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
 			qDebug() << "loaded " << data->size() << " bytes of thumbnail data";
 		}
