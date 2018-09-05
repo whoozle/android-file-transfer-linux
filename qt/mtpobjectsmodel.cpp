@@ -23,6 +23,7 @@
 #include <QDebug>
 #include <QBrush>
 #include <QColor>
+#include <QIcon>
 #include <QFile>
 #include <QFont>
 #include <QFileInfo>
@@ -133,14 +134,17 @@ MtpObjectsModel::ThumbnailPtr MtpObjectsModel::Row::GetThumbnail(mtp::SessionPtr
 			auto data = stream->GetData();
 			QPixmap pixmap;
 			if (!pixmap.loadFromData(data->data(), data->size()))
-				return _thumbnail;
+				throw std::runtime_error("couldn't load pixmap");
 
 			*_thumbnail = pixmap.scaled(maxSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
 			qDebug() << "loaded " << data->size() << " bytes of thumbnail data";
 		}
 		catch(const std::exception &ex)
-		{ qDebug() << "failed to get thumbnail" << fromUtf8(ex.what()); }
+		{
+			qDebug() << "failed to get thumbnail" << fromUtf8(ex.what());
+			*_thumbnail = QIcon::fromTheme("image-missing").pixmap(maxSize);
+		}
 	}
 	return _thumbnail;
 }
@@ -198,7 +202,7 @@ QVariant MtpObjectsModel::data(const QModelIndex &index, int role) const
 
 	case Qt::DecorationRole:
 		if (_enableThumbnails)
-			return *row.GetThumbnail(_session, _maxThumbnailSize);
+			return *row.GetThumbnail(_session, QSize(_maxThumbnailSize.width(), _maxThumbnailSize.height() / 1.5f));
 		else
 			return QVariant();
 
