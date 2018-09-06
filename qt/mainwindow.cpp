@@ -279,9 +279,20 @@ void MainWindow::onStorageChanged(int idx)
 	updateActionsState();
 }
 
+void MainWindow::down()
+{
+	QModelIndex index = mapIndex(_ui->listView->currentIndex());
+	activate(index);
+}
+
 void MainWindow::onActivated ( const QModelIndex & proxyIndex )
 {
 	QModelIndex index = mapIndex(proxyIndex);
+	activate(index);
+}
+
+void MainWindow::activate(const QModelIndex & index)
+{
 	QString name = _objectModel->data(index).toString();
 	if (_objectModel->enter(index.row()))
 		_history.push_back(qMakePair(name, _objectModel->parentObjectId()));
@@ -386,15 +397,6 @@ void MainWindow::back()
 	QModelIndex prevIndex = _objectModel->findObject(oldParent);
 	if (prevIndex.isValid())
 		_ui->listView->setCurrentIndex(_proxyModel->mapFromSource(prevIndex));
-	updateActionsState();
-}
-
-void MainWindow::down()
-{
-	QModelIndex index = mapIndex(_ui->listView->currentIndex());
-	QString name = _objectModel->data(index).toString();
-	if (_objectModel->enter(index.row()))
-		_history.push_back(qMakePair(name, _objectModel->parentObjectId()));
 	updateActionsState();
 }
 

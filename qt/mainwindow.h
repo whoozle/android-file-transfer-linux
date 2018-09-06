@@ -59,6 +59,7 @@ private slots:
 	void back();
 	void down();
 	void onActivated ( const QModelIndex & index );
+	void activate(const QModelIndex & index);
 	void updateActionsState();
 	void showContextMenu ( const QPoint & pos );
 	void createDirectory();
