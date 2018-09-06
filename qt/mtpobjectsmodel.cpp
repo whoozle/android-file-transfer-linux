@@ -189,6 +189,7 @@ QVariant MtpObjectsModel::data(const QModelIndex &index, int role) const
 
 	switch(role)
 	{
+	case Qt::ToolTipRole:
 	case Qt::DisplayRole:
 		return fromUtf8(row.GetInfo(_session)->Filename);
 
