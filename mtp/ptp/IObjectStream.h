@@ -28,7 +28,7 @@ namespace mtp
 {
 	struct ICancellableStream //! interfaces for streams with cancellation functionality
 	{
-		virtual ~ICancellableStream() { }
+		virtual ~ICancellableStream() = default;
 		virtual void Cancel() = 0;
 	};
 	DECLARE_PTR(ICancellableStream);

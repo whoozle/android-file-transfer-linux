@@ -121,7 +121,7 @@ namespace cli
 
 	struct ICommand
 	{
-		virtual ~ICommand() { }
+		virtual ~ICommand() = default;
 
 		virtual void Execute(const Tokens &tokens) const = 0;
 		virtual size_t GetArgumentCount() const = 0;

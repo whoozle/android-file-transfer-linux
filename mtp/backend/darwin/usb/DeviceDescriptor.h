@@ -39,7 +39,6 @@ namespace mtp { namespace usb
 
 	public:
 		Configuration(IOUSBDeviceType ** dev, IOUSBConfigurationDescriptorPtr conf);
-		~Configuration() { }
 
 		int GetIndex() const
 		{ return _conf->bConfigurationValue; }

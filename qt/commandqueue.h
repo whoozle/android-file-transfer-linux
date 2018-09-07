@@ -31,7 +31,7 @@ class CommandQueue;
 
 struct Command
 {
-	virtual ~Command() { }
+	virtual ~Command() = default;
 	virtual void execute(CommandQueue &queue) = 0;
 };
 

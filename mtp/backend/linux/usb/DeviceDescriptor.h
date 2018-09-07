@@ -32,7 +32,6 @@ namespace mtp { namespace usb
 		std::map<int, InterfacePtr> _interfaces;
 	public:
 		Configuration() { }
-		~Configuration() { }
 
 		int GetIndex() const
 		{ return 0; }

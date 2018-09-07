@@ -40,7 +40,7 @@ namespace cli
 
 	public:
 		BaseObjectStream(): _current(0), _total(0) { }
-		virtual ~BaseObjectStream() { }
+		virtual ~BaseObjectStream() = default;
 
 		void SetProgressReporter(const decltype(_progressReporter) & pr)
 		{ _progressReporter = pr; }
