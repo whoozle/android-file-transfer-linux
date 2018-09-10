@@ -1,7 +1,7 @@
 project(android-file-transfer)
 
 set(VERSION_MAJOR "3")
-set(VERSION_MINOR "5")
+set(VERSION_MINOR "6")
 set(VERSION_PATCH "0")
 set(VERSION_COUNT 3)
 set(VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
@@ -141,7 +141,7 @@ endif()
 
 if (BUILD_SHARED_LIB)
 	add_library(mtp-ng SHARED ${SOURCES})
-	set_target_properties(mtp-ng PROPERTIES SOVERSION 1)
+	set_target_properties(mtp-ng PROPERTIES SOVERSION ${VERSION})
 	target_link_libraries(mtp-ng ${CMAKE_THREAD_LIBS_INIT} ${MTP_SHARED_LIBRARIES})
 
 	if (USB_BACKEND_LIBUSB)
