@@ -1,5 +1,7 @@
 project(android-file-transfer)
 
+set (CMAKE_CXX_STANDARD 11)
+
 set(VERSION_MAJOR "3")
 set(VERSION_MINOR "6")
 set(VERSION_PATCH "0")
@@ -58,7 +60,7 @@ if (USB_BACKEND_LIBUSB)
 	message(WARNING "WARNING! You're using libusb, this is known to be broken -- large memory consumption, violating kernel memory limits and bugs. Continue at your own risk")
 endif()
 
-add_definitions(-Wall -pthread -std=c++11)
+add_definitions(-Wall -pthread)
 
 if (NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE Release)
