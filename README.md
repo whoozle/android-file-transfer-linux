@@ -36,6 +36,21 @@ https://www.paypal.me/whoozle
 
 ## Building instructions
 
+### Gentoo
+
+  AFT for Linux is now included in Gentoo, you don't have to build anything, just run
+  ```
+  sudo emerge -av sys-fs/android-file-transfer-linux
+  ```
+
+  If you need fuse mount helper to mount MTP filesystem, you have to enable fuse use flag, e.g. adding the following somewhere in /etc/portage.use/...
+  ```
+  sys-fs/android-file-transfer-linux fuse
+  ```
+
+  You can unmask ```sys-fs/android-file-transfer-linux-9999``` ebuild if you want the latest git-version
+
+
 ### Prerequisites
 
 * You will need Qt libraries for building ui program. If you're planning to use only library (*Qt is not needed*), you could turn the option ```BUILD_QT_UI``` off.
@@ -44,10 +59,12 @@ https://www.paypal.me/whoozle
   ```shell
   sudo apt-get install build-essential cmake libqt4-dev ninja-build libfuse-dev libreadline-dev
   ```
+
   For Fedora:
   ```
   dnf install make automake gcc gcc-c++ kernel-devel cmake fuse fuse-devel qt-devel readline-devel
   ```
+
 * Basically, you need `libqtX-dev` for UI, `libfuse-dev` for FUSE interface, `cmake`, `ninja` or `make` for building the project. You could use libqt5-dev as well.
 
 ### Building with ninja
