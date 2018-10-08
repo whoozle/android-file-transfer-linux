@@ -30,6 +30,9 @@
 
 #include <getopt.h>
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 int main(int argc, char **argv)
 {
@@ -39,6 +42,8 @@ int main(int argc, char **argv)
 	bool showPrompt = true;
 	bool showVersion = false;
 	bool claimInterface = true;
+	const char *fileInput = nullptr;
+
 	if (!isatty(STDIN_FILENO))
 		showPrompt = false;
 
@@ -50,17 +55,20 @@ int main(int argc, char **argv)
 		{"help",			no_argument,		0,	'h' },
 		{"version",			no_argument,		0,	'V' },
 		{"no-claim",		no_argument,		0,	'C' },
+		{"input-file",		required_argument,	0,	'f' },
 		{0,					0,					0,	 0	}
 	};
 
 	while(true)
 	{
 		int optionIndex = 0; //index of matching option
-		int c = getopt_long(argc, argv, "ibhvVC", long_options, &optionIndex);
+		int c = getopt_long(argc, argv, "ibhvVCf:", long_options, &optionIndex);
 		if (c == -1)
 			break;
 		switch(c)
 		{
+		case 'f':
+			fileInput = optarg; //falling back to batch processing here
 		case 'b':
 			showPrompt = false; //no break here, prompt = false, interactive = true
 		case 'i':
@@ -79,6 +87,21 @@ int main(int argc, char **argv)
 		case 'h':
 		default:
 			showHelp = true;
+		}
+	}
+	if (fileInput)
+	{
+		close(STDIN_FILENO);
+		int fd = open(fileInput, O_RDONLY);
+		if (fd == -1)
+		{
+			perror("open");
+			exit(1);
+		}
+		if (fd != STDIN_FILENO)
+		{
+			fprintf(stderr, "failed to reopen stdin\n");
+			exit(1);
 		}
 	}
 
