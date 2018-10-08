@@ -109,12 +109,13 @@ int main(int argc, char **argv)
 	{
 		error(
 			"usage:\n"
-			"-h\tshow this help\n"
-			"-v\tshow debug output\n"
-			"-i\tforce interactive mode\n"
-			"-b\tbatch command processing\n"
-			"-C\tno usb interface claim\n"
-			"-V\tshow version information"
+			"-h\t--help\t\tshow this help\n"
+			"-v\t--verbose\tshow debug output\n"
+			"-i\t--interactive\tforce interactive mode\n"
+			"-b\t--batch\t\tbatch command processing\n"
+			"-f\t--input-file\tuse file to read input commands\n"
+			"-C\t--no-claim\tno usb interface claim\n"
+			"-V\t--version\tshow version information"
 			);
 		exit(0);
 	}
