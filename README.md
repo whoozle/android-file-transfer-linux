@@ -43,13 +43,15 @@ https://www.paypal.me/whoozle
   sudo emerge -av sys-fs/android-file-transfer-linux
   ```
 
-  If you need fuse mount helper to mount MTP filesystem, you have to enable fuse use flag, e.g. adding the following somewhere in /etc/portage.use/...
+  If you need fuse mount helper to mount MTP filesystem, you have to enable fuse use flag, e.g. adding the following in /etc/portage/package.use (which can either be a directory or a file)
   ```
   sys-fs/android-file-transfer-linux fuse
   ```
 
-  You can unmask ```sys-fs/android-file-transfer-linux-9999``` ebuild if you want the latest git-version
-
+  You can use ```sys-fs/android-file-transfer-linux-9999``` ebuild if you want the latest git-version by adding the following entry into /etc/portage/package.accept_keywords (which can either be a directory or a file)
+  ```
+  =sys-fs/android-file-transfer-linux-9999 **
+  ```
 
 ### Prerequisites
 
