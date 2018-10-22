@@ -64,6 +64,7 @@ namespace cli
 		_cd(mtp::Session::Root),
 		_running(true),
 		_interactive(isatty(STDOUT_FILENO)),
+		_showEvents(false),
 		_showPrompt(showPrompt),
 		_terminalWidth(80),
 		_batterySupported(false)
@@ -244,6 +245,7 @@ namespace cli
 		Tokenizer(input, tokens);
 		if (!tokens.empty())
 			ProcessCommand(std::move(tokens));
+		mtp::print(":done");
 	}
 
 	void Session::ProcessCommand(Tokens && tokens_)
@@ -296,6 +298,7 @@ namespace cli
 	void Session::InteractiveInput(bool showEvents)
 	{
 		using namespace mtp;
+		_showEvents = showEvents;
 		if (_interactive && _showPrompt)
 		{
 			print("android file transfer for linux version ", GetVersion());

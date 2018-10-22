@@ -42,6 +42,7 @@ namespace cli
 		mtp::ObjectId				_cd; //current directory
 		bool						_running;
 		bool						_interactive;
+		bool						_showEvents;
 		bool						_showPrompt;
 		std::string					_prompt;
 		unsigned					_terminalWidth;
