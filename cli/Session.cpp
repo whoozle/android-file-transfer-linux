@@ -245,7 +245,8 @@ namespace cli
 		Tokenizer(input, tokens);
 		if (!tokens.empty())
 			ProcessCommand(std::move(tokens));
-		mtp::print(":done");
+		if (_showEvents)
+			mtp::print(":done");
 	}
 
 	void Session::ProcessCommand(Tokens && tokens_)
