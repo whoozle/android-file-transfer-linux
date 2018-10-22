@@ -296,10 +296,9 @@ namespace cli
 			_prompt.clear();
 	}
 
-	void Session::InteractiveInput(bool showEvents)
+	void Session::InteractiveInput()
 	{
 		using namespace mtp;
-		_showEvents = showEvents;
 		if (_interactive && _showPrompt)
 		{
 			print("android file transfer for linux version ", GetVersion());
@@ -630,7 +629,7 @@ namespace cli
 		else
 		{
 			auto stream = std::make_shared<ObjectOutputStream>(dst);
-			if (IsInteractive())
+			if (IsInteractive() || _showEvents)
 			{
 				mtp::u64 size = _session->GetObjectIntegerProperty(srcId, mtp::ObjectProperty::ObjectSize);
 				stream->SetTotal(size);

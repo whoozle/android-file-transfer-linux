@@ -143,10 +143,11 @@ int main(int argc, char **argv)
 	{
 		bool hasCommands = optind >= argc;
 		cli::Session session(mtp, showPrompt);
+		session.ShowEvents(showEvents);
 
 		if (forceInteractive || (session.IsInteractive() && hasCommands))
 		{
-			session.InteractiveInput(showEvents);
+			session.InteractiveInput();
 		}
 		else
 		{
