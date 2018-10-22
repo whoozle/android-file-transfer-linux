@@ -633,8 +633,14 @@ namespace cli
 			{
 				mtp::u64 size = _session->GetObjectIntegerProperty(srcId, mtp::ObjectProperty::ObjectSize);
 				stream->SetTotal(size);
-				if (IsInteractive())
+				if (_showEvents)
+				{
+					try { stream->SetProgressReporter(EventProgressBar(dst)); } catch(const std::exception &ex) { }
+				}
+				else if (_showPrompt)
+				{
 					try { stream->SetProgressReporter(ProgressBar(dst, _terminalWidth / 3, _terminalWidth)); } catch(const std::exception &ex) { }
+				}
 			}
 			if (thumb)
 				_session->GetThumb(srcId, stream);

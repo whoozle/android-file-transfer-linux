@@ -22,10 +22,31 @@
 
 #include <string>
 #include <mtp/types.h>
+#include <mtp/log.h>
 #include <stdio.h>
 
 namespace cli
 {
+	class EventProgressBar
+	{
+		std::string		_title;
+		int				_steps;
+		mtp::u64		_current;
+
+	public:
+		EventProgressBar(const std::string &title, int steps = 1000): _title(title), _steps(steps), _current(0) { }
+
+		void operator()(mtp::u64 offset, mtp::u64 total)
+		{
+			auto current = offset * _steps / total;
+			if (current != _current || offset >= total)
+			{
+				_current = current;
+				mtp::print(":progress ", _title, " ", offset, " ", total);
+			}
+		}
+
+	};
 
 	class ProgressBar
 	{
