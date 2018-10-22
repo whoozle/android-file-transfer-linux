@@ -751,8 +751,14 @@ namespace cli
 			oi.ObjectFormat = ObjectFormatFromFilename(src);
 			oi.SetSize(stream->GetSize());
 
-			if (IsInteractive())
+			if (_showEvents)
+			{
+				try { stream->SetProgressReporter(EventProgressBar(src)); } catch(const std::exception &ex) { }
+			}
+			else if (IsInteractive())
+			{
 				try { stream->SetProgressReporter(ProgressBar(src, _terminalWidth / 3, _terminalWidth)); } catch(const std::exception &ex) { }
+			}
 
 			_session->SendObjectInfo(oi, GetUploadStorageId(), parentId);
 			_session->SendObject(stream);
