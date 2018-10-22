@@ -57,7 +57,7 @@ namespace mtp
 		public:
 			MessageParsingStream(IObjectOutputStreamPtr stream): _header(new FixedSizeByteArrayObjectOutputStream(4)), _stream(stream), _offset(0), _size(4) { }
 
-			virtual void OnStream1Exhausted()
+			void OnStream1Exhausted() override
 			{
 				_stream1Exhausted = true;
 				InputStream is(_header->GetData());
@@ -68,7 +68,7 @@ namespace mtp
 				_size = size;
 			}
 
-			virtual size_t Write(const u8 *data, size_t size)
+			size_t Write(const u8 *data, size_t size) override
 			{
 				size_t r = JoinedObjectOutputStreamBase::Write(data, size);
 				_offset += r;
