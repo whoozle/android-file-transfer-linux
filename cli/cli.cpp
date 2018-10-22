@@ -42,6 +42,7 @@ int main(int argc, char **argv)
 	bool showPrompt = true;
 	bool showVersion = false;
 	bool claimInterface = true;
+	bool showEvents = false;
 	const char *fileInput = nullptr;
 
 	if (!isatty(STDIN_FILENO))
@@ -52,6 +53,7 @@ int main(int argc, char **argv)
 		{"verbose",			no_argument,		0,	'v' },
 		{"interactive",		no_argument,		0,	'i' },
 		{"batch",			no_argument,		0,	'b' },
+		{"events",			no_argument,		0,	'e' },
 		{"help",			no_argument,		0,	'h' },
 		{"version",			no_argument,		0,	'V' },
 		{"no-claim",		no_argument,		0,	'C' },
@@ -62,7 +64,7 @@ int main(int argc, char **argv)
 	while(true)
 	{
 		int optionIndex = 0; //index of matching option
-		int c = getopt_long(argc, argv, "ibhvVCf:", long_options, &optionIndex);
+		int c = getopt_long(argc, argv, "ibehvVCf:", long_options, &optionIndex);
 		if (c == -1)
 			break;
 		switch(c)
@@ -82,6 +84,9 @@ int main(int argc, char **argv)
 			break;
 		case 'C':
 			claimInterface = false;
+			break;
+		case 'e':
+			showEvents = true;
 			break;
 		case '?':
 		case 'h':
@@ -113,6 +118,7 @@ int main(int argc, char **argv)
 			"-v\t--verbose\tshow debug output\n"
 			"-i\t--interactive\tforce interactive mode\n"
 			"-b\t--batch\t\tbatch command processing\n"
+			"-e\t--events\t\tallow event processing\n"
 			"-f\t--input-file\tuse file to read input commands\n"
 			"-C\t--no-claim\tno usb interface claim\n"
 			"-V\t--version\tshow version information"
@@ -140,7 +146,7 @@ int main(int argc, char **argv)
 
 		if (forceInteractive || (session.IsInteractive() && hasCommands))
 		{
-			session.InteractiveInput();
+			session.InteractiveInput(showEvents);
 		}
 		else
 		{

@@ -293,7 +293,7 @@ namespace cli
 			_prompt.clear();
 	}
 
-	void Session::InteractiveInput()
+	void Session::InteractiveInput(bool showEvents)
 	{
 		using namespace mtp;
 		if (_interactive && _showPrompt)

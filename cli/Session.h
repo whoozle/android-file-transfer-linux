@@ -69,7 +69,7 @@ namespace cli
 		void UpdatePrompt();
 		bool IsInteractive() const
 		{ return _interactive; }
-		void InteractiveInput();
+		void InteractiveInput(bool showEvents);
 		void ProcessCommand(const std::string &input);
 		void ProcessCommand(Tokens &&tokens);
 
