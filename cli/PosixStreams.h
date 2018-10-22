@@ -33,7 +33,7 @@
 
 namespace cli
 {
-	class BaseObjectStream : public mtp::CancellableStream
+	class BaseObjectStream: public mtp::CancellableStream
 	{
 		std::function<void (mtp::u64, mtp::u64)>	_progressReporter;
 		mtp::u64									_current, _total;
@@ -59,7 +59,7 @@ namespace cli
 		}
 	};
 
-	class ObjectInputStream :
+	class ObjectInputStream final:
 		public BaseObjectStream,
 		public virtual mtp::IObjectInputStream
 	{
@@ -95,7 +95,7 @@ namespace cli
 		}
 	};
 
-	class ObjectOutputStream :
+	class ObjectOutputStream final:
 		public BaseObjectStream,
 		public mtp::IObjectOutputStream
 	{

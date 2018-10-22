@@ -26,14 +26,14 @@
 namespace mtp
 {
 
-	class ByteArrayObjectInputStream : public IObjectInputStream, public CancellableStream //! stream constructed from \ref ByteArray data
+	class ByteArrayObjectInputStream final: public IObjectInputStream, public CancellableStream //! stream constructed from \ref ByteArray data
 	{
 		ByteArray	_data;
 		size_t		_offset;
 
 	public:
-		ByteArrayObjectInputStream(const ByteArray & data): _data(data), _offset(0) { }
-		ByteArrayObjectInputStream(ByteArray && data): _data(data), _offset(0) { }
+		ByteArrayObjectInputStream(const ByteArray & data) noexcept: _data(data), _offset(0) { }
+		ByteArrayObjectInputStream(ByteArray && data) noexcept: _data(data), _offset(0) { }
 
 		const ByteArray &GetData() const
 		{ return _data; }
@@ -52,7 +52,7 @@ namespace mtp
 	};
 	DECLARE_PTR(ByteArrayObjectInputStream);
 
-	class ByteArrayObjectOutputStream : public IObjectOutputStream, public CancellableStream //! stream inserting into \ref ByteArray
+	class ByteArrayObjectOutputStream final: public IObjectOutputStream, public CancellableStream //! stream inserting into \ref ByteArray
 	{
 		ByteArray	_data;
 
@@ -71,7 +71,7 @@ namespace mtp
 	};
 	DECLARE_PTR(ByteArrayObjectOutputStream);
 
-	class FixedSizeByteArrayObjectOutputStream : public IObjectOutputStream, public CancellableStream //! stream writing into fixed size \ref ByteArray
+	class FixedSizeByteArrayObjectOutputStream final: public IObjectOutputStream, public CancellableStream //! stream writing into fixed size \ref ByteArray
 	{
 		ByteArray	_data;
 		size_t		_offset;

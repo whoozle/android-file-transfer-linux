@@ -6,7 +6,7 @@
 
 namespace mtp
 {
-	class MemoryObjectOutputStream :
+	class MemoryObjectOutputStream final:
 		public IObjectOutputStream,
 		public CancellableStream
 	{

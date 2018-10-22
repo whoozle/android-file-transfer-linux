@@ -40,7 +40,7 @@ namespace mtp
 
 	namespace
 	{
-		class MessageParsingStream : public JoinedObjectOutputStreamBase
+		class MessageParsingStream final: public JoinedObjectOutputStreamBase
 		{
 			FixedSizeByteArrayObjectOutputStreamPtr	_header;
 			IObjectOutputStreamPtr					_stream;
@@ -111,13 +111,13 @@ namespace mtp
 
 	namespace
 	{
-		struct DummyOutputStream : IObjectOutputStream, public CancellableStream
+		struct DummyOutputStream final: IObjectOutputStream, public CancellableStream
 		{
 			virtual size_t Write(const u8 *data, size_t size)
 			{ return size; }
 		};
 
-		class HeaderParserObjectOutputStream : public JoinedObjectOutputStreamBase
+		class HeaderParserObjectOutputStream final: public JoinedObjectOutputStreamBase
 		{
 			size_t									_offset;
 			u32										_transaction;

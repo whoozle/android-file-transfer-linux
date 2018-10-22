@@ -56,7 +56,7 @@ namespace mtp
 		}
 	};
 
-	class JoinedObjectInputStream : public JoinedObjectInputStreamBase  //! Input stream made of two subsequent stream
+	class JoinedObjectInputStream final: public JoinedObjectInputStreamBase  //! Input stream made of two subsequent stream
 	{
 		IObjectInputStreamPtr	_stream1, _stream2;
 		size_t					_stream1Size, _stream2Size;
@@ -111,7 +111,7 @@ namespace mtp
 		}
 	};
 
-	class JoinedObjectOutputStream : public JoinedObjectOutputStreamBase //! Output stream made of two subsequent stream
+	class JoinedObjectOutputStream final: public JoinedObjectOutputStreamBase //! Output stream made of two subsequent stream
 	{
 		IObjectOutputStreamPtr	_stream1, _stream2;
 
