@@ -54,8 +54,8 @@ namespace mtp
 		int				_defaultTimeout;
 
 	public:
-		static const int DefaultTimeout		= 10000;
-		static const int LongTimeout		= 30000;
+		static constexpr int DefaultTimeout		= 10000;
+		static constexpr int LongTimeout		= 30000;
 
 		static const StorageId AllStorages;
 		static const StorageId AnyStorage;
@@ -135,6 +135,9 @@ namespace mtp
 		void AbortCurrentTransaction(int timeout);
 
 	private:
+		template<typename ... Args>
+		ByteArray RunTransaction(int timeout, OperationCode code, Args && ... args);
+
 		void SetCurrentTransaction(Transaction *);
 
 		msg::DeviceInfo GetDeviceInfoImpl();

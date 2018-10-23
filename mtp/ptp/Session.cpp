@@ -109,12 +109,18 @@ namespace mtp
 		return data;
 	}
 
-	msg::DeviceInfo Session::GetDeviceInfoImpl()
+	template<typename ... Args>
+	ByteArray Session::RunTransaction(int timeout, OperationCode code, Args && ... args)
 	{
 		scoped_mutex_lock l(_mutex);
 		Transaction transaction(this);
-		Send(OperationRequest(OperationCode::GetDeviceInfo, transaction.Id));
-		ByteArray data = Get(transaction.Id);
+		Send(OperationRequest(code, transaction.Id, std::forward<Args>(args) ... ), timeout);
+		return Get(transaction.Id);
+	}
+
+	msg::DeviceInfo Session::GetDeviceInfoImpl()
+	{
+		auto data = RunTransaction(_defaultTimeout, OperationCode::GetDeviceInfo);
 		InputStream stream(data); //operation code + session id
 		msg::DeviceInfo gdi;
 		gdi.Read(stream);
@@ -124,10 +130,7 @@ namespace mtp
 
 	msg::ObjectHandles Session::GetObjectHandles(StorageId storageId, ObjectFormat objectFormat, ObjectId parent, int timeout)
 	{
-		scoped_mutex_lock l(_mutex);
-		Transaction transaction(this);
-		Send(OperationRequest(OperationCode::GetObjectHandles, transaction.Id, storageId.Id, static_cast<u32>(objectFormat), parent.Id), timeout);
-		ByteArray data = Get(transaction.Id, timeout);
+		auto data = RunTransaction(timeout, OperationCode::GetObjectHandles, storageId.Id, static_cast<u32>(objectFormat), parent.Id);
 		InputStream stream(data);
 
 		msg::ObjectHandles goh;
@@ -137,10 +140,7 @@ namespace mtp
 
 	msg::StorageIDs Session::GetStorageIDs()
 	{
-		scoped_mutex_lock l(_mutex);
-		Transaction transaction(this);
-		Send(OperationRequest(OperationCode::GetStorageIDs, transaction.Id));
-		ByteArray data = Get(transaction.Id);
+		auto data = RunTransaction(_defaultTimeout, OperationCode::GetStorageIDs);
 		InputStream stream(data);
 
 		msg::StorageIDs gsi;
@@ -150,10 +150,7 @@ namespace mtp
 
 	msg::StorageInfo Session::GetStorageInfo(StorageId storageId)
 	{
-		scoped_mutex_lock l(_mutex);
-		Transaction transaction(this);
-		Send(OperationRequest(OperationCode::GetStorageInfo, transaction.Id, storageId.Id));
-		ByteArray data = Get(transaction.Id);
+		auto data = RunTransaction(_defaultTimeout, OperationCode::GetStorageInfo, storageId.Id);
 		InputStream stream(data);
 		msg::StorageInfo gsi;
 		gsi.Read(stream);
@@ -176,10 +173,7 @@ namespace mtp
 
 	msg::ObjectInfo Session::GetObjectInfo(ObjectId objectId)
 	{
-		scoped_mutex_lock l(_mutex);
-		Transaction transaction(this);
-		Send(OperationRequest(OperationCode::GetObjectInfo, transaction.Id, objectId.Id));
-		ByteArray data = Get(transaction.Id);
+		auto data = RunTransaction(_defaultTimeout, OperationCode::GetObjectInfo, objectId.Id);
 		InputStream stream(data);
 		msg::ObjectInfo goi;
 		goi.Read(stream);
@@ -188,10 +182,7 @@ namespace mtp
 
 	msg::ObjectPropertiesSupported Session::GetObjectPropertiesSupported(ObjectId objectId)
 	{
-		scoped_mutex_lock l(_mutex);
-		Transaction transaction(this);
-		Send(OperationRequest(OperationCode::GetObjectPropsSupported, transaction.Id, objectId.Id));
-		ByteArray data = Get(transaction.Id);
+		auto data = RunTransaction(_defaultTimeout, OperationCode::GetObjectPropsSupported, objectId.Id);
 		InputStream stream(data);
 		msg::ObjectPropertiesSupported ops;
 		ops.Read(stream);
@@ -222,17 +213,14 @@ namespace mtp
 
 	ByteArray Session::GetPartialObject(ObjectId objectId, u64 offset, u32 size)
 	{
-		scoped_mutex_lock l(_mutex);
-		Transaction transaction(this);
 		if (_getPartialObject64Supported)
-			Send(OperationRequest(OperationCode::GetPartialObject64, transaction.Id, objectId.Id, offset, offset >> 32, size));
+			return RunTransaction(_defaultTimeout, OperationCode::GetPartialObject64, objectId.Id, offset, offset >> 32, size);
 		else
 		{
 			if (offset + size > std::numeric_limits<u32>::max())
 				throw std::runtime_error("32 bit overflow for GetPartialObject");
-			Send(OperationRequest(OperationCode::GetPartialObject, transaction.Id, objectId.Id, offset, size));
+			return RunTransaction(_defaultTimeout, OperationCode::GetPartialObject, objectId.Id, offset, size);
 		}
-		return Get(transaction.Id);
 	}
 
 
@@ -277,12 +265,7 @@ namespace mtp
 	}
 
 	void Session::BeginEditObject(ObjectId objectId)
-	{
-		scoped_mutex_lock l(_mutex);
-		Transaction transaction(this);
-		Send(OperationRequest(OperationCode::BeginEditObject, transaction.Id, objectId.Id));
-		Get(transaction.Id);
-	}
+	{ RunTransaction(_defaultTimeout, OperationCode::BeginEditObject, objectId.Id); }
 
 	void Session::SendPartialObject(ObjectId objectId, u64 offset, const ByteArray &data)
 	{
@@ -299,21 +282,10 @@ namespace mtp
 	}
 
 	void Session::TruncateObject(ObjectId objectId, u64 size)
-	{
-		scoped_mutex_lock l(_mutex);
-		Transaction transaction(this);
-		//64 bit size?
-		Send(OperationRequest(OperationCode::TruncateObject, transaction.Id, objectId.Id, size, size >> 32));
-		Get(transaction.Id);
-	}
+	{ RunTransaction(_defaultTimeout, OperationCode::TruncateObject, objectId.Id, size, size >> 32); }
 
 	void Session::EndEditObject(ObjectId objectId)
-	{
-		scoped_mutex_lock l(_mutex);
-		Transaction transaction(this);
-		Send(OperationRequest(OperationCode::EndEditObject, transaction.Id, objectId.Id));
-		Get(transaction.Id);
-	}
+	{ RunTransaction(_defaultTimeout, OperationCode::EndEditObject, objectId.Id); }
 
 	void Session::SetObjectProperty(ObjectId objectId, ObjectProperty property, const ByteArray &value)
 	{
@@ -350,17 +322,10 @@ namespace mtp
 	}
 
 	ByteArray Session::GetObjectProperty(ObjectId objectId, ObjectProperty property)
-	{
-		scoped_mutex_lock l(_mutex);
-		Transaction transaction(this);
-		Send(OperationRequest(OperationCode::GetObjectPropValue, transaction.Id, objectId.Id, (u16)property));
-		return Get(transaction.Id);
-	}
+	{ return RunTransaction(_defaultTimeout, OperationCode::GetObjectPropValue, objectId.Id, (u16)property); }
 
 	u64 Session::GetObjectIntegerProperty(ObjectId objectId, ObjectProperty property)
-	{
-		return ReadSingleInteger(GetObjectProperty(objectId, property));
-	}
+	{ return ReadSingleInteger(GetObjectProperty(objectId, property)); }
 
 	void Session::SetObjectProperty(ObjectId objectId, ObjectProperty property, u64 value)
 	{
@@ -406,60 +371,35 @@ namespace mtp
 	}
 
 	u64 Session::GetDeviceIntegerProperty(DeviceProperty property)
-	{
-		return ReadSingleInteger(GetDeviceProperty(property));
-	}
+	{ return ReadSingleInteger(GetDeviceProperty(property)); }
 
 	std::string Session::GetDeviceStringProperty(DeviceProperty property)
-	{
-		return ReadSingleString(GetDeviceProperty(property));
-	}
+	{ return ReadSingleString(GetDeviceProperty(property)); }
 
 	ByteArray Session::GetObjectPropertyList(ObjectId objectId, ObjectFormat format, ObjectProperty property, u32 groupCode, u32 depth, int timeout)
 	{
 		if (objectId == Root) //ffffffff -> 0
 			objectId = Device;
-		scoped_mutex_lock l(_mutex);
-		Transaction transaction(this);
-		Send(OperationRequest(OperationCode::GetObjectPropList, transaction.Id, objectId.Id, (u32)format, property != ObjectProperty::All? (u32)property: 0xffffffffu, groupCode, depth), timeout);
-		return Get(transaction.Id, timeout);
+		return RunTransaction(timeout, OperationCode::GetObjectPropList, objectId.Id, (u32)format, property != ObjectProperty::All? (u32)property: 0xffffffffu, groupCode, depth);
 	}
 
 	void Session::DeleteObject(ObjectId objectId, int timeout)
-	{
-		scoped_mutex_lock l(_mutex);
-		Transaction transaction(this);
-		Send(OperationRequest(OperationCode::DeleteObject, transaction.Id, objectId.Id, 0), timeout);
-		Get(transaction.Id);
-	}
+	{ RunTransaction(timeout, OperationCode::DeleteObject, objectId.Id, 0); }
 
 	ByteArray Session::GetDeviceProperty(DeviceProperty property)
-	{
-		scoped_mutex_lock l(_mutex);
-		Transaction transaction(this);
-		Send(OperationRequest(OperationCode::GetDevicePropValue, transaction.Id, (u16)property));
-		return Get(transaction.Id);
-	}
+	{ return RunTransaction(_defaultTimeout, OperationCode::GetDevicePropValue, (u16)property); }
 
 	Session::ObjectEditSession::ObjectEditSession(const SessionPtr & session, ObjectId objectId): _session(session), _objectId(objectId)
-	{
-		session->BeginEditObject(objectId);
-	}
+	{ session->BeginEditObject(objectId); }
 
 	Session::ObjectEditSession::~ObjectEditSession()
-	{
-		_session->EndEditObject(_objectId);
-	}
+	{ _session->EndEditObject(_objectId); }
 
 	void Session::ObjectEditSession::Truncate(u64 size)
-	{
-		_session->TruncateObject(_objectId, size);
-	}
+	{ _session->TruncateObject(_objectId, size); }
 
 	void Session::ObjectEditSession::Send(u64 offset, const ByteArray &data)
-	{
-		_session->SendPartialObject(_objectId, offset, data);
-	}
+	{ _session->SendPartialObject(_objectId, offset, data); }
 
 	void Session::AbortCurrentTransaction(int timeout)
 	{
