@@ -31,19 +31,19 @@
 
 namespace mtp
 {
-	typedef std::unique_lock<std::mutex> scoped_mutex_lock;
+	using scoped_mutex_lock = std::unique_lock<std::mutex>;
 
-	typedef uint8_t		u8;
-	typedef uint16_t	u16;
-	typedef uint32_t	u32;
-	typedef uint64_t	u64;
+	using u8	= uint8_t;
+	using u16	= uint16_t;
+	using u32	= uint32_t;
+	using u64	= uint64_t;
 
-	typedef int8_t		s8;
-	typedef int16_t		s16;
-	typedef int32_t		s32;
-	typedef int64_t		s64;
+	using s8	= int8_t;
+	using s16	= int16_t;
+	using s32	= int32_t;
+	using s64	= int64_t;
 
-	#define DECLARE_PTR(C) typedef std::shared_ptr<C> C##Ptr
+	#define DECLARE_PTR(C) using C##Ptr = std::shared_ptr<C>
 
 	template<typename T>
 	inline T RequireNotNull(const T &t, const std::string &expr) {

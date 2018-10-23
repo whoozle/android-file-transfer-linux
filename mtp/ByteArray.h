@@ -26,7 +26,7 @@
 
 namespace mtp
 {
-	typedef std::vector<u8> ByteArray; //! \typedef ByteArray : vector of bytes
+	using ByteArray = std::vector<u8>; //! \typedef ByteArray : vector of bytes
 	DECLARE_PTR(ByteArray);
 
 	//! output hex dump to debug channel
