@@ -146,6 +146,8 @@ namespace cli
 		AddCommand("type", "<path> shows type of file (recognized by libmagic/extension)",
 			make_function([this](const LocalPath &path) -> void { ShowType(path); }));
 
+		AddCommand("rename", "renames object",
+			make_function([this](const Path & path, const std::string & newName) -> void { Rename(path, newName); }));
 		AddCommand("storage-list", "shows available MTP storages",
 			make_function([this]() -> void { ListStorages(); }));
 		AddCommand("properties", "<path> lists properties for <path>",
@@ -678,6 +680,13 @@ namespace cli
 		if (text.empty() || text[text.size() - 1] == '\n')
 			fputc('\n', stdout);
 	}
+
+	void Session::Rename(const Path &path, const std::string &newName)
+	{
+		auto objectId = Resolve(path);
+		_session->SetObjectProperty(objectId, mtp::ObjectProperty::ObjectFilename, newName);
+	}
+
 	namespace
 	{
 		struct stat Stat(const std::string &path)

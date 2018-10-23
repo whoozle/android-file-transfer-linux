@@ -96,6 +96,7 @@ namespace cli
 		void GetThumb(const LocalPath &dst, mtp::ObjectId srcId)
 		{ Get(dst, srcId, true); }
 		void Cat(const Path &path);
+		void Rename(const Path & path, const std::string & newName);
 		void Put(mtp::ObjectId parentId, const LocalPath &src, const std::string &targetFilename = std::string());
 		void Put(const LocalPath &src, const Path &dst);
 		mtp::ObjectId MakeDirectory(mtp::ObjectId parentId, const std::string & name);
