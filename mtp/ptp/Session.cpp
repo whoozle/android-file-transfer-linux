@@ -110,11 +110,17 @@ namespace mtp
 	}
 
 	template<typename ... Args>
-	ByteArray Session::RunTransaction(int timeout, OperationCode code, Args && ... args)
+	ByteArray Session::RunTransactionWithDataRequest(int timeout, OperationCode code, const IObjectInputStreamPtr & inputStream, Args && ... args)
 	{
 		scoped_mutex_lock l(_mutex);
 		Transaction transaction(this);
 		Send(OperationRequest(code, transaction.Id, std::forward<Args>(args) ... ), timeout);
+		if (inputStream)
+		{
+			DataRequest req(code, transaction.Id);
+			Container container(req, inputStream);
+			_packeter.Write(std::make_shared<JoinedObjectInputStream>(std::make_shared<ByteArrayObjectInputStream>(container.Data), inputStream), timeout);
+		}
 		return Get(transaction.Id);
 	}
 
@@ -269,16 +275,8 @@ namespace mtp
 
 	void Session::SendPartialObject(ObjectId objectId, u64 offset, const ByteArray &data)
 	{
-		scoped_mutex_lock l(_mutex);
-		Transaction transaction(this);
-		Send(OperationRequest(OperationCode::SendPartialObject, transaction.Id, objectId.Id, offset, offset >> 32, data.size()));
-		{
-			DataRequest req(OperationCode::SendPartialObject, transaction.Id);
-			IObjectInputStreamPtr inputStream = std::make_shared<ByteArrayObjectInputStream>(data);
-			Container container(req, inputStream);
-			_packeter.Write(std::make_shared<JoinedObjectInputStream>(std::make_shared<ByteArrayObjectInputStream>(container.Data), inputStream), _defaultTimeout);
-		}
-		Get(transaction.Id);
+		IObjectInputStreamPtr inputStream = std::make_shared<ByteArrayObjectInputStream>(data);
+		RunTransactionWithDataRequest(_defaultTimeout, OperationCode::SendPartialObject, inputStream, objectId.Id, offset, offset >> 32, data.size());
 	}
 
 	void Session::TruncateObject(ObjectId objectId, u64 size)
@@ -289,16 +287,8 @@ namespace mtp
 
 	void Session::SetObjectProperty(ObjectId objectId, ObjectProperty property, const ByteArray &value)
 	{
-		scoped_mutex_lock l(_mutex);
-		Transaction transaction(this);
-		Send(OperationRequest(OperationCode::SetObjectPropValue, transaction.Id, objectId.Id, (u16)property));
-		{
-			DataRequest req(OperationCode::SetObjectPropValue, transaction.Id);
-			req.Append(value);
-			Container container(req);
-			_packeter.Write(container.Data, _defaultTimeout);
-		}
-		Get(transaction.Id);
+		IObjectInputStreamPtr inputStream = std::make_shared<ByteArrayObjectInputStream>(value);
+		RunTransactionWithDataRequest(_defaultTimeout, OperationCode::SetObjectPropValue, inputStream, objectId.Id, (u16)property);
 	}
 
 	StorageId Session::GetObjectStorage(mtp::ObjectId id)

@@ -136,7 +136,10 @@ namespace mtp
 
 	private:
 		template<typename ... Args>
-		ByteArray RunTransaction(int timeout, OperationCode code, Args && ... args);
+		ByteArray RunTransaction(int timeout, OperationCode code, Args && ... args)
+		{ return RunTransactionWithDataRequest<Args...>(timeout, code, nullptr, std::forward<Args>(args) ... ); }
+		template<typename ... Args>
+		ByteArray RunTransactionWithDataRequest(int timeout, OperationCode code, const IObjectInputStreamPtr & inputStream, Args && ... args);
 
 		void SetCurrentTransaction(Transaction *);
 
