@@ -63,7 +63,47 @@ namespace mtp
 			return size;
 		}
 
-		void WriteString(const std::string &value);
+		void WriteString(const std::string &value)
+		{
+			if (value.empty())
+			{
+				Write8(0);
+				return;
+			}
+			size_t len = 1 + Utf8Length(value);
+			if (len > 255)
+				throw std::runtime_error("string is too big (only 255 chars allowed, including null terminator)");
+			Write8(len);
+			for(size_t i = 0, p = 0; i < len && p < value.size(); ++i)
+			{
+				u8 c0 = value[p++];
+				u16 uni;
+				if (c0 == 0xc0 || c0 == 0xc1 || c0 >= 0xf5)
+				{
+					uni = '?';
+				}
+				else if (c0 < 0x80)
+				{
+					uni = c0;
+				}
+				else
+				{
+					u8 c1 = value[p++];
+					if (c0 >= 0xc2 && c0 <= 0xdf)
+						uni = ((c0 & 0x1f) << 6) | (c1 & 0x3f);
+					else
+					{
+						u8 c2 = value[p++];
+						if (c0 >= 0xe0 && c0 <= 0xef)
+							uni = ((c0 & 0x0f) << 12) | ((c1 & 0x3f) << 6) | (c2 & 0x3f);
+						else
+							uni = '?';
+					}
+				}
+				Write16(uni);
+			}
+			Write16(0);
+		}
 
 		template<typename ElementType>
 		void WriteArray(const std::vector<ElementType> &array)
