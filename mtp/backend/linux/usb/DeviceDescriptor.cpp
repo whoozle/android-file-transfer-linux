@@ -19,6 +19,7 @@
 
 #include <usb/DeviceDescriptor.h>
 #include <usb/Directory.h>
+#include <mtp/log.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -48,7 +49,10 @@ namespace mtp { namespace usb
 		char fname[256];
 		snprintf(fname, sizeof(fname), "/dev/bus/usb/%03d/%03u", _busId, _deviceNumber);
 		int fd = open(fname, O_RDWR);
-		return fd != -1? std::make_shared<Device>(fd, _controlEp): nullptr;
+		if (fd != -1)
+			return std::make_shared<Device>(fd, _controlEp);
+		debug("error: ", posix::Exception::GetErrorMessage(errno));
+		return nullptr;
 	}
 
 	DeviceDescriptor::~DeviceDescriptor()
