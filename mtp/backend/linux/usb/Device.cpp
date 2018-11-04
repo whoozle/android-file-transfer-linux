@@ -201,7 +201,7 @@ namespace mtp { namespace usb
 
 		pollfd fd = {};
 		fd.fd		= _fd.Get();
-		fd.events	= POLLOUT;
+		fd.events	= POLLOUT | POLLWRNORM;
 		int r = poll(&fd, 1, timeout);
 
 		timeval now = {};
