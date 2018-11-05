@@ -143,6 +143,11 @@ int main(int argc, char **argv)
 	{
 		bool hasCommands = optind >= argc;
 		cli::Session session(mtp, showPrompt);
+		if (!session.SetFirstStorage())
+		{
+			error("your device may be locked or does not have any storage available");
+			exit(2);
+		}
 		session.ShowEvents(showEvents);
 
 		if (forceInteractive || (session.IsInteractive() && hasCommands))

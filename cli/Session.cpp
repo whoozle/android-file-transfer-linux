@@ -172,6 +172,17 @@ namespace cli
 		}));
 	}
 
+	bool Session::SetFirstStorage()
+	{
+		auto ids = _session->GetStorageIDs();
+		if (ids.StorageIDs.empty())
+			return false;
+
+		auto id = std::to_string(ids.StorageIDs.front().Id);
+		ChangeStorage(StoragePath(id));
+		return true;
+	}
+
 	char ** Session::CompletionCallback(const char *text, int start, int end)
 	{
 		Tokens tokens;

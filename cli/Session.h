@@ -67,6 +67,8 @@ namespace cli
 	public:
 		Session(const mtp::DevicePtr &device, bool showPrompt);
 
+		bool SetFirstStorage();
+
 		void UpdatePrompt();
 		bool IsInteractive() const
 		{ return _interactive; }
