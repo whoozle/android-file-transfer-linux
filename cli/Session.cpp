@@ -161,23 +161,15 @@ namespace cli
 
 		AddCommand("test-property-list", "test GetObjectPropList on given object",
 			make_function([this](const Path &path) -> void { TestObjectPropertyList(path); }));
-#if 0
-		auto test = [](const std::string &input)
+
+		AddCommand("test-lexer", "tests lexer", make_function([](const std::string &input) -> void
 		{
 			Tokens tokens;
 			Tokenizer(input, tokens);
 			print(input);
 			for(auto t : tokens)
 				print("\t", t);
-		};
-		AddCommand("test-lexer", "tests lexer",
-			make_function([&test]() -> void
-			{
-				test("a\\ b\\ c d");
-				test("\"a b c\" d");
-				test("\"\\\"\"");
-			}));
-#endif
+		}));
 	}
 
 	char ** Session::CompletionCallback(const char *text, int start, int end)
