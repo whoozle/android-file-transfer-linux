@@ -1,3 +1,8 @@
+# notes on this fork of Android File Transfer...
+this fork was created to work on an ARMv7 laptop with Android 7 phones...
+no need to compile the old v3.2 source anymore just to get it to work! 
+
+
 # Android File Transfer For Linux (and Mac OS X!)
 
 [![License](http://img.shields.io/:license-LGPLv2.1-blue.svg)](https://github.com/whoozle/android-file-transfer-linux/blob/master/LICENSE)
