@@ -24,7 +24,7 @@ install:
       sudo apt-get -y install qt59base libfuse-dev libmagic-dev &&
       source /opt/qt*/bin/qt*-env.sh
     elif [ "${TRAVIS_OS_NAME}" = "osx" ]; then
-      brew install qt5
+      brew tap homebrew/cask && brew install qt5 homebrew/cask/osxfuse
     fi
 
 script:
