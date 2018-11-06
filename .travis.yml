@@ -8,6 +8,7 @@ matrix:
         - os: linux
           compiler: gcc
         - os: osx
+          osx_image: xcode10.1
           compiler: clang
 
 before_install:
@@ -46,6 +47,8 @@ script:
       make -j$(sysctl -n hw.ncpu) &&
       make install &&
       mv installdir/android-file-transfer.app installdir/Android\ File\ Transfer\ for\ Linux.app &&
+      mkdir -p installdir/Android\ File\ Transfer\ for\ Linux.app/Contents/SharedSupport/ &&
+      mv installdir/bin installdir/Android\ File\ Transfer\ for\ Linux.app/Contents/SharedSupport/ &&
       git clone https://github.com/andreyvit/create-dmg.git &&
       cd create-dmg &&
       ./create-dmg --volicon "../../osx/android-file-transfer.icns" --icon-size 96 --icon "Android File Transfer for Linux" 110 100 --app-drop-link 380 100 AndroidFileTransferForLinux.dmg ../installdir/Android\ File\ Transfer\ for\ Linux.app
