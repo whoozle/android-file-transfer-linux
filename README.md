@@ -91,6 +91,22 @@ make
 ./qt/android-file-transfer
 ```
 
+### Installing binary package on OS X / macOS
+There is a binary package that can be installed via Homebrew:
+ * First [install brew](https://brew.sh) if you don't have it already installed.
+ * Then the stable package may be installed via:
+
+ ```shell
+brew install homebrew/cask/whoozle-android-file-transfer
+ ```
+ * Nighlty build may be installed via;
+
+ ```shell
+brew install homebrew/cask-versions/whoozle-android-file-transfer-nightly
+ ```
+
+ * Please note: they are in conflict, so please make sure to uninstall it when you want switch between stable and nightly.
+
 ### Building app package on OS X / macOS
 
 You'll need Qt installed to build the GUI app. Here are the build instructions with qt5 from homebrew (`brew install qt5`):
