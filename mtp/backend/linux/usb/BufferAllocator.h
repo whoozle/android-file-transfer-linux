@@ -77,7 +77,7 @@ namespace mtp { namespace usb
 
 		~BufferAllocator()
 		{
-			if (_fd >= 0)
+			// if (_fd >= 0)
 				munmap(_buffer, _bufferSize);
 		}
 
@@ -94,7 +94,7 @@ namespace mtp { namespace usb
 			if (!_buffer)
 			{
 				_bufferSize = (BufferSize + _pageSize - 1) / _pageSize * _pageSize;
-				if (_fd >= 0)
+				/* if (_fd >= 0)
 				{
 					try
 					{
@@ -111,7 +111,7 @@ namespace mtp { namespace usb
 						AllocateNormalBuffer();
 					}
 				}
-				else
+				else */
 					AllocateNormalBuffer();
 			}
 			if (size > BufferSize)
