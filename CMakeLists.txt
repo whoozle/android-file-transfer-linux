@@ -24,14 +24,7 @@ include(CheckIncludeFiles)
 
 find_package ( Threads )
 
-# Don't mistake osx for unix
-if(UNIX AND NOT APPLE)
-  set(UNIX_SYS ON)
-else()
-  set(UNIX_SYS OFF)
-endif()
-
-option(BUILD_FUSE "Build fuse mount helper" ${UNIX_SYS})
+option(BUILD_FUSE "Build fuse mount helper" ON)
 
 if (BUILD_FUSE)
 	pkg_check_modules ( FUSE fuse )
