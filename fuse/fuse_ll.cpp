@@ -160,7 +160,7 @@ namespace
 			mtp::ByteArray data = _session->GetObjectPropertyList(parent, mtp::ObjectFormat::Any, property, 0, 1);
 			mtp::ObjectPropertyListParser<PropertyValueType> parser;
 
-			parser.Parse(data, [this, &objectList, &callback, property](mtp::ObjectId objectId, mtp::ObjectProperty p, const PropertyValueType & value) {
+			parser.Parse(data, [&objectList, &callback, property](mtp::ObjectId objectId, mtp::ObjectProperty p, const PropertyValueType & value) {
 				auto it = objectList.find(objectId);
 				if (property == p && it != objectList.end())
 				{
