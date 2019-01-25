@@ -2,7 +2,7 @@
 <component type="desktop-application">
    <id>android-file-transfer</id>
    <metadata_license>CC0-1.0</metadata_license>
-   <project_license>GPL-2.0+</project_license>
+   <project_license>LGPL-2.0+</project_license>
    <name>Android File Transfer</name>
    <summary>Interactive MTP client with Qt4/Qt5 GUI</summary>
    <description>
