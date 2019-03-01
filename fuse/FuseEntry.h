@@ -30,7 +30,7 @@ namespace mtp { namespace fuse
 	struct FuseEntry : fuse_entry_param
 	{
 		static constexpr const double	Timeout = 60.0;
-		static constexpr unsigned 		FileMode 		= S_IFREG | 0444;
+		static constexpr unsigned 		FileMode 		= S_IFREG | 0644;
 		static constexpr unsigned 		DirectoryMode	= S_IFDIR | 0755;
 
 		fuse_req_t Request;
