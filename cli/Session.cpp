@@ -139,6 +139,8 @@ namespace cli
 			make_function([this]() -> void { CurrentDirectory(); }));
 		AddCommand("rm", "<path> removes object (WARNING: RECURSIVE, be careful!)",
 			make_function([this](const LocalPath &path) -> void { Delete(path); }));
+		AddCommand("rm-id", "<path> removes object by id (WARNING: RECURSIVE, be careful!)",
+			make_function([this](mtp::u32 id) -> void { Delete(mtp::ObjectId(id)); }));
 		AddCommand("mkdir", "<path> makes directory",
 			make_function([this](const Path &path) -> void { MakeDirectory(path); }));
 		AddCommand("mkpath", "<path> create directory structure specified in path",

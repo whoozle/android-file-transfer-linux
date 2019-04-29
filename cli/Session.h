@@ -142,7 +142,10 @@ namespace cli
 		{ Resolve(path, true); }
 
 		void Delete(const Path &path)
-		{ _session->DeleteObject(Resolve(path)); }
+		{ Delete(Resolve(path)); }
+
+		void Delete(mtp::ObjectId id)
+		{ _session->DeleteObject(id); }
 
 		void ListProperties(const Path &path)
 		{ ListProperties(Resolve(path)); }
