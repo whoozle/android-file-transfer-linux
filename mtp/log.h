@@ -28,7 +28,7 @@
 //I love libstdc++!
 inline std::ostream & operator << (std::ostream & stream, unsigned char v)
 {
-	stream << (mtp::u16)v;;
+	stream << (mtp::u16)v;
 	return stream;
 }
 
