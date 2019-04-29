@@ -167,8 +167,13 @@ void MtpObjectsModel::deleteObjects(const MtpObjectList &objects)
 {
 	for(mtp::ObjectId objectId: objects)
 	{
-		qDebug() << "deleting object " << objectId;
-		_session->DeleteObject(objectId);
+		try
+		{
+			qDebug() << "deleting object " << objectId;
+			_session->DeleteObject(objectId);
+		}
+		catch(const std::exception &ex)
+		{ qDebug() << "failed to delete object " << fromUtf8(ex.what()); }
 	}
 	refresh();
 }
