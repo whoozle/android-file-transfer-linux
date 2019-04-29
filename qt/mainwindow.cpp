@@ -441,6 +441,7 @@ void MainWindow::uploadFiles(const QStringList &files)
 
 	_objectModel->moveToThread(QApplication::instance()->thread());
 	_proxyModel->setSourceModel(_objectModel);
+	refresh();
 }
 
 
