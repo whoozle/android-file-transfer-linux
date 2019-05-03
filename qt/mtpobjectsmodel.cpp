@@ -54,7 +54,13 @@ void MtpObjectsModel::setParent(mtp::ObjectId parentObjectId)
 	beginResetModel();
 
 	_parentObjectId = parentObjectId;
-	mtp::msg::ObjectHandles handles = _session->GetObjectHandles(_storageId, mtp::ObjectFormat::Any, parentObjectId);
+	mtp::msg::ObjectHandles handles;
+	try
+	{
+		handles = _session->GetObjectHandles(_storageId, mtp::ObjectFormat::Any, parentObjectId);
+	}
+	catch(const std::exception & ex)
+	{ qDebug() << "setParent failed:" << fromUtf8(ex.what()); }
 	_rows.clear();
 	_rows.reserve(handles.ObjectHandles.size());
 	for(size_t i = 0; i < handles.ObjectHandles.size(); ++i)
