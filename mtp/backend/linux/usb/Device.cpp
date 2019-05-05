@@ -75,6 +75,8 @@ namespace mtp { namespace usb
 		{ error("get usbfs capabilities failed: ", ex.what()); }
 		debug("capabilities = 0x", hex(_capabilities, 8));
 		bool mmap = _capabilities & USBDEVFS_CAP_MMAP;
+		//disable mmap allocation for now, see https://github.com/whoozle/android-file-transfer-linux/issues/194
+		mmap = false;
 		_bufferAllocator = std::make_shared<BufferAllocator>(mmap? fd: -1);
 
 		if (_capabilities)

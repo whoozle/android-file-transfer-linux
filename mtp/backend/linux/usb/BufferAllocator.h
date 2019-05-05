@@ -70,8 +70,6 @@ namespace mtp { namespace usb
 	public:
 		BufferAllocator(int fd): _fd(fd), _pageSize(sysconf(_SC_PAGESIZE)), _buffer(nullptr), _bufferSize(0), _bufferAllocated()
 		{
-//disable mmap allocation for now, see https://github.com/whoozle/android-file-transfer-linux/issues/194
-			_fd = -1;
 			if (_pageSize <= 0)
 				throw posix::Exception("sysconf(_SC_PAGESIZE)");
 			debug("page size = ", _pageSize);
