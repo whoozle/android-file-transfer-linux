@@ -60,7 +60,7 @@ void MtpObjectsModel::setParent(mtp::ObjectId parentObjectId)
 		handles = _session->GetObjectHandles(_storageId, mtp::ObjectFormat::Any, parentObjectId);
 	}
 	catch(const std::exception & ex)
-	{ qDebug() << "setParent failed:" << fromUtf8(ex.what()); }
+	{ qWarning() << "setParent failed:" << fromUtf8(ex.what()); }
 	_rows.clear();
 	_rows.reserve(handles.ObjectHandles.size());
 	for(size_t i = 0; i < handles.ObjectHandles.size(); ++i)
@@ -121,7 +121,7 @@ mtp::msg::ObjectInfoPtr MtpObjectsModel::Row::GetInfo(mtp::SessionPtr session)
 			//qDebug() << fromUtf8(row.Info->Filename);
 		}
 		catch(const std::exception &ex)
-		{ qDebug() << "failed to get object info " << fromUtf8(ex.what()); }
+		{ qWarning() << "failed to get object info " << fromUtf8(ex.what()); }
 	}
 	return _info;
 }
@@ -148,7 +148,7 @@ MtpObjectsModel::ThumbnailPtr MtpObjectsModel::Row::GetThumbnail(mtp::SessionPtr
 		}
 		catch(const std::exception &ex)
 		{
-			qDebug() << "failed to get thumbnail" << fromUtf8(ex.what());
+			qWarning() << "failed to get thumbnail" << fromUtf8(ex.what());
 			*_thumbnail = QIcon::fromTheme("image-missing").pixmap(maxSize);
 		}
 	}
@@ -169,7 +169,7 @@ void MtpObjectsModel::rename(int idx, const QString &fileName)
 		_session->SetObjectProperty(objectIdAt(idx), mtp::ObjectProperty::ObjectFilename, toUtf8(fileName));
 	}
 	catch(const std::exception &ex)
-	{ qDebug() << "failed to rename object" << fromUtf8(ex.what()); }
+	{ qWarning() << "failed to rename object" << fromUtf8(ex.what()); }
 
 	_rows[idx].ResetInfo();
 	emit dataChanged(createIndex(idx, 0), createIndex(idx, 0));
@@ -185,7 +185,7 @@ void MtpObjectsModel::deleteObjects(const MtpObjectList &objects)
 			_session->DeleteObject(objectId);
 		}
 		catch(const std::exception &ex)
-		{ qDebug() << "failed to delete object " << fromUtf8(ex.what()); }
+		{ qWarning() << "failed to delete object " << fromUtf8(ex.what()); }
 	}
 	refresh();
 }
@@ -276,7 +276,7 @@ bool MtpObjectsModel::uploadFile(mtp::ObjectId parentObjectId, const QString &fi
 			_session->DeleteObject(_rows.at(existingObject.row()).ObjectId);
 		}
 		catch(const std::exception &ex)
-		{ qDebug() << "failed to delete object" << fromUtf8(ex.what()); return false; }
+		{ qWarning() << "failed to delete object" << fromUtf8(ex.what()); return false; }
 
 		needReset = parentObjectId == _parentObjectId;
 	}
@@ -303,7 +303,7 @@ bool MtpObjectsModel::uploadFile(mtp::ObjectId parentObjectId, const QString &fi
 		qDebug() << "ok";
 	}
 	catch(const std::exception &ex)
-	{ qDebug() << "failed to send new object info " << fromUtf8(ex.what()); return false; }
+	{ qWarning() << "failed to send new object info " << fromUtf8(ex.what()); return false; }
 
 	if (parentObjectId == _parentObjectId)
 	{
