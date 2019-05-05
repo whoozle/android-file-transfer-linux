@@ -22,12 +22,17 @@
 #include <usb/Interface.h>
 #include <usb/call.h>
 #include <mtp/ByteArray.h>
+#include <mtp/log.h>
 
 namespace mtp { namespace usb
 {
 
 	Device::Device(ContextPtr context, libusb_device_handle * handle): _context(context), _handle(handle)
-	{}
+	{
+		try { USB_CALL(libusb_reset_device(_handle)); }
+		catch (std::exception & ex)
+		{ error("libusb_reset_device failed: ", ex.what()); }
+	}
 
 	Device::~Device()
 	{
