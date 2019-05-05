@@ -82,7 +82,9 @@ namespace mtp { namespace usb
 		debug("capabilities = 0x", hex(_capabilities, 8));
 		bool mmap = _capabilities & USBDEVFS_CAP_MMAP;
 		//disable mmap allocation for now, see https://github.com/whoozle/android-file-transfer-linux/issues/194
+#if 1
 		mmap = false;
+#endif
 		_bufferAllocator = std::make_shared<BufferAllocator>(mmap? fd: -1);
 
 		if (_capabilities)
