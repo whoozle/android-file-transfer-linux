@@ -70,9 +70,15 @@ namespace mtp { namespace usb
 
 	Device::Device(int fd, const EndpointPtr &controlEp): _fd(fd), _capabilities(0), _controlEp(controlEp)
 	{
+		try
+		{ IOCTL(_fd.Get(), USBDEVFS_RESET); }
+		catch(const std::exception &ex)
+		{ error("resetting control point failed: ", ex.what()); }
+
 		try { IOCTL(_fd.Get(), USBDEVFS_GET_CAPABILITIES, &_capabilities); }
 		catch(const std::exception &ex)
 		{ error("get usbfs capabilities failed: ", ex.what()); }
+
 		debug("capabilities = 0x", hex(_capabilities, 8));
 		bool mmap = _capabilities & USBDEVFS_CAP_MMAP;
 		//disable mmap allocation for now, see https://github.com/whoozle/android-file-transfer-linux/issues/194
