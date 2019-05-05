@@ -164,7 +164,13 @@ bool MtpObjectsModel::Row::IsAssociation(mtp::SessionPtr session)
 void MtpObjectsModel::rename(int idx, const QString &fileName)
 {
 	qDebug() << "renaming row " << idx << " to " << fileName;
-	_session->SetObjectProperty(objectIdAt(idx), mtp::ObjectProperty::ObjectFilename, toUtf8(fileName));
+	try
+	{
+		_session->SetObjectProperty(objectIdAt(idx), mtp::ObjectProperty::ObjectFilename, toUtf8(fileName));
+	}
+	catch(const std::exception &ex)
+	{ qDebug() << "failed to rename object" << fromUtf8(ex.what()); }
+
 	_rows[idx].ResetInfo();
 	emit dataChanged(createIndex(idx, 0), createIndex(idx, 0));
 }
@@ -265,7 +271,13 @@ bool MtpObjectsModel::uploadFile(mtp::ObjectId parentObjectId, const QString &fi
 			qDebug() << "skipping, overwrite not confirmed";
 			return false;
 		}
-		_session->DeleteObject(_rows.at(existingObject.row()).ObjectId);
+		try
+		{
+			_session->DeleteObject(_rows.at(existingObject.row()).ObjectId);
+		}
+		catch(const std::exception &ex)
+		{ qDebug() << "failed to delete object" << fromUtf8(ex.what()); return false; }
+
 		needReset = parentObjectId == _parentObjectId;
 	}
 
@@ -282,10 +294,17 @@ bool MtpObjectsModel::uploadFile(mtp::ObjectId parentObjectId, const QString &fi
 	oi.Filename = toUtf8(filename);
 	oi.ObjectFormat = objectFormat;
 	oi.SetSize(fileInfo.size());
-	mtp::Session::NewObjectInfo noi = _session->SendObjectInfo(oi, _storageId != mtp::Session::AllStorages? _storageId: mtp::Session::AnyStorage, parentObjectId);
-	qDebug() << "new object id: " << noi.ObjectId << ", sending...";
-	_session->SendObject(object);
-	qDebug() << "ok";
+	mtp::Session::NewObjectInfo noi;
+	try
+	{
+		noi = _session->SendObjectInfo(oi, _storageId != mtp::Session::AllStorages? _storageId: mtp::Session::AnyStorage, parentObjectId);
+		qDebug() << "new object id: " << noi.ObjectId << ", sending...";
+		_session->SendObject(object);
+		qDebug() << "ok";
+	}
+	catch(const std::exception &ex)
+	{ qDebug() << "failed to send new object info " << fromUtf8(ex.what()); return false; }
+
 	if (parentObjectId == _parentObjectId)
 	{
 		beginInsertRows(QModelIndex(), _rows.size(), _rows.size());
