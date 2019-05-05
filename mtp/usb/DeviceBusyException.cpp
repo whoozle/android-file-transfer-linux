@@ -8,7 +8,7 @@
 
 //mtp
 #	include <Exception.h>
-#	include <usb/Directory.h>
+#	include <mtp/backend/linux/usb/Directory.h>
 #endif
 
 namespace mtp { namespace usb
