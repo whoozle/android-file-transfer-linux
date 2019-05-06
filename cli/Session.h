@@ -82,7 +82,7 @@ namespace cli
 		mtp::ObjectId Resolve(const Path &path, bool create = false);
 
 		void Help();
-		void Quit() { _running = false; }
+		void Quit();
 
 		void CompletePath(const Path &path, CompletionResult &result);
 		void CompleteStoragePath(const StoragePath &path, CompletionResult &result);

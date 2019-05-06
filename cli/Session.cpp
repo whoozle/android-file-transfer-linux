@@ -671,8 +671,12 @@ namespace cli
 
 	void Session::Cancel()
 	{
-		_running = false;
 		_session->AbortCurrentTransaction();
+	}
+
+	void Session::Quit()
+	{
+		_running = false;
 	}
 
 	void Session::GetThumb(mtp::ObjectId srcId)

@@ -46,15 +46,18 @@ namespace
 	static void SigIntHandler(int)
 	{
 		cli::Session * session = gSession.load();
+		if (!session)
+			exit(0);
+
 		try
 		{
-			if (session)
-				session->Cancel();
+			session->Cancel();
 		}
 		catch(const std::exception & ex)
 		{
 			mtp::debug("cancellation failed: ", ex.what());
-			exit(0);
+			session->Quit();
+			exit(0); //fixme: use readline alternate interface (manually feeding data from poll loop)
 		}
 	}
 }
