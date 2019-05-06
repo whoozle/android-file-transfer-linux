@@ -132,7 +132,7 @@ namespace mtp
 		u64 GetDeviceIntegerProperty(DeviceProperty property);
 		std::string GetDeviceStringProperty(DeviceProperty property);
 
-		void AbortCurrentTransaction(int timeout);
+		void AbortCurrentTransaction(int timeout = DefaultTimeout);
 
 	private:
 		template<typename ... Args>
