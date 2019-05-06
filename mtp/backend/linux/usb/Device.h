@@ -79,6 +79,7 @@ namespace mtp { namespace usb
 	private:
 		static u8 TransactionType(const EndpointPtr &ep);
 		void * Reap(int timeout);
+		void * AsyncReap();
 		void Submit(Urb *urb, int timeout);
 	};
 	DECLARE_PTR(Device);

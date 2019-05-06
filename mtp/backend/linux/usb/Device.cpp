@@ -226,15 +226,23 @@ namespace mtp { namespace usb
 			int ms = (now.tv_sec - started.tv_sec) * 1000 + (now.tv_usec - started.tv_usec) / 1000;
 			error(ms, " ms since the last poll call");
 		}
+		auto urb = AsyncReap();
+		if (urb)
+			return urb;
+		else
+			throw TimeoutException("timeout reaping usb urb");
+	}
 
+	void * Device::AsyncReap()
+	{
 		usbdevfs_urb *urb;
-		r = ioctl(_fd.Get(), USBDEVFS_REAPURBNDELAY, &urb);
+		int r = ioctl(_fd.Get(), USBDEVFS_REAPURBNDELAY, &urb);
 		if (r == 0)
 			return urb;
 		else if (errno == EAGAIN)
-			throw TimeoutException("timeout reaping usb urb");
+			return nullptr;
 		else
-			throw posix::Exception("ioctl");
+			throw posix::Exception("ioctl(USBDEVFS_REAPURBNDELAY)");
 	}
 
 	void Device::ClearHalt(const EndpointPtr & ep)
