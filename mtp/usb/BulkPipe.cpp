@@ -31,6 +31,16 @@ namespace mtp { namespace usb
 		int currentConfigurationIndex = _device->GetConfiguration();
 		if (conf->GetIndex() != currentConfigurationIndex)
 			_device->SetConfiguration(conf->GetIndex());
+
+		try
+		{ device->ClearHalt(in); }
+		catch(const std::exception & ex)
+		{ error("clearing halt for in ep: ", ex.what()); }
+
+		try
+		{ device->ClearHalt(out); }
+		catch(const std::exception & ex)
+		{ error("clearing halt for in ep: ", ex.what()); }
 	}
 
 	BulkPipe::~BulkPipe()
