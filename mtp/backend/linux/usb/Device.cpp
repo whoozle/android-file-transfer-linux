@@ -73,7 +73,7 @@ namespace mtp { namespace usb
 		try
 		{ IOCTL(_fd.Get(), USBDEVFS_RESET); }
 		catch(const std::exception &ex)
-		{ error("resetting control point failed: ", ex.what()); }
+		{ error("resetting device failed: ", ex.what()); }
 
 		try { IOCTL(_fd.Get(), USBDEVFS_GET_CAPABILITIES, &_capabilities); }
 		catch(const std::exception &ex)
