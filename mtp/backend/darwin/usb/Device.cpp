@@ -24,8 +24,6 @@
 #include <mtp/ByteArray.h>
 #include <mtp/log.h>
 
-#include <usb/call.h>
-
 namespace mtp { namespace usb
 {
 
@@ -41,6 +39,9 @@ namespace mtp { namespace usb
 	{ return 0; }
 
 	void Device::SetConfiguration(int idx)
+	{ }
+
+	void Device::ClearHalt(const EndpointPtr & ep)
 	{ }
 
 	void Device::WriteBulk(const EndpointPtr & ep, const IObjectInputStreamPtr &inputStream, int timeout)
