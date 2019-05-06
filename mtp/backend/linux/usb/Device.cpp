@@ -205,6 +205,10 @@ namespace mtp { namespace usb
 
 	void * Device::Reap(int timeout)
 	{
+		auto urb = AsyncReap(); //attempt to pick up old urbs
+		if (urb)
+			return urb;
+
 		timeval started = {};
 		if (gettimeofday(&started, NULL) == -1)
 			throw posix::Exception("gettimeofday");
@@ -226,7 +230,7 @@ namespace mtp { namespace usb
 			int ms = (now.tv_sec - started.tv_sec) * 1000 + (now.tv_usec - started.tv_usec) / 1000;
 			error(ms, " ms since the last poll call");
 		}
-		auto urb = AsyncReap();
+		urb = AsyncReap();
 		if (urb)
 			return urb;
 		else
