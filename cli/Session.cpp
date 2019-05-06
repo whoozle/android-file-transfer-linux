@@ -636,6 +636,7 @@ namespace cli
 		else
 		{
 			auto stream = std::make_shared<ObjectOutputStream>(dst);
+			_currentStream = stream;
 			if (IsInteractive() || _showEvents)
 			{
 				mtp::u64 size = _session->GetObjectIntegerProperty(srcId, mtp::ObjectProperty::ObjectSize);
@@ -667,6 +668,14 @@ namespace cli
 	{
 		auto info = _session->GetObjectInfo(srcId);
 		Get(LocalPath(info.Filename), srcId);
+	}
+
+	void Session::Cancel()
+	{
+		_running = false;
+		auto stream = _currentStream.lock();
+		if (stream)
+			stream->Cancel();
 	}
 
 	void Session::GetThumb(mtp::ObjectId srcId)
@@ -757,6 +766,7 @@ namespace cli
 			{ }
 
 			auto stream = std::make_shared<ObjectInputStream>(src);
+			_currentStream = stream;
 			stream->SetTotal(stream->GetSize());
 
 			msg::ObjectInfo oi;

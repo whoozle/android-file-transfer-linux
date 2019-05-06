@@ -26,6 +26,7 @@
 
 #include <cli/Command.h>
 
+#include <atomic>
 #include <functional>
 #include <map>
 #include <set>
@@ -34,19 +35,22 @@ namespace cli
 {
 	class Session
 	{
+		using CancellableStreamPtr = std::weak_ptr<mtp::CancellableStream>;
+
 		mtp::DevicePtr				_device;
 		mtp::SessionPtr				_session;
 		mtp::msg::DeviceInfo		_gdi;
 		mtp::StorageId				_cs; //current storage
 		std::string					_csName; //current storage name
 		mtp::ObjectId				_cd; //current directory
-		bool						_running;
+		std::atomic<bool>			_running;
 		bool						_interactive;
 		bool						_showEvents;
 		bool						_showPrompt;
 		std::string					_prompt;
 		unsigned					_terminalWidth;
 		bool						_batterySupported;
+		CancellableStreamPtr		_currentStream;
 
 		std::multimap<std::string, ICommandPtr> _commands;
 
@@ -105,6 +109,7 @@ namespace cli
 		void ListProperties(mtp::ObjectId id);
 		void ListDeviceProperties();
 		void TestObjectPropertyList(const Path &path);
+		void Cancel();
 
 		void ChangeDirectory(const Path &path)
 		{ _cd = Resolve(path); }
