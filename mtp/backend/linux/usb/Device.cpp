@@ -218,12 +218,12 @@ namespace mtp { namespace usb
 		fd.events	= POLLOUT | POLLWRNORM;
 		int r = poll(&fd, 1, timeout);
 
+		if (r < 0)
+			throw posix::Exception("poll");
+
 		timeval now = {};
 		if (gettimeofday(&now, NULL) == -1)
 			throw posix::Exception("gettimeofday");
-
-		if (r < 0)
-			throw posix::Exception("poll");
 
 		if (r == 0 && timeout > 0)
 		{
