@@ -35,8 +35,6 @@ namespace cli
 {
 	class Session
 	{
-		using CancellableStreamPtr = std::weak_ptr<mtp::CancellableStream>;
-
 		mtp::DevicePtr				_device;
 		mtp::SessionPtr				_session;
 		mtp::msg::DeviceInfo		_gdi;
@@ -50,7 +48,6 @@ namespace cli
 		std::string					_prompt;
 		unsigned					_terminalWidth;
 		bool						_batterySupported;
-		CancellableStreamPtr		_currentStream;
 
 		std::multimap<std::string, ICommandPtr> _commands;
 
