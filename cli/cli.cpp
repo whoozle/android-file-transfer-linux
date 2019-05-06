@@ -28,11 +28,36 @@
 #include <mtp/log.h>
 #include <mtp/version.h>
 
+#include <atomic>
+
+#include <fcntl.h>
+#include <fcntl.h>
 #include <getopt.h>
 #include <unistd.h>
+#include <signal.h>
+
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <fcntl.h>
+
+namespace
+{
+	std::atomic<cli::Session *>		gSession(nullptr);
+
+	static void SigIntHandler(int)
+	{
+		cli::Session * session = gSession.load();
+		try
+		{
+			if (session)
+				session->Cancel();
+		}
+		catch(const std::exception & ex)
+		{
+			mtp::debug("cancellation failed: ", ex.what());
+			exit(0);
+		}
+	}
+}
 
 int main(int argc, char **argv)
 {
@@ -60,6 +85,12 @@ int main(int argc, char **argv)
 		{"input-file",		required_argument,	0,	'f' },
 		{0,					0,					0,	 0	}
 	};
+
+	struct sigaction newHandler = { };
+	newHandler.sa_handler = &SigIntHandler;
+	newHandler.sa_flags = SA_RESTART;
+	if (sigaction(SIGINT, &newHandler, nullptr) != 0)
+		perror("sigaction(SIGINT)");
 
 	while(true)
 	{
@@ -143,6 +174,7 @@ int main(int argc, char **argv)
 	{
 		bool hasCommands = optind >= argc;
 		cli::Session session(mtp, showPrompt);
+		gSession.store(&session);
 		if (!session.SetFirstStorage())
 		{
 			error("your device may be locked or does not have any storage available");
@@ -161,6 +193,7 @@ int main(int argc, char **argv)
 				session.ProcessCommand(argv[i]);
 			}
 		}
+		gSession.store(nullptr);
 
 		exit(0);
 	}
