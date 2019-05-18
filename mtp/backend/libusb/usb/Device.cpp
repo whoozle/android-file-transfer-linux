@@ -94,6 +94,11 @@ namespace mtp { namespace usb
 		USB_CALL(libusb_control_transfer(_handle, type, req, value, index, const_cast<u8 *>(data.data()), data.size(), timeout));
 	}
 
+	void Device::ClearHalt(const EndpointPtr & ep)
+	{
+		USB_CALL(libusb_clear_halt(_handle, ep->GetAddress()));
+	}
+
 	std::string Device::GetString(int idx) const
 	{
 		unsigned char buffer[4096];
