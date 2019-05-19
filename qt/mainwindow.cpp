@@ -188,6 +188,7 @@ bool MainWindow::reconnectToDevice()
 
 	qDebug() << "device found, opening session...";
 	static const int MaxAttempts = 3;
+	QString error;
 	for(int attempt = 0; attempt < MaxAttempts; ++attempt)
 	{
 		try
@@ -211,7 +212,20 @@ bool MainWindow::reconnectToDevice()
 		{
 			qDebug() << "device disconnected, retrying...";
 		}
+		catch(const std::exception &ex)
+		{
+			error = fromUtf8(ex.what());
+			qWarning() << "open session/device info failed: " << error;
+		}
 	}
+
+	if (!_session)
+	{
+		_device.reset();
+		QMessageBox::critical(this, tr("MTP"), tr("Could not open MTP session: %1").arg(error));
+		return false;
+	}
+
 	return true;
 }
 
