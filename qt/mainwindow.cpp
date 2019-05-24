@@ -123,6 +123,8 @@ bool MainWindow::reconnectToDevice()
 {
 	_session.reset();
 	_device.reset();
+	bool claimInterface = true;
+	bool resetDevice = false;
 
 	mtp::usb::ContextPtr ctx(new mtp::usb::Context);
 
@@ -132,7 +134,7 @@ bool MainWindow::reconnectToDevice()
 		qDebug("probing device...");
 		try
 		{
-			_device = mtp::Device::Open(ctx, *desc);
+			_device = mtp::Device::Open(ctx, *desc, claimInterface, resetDevice);
 			++desc;
 		}
 		catch(const mtp::usb::DeviceBusyException &ex)
@@ -155,7 +157,7 @@ bool MainWindow::reconnectToDevice()
 				"\nPress Abort to kill them or Ignore to try next device."),
 				(canKill? QMessageBox::Abort: QMessageBox::StandardButton(0)) | QMessageBox::Ignore,
 				this
-				);
+			);
 
 			dialog.setDefaultButton(QMessageBox::Ignore);
 			dialog.setEscapeButton(QMessageBox::Ignore);
@@ -172,8 +174,26 @@ bool MainWindow::reconnectToDevice()
 		}
 		catch(const std::exception &ex)
 		{
-			++desc;
 			qWarning("Device::Find failed: %s", ex.what());
+			QMessageBox dialog(
+				QMessageBox::Warning,
+				tr("Device::Find failed"),
+				tr(
+					"MTP device could not be opened at the moment\n\nFailure: %1\n"
+					"Press Reset to reset them or Ignore to try next device.").arg(fromUtf8(ex.what())),
+				QMessageBox::Reset | QMessageBox::Ignore,
+				this
+			);
+			auto r = dialog.exec();
+
+			if ((r & QMessageBox::Reset) == QMessageBox::Reset)
+			{
+				qDebug("retry with reset...");
+				resetDevice = true;
+			}
+			qDebug() << r << QMessageBox::Ignore;
+			if ((r & QMessageBox::Ignore) == QMessageBox::Ignore)
+				++desc;
 		}
 
 		if (_device)
