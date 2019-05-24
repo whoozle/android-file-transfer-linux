@@ -100,7 +100,7 @@ int main(int argc, char **argv)
 	while(true)
 	{
 		int optionIndex = 0; //index of matching option
-		int c = getopt_long(argc, argv, "ibehvVCf:", long_options, &optionIndex);
+		int c = getopt_long(argc, argv, "ibehvVCRf:", long_options, &optionIndex);
 		if (c == -1)
 			break;
 		switch(c)
@@ -157,9 +157,10 @@ int main(int argc, char **argv)
 			"-v\t--verbose\tshow debug output\n"
 			"-i\t--interactive\tforce interactive mode\n"
 			"-b\t--batch\t\tbatch command processing\n"
-			"-e\t--events\t\tallow event processing\n"
+			"-e\t--events\tallow event processing\n"
 			"-f\t--input-file\tuse file to read input commands\n"
 			"-C\t--no-claim\tno usb interface claim\n"
+			"-R\t--reset-device\treset usb device before connecting\n"
 			"-V\t--version\tshow version information"
 			);
 		exit(0);
