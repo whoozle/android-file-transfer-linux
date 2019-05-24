@@ -71,12 +71,13 @@ namespace mtp
 		throw std::runtime_error("no interface descriptor found");
 	}
 
-	DevicePtr Device::Open(usb::ContextPtr ctx, usb::DeviceDescriptorPtr desc, bool claimInterface)
+	DevicePtr Device::Open(usb::ContextPtr ctx, usb::DeviceDescriptorPtr desc, bool claimInterface, bool resetDevice)
 	{
 		debug("probing device ", hex(desc->GetVendorId(), 4), ":", hex(desc->GetProductId(), 4));
 		usb::DevicePtr device = desc->TryOpen(ctx);
 		if (!device)
 			return nullptr;
+
 		int confs = desc->GetConfigurationsCount();
 		//debug("configurations: ", confs);
 
@@ -113,6 +114,9 @@ namespace mtp
 				if (name == "MTP")
 				{
 					//device->SetConfiguration(configuration->GetIndex());
+					if (resetDevice)
+						device->Reset();
+
 					usb::BulkPipePtr pipe = usb::BulkPipe::Create(device, conf, iface, token);
 					return std::make_shared<Device>(pipe);
 				}
@@ -126,14 +130,14 @@ namespace mtp
 		return nullptr;
 	}
 
-	DevicePtr Device::FindFirst(bool claimInterface)
+	DevicePtr Device::FindFirst(bool claimInterface, bool resetDevice)
 	{
 		usb::ContextPtr ctx(new usb::Context);
 
 		for (usb::DeviceDescriptorPtr desc : ctx->GetDevices())
 		try
 		{
-			auto device = Open(ctx, desc, claimInterface);
+			auto device = Open(ctx, desc, claimInterface, resetDevice);
 			if (device)
 				return device;
 		}

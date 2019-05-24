@@ -71,6 +71,7 @@ int main(int argc, char **argv)
 	bool showVersion = false;
 	bool claimInterface = true;
 	bool showEvents = false;
+	bool resetDevice = false;
 	const char *fileInput = nullptr;
 
 	if (!isatty(STDIN_FILENO))
@@ -86,6 +87,7 @@ int main(int argc, char **argv)
 		{"version",			no_argument,		0,	'V' },
 		{"no-claim",		no_argument,		0,	'C' },
 		{"input-file",		required_argument,	0,	'f' },
+		{"reset-device",	no_argument	,		0,	'R' },
 		{0,					0,					0,	 0	}
 	};
 
@@ -121,6 +123,9 @@ int main(int argc, char **argv)
 			break;
 		case 'e':
 			showEvents = true;
+			break;
+		case 'R':
+			resetDevice = true;
 			break;
 		case '?':
 		case 'h':
@@ -166,7 +171,7 @@ int main(int argc, char **argv)
 		exit(0);
 	}
 
-	auto mtp = Device::FindFirst(claimInterface);
+	auto mtp = Device::FindFirst(claimInterface, resetDevice);
 	if (!mtp)
 	{
 		error("no mtp device found");
