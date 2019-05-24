@@ -35,6 +35,9 @@ namespace mtp { namespace usb
 		(*_dev)->USBDeviceClose(_dev);
 	}
 
+	void Device::Reset()
+	{ }
+
 	int Device::GetConfiguration() const
 	{ return 0; }
 

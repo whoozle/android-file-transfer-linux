@@ -29,12 +29,13 @@ namespace mtp { namespace usb
 
 	Device::Device(ContextPtr context, libusb_device_handle * handle): _context(context), _handle(handle)
 	{
-#ifndef __FreeBSD__
-		//does not work in FreeBSD, see https://github.com/whoozle/android-file-transfer-linux/issues/221
+	}
+
+	void Device::Reset()
+	{
 		try { USB_CALL(libusb_reset_device(_handle)); }
 		catch (std::exception & ex)
 		{ error("libusb_reset_device failed: ", ex.what()); }
-#endif
 	}
 
 	Device::~Device()

@@ -66,6 +66,7 @@ namespace mtp { namespace usb
 		InterfaceTokenPtr ClaimInterface(const InterfacePtr & interface)
 		{ return std::make_shared<InterfaceToken>(_fd.Get(), interface->GetIndex()); }
 
+		void Reset();
 		int GetConfiguration() const;
 		void SetConfiguration(int idx);
 

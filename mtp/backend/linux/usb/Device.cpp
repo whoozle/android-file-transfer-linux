@@ -70,11 +70,6 @@ namespace mtp { namespace usb
 
 	Device::Device(int fd, const EndpointPtr &controlEp): _fd(fd), _capabilities(0), _controlEp(controlEp)
 	{
-		try
-		{ IOCTL(_fd.Get(), USBDEVFS_RESET); }
-		catch(const std::exception &ex)
-		{ error("resetting device failed: ", ex.what()); }
-
 		try { IOCTL(_fd.Get(), USBDEVFS_GET_CAPABILITIES, &_capabilities); }
 		catch(const std::exception &ex)
 		{ error("get usbfs capabilities failed: ", ex.what()); }
@@ -106,6 +101,14 @@ namespace mtp { namespace usb
 
 	Device::~Device()
 	{ }
+
+	void Device::Reset()
+	{
+		try
+		{ IOCTL(_fd.Get(), USBDEVFS_RESET); }
+		catch(const std::exception &ex)
+		{ error("resetting device failed: ", ex.what()); }
+	}
 
 	int Device::GetConfiguration() const
 	{

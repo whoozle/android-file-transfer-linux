@@ -81,6 +81,7 @@ namespace mtp { namespace usb
 
 		InterfaceTokenPtr ClaimInterface(const InterfacePtr & interface);
 
+		void Reset();
 		int GetConfiguration() const;
 		void SetConfiguration(int idx);
 
