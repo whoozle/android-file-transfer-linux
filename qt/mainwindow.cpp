@@ -184,6 +184,8 @@ bool MainWindow::reconnectToDevice()
 				QMessageBox::Reset | QMessageBox::Ignore,
 				this
 			);
+			dialog.setDefaultButton(QMessageBox::Ignore);
+			dialog.setEscapeButton(QMessageBox::Ignore);
 			auto r = dialog.exec();
 
 			if ((r & QMessageBox::Reset) == QMessageBox::Reset)
@@ -191,7 +193,6 @@ bool MainWindow::reconnectToDevice()
 				qDebug("retry with reset...");
 				resetDevice = true;
 			}
-			qDebug() << r << QMessageBox::Ignore;
 			if ((r & QMessageBox::Ignore) == QMessageBox::Ignore)
 				++desc;
 		}
