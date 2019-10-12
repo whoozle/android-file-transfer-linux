@@ -35,7 +35,7 @@ namespace mtp { namespace posix
 	std::string Exception::GetErrorMessage(int returnCode)
 	{
 		char buf[1024];
-#ifdef _GNU_SOURCE
+#if defined(_GNU_SOURCE) && defined(__GLIBC__)
 		std::string text(strerror_r(returnCode, buf, sizeof(buf)));
 #else
 		int r = strerror_r(returnCode, buf, sizeof(buf));
