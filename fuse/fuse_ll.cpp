@@ -433,11 +433,18 @@ namespace
 
 		void Init(void *, fuse_conn_info *conn)
 		{
+#if 0
+			/*
+				Disable FUSE_CAP_BIG_WRITES until further investigation
+				https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?h=v5.4&id=1fb027d7596464d3fad3ed59f70f43807ef926c6
+				https://github.com/netheril96/securefs/commit/e5b9e5d41a6dcdee60ab4a18b46b9a0c6475ba21
+			*/
 			mtp::scoped_mutex_lock l(_mutex);
 			conn->want |= conn->capable & FUSE_CAP_BIG_WRITES; //big writes
 			static const size_t MaxWriteSize = 1024 * 1024;
 			if (conn->max_write < MaxWriteSize)
 				conn->max_write = MaxWriteSize;
+#endif
 		}
 
 		void Lookup (fuse_req_t req, FuseId parent, const char *name)
