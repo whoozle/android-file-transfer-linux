@@ -19,6 +19,7 @@
 
 #include <usb/DeviceDescriptor.h>
 #include <usb/call.h>
+#include <mtp/log.h>
 
 //https://developer.apple.com/library/mac/documentation/DeviceDrivers/Conceptual/USBBook/USBDeviceInterfaces/USBDevInterfaces.html
 
