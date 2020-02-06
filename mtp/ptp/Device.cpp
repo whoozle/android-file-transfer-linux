@@ -75,8 +75,10 @@ namespace mtp
 	{
 		debug("probing device ", hex(desc->GetVendorId(), 4), ":", hex(desc->GetProductId(), 4));
 		usb::DevicePtr device = desc->TryOpen(ctx);
-		if (!device)
+		if (!device) {
+			debug("descriptor->TryOpen() failed");
 			return nullptr;
+		}
 
 		int confs = desc->GetConfigurationsCount();
 		//debug("configurations: ", confs);
