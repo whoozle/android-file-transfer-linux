@@ -133,7 +133,11 @@ namespace mtp { namespace usb
 	DevicePtr DeviceDescriptor::TryOpen(ContextPtr context)
 	{
 		int r = (*_dev)->USBDeviceOpen(_dev);
-		return r == kIOReturnSuccess? std::make_shared<Device>(context, _dev): nullptr;
+		if (r == kIOReturnSuccess)
+			return std::make_shared<Device>(context, _dev);
+
+		debug("USBDeviceOpen failed: ", Exception::GetErrorMessage(r));
+		return nullptr;
 	}
 
 	DeviceDescriptor::~DeviceDescriptor()
