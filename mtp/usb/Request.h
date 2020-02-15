@@ -84,14 +84,15 @@ namespace mtp { namespace usb
 
 		enum struct Request : u8
 		{
-			GetStatus			= 0,
-			ClearFeature		= 1,
-			SetFeature			= 3,
-			SetAddress			= 5,
-			GetDescriptor		= 6,
-			SetDescriptor		= 7,
-			GetConfiguration	= 8,
-			SetConfiguration	= 9
+			GetStatus				= 0,
+			ClearFeature			= 1,
+			SetFeature				= 3,
+			SetAddress				= 5,
+			GetDescriptor			= 6,
+			SetDescriptor			= 7,
+			GetConfiguration		= 8,
+			SetConfiguration		= 9,
+			GetOSStringDescriptor  	= 0xee
 		};
 
 		u16 GetStatus();
