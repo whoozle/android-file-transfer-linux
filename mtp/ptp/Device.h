@@ -32,7 +32,7 @@ namespace mtp
 		PipePacketer	_packeter;
 
 	private:
-		static int GetInterfaceStringIndex(usb::DeviceDescriptorPtr desc, u8 number);
+		static u8 GetInterfaceStringIndex(usb::DeviceDescriptorPtr desc, u8 number);
 
 	public:
 		Device(usb::BulkPipePtr pipe);

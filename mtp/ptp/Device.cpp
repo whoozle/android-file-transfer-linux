@@ -49,7 +49,7 @@ namespace mtp
 		return std::make_shared<Session>(_packeter.GetPipe(), sessionId);
 	}
 
-	int Device::GetInterfaceStringIndex(usb::DeviceDescriptorPtr desc, u8 number)
+	u8 Device::GetInterfaceStringIndex(usb::DeviceDescriptorPtr desc, u8 number)
 	{
 		static const u16 DT_INTERFACE = 4;
 
@@ -102,7 +102,7 @@ namespace mtp
 				if (data.size() < 4 || data[1] != (u8)usb::DescriptorType::String)
 					continue;
 
-				int interfaceStringIndex = GetInterfaceStringIndex(desc, j);
+				auto interfaceStringIndex = GetInterfaceStringIndex(desc, j);
 				u16 langId = data[2] | ((u16)data[3] << 8);
 				data = usb::DeviceRequest(device).GetDescriptor(usb::DescriptorType::String, interfaceStringIndex, langId);
 				HexDump("interface name", data);
