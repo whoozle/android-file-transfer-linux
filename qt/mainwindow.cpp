@@ -652,7 +652,7 @@ void MainWindow::uploadAlbum(QString dirPath)
 	{
 		QStringList ext({"*.png", "*.jpg", "*.jpeg"});
 		covers = dir.entryList(ext, QDir::Files);
-		qSort(covers.begin(), covers.end(), &HeuristicLess);
+		std::sort(covers.begin(), covers.end(), &HeuristicLess);
 		qDebug() << "covers" << covers;
 		if (!covers.isEmpty())
 			cover = covers.front();
