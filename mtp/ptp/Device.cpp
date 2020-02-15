@@ -104,14 +104,49 @@ namespace mtp
 
 				auto interfaceStringIndex = GetInterfaceStringIndex(desc, j);
 				u16 langId = data[2] | ((u16)data[3] << 8);
-				data = usb::DeviceRequest(device).GetDescriptor(usb::DescriptorType::String, interfaceStringIndex, langId);
-				HexDump("interface name", data);
-				if (data.size() < 4 || data[1] != (u8)usb::DescriptorType::String)
-					continue;
 
-				u8 len = data[0];
-				InputStream stream(data, 2);
-				std::string name = stream.ReadString((len - 2) / 2);
+				std::string name;
+
+				try
+				{
+					data = usb::DeviceRequest(device).GetDescriptor(usb::DescriptorType::String, static_cast<u8>(usb::DeviceRequest::Request::GetOSStringDescriptor), langId);
+					HexDump("OSStringDescriptor", data);
+					if (data.size() < 0x12 || data.at(2) != 'M' || data.at(4) != 'S' || data.at(6) != 'F' || data.at(8) != 'T')
+						throw std::runtime_error("invalid OSString descriptor");
+					u8 command = data.at(0x10);
+					debug("vendor code: 0x", hex(command, 2));
+
+					//getting extended OS compat descriptor
+					data.resize(255);
+					device->ReadControl(static_cast<u8>(usb::RequestType::DeviceToHost | usb::RequestType::Vendor | usb::RequestType::Device),
+						command, 0, 4, data, usb::BaseRequest::DefaultTimeout);
+					HexDump("extended compat id os feature desctriptor", data);
+					if (data.at(0x12) == 'M' && data.at(0x13) == 'T' && data.at(0x14) == 'P')
+						name = "MTP";
+
+					try
+					{
+						data.resize(255);
+						device->ReadControl(static_cast<u8>(usb::RequestType::DeviceToHost | usb::RequestType::Vendor | usb::RequestType::Device),
+							command, 0, 5, data, usb::BaseRequest::DefaultTimeout);
+						HexDump("extended properties os features descriptor", data);
+					}
+					catch (const std::exception & ex)
+					{ debug ("getting extended properties os features descriptor failed: ", ex.what()); }
+				}
+				catch (const std::exception & ex)
+				{ debug("winusb handshake failed: ", ex.what()); }
+
+				if (name != "MTP") {
+					data = usb::DeviceRequest(device).GetDescriptor(usb::DescriptorType::String, interfaceStringIndex, langId);
+					HexDump("interface name", data);
+					if (data.size() < 4 || data[1] != (u8)usb::DescriptorType::String)
+						continue;
+
+					u8 len = data[0];
+					InputStream stream(data, 2);
+					name = stream.ReadString((len - 2) / 2);
+				}
 #endif
 				if (name == "MTP")
 				{
