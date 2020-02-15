@@ -123,16 +123,6 @@ namespace mtp
 					HexDump("extended compat id os feature desctriptor", data);
 					if (data.at(0x12) == 'M' && data.at(0x13) == 'T' && data.at(0x14) == 'P')
 						name = "MTP";
-
-					try
-					{
-						data.resize(255);
-						device->ReadControl(static_cast<u8>(usb::RequestType::DeviceToHost | usb::RequestType::Vendor | usb::RequestType::Device),
-							command, 0, 5, data, usb::BaseRequest::DefaultTimeout);
-						HexDump("extended properties os features descriptor", data);
-					}
-					catch (const std::exception & ex)
-					{ debug ("getting extended properties os features descriptor failed: ", ex.what()); }
 				}
 				catch (const std::exception & ex)
 				{ debug("winusb handshake failed: ", ex.what()); }
