@@ -121,7 +121,9 @@ namespace mtp
 
 					usb::BulkPipePtr pipe = usb::BulkPipe::Create(device, conf, iface, token);
 					return std::make_shared<Device>(pipe);
-				}
+				} else
+					debug("skipping interface with name ", name);
+
 				if (iface->GetClass() == 6 && iface->GetSubclass() == 1)
 				{
 					usb::BulkPipePtr pipe = usb::BulkPipe::Create(device, conf, iface, token);
