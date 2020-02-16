@@ -13,11 +13,12 @@
 
 namespace mtp { namespace usb
 {
+
+#ifdef __linux__
 	namespace
 	{
 		std::string ReadLink(const std::string &path)
 		{
-#ifdef __linux__
 			char buf[NAME_MAX];
 			auto pathSize = readlink(path.c_str(), buf, sizeof(buf));
 			if (pathSize >= 0)
@@ -25,10 +26,9 @@ namespace mtp { namespace usb
 
 			debug("Readlink ", path, ": ", posix::Exception::GetErrorMessage(errno));
 			return buf;
-#endif
-			return std::string();
 		}
 	}
+#endif
 
 	DeviceBusyException::DeviceBusyException(int fd, const std::string &msg):
 		std::runtime_error(msg)

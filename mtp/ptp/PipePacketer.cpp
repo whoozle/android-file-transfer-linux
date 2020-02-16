@@ -48,10 +48,10 @@ namespace mtp
 			u64										_size;
 
 		private:
-			IObjectOutputStreamPtr GetStream1() const
+			IObjectOutputStreamPtr GetStream1() const override
 			{ return _header; }
 
-			IObjectOutputStreamPtr GetStream2() const
+			IObjectOutputStreamPtr GetStream2() const override
 			{ return _stream; }
 
 		public:
@@ -134,9 +134,9 @@ namespace mtp
 			ResponseType							_responseCode;
 
 		private:
-			virtual IObjectOutputStreamPtr GetStream1() const
+			virtual IObjectOutputStreamPtr GetStream1() const override
 			{ return _header; }
-			virtual IObjectOutputStreamPtr GetStream2() const
+			virtual IObjectOutputStreamPtr GetStream2() const override
 			{ if (!_output) throw std::runtime_error("no data stream"); return _output; }
 
 			void OnStream1Exhausted() override

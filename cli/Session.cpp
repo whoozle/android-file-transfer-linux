@@ -146,7 +146,7 @@ namespace cli
 		AddCommand("mkpath", "<path> create directory structure specified in path",
 			make_function([this](const Path &path) -> void { MakePath(path); }));
 		AddCommand("type", "<path> shows type of file (recognized by libmagic/extension)",
-			make_function([this](const LocalPath &path) -> void { ShowType(path); }));
+			make_function([](const LocalPath &path) -> void { ShowType(path); }));
 
 		AddCommand("rename", "renames object",
 			make_function([this](const Path & path, const std::string & newName) -> void { Rename(path, newName); }));
@@ -903,7 +903,7 @@ namespace cli
 
 		bool ok = true;
 
-		parser.Parse(data, [this, &objectList, property, &ok](mtp::ObjectId objectId, ObjectProperty p, const ByteArray & ) {
+		parser.Parse(data, [&objectList, property, &ok](mtp::ObjectId objectId, ObjectProperty p, const ByteArray & ) {
 			if ((p == property || property == ObjectProperty::All))
 				objectList.insert(objectId);
 			else
