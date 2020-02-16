@@ -62,7 +62,6 @@ namespace mtp
 
 			void OnStream1Exhausted() override
 			{
-				_stream1Exhausted = true;
 				InputStream is(_header->GetData());
 				u32 size;
 				is >> size;
@@ -75,8 +74,10 @@ namespace mtp
 			{
 				size_t r = JoinedObjectOutputStreamBase::Write(data, size);
 				_offset += r;
-				if (_offset == _header->GetData().size())
+				if (_offset == _header->GetData().size()) {
+					_stream1Exhausted = true;
 					OnStream1Exhausted();
+				}
 				return r;
 			}
 		};
@@ -140,7 +141,6 @@ namespace mtp
 
 			void OnStream1Exhausted() override
 			{
-				_stream1Exhausted = true;
 				InputStream stream(_header->GetData());
 				Response header;
 				header.Read(stream);
@@ -191,8 +191,10 @@ namespace mtp
 			{
 				size_t r = JoinedObjectOutputStreamBase::Write(data, size);
 				_offset += r;
-				if (_offset == _header->GetData().size())
+				if (_offset == _header->GetData().size()) {
+					_stream1Exhausted = true;
 					OnStream1Exhausted();
+				}
 				return r;
 			}
 		};
