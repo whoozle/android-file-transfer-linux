@@ -90,7 +90,7 @@ namespace mtp
 	public:
 		JoinedObjectOutputStreamBase(): _stream1Exhausted(false) { }
 
-		virtual size_t Write(const u8 *data, size_t size)
+		size_t Write(const u8 *data, size_t size) override
 		{
 			CheckCancelled();
 			size_t r;

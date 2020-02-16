@@ -117,7 +117,7 @@ namespace mtp
 	{
 		struct DummyOutputStream final: IObjectOutputStream, public CancellableStream
 		{
-			virtual size_t Write(const u8 *data, size_t size)
+			size_t Write(const u8 *data, size_t size) override
 			{ return size; }
 		};
 
@@ -187,7 +187,7 @@ namespace mtp
 			bool Finished() const
 			{ return _finished; }
 
-			virtual size_t Write(const u8 *data, size_t size)
+			size_t Write(const u8 *data, size_t size) override
 			{
 				size_t r = JoinedObjectOutputStreamBase::Write(data, size);
 				_offset += r;

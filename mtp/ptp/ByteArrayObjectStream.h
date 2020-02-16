@@ -62,7 +62,7 @@ namespace mtp
 		const ByteArray &GetData() const
 		{ return _data; }
 
-		virtual size_t Write(const u8 *data, size_t size)
+		size_t Write(const u8 *data, size_t size) override
 		{
 			CheckCancelled();
 			std::copy(data, data + size, std::back_inserter(_data));
@@ -82,7 +82,7 @@ namespace mtp
 		const ByteArray &GetData() const
 		{ return _data; }
 
-		virtual size_t Write(const u8 *data, size_t size)
+		size_t Write(const u8 *data, size_t size) override
 		{
 			CheckCancelled();
 			size_t n = std::min(size, _data.size() - _offset);
