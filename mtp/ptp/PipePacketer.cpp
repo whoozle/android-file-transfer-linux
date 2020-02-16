@@ -74,7 +74,7 @@ namespace mtp
 			{
 				size_t r = JoinedObjectOutputStreamBase::Write(data, size);
 				_offset += r;
-				if (_offset == _header->GetData().size()) {
+				if (!_stream1Exhausted && _offset >= _header->GetData().size()) {
 					_stream1Exhausted = true;
 					OnStream1Exhausted();
 				}
@@ -191,7 +191,7 @@ namespace mtp
 			{
 				size_t r = JoinedObjectOutputStreamBase::Write(data, size);
 				_offset += r;
-				if (_offset == _header->GetData().size()) {
+				if (!_stream1Exhausted && _offset >= _header->GetData().size()) {
 					_stream1Exhausted = true;
 					OnStream1Exhausted();
 				}
