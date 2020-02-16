@@ -11,18 +11,10 @@ matrix:
           osx_image: xcode10.1
           compiler: clang
 
-before_install:
-  - |
-    if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
-      sudo add-apt-repository ppa:beineri/opt-qt592-trusty -y &&
-      sudo apt-get update -qq
-    fi
-
 install:
   - |
     if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
-      sudo apt-get -y install qt59base libfuse-dev libmagic-dev &&
-      source /opt/qt*/bin/qt*-env.sh
+      sudo apt-get -y install qt5-default libfuse-dev libmagic-dev
     elif [ "${TRAVIS_OS_NAME}" = "osx" ]; then
       brew tap homebrew/cask && brew install qt5 homebrew/cask/osxfuse
     fi
