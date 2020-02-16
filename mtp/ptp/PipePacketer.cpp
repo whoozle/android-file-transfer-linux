@@ -55,7 +55,10 @@ namespace mtp
 			{ return _stream; }
 
 		public:
-			MessageParsingStream(IObjectOutputStreamPtr stream): _header(new FixedSizeByteArrayObjectOutputStream(4)), _stream(stream), _offset(0), _size(4) { }
+			MessageParsingStream(IObjectOutputStreamPtr stream):
+				_header(new FixedSizeByteArrayObjectOutputStream(4)),
+				_stream(stream), _offset(0), _size(4)
+			{ }
 
 			void OnStream1Exhausted() override
 			{
@@ -135,7 +138,7 @@ namespace mtp
 			virtual IObjectOutputStreamPtr GetStream2() const
 			{ if (!_output) throw std::runtime_error("no data stream"); return _output; }
 
-			virtual void OnStream1Exhausted()
+			void OnStream1Exhausted() override
 			{
 				_stream1Exhausted = true;
 				InputStream stream(_header->GetData());
