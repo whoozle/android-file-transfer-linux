@@ -26,5 +26,7 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>SWELLApplication</string>
+	<key>com.apple.security.device.usb</key>
+	<true/>
 </dict>
 </plist>
