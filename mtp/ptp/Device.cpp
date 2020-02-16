@@ -102,7 +102,6 @@ namespace mtp
 				if (data.size() < 4 || data[1] != (u8)usb::DescriptorType::String)
 					continue;
 
-				auto interfaceStringIndex = GetInterfaceStringIndex(desc, j);
 				u16 langId = data[2] | ((u16)data[3] << 8);
 
 				std::string name;
@@ -128,6 +127,7 @@ namespace mtp
 				{ debug("winusb handshake failed: ", ex.what()); }
 
 				if (name != "MTP") {
+					auto interfaceStringIndex = GetInterfaceStringIndex(desc, j);
 					data = usb::DeviceRequest(device).GetDescriptor(usb::DescriptorType::String, interfaceStringIndex, langId);
 					HexDump("interface name", data);
 					if (data.size() < 4 || data[1] != (u8)usb::DescriptorType::String)
