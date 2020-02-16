@@ -92,6 +92,8 @@ namespace mtp { namespace usb
 			PRINT_CAP(USBDEVFS_CAP_REAP_AFTER_DISCONNECT, "<reap-after-disconnect>");
 			PRINT_CAP(USBDEVFS_CAP_MMAP, "<mmap>");
 			PRINT_CAP(USBDEVFS_CAP_DROP_PRIVILEGES, "<drop-privileges>");
+			PRINT_CAP(USBDEVFS_CAP_CONNINFO_EX, "<conninfo-ex>");
+			PRINT_CAP(USBDEVFS_CAP_SUSPEND, "<suspend>");
 			if (capabilities)
 				debug("<unknown capability 0x", hex(capabilities, 2), ">");
 		}
