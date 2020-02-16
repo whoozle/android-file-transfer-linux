@@ -60,6 +60,9 @@ namespace mtp
 				_stream(stream), _offset(0), _size(4)
 			{ }
 
+			bool Finished() const
+			{ return _offset >= _size; }
+
 			void OnStream1Exhausted() override
 			{
 				InputStream is(_header->GetData());
@@ -85,10 +88,7 @@ namespace mtp
 	}
 
 	void PipePacketer::ReadMessage(const IObjectOutputStreamPtr &outputStream, int timeout)
-	{
-		MessageParsingStreamPtr output(new MessageParsingStream(outputStream));
-		_pipe->Read(output, timeout);
-	}
+	{ _pipe->Read(outputStream, timeout); }
 
 	void PipePacketer::PollEvent()
 	{
@@ -210,15 +210,27 @@ namespace mtp
 
 		response.clear();
 
+		HeaderParserObjectOutputStreamPtr parser;
+		MessageParsingStreamPtr output;
+
 		while(true)
 		{
-			HeaderParserObjectOutputStreamPtr parser(new HeaderParserObjectOutputStream(transaction, object));
-			ReadMessage(parser, timeout);
+			if (!parser)
+				parser.reset(new HeaderParserObjectOutputStream(transaction, object));
+			if (!output)
+				output.reset(new MessageParsingStream(parser));
+
+			ReadMessage(output, timeout);
 			if (parser->Finished())
 			{
 				response = parser->GetResponse();
 				code = parser->GetResponseCode();
 				break;
+			}
+
+			if (output->Finished()) {
+				parser.reset();
+				output.reset();
 			}
 		}
 
