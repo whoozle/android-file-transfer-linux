@@ -21,12 +21,15 @@
 #include <mtp/ptp/Session.h>
 #include <mtp/log.h>
 #include <mutex>
+#include <tuple>
 
 #ifdef MTPZ_ENABLED
 #	include <openssl/bio.h>
 #	include <openssl/bn.h>
 #	include <openssl/crypto.h>
 #	include <openssl/rsa.h>
+#	include <openssl/rand.h>
+#	include <openssl/sha.h>
 #endif
 
 namespace mtp
@@ -74,10 +77,76 @@ namespace mtp
 				RSA_free(rsa);
 		}
 
-		ByteArray GenerateCertificateMessage()
+		ByteArray HKDF(const u8 * message, size_t messageSize, size_t keySize)
 		{
-			ByteArray cert;
-			return cert;
+			size_t blockSize = SHA_DIGEST_LENGTH;
+			size_t blocks = (keySize + blockSize - 1) / blockSize;
+			ByteArray key(blocks * blockSize);
+			ByteArray ctr(messageSize + 4);
+			const auto ctrPtr = std::copy(message, message + messageSize, ctr.data());
+
+			u8 * dst = key.data();
+			for(size_t i = 0; i < blocks; ++i, dst += blockSize)
+			{
+				ctrPtr[0] = i >> 24;
+				ctrPtr[1] = i >> 16;
+				ctrPtr[2] = i >> 8;
+				ctrPtr[3] = i;
+				SHA1(ctr.data(), ctr.size(), dst);
+			}
+
+			return key;
+		}
+
+		std::tuple<ByteArray, ByteArray> GenerateCertificateMessage()
+		{
+			static const size_t messageSize = 156 + certificate.size();
+			ByteArray challenge(16);
+			RAND_bytes(challenge.data(), challenge.size());
+
+			ByteArray message(messageSize);
+			auto dst = message.data();
+			*dst++ = 0x02;
+			*dst++ = 0x01;
+			*dst++ = 0x01;
+			*dst++ = 0x00;
+			*dst++ = 0x00;
+			*dst++ = certificate.size() >> 8;
+			*dst++ = certificate.size();
+			dst = std::copy(certificate.begin(), certificate.end(), dst);
+			*dst++ = 0x00;
+			*dst++ = 0x10;
+			dst = std::copy(challenge.begin(), challenge.end(), dst);
+
+			ByteArray hash(SHA_DIGEST_LENGTH);
+			{
+				ByteArray salt(SHA_DIGEST_LENGTH + 8);
+				SHA1(certificate.data() + 2, dst - certificate.data() - 2, salt.data() + 8);
+				SHA1(salt.data(), salt.size(), hash.data());
+			}
+
+			ByteArray key = HKDF(hash.data(), hash.size(), 107);
+			HexDump("key", key);
+
+			ByteArray signature(RSA_size(rsa));
+			signature[106] = 1;
+			for(size_t i = 0; i < hash.size(); ++i)
+				signature[i + 107] = hash[i];
+			for(size_t i = 0; i < 107; ++i)
+				signature[i] ^= key[i];
+
+			signature[0] &= 127;
+			signature[127] = 188;
+			HexDump("signature", signature);
+
+			*dst++ = 1;
+			*dst++ = 0;
+			*dst++ = signature.size();
+
+			if (RSA_private_encrypt(signature.size(), signature.data(), dst, rsa, RSA_NO_PADDING) == -1)
+				throw std::runtime_error("RSA_private_encrypt failed");
+
+			return std::make_tuple(challenge, message);
 		}
 
 		static u8 FromHex(char ch)
@@ -123,7 +192,11 @@ namespace mtp
 
 	void TrustedApp::Authenticate()
 	{
-		_session->RunTransaction(Session::DefaultTimeout, OperationCode::EndTrustedAppSession);
+		_session->GenericOperation(OperationCode::EndTrustedAppSession);
+		ByteArray challenge, message;
+		std::tie(challenge, message) = _keys->GenerateCertificateMessage();
+		HexDump("certificate payload", message);
+		_session->GenericOperation(OperationCode::SendWMDRMPDAppRequest, message);
 	}
 
 	TrustedApp::KeysPtr TrustedApp::LoadKeys(const std::string & path)
