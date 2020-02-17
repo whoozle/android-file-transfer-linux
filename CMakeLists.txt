@@ -25,6 +25,7 @@ include(CheckIncludeFiles)
 find_package ( Threads )
 
 option(BUILD_FUSE "Build fuse mount helper" ON)
+option(BUILD_MTPZ "Build with MTPZ support" ON)
 
 if (BUILD_FUSE)
 	pkg_check_modules ( FUSE fuse )
@@ -131,6 +132,21 @@ else()
 		mtp/backend/linux/usb/Interface.cpp
 		mtp/backend/linux/usb/DeviceDescriptor.cpp
 	)
+endif()
+
+if (BUILD_MTPZ)
+	include(FindOpenSSL)
+	if (OPENSSL_FOUND)
+		message(STATUS "building with MTPZ support")
+		add_definitions(-DMTPZ_ENABLED)
+		list(APPEND SOURCES
+			mtp/mtpz/TrustedApp.cpp
+		)
+		include_directories(${OPENSSL_INCLUDE_DIR})
+		list(APPEND MTP_SHARED_LIBRARIES ${OPENSSL_CRYPTO_LIBRARY})
+	else()
+		message(WARNING "building without MTPZ support, openssl not found")
+	endif()
 endif()
 
 

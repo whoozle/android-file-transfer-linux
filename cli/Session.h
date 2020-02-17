@@ -31,12 +31,19 @@
 #include <map>
 #include <set>
 
+namespace mtp
+{
+	class TrustedApp;
+	DECLARE_PTR(TrustedApp);
+}
+
 namespace cli
 {
 	class Session
 	{
 		mtp::DevicePtr				_device;
 		mtp::SessionPtr				_session;
+		mtp::TrustedAppPtr			_trustedApp;
 		mtp::msg::DeviceInfo		_gdi;
 		mtp::StorageId				_cs; //current storage
 		std::string					_csName; //current storage name
@@ -65,8 +72,11 @@ namespace cli
 		mtp::StorageId GetUploadStorageId()
 		{ return _cs == mtp::Session::AllStorages? mtp::Session::AnyStorage: _cs; }
 
+		static std::string GetMtpzDataPath();
+
 	public:
 		Session(const mtp::DevicePtr &device, bool showPrompt);
+		~Session();
 
 		bool SetFirstStorage();
 

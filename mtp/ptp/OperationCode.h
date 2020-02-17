@@ -57,6 +57,12 @@ namespace mtp
 
 		CancelTransaction		= 0x4001,
 
+		SendWMDRMPDAppRequest	= 0x9212,
+		GetWMDRMPDAppResponse	= 0x9213,
+		EnableTrustedFilesOperations	= 0x9214,
+		DisableTrustedFilesOperations 	= 0x9215,
+		EndTrustedAppSession	= 0x9216,
+
 		GetPartialObject64		= 0x95c1,
 		SendPartialObject		= 0x95c2,
 		TruncateObject			= 0x95c3,

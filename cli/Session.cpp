@@ -28,6 +28,7 @@
 #include <mtp/ptp/ObjectPropertyListParser.h>
 #include <mtp/log.h>
 #include <mtp/version.h>
+#include <mtp/mtpz/TrustedApp.h>
 
 #include <sstream>
 #include <set>
@@ -59,6 +60,7 @@ namespace cli
 	Session::Session(const mtp::DevicePtr &device, bool showPrompt):
 		_device(device),
 		_session(_device->OpenSession(1)),
+		_trustedApp(mtp::TrustedApp::Create(_session, GetMtpzDataPath())),
 		_gdi(_session->GetDeviceInfo()),
 		_cs(mtp::Session::AllStorages),
 		_cd(mtp::Session::Root),
@@ -172,6 +174,15 @@ namespace cli
 			for(auto t : tokens)
 				print("\t", t);
 		}));
+	}
+
+	Session::~Session()
+	{ }
+
+	std::string Session::GetMtpzDataPath()
+	{
+		char * home = getenv("HOME");
+		return std::string(home? home: ".") + "/.mtpz-data";
 	}
 
 	bool Session::SetFirstStorage()
