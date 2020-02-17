@@ -141,7 +141,7 @@ list(APPEND SOURCES
 
 if (BUILD_MTPZ)
 	include(FindOpenSSL)
-	if (OPENSSL_FOUND)
+	if (OPENSSL_FOUND AND (OPENSSL_VERSION VERSION_GREATER_EQUAL 1.1))
 		message(STATUS "building with MTPZ support")
 		add_definitions(-DMTPZ_ENABLED)
 		include_directories(${OPENSSL_INCLUDE_DIR})
