@@ -366,6 +366,22 @@ namespace mtp
 	std::string Session::GetDeviceStringProperty(DeviceProperty property)
 	{ return ReadSingleString(GetDeviceProperty(property)); }
 
+	void Session::SetDeviceProperty(DeviceProperty property, const ByteArray &value)
+	{
+		IObjectInputStreamPtr inputStream = std::make_shared<ByteArrayObjectInputStream>(value);
+		RunTransactionWithDataRequest(_defaultTimeout, OperationCode::SetDevicePropValue, inputStream, (u16)property);
+	}
+
+	void Session::SetDeviceProperty(DeviceProperty property, const std::string &value)
+	{
+		ByteArray data;
+		data.reserve(value.size() * 2 + 1);
+		OutputStream stream(data);
+		stream << value;
+		SetDeviceProperty(property, data);
+	}
+
+
 	ByteArray Session::GetObjectPropertyList(ObjectId objectId, ObjectFormat format, ObjectProperty property, u32 groupCode, u32 depth, int timeout)
 	{
 		if (objectId == Root) //ffffffff -> 0

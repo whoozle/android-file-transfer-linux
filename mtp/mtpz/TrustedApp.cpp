@@ -106,6 +106,7 @@ namespace mtp
 
 	bool TrustedApp::Authenticate()
 	{
+		_session->SetDeviceProperty(DeviceProperty::SessionInitiatorVersionInfo, "Android File Transfer for Linux"); //fixme: move to session?
 		_session->RunTransaction(Session::DefaultTimeout, OperationCode::EndTrustedAppSession);
 		return false;
 	}

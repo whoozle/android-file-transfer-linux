@@ -131,6 +131,8 @@ namespace mtp
 		ByteArray GetDeviceProperty(DeviceProperty property);
 		u64 GetDeviceIntegerProperty(DeviceProperty property);
 		std::string GetDeviceStringProperty(DeviceProperty property);
+		void SetDeviceProperty(DeviceProperty property, const ByteArray & value);
+		void SetDeviceProperty(DeviceProperty property, const std::string & value);
 
 		void AbortCurrentTransaction(int timeout = DefaultTimeout);
 
