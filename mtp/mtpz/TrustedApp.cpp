@@ -104,11 +104,10 @@ namespace mtp
 		return supported;
 	}
 
-	bool TrustedApp::Authenticate()
+	void TrustedApp::Authenticate()
 	{
 		_session->SetDeviceProperty(DeviceProperty::SessionInitiatorVersionInfo, "Android File Transfer for Linux"); //fixme: move to session?
 		_session->RunTransaction(Session::DefaultTimeout, OperationCode::EndTrustedAppSession);
-		return false;
 	}
 
 	TrustedApp::KeysPtr TrustedApp::LoadKeys(const std::string & path)
@@ -168,8 +167,8 @@ namespace mtp
 	TrustedApp::KeysPtr TrustedApp::LoadKeys(const std::string & path)
 	{ return nullptr; }
 
-	bool TrustedApp::Authenticate()
-	{ return false; }
+	void TrustedApp::Authenticate()
+	{ }
 
 #endif
 }
