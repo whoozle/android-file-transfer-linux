@@ -80,18 +80,29 @@ namespace mtp
 			return cert;
 		}
 
-		static ByteArray FromHex(char *buf, size_t bufsize)
+		static u8 FromHex(char ch)
 		{
-			while(bufsize > 0 && isspace(buf[bufsize - 1]))
-				--bufsize;
-			buf[bufsize] = 0;
+			if (ch >= '0' && ch <= '9')
+				return ch - '0';
+			if (ch >= 'a' && ch <= 'f')
+				return ch - 'a' + 10;
+			if (ch >= 'A' && ch <= 'F')
+				return ch - 'A' + 10;
+			throw std::runtime_error(std::string("invalid hex character ") + ch);
+		}
 
-			long size = 0;
-			u8 * ptr = OPENSSL_hexstr2buf(buf, &size);
-			if (!ptr)
-				throw std::runtime_error("hex decoding failed");
-			ByteArray data(ptr, ptr + size);
-			OPENSSL_free(ptr);
+		static ByteArray FromHex(const char *buf, size_t bufsize)
+		{
+			ByteArray data;
+			data.reserve((bufsize + 1) / 2);
+			while(buf[0] && buf[1]) {
+				u8 h = FromHex(*buf++);
+				u8 l = FromHex(*buf++);
+				data.push_back((h << 4) | l);
+			}
+			if (buf[0] != 0 && !isspace(buf[0]))
+				throw std::runtime_error("tailing character");
+
 			return data;
 		}
 	};
