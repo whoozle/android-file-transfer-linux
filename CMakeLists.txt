@@ -134,14 +134,16 @@ else()
 	)
 endif()
 
+#Always add TrustedApp to avoid polluting client code.
+list(APPEND SOURCES
+	mtp/mtpz/TrustedApp.cpp
+)
+
 if (BUILD_MTPZ)
 	include(FindOpenSSL)
 	if (OPENSSL_FOUND)
 		message(STATUS "building with MTPZ support")
 		add_definitions(-DMTPZ_ENABLED)
-		list(APPEND SOURCES
-			mtp/mtpz/TrustedApp.cpp
-		)
 		include_directories(${OPENSSL_INCLUDE_DIR})
 		list(APPEND MTP_SHARED_LIBRARIES ${OPENSSL_CRYPTO_LIBRARY})
 	else()
