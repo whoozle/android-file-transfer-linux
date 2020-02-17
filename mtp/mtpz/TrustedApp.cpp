@@ -149,6 +149,7 @@ namespace mtp
 			if (r <= 0)
 				throw std::runtime_error("BIO_gets: short read");
 			keys->skey = Keys::FromHex(buf, r);
+			//HexDump("session key", keys->skey);
 
 			//public mod
 			BIO_gets(bio, buf, sizeof(buf));
