@@ -134,13 +134,13 @@ namespace mtp
 
 		void AbortCurrentTransaction(int timeout = DefaultTimeout);
 
-	private:
 		template<typename ... Args>
 		ByteArray RunTransaction(int timeout, OperationCode code, Args && ... args)
 		{ return RunTransactionWithDataRequest<Args...>(timeout, code, nullptr, std::forward<Args>(args) ... ); }
 		template<typename ... Args>
 		ByteArray RunTransactionWithDataRequest(int timeout, OperationCode code, const IObjectInputStreamPtr & inputStream, Args && ... args);
 
+	private:
 		void SetCurrentTransaction(Transaction *);
 
 		msg::DeviceInfo GetDeviceInfoImpl();
