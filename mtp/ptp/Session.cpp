@@ -395,6 +395,15 @@ namespace mtp
 	ByteArray Session::GetDeviceProperty(DeviceProperty property)
 	{ return RunTransaction(_defaultTimeout, OperationCode::GetDevicePropValue, (u16)property); }
 
+	ByteArray Session::GenericOperation(OperationCode code)
+	{ return RunTransaction(_defaultTimeout, code); }
+
+	ByteArray Session::GenericOperation(OperationCode code, const ByteArray & payload)
+	{
+		IObjectInputStreamPtr inputStream = std::make_shared<ByteArrayObjectInputStream>(payload);
+		return RunTransactionWithDataRequest(_defaultTimeout, code, inputStream);
+	}
+
 	Session::ObjectEditSession::ObjectEditSession(const SessionPtr & session, ObjectId objectId): _session(session), _objectId(objectId)
 	{ session->BeginEditObject(objectId); }
 
