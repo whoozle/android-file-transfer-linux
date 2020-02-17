@@ -86,6 +86,8 @@ namespace cli
 			_terminalWidth = ts.ws_col;
 #endif
 		}
+		try { if (_trustedApp) _trustedApp->Authenticate(); }
+		catch(const std::exception & ex) { error("mtpz authentication failed: ", ex.what()); }
 
 		AddCommand("help", "shows this help",
 			make_function([this]() -> void { Help(); }));

@@ -74,6 +74,12 @@ namespace mtp
 				RSA_free(rsa);
 		}
 
+		ByteArray GenerateCertificateMessage()
+		{
+			ByteArray cert;
+			return cert;
+		}
+
 		static ByteArray FromHex(char *buf, size_t bufsize)
 		{
 			while(bufsize > 0 && isspace(buf[bufsize - 1]))
@@ -106,7 +112,6 @@ namespace mtp
 
 	void TrustedApp::Authenticate()
 	{
-		_session->SetDeviceProperty(DeviceProperty::SessionInitiatorVersionInfo, "Android File Transfer for Linux"); //fixme: move to session?
 		_session->RunTransaction(Session::DefaultTimeout, OperationCode::EndTrustedAppSession);
 	}
 
