@@ -150,6 +150,44 @@ namespace mtp
 			return std::make_tuple(challenge, message);
 		}
 
+		void VerifyResponse(const ByteArray & message)
+		{
+
+#define CHECK_MORE(SIZE) if (src - message.data() + static_cast<size_t>(SIZE) > message.size()) \
+	throw std::runtime_error("input buffer overrun");
+
+			const u8 * src = message.data();
+
+			CHECK_MORE(4);
+			if (*src++ != 2)
+				throw std::runtime_error("invalid tag");
+			if (*src++ != 2)
+				throw std::runtime_error("invalid tag");
+
+			size_t signatureSize = *src++ << 8;
+			signatureSize += *src++;
+
+			if (signatureSize < 0x80 || signatureSize != static_cast<size_t>(RSA_size(rsa)))
+				throw std::runtime_error("invalid signature size");
+
+			CHECK_MORE(signatureSize);
+			ByteArray signature(signatureSize);
+			if (RSA_private_decrypt(signatureSize, src, signature.data(), rsa, RSA_NO_PADDING) == -1)
+				throw std::runtime_error("RSA_private_decrypt failed");
+			src += signatureSize;
+
+			{
+				ByteArray hash = HKDF(signature.data() + 21, 107, 20);
+				for(size_t i = 0; i < 20; ++i)
+					signature[1 + i] ^= hash[i];
+				ByteArray key = HKDF(signature.data() + 1, 20, 107);
+				for(size_t i = 0; i < 107; ++i)
+					signature[21 + i] ^= key[i];
+			}
+			HexDump("signature out", signature);
+			ByteArray key = ByteArray(signature.begin() + 0x70, signature.end());
+		}
+
 		static u8 FromHex(char ch)
 		{
 			if (ch >= '0' && ch <= '9')
@@ -205,6 +243,10 @@ namespace mtp
 		std::tie(challenge, message) = _keys->GenerateCertificateMessage();
 		//HexDump("certificate payload", message);
 		_session->GenericOperation(OperationCode::SendWMDRMPDAppRequest, message);
+
+		ByteArray response = _session->GenericOperation(OperationCode::GetWMDRMPDAppResponse);
+		HexDump("device response", response);
+		_keys->VerifyResponse(response);
 	}
 
 	TrustedApp::KeysPtr TrustedApp::LoadKeys(const std::string & path)
