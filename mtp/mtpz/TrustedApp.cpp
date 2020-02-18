@@ -360,9 +360,9 @@ namespace mtp
 		//HexDump("device response", response);
 		ByteArray cmacKey = _keys->VerifyResponse(response, challenge);
 		debug("validated MTPZ device response...");
-		HexDump("cmac key", cmacKey);
+		//HexDump("cmac key", cmacKey);
 		ByteArray signature = _keys->SignResponse(cmacKey);
-		HexDump("signature", signature);
+		//HexDump("signature", signature);
 		_session->GenericOperation(OperationCode::SendWMDRMPDAppRequest, signature);
 		debug("hanshake finished");
 	}
