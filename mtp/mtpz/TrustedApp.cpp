@@ -162,15 +162,15 @@ namespace mtp
 			return result;
 		}
 
-		void VerifyResponse(const ByteArray & message)
+		ByteArray VerifyResponse(const ByteArray & message, const ByteArray & originalChallenge)
 		{
 
-#define CHECK_MORE(SIZE) if (src - message.data() + static_cast<size_t>(SIZE) > message.size()) \
+#define CHECK_MORE(ARRAY, SIZE) if (src - (ARRAY).data() + static_cast<size_t>(SIZE) > (ARRAY).size()) \
 	throw std::runtime_error("input buffer overrun");
 
 			const u8 * src = message.data();
 
-			CHECK_MORE(4);
+			CHECK_MORE(message, 4);
 			if (*src++ != 2)
 				throw std::runtime_error("invalid tag");
 			if (*src++ != 2)
@@ -182,7 +182,7 @@ namespace mtp
 			if (signatureSize < 0x80 || signatureSize != static_cast<size_t>(RSA_size(rsa)))
 				throw std::runtime_error("invalid signature size");
 
-			CHECK_MORE(signatureSize);
+			CHECK_MORE(message, signatureSize);
 			ByteArray signature(signatureSize);
 			if (RSA_private_decrypt(signatureSize, src, signature.data(), rsa, RSA_NO_PADDING) == -1)
 				throw std::runtime_error("RSA_private_decrypt failed");
@@ -196,10 +196,11 @@ namespace mtp
 				for(size_t i = 0; i < 107; ++i)
 					signature[21 + i] ^= key[i];
 			}
-			HexDump("signature out", signature);
+			//HexDump("signature out", signature);
 			ByteArray key = ByteArray(signature.begin() + 0x70, signature.end());
-			HexDump("key", key);
-			CHECK_MORE(4);
+			//HexDump("key", key);
+
+			CHECK_MORE(message, 4);
 			if (*src++ != 0)
 				throw std::runtime_error("invalid record");
 			if (*src++ != 0)
@@ -207,10 +208,63 @@ namespace mtp
 
 			size_t payloadSize = *src++ << 8;
 			payloadSize += *src++;
-			CHECK_MORE(payloadSize);
-			debug("payload size ", payloadSize);
+			CHECK_MORE(message, payloadSize);
+			//debug("payload size ", payloadSize);
 			ByteArray payload = Decrypt(key, src, payloadSize);
-			HexDump("payload", payload);
+			//HexDump("payload", payload);
+
+			src = payload.data();
+			if (*src++ != 1)
+				throw std::runtime_error("decryption failed");
+
+			size_t certificateSize = *src++ << 24;
+			certificateSize |= *src++ << 16;
+			certificateSize |= *src++ << 8;
+			certificateSize |= *src++;
+			//debug("certificate size ", certificateSize);
+			CHECK_MORE(payload, certificateSize);
+			src += certificateSize;
+
+			CHECK_MORE(payload, 2);
+			size_t challengeSize = *src++ << 8;
+			challengeSize |= *src++;
+			//debug("challenge size ", challengeSize);
+			if (challengeSize != originalChallenge.size())
+				throw std::runtime_error("invalid challenge size");
+
+			CHECK_MORE(payload, challengeSize);
+			if (memcmp(src, originalChallenge.data(), challengeSize) != 0)
+				throw std::runtime_error("challenge does not match");
+			src += challengeSize;
+			//debug("challenge matches...");
+
+			CHECK_MORE(payload, 2);
+			challengeSize = *src++ << 8;
+			challengeSize |= *src++;
+
+			//debug("device challenge size ", challengeSize);
+			CHECK_MORE(payload, challengeSize);
+			src += challengeSize;
+
+			CHECK_MORE(payload, 3);
+			if (*src++ != 1)
+				throw std::runtime_error("invalid signature");
+
+			signatureSize = *src++ << 8;
+			signatureSize |= *src++;
+			//debug("signature size: ", signatureSize);
+			CHECK_MORE(payload, signatureSize);
+			src += signatureSize;
+
+			CHECK_MORE(payload, 3);
+			if (*src++ != 1)
+				throw std::runtime_error("invalid hmac record");
+			challengeSize = *src++ << 8;
+			challengeSize |= *src++;
+			//debug("hmac size: ", challengeSize);
+			CHECK_MORE(payload, challengeSize);
+
+			return ByteArray(src, src + challengeSize);
 		}
 
 		static u8 FromHex(char ch)
@@ -270,8 +324,10 @@ namespace mtp
 		_session->GenericOperation(OperationCode::SendWMDRMPDAppRequest, message);
 
 		ByteArray response = _session->GenericOperation(OperationCode::GetWMDRMPDAppResponse);
-		HexDump("device response", response);
-		_keys->VerifyResponse(response);
+		//HexDump("device response", response);
+		ByteArray hmac = _keys->VerifyResponse(response, challenge);
+		debug("validated MTPZ device response...");
+		HexDump("hmac", hmac);
 	}
 
 	TrustedApp::KeysPtr TrustedApp::LoadKeys(const std::string & path)
