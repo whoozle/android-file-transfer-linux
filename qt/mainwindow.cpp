@@ -220,7 +220,7 @@ bool MainWindow::reconnectToDevice()
 			qDebug() << "device info" << fromUtf8(di.Manufacturer) << " " << fromUtf8(di.Model);
 			auto path = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
 			qDebug() << "writable home path: " << path;
-			_trustedApp = mtp::TrustedApp::Create(_session, toUtf8(path) + "/.mtp-data");
+			_trustedApp = mtp::TrustedApp::Create(_session, toUtf8(path + "/.mtpz-data"));
 			break;
 		}
 		catch(const mtp::usb::TimeoutException &ex)

@@ -47,9 +47,7 @@ namespace mtp
 
 		~TrustedApp();
 
-		///shortcut for creating trusted app straight from ctor
-		static TrustedAppPtr Create(const SessionPtr & session, const std::string &mtpzDataPath)
-		{ return Probe(session)? TrustedAppPtr(new TrustedApp(session, mtpzDataPath)): nullptr; }
+		static TrustedAppPtr Create(const SessionPtr & session, const std::string &mtpzDataPath);
 		void Authenticate();
 
 		bool KeysLoaded() const

@@ -45,6 +45,11 @@ namespace mtp
 	TrustedApp::~TrustedApp()
 	{ }
 
+	TrustedAppPtr TrustedApp::Create(const SessionPtr & session, const std::string &mtpzDataPath)
+	{
+		return TrustedAppPtr(Probe(session)? new TrustedApp(session, mtpzDataPath): nullptr);
+	}
+
 #ifdef MTPZ_ENABLED
 
 	struct TrustedApp::Keys
