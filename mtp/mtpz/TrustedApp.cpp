@@ -77,7 +77,7 @@ namespace mtp
 				RSA_free(rsa);
 		}
 
-		ByteArray HKDF(const u8 * message, size_t messageSize, size_t keySize)
+		static ByteArray HKDF(const u8 * message, size_t messageSize, size_t keySize)
 		{
 			static constexpr size_t blockSize = SHA_DIGEST_LENGTH;
 			size_t blocks = (keySize + blockSize - 1) / blockSize;
@@ -122,7 +122,7 @@ namespace mtp
 			ByteArray hash(SHA_DIGEST_LENGTH);
 			{
 				ByteArray salt(SHA_DIGEST_LENGTH + 8);
-				SHA1(certificate.data() + 2, dst - certificate.data() - 2, salt.data() + 8);
+				SHA1(certificate.data() + 2, dst - message.data() - 2, salt.data() + 8);
 				SHA1(salt.data(), salt.size(), hash.data());
 			}
 
@@ -144,7 +144,7 @@ namespace mtp
 			*dst++ = 0;
 			*dst++ = signature.size();
 
-			if (RSA_private_encrypt(signature.size(), signature.data(), dst, rsa, RSA_NO_PADDING) == -1)
+			if (RSA_private_decrypt(signature.size(), signature.data(), dst, rsa, RSA_NO_PADDING) == -1)
 				throw std::runtime_error("RSA_private_encrypt failed");
 
 			return std::make_tuple(challenge, message);
