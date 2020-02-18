@@ -37,6 +37,7 @@
 #include <QKeyEvent>
 #include <QFileDialog>
 #include <QSettings>
+#include <QStandardPaths>
 #include <QDir>
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -217,6 +218,9 @@ bool MainWindow::reconnectToDevice()
 			_session = _device->OpenSession(1);
 			mtp::msg::DeviceInfo di = _session->GetDeviceInfo();
 			qDebug() << "device info" << fromUtf8(di.Manufacturer) << " " << fromUtf8(di.Model);
+			auto path = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
+			qDebug() << "writable home path: " << path;
+			_trustedApp = mtp::TrustedApp::Create(_session, toUtf8(path) + "/.mtp-data");
 			break;
 		}
 		catch(const mtp::usb::TimeoutException &ex)

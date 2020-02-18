@@ -21,6 +21,7 @@
 #define MAINWINDOW_H
 
 #include <mtp/ptp/Device.h>
+#include <mtp/mtpz/TrustedApp.h>
 #include <QMainWindow>
 #include <QModelIndex>
 #include <QVector>
@@ -95,6 +96,7 @@ private:
 
 	mtp::DevicePtr				_device;
 	mtp::SessionPtr				_session;
+	mtp::TrustedAppPtr			_trustedApp;
 };
 
 #endif // MAINWINDOW_H
