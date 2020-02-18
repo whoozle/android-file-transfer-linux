@@ -25,34 +25,41 @@
 
 namespace mtp
 {
-    class Session;
-    DECLARE_PTR(Session);
+	class Session;
+	DECLARE_PTR(Session);
 
 	class TrustedApp;
 	DECLARE_PTR(TrustedApp);
 
-    class TrustedApp
-    {
-        struct Keys;
-        DECLARE_PTR(Keys);
+	class TrustedApp
+	{
+	private:
+		struct Keys;
+		DECLARE_PTR(Keys);
 
-        SessionPtr	_session;
-        KeysPtr		_keys;
+	private:
+		SessionPtr	_session;
+		KeysPtr		_keys;
 
-    public:
-        static bool Probe(const SessionPtr & session);
+	public:
+		static bool Supported();
+		static bool Probe(const SessionPtr & session);
 
-        TrustedApp(const SessionPtr & session, const std::string &mtpzDataPath);
-        ~TrustedApp();
+		~TrustedApp();
 
 		///shortcut for creating trusted app straight from ctor
 		static TrustedAppPtr Create(const SessionPtr & session, const std::string &mtpzDataPath)
-		{ return Probe(session)? std::make_shared<TrustedApp>(session, mtpzDataPath): nullptr; }
-        void Authenticate();
+		{ return Probe(session)? TrustedAppPtr(new TrustedApp(session, mtpzDataPath)): nullptr; }
+		void Authenticate();
 
-    private:
+		bool KeysLoaded() const
+		{ return !!_keys; }
+
+	private:
+		TrustedApp(const SessionPtr & session, const std::string & mtpzDataPath);
 		static KeysPtr LoadKeys(const std::string & path);
-    };
+
+	};
 }
 
 #endif
