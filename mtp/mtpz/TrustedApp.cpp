@@ -182,7 +182,6 @@ namespace mtp
 			text[15] = 1;
 
 			ByteArray message(20);
-
 			u8 * dst = message.data();
 			*dst++ = 2;
 			*dst++ = 3;
@@ -361,6 +360,7 @@ namespace mtp
 		ByteArray signature = _keys->SignResponse(cmacKey);
 		HexDump("signature", signature);
 		_session->GenericOperation(OperationCode::SendWMDRMPDAppRequest, signature);
+		debug("hanshake finished");
 	}
 
 	TrustedApp::KeysPtr TrustedApp::LoadKeys(const std::string & path)
