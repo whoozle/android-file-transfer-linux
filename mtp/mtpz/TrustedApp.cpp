@@ -401,7 +401,7 @@ namespace mtp
 	{
 		BIO * bio = BIO_new_file(path.c_str(), "rt");
 		if (bio == NULL) {
-			error("could not open .mtpz-data");
+			error("could not open ", path);
 			return nullptr;
 		}
 
