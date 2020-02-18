@@ -23,7 +23,7 @@
 namespace mtp
 {
 
-	enum struct DeviceProperty
+	enum struct DeviceProperty : u16
 	{
 		Undefined					= 0x5000,
 		BatteryLevel				= 0x5001,
@@ -68,6 +68,7 @@ namespace mtp
 		SessionInitiatorVersionInfo	= 0xd406,
 		PerceivedDeviceType			= 0xd407
 	};
+	DECLARE_ENUM(DeviceProperty, u16);
 
 }
 

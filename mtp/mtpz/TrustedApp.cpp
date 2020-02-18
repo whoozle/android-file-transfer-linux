@@ -192,6 +192,7 @@ namespace mtp
 
 	void TrustedApp::Authenticate()
 	{
+		_session->SetDeviceProperty(DeviceProperty::SessionInitiatorVersionInfo, "Android File Transfer for Linux/MTPZClass Driver");
 		_session->GenericOperation(OperationCode::EndTrustedAppSession);
 		ByteArray challenge, message;
 		std::tie(challenge, message) = _keys->GenerateCertificateMessage();

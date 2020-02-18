@@ -20,6 +20,7 @@
 #ifndef MESSAGES_H
 #define	MESSAGES_H
 
+#include <mtp/ptp/DeviceProperty.h>
 #include <mtp/ptp/InputStream.h>
 #include <mtp/ptp/OutputStream.h>
 #include <mtp/ptp/ObjectFormat.h>
@@ -39,7 +40,7 @@ namespace mtp { namespace msg
 		u16							FunctionalMode;
 		std::vector<OperationCode>	OperationsSupported;
 		std::vector<u16>			EventsSupported;
-		std::vector<u16>			DevicePropertiesSupported;
+		std::vector<DeviceProperty>	DevicePropertiesSupported;
 		std::vector<u16>			CaptureFormats;
 		std::vector<u16>			ImageFormats;
 		std::string					Manufacturer;
@@ -69,6 +70,12 @@ namespace mtp { namespace msg
 		{
 			auto i = std::find(OperationsSupported.begin(), OperationsSupported.end(), opcode);
 			return i != OperationsSupported.end();
+		}
+
+		bool Supports(DeviceProperty property) const
+		{
+			auto i = std::find(DevicePropertiesSupported.begin(), DevicePropertiesSupported.end(), property);
+			return i != DevicePropertiesSupported.end();
 		}
 	};
 

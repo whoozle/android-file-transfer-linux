@@ -333,10 +333,10 @@ namespace cli
 			}
 			ss << "\n";
 			ss << "supported properties: ";
-			for(u16 code : _gdi.DevicePropertiesSupported)
+			for(DeviceProperty code : _gdi.DevicePropertiesSupported)
 			{
 				ss << hex(code, 4) << " ";
-				if (mtp::DeviceProperty(code) == mtp::DeviceProperty::BatteryLevel)
+				if (code == mtp::DeviceProperty::BatteryLevel)
 					_batterySupported = true;
 			}
 			ss << "\n";
@@ -870,10 +870,10 @@ namespace cli
 	void Session::ListDeviceProperties()
 	{
 		using namespace mtp;
-		for(u16 code : _gdi.DevicePropertiesSupported)
+		for(DeviceProperty code : _gdi.DevicePropertiesSupported)
 		{
 			print("property code: ", hex(code, 4));
-			ByteArray data = _session->GetDeviceProperty((mtp::DeviceProperty)code);
+			ByteArray data = _session->GetDeviceProperty(code);
 			HexDump("value", data, true);
 		}
 	}
