@@ -27,6 +27,7 @@
 #	include <openssl/aes.h>
 #	include <openssl/bio.h>
 #	include <openssl/bn.h>
+#	include <openssl/cmac.h>
 #	include <openssl/crypto.h>
 #	include <openssl/rsa.h>
 #	include <openssl/rand.h>
@@ -162,6 +163,35 @@ namespace mtp
 			return result;
 		}
 
+		void CMAC(const u8 * key, size_t keySize, const ByteArray & message, u8 *dst)
+		{
+			CMAC_CTX *ctx = CMAC_CTX_new();
+			if (!ctx)
+				throw std::runtime_error("CMAC_CTX_new failed");
+
+			CMAC_Init(ctx, key, keySize, EVP_aes_128_cbc(), NULL);
+			CMAC_Update(ctx, message.data(), message.size());
+			size_t len = 0;
+			CMAC_Final(ctx, dst, &len);
+			CMAC_CTX_free(ctx);
+		}
+
+		ByteArray SignResponse(const ByteArray & key)
+		{
+			ByteArray text(16);
+			text[15] = 1;
+
+			ByteArray message(20);
+
+			u8 * dst = message.data();
+			*dst++ = 2;
+			*dst++ = 3;
+			*dst++ = 0;
+			*dst++ = 16;
+			CMAC(key.data(), 16, text, dst);
+			return message;
+		}
+
 		ByteArray VerifyResponse(const ByteArray & message, const ByteArray & originalChallenge)
 		{
 
@@ -258,10 +288,10 @@ namespace mtp
 
 			CHECK_MORE(payload, 3);
 			if (*src++ != 1)
-				throw std::runtime_error("invalid hmac record");
+				throw std::runtime_error("invalid cmac record");
 			challengeSize = *src++ << 8;
 			challengeSize |= *src++;
-			//debug("hmac size: ", challengeSize);
+			//debug("cmac size: ", challengeSize);
 			CHECK_MORE(payload, challengeSize);
 
 			return ByteArray(src, src + challengeSize);
@@ -325,9 +355,12 @@ namespace mtp
 
 		ByteArray response = _session->GenericOperation(OperationCode::GetWMDRMPDAppResponse);
 		//HexDump("device response", response);
-		ByteArray hmac = _keys->VerifyResponse(response, challenge);
+		ByteArray cmacKey = _keys->VerifyResponse(response, challenge);
 		debug("validated MTPZ device response...");
-		HexDump("hmac", hmac);
+		HexDump("cmac key", cmacKey);
+		ByteArray signature = _keys->SignResponse(cmacKey);
+		HexDump("signature", signature);
+		_session->GenericOperation(OperationCode::SendWMDRMPDAppRequest, signature);
 	}
 
 	TrustedApp::KeysPtr TrustedApp::LoadKeys(const std::string & path)
