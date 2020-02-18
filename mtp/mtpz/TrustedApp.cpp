@@ -169,10 +169,13 @@ namespace mtp
 			if (!ctx)
 				throw std::runtime_error("CMAC_CTX_new failed");
 
-			CMAC_Init(ctx, key, keySize, EVP_aes_128_cbc(), NULL);
-			CMAC_Update(ctx, message.data(), message.size());
+			if (!CMAC_Init(ctx, key, keySize, EVP_aes_128_cbc(), NULL))
+				error("CMAC_Init failed");
+			if (!CMAC_Update(ctx, message.data(), message.size()))
+				error("CMAC_Update failed");
 			size_t len = 0;
-			CMAC_Final(ctx, dst, &len);
+			if (!CMAC_Final(ctx, dst, &len))
+				error("CMAC_Final failed");
 			CMAC_CTX_free(ctx);
 		}
 
