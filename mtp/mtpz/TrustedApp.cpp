@@ -24,6 +24,7 @@
 #include <tuple>
 
 #ifdef MTPZ_ENABLED
+#	include <openssl/aes.h>
 #	include <openssl/bio.h>
 #	include <openssl/bn.h>
 #	include <openssl/crypto.h>
@@ -150,6 +151,17 @@ namespace mtp
 			return std::make_tuple(challenge, message);
 		}
 
+		static ByteArray Decrypt(const ByteArray & key, const u8 * src, size_t size)
+		{
+			AES_KEY aesKey;
+			AES_set_decrypt_key(key.data(), key.size() * 8, &aesKey);
+
+			ByteArray iv(16);
+			ByteArray result(size);
+			AES_cbc_encrypt(src, result.data(), size, &aesKey, iv.data(), 0);
+			return result;
+		}
+
 		void VerifyResponse(const ByteArray & message)
 		{
 
@@ -186,6 +198,19 @@ namespace mtp
 			}
 			HexDump("signature out", signature);
 			ByteArray key = ByteArray(signature.begin() + 0x70, signature.end());
+			HexDump("key", key);
+			CHECK_MORE(4);
+			if (*src++ != 0)
+				throw std::runtime_error("invalid record");
+			if (*src++ != 0)
+				throw std::runtime_error("invalid record");
+
+			size_t payloadSize = *src++ << 8;
+			payloadSize += *src++;
+			CHECK_MORE(payloadSize);
+			debug("payload size ", payloadSize);
+			ByteArray payload = Decrypt(key, src, payloadSize);
+			HexDump("payload", payload);
 		}
 
 		static u8 FromHex(char ch)
