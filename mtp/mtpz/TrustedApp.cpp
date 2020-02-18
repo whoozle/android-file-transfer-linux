@@ -163,7 +163,7 @@ namespace mtp
 			return result;
 		}
 
-		void CMAC(const u8 * key, size_t keySize, const ByteArray & message, u8 *dst)
+		void CMAC(const u8 * key, size_t keySize, const u8 * src, size_t size, u8 *dst)
 		{
 			CMAC_CTX *ctx = CMAC_CTX_new();
 			if (!ctx)
@@ -171,7 +171,7 @@ namespace mtp
 
 			if (!CMAC_Init(ctx, key, keySize, EVP_aes_128_cbc(), NULL))
 				error("CMAC_Init failed");
-			if (!CMAC_Update(ctx, message.data(), message.size()))
+			if (!CMAC_Update(ctx, src, size))
 				error("CMAC_Update failed");
 			size_t len = 0;
 			if (!CMAC_Final(ctx, dst, &len))
@@ -190,8 +190,29 @@ namespace mtp
 			*dst++ = 3;
 			*dst++ = 0;
 			*dst++ = 16;
-			CMAC(key.data(), 16, text, dst);
+			CMAC(key.data(), 16, text.data(), text.size(), dst);
 			return message;
+		}
+
+		void SignSessionRequest(u32 cmac[4], const ByteArray & key)
+		{
+			u8 signature[16];
+			CMAC(key.data(), 16, key.data() + 16, 4, signature);
+			//HexDump("signature", ByteArray(signature, signature + 16));
+			const u8 *src = signature;
+			u32 *dst = cmac;
+			for(size_t i = 0; i < 4; ++i)
+			{
+				u32 value = 0;
+				for(size_t j = 0; j < 4; ++j)
+					value |= static_cast<u32>(*src++) << ((3 - j) << 3);
+
+				*dst++ = value;
+			}
+			debug("secure session enabler: ", hex(cmac[0]), "-",
+				hex(cmac[1]), "-",
+				hex(cmac[2]), "-",
+				hex(cmac[3]));
 		}
 
 		ByteArray VerifyResponse(const ByteArray & message, const ByteArray & originalChallenge)
@@ -364,6 +385,10 @@ namespace mtp
 		ByteArray signature = _keys->SignResponse(cmacKey);
 		//HexDump("signature", signature);
 		_session->GenericOperation(OperationCode::SendWMDRMPDAppRequest, signature);
+		debug("authentication finished, enabling secure session...");
+		u32 cmac[4];
+		_keys->SignSessionRequest(cmac, cmacKey);
+		_session->EnableSecureFileOperations(cmac);
 		debug("hanshake finished");
 	}
 

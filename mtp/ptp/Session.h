@@ -139,6 +139,9 @@ namespace mtp
 		ByteArray GenericOperation(OperationCode code);
 		ByteArray GenericOperation(OperationCode code, const ByteArray & payload);
 
+		//windows specific
+		void EnableSecureFileOperations(u32 cmac1[4]);
+
 	private:
 		template<typename ... Args>
 		ByteArray RunTransaction(int timeout, OperationCode code, Args && ... args)

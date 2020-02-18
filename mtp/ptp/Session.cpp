@@ -405,6 +405,9 @@ namespace mtp
 		return RunTransactionWithDataRequest(_defaultTimeout, code, inputStream);
 	}
 
+	void Session::EnableSecureFileOperations(u32 cmac[4])
+	{ RunTransaction(_defaultTimeout, OperationCode::EnableTrustedFilesOperations, cmac[0], cmac[1], cmac[2], cmac[3]); }
+
 	Session::ObjectEditSession::ObjectEditSession(const SessionPtr & session, ObjectId objectId): _session(session), _objectId(objectId)
 	{ session->BeginEditObject(objectId); }
 
