@@ -122,7 +122,7 @@ namespace mtp
 			ByteArray hash(SHA_DIGEST_LENGTH);
 			{
 				ByteArray salt(SHA_DIGEST_LENGTH + 8);
-				SHA1(certificate.data() + 2, dst - message.data() - 2, salt.data() + 8);
+				SHA1(message.data() + 2, dst - message.data() - 2, salt.data() + 8);
 				SHA1(salt.data(), salt.size(), hash.data());
 			}
 
