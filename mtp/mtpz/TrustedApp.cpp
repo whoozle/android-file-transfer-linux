@@ -192,6 +192,9 @@ namespace mtp
 
 	void TrustedApp::Authenticate()
 	{
+		if (!_keys)
+			return;
+
 		auto & di = _session->GetDeviceInfo();
 		if (di.Supports(DeviceProperty::SessionInitiatorVersionInfo))
 			_session->SetDeviceProperty(DeviceProperty::SessionInitiatorVersionInfo, "Android File Transfer for Linux/MTPZClass Driver");
