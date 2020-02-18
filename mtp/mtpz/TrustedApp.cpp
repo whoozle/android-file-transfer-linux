@@ -79,7 +79,7 @@ namespace mtp
 
 		ByteArray HKDF(const u8 * message, size_t messageSize, size_t keySize)
 		{
-			size_t blockSize = SHA_DIGEST_LENGTH;
+			static constexpr size_t blockSize = SHA_DIGEST_LENGTH;
 			size_t blocks = (keySize + blockSize - 1) / blockSize;
 			ByteArray key(blocks * blockSize);
 			ByteArray ctr(messageSize + 4);
@@ -114,8 +114,9 @@ namespace mtp
 			*dst++ = certificate.size() >> 8;
 			*dst++ = certificate.size();
 			dst = std::copy(certificate.begin(), certificate.end(), dst);
-			*dst++ = 0x00;
-			*dst++ = 0x10;
+
+			*dst++ = challenge.size() >> 8;
+			*dst++ = challenge.size();
 			dst = std::copy(challenge.begin(), challenge.end(), dst);
 
 			ByteArray hash(SHA_DIGEST_LENGTH);
