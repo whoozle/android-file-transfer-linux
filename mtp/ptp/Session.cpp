@@ -119,7 +119,8 @@ namespace mtp
 		{
 			DataRequest req(code, transaction.Id);
 			Container container(req, inputStream);
-			_packeter.Write(std::make_shared<JoinedObjectInputStream>(std::make_shared<ByteArrayObjectInputStream>(container.Data), inputStream), timeout);
+			_packeter.Write(std::make_shared<ByteArrayObjectInputStream>(container.Data), timeout);
+			_packeter.Write(inputStream, timeout);
 		}
 		return Get(transaction.Id);
 	}
