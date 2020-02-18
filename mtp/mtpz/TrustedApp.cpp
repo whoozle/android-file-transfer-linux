@@ -347,7 +347,8 @@ namespace mtp
 
 		auto & di = _session->GetDeviceInfo();
 		if (di.Supports(DeviceProperty::SessionInitiatorVersionInfo))
-			_session->SetDeviceProperty(DeviceProperty::SessionInitiatorVersionInfo, "Android File Transfer for Linux/MTPZClass Driver");
+			_session->SetDeviceProperty(DeviceProperty::SessionInitiatorVersionInfo,
+			"Android File Transfer for Linux - MTPZClassDriver");
 
 		_session->GenericOperation(OperationCode::EndTrustedAppSession);
 		ByteArray challenge, message;
