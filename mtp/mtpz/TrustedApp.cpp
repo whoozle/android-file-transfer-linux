@@ -127,7 +127,7 @@ namespace mtp
 			}
 
 			ByteArray key = HKDF(hash.data(), hash.size(), 107);
-			HexDump("key", key);
+			//HexDump("key", key);
 
 			ByteArray signature(RSA_size(rsa));
 			signature[106] = 1;
@@ -138,7 +138,7 @@ namespace mtp
 
 			signature[0] &= 127;
 			signature[127] = 188;
-			HexDump("signature", signature);
+			//HexDump("signature", signature);
 
 			*dst++ = 1;
 			*dst++ = 0;
@@ -203,7 +203,7 @@ namespace mtp
 		_session->GenericOperation(OperationCode::EndTrustedAppSession);
 		ByteArray challenge, message;
 		std::tie(challenge, message) = _keys->GenerateCertificateMessage();
-		HexDump("certificate payload", message);
+		//HexDump("certificate payload", message);
 		_session->GenericOperation(OperationCode::SendWMDRMPDAppRequest, message);
 	}
 
