@@ -166,4 +166,4 @@ Please do not hesitate to contact me if you have any further questions, my email
 
 Android File Transfer for Linux is released under [GNU LGPLv2.1 License](https://github.com/whoozle/android-file-transfer-linux/blob/master/LICENSE).
 
-Copyright © 2015-2018 Vladimir Menshakov
+Copyright © 2015-2020 Vladimir Menshakov
