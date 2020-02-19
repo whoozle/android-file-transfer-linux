@@ -37,7 +37,11 @@
 #include <QKeyEvent>
 #include <QFileDialog>
 #include <QSettings>
-#include <QStandardPaths>
+#if QT_VERSION >= 0x050000
+#	include <QStandardPaths>
+#else
+#	include <QDesktopServices>
+#endif
 #include <QDir>
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -218,21 +222,29 @@ bool MainWindow::reconnectToDevice()
 			_session = _device->OpenSession(1);
 			mtp::msg::DeviceInfo di = _session->GetDeviceInfo();
 			qDebug() << "device info" << fromUtf8(di.Manufacturer) << " " << fromUtf8(di.Model);
+#if QT_VERSION >= 0x050000
 			auto path = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
+#else
+			auto path = QDesktopServices::storageLocation(QDesktopServices::HomeLocation);
+#endif
 			qDebug() << "writable home path: " << path;
 			_trustedApp = mtp::TrustedApp::Create(_session, toUtf8(path + "/.mtpz-data-"));
 			if (_trustedApp && !_trustedApp->KeysLoaded()) {
-				QMessageBox downloadKeys(QMessageBox::Question,
-					tr("MTPZ Keys are Missing"),
-					tr(
-						"It seems your computer is missing an important bit for talking with MTPZ device"
-						" — private keys and certificate material from Microsoft. "
-						"In some countries it's lawful to modify things to make them working again, "
-						"just because you own it.\n\n"
-						"On the other hand, Microsoft could have released key material for MTPZ devices "
+				QString title = tr("MTPZ Keys are Missing");
+				QString header = tr(
+						"It seems your computer is missing an important bit for talking with MTPZ device: "
+						"private keys and certificate material from Microsoft.\n"
+						"This means that you can't download and upload files from/to such devices.\n\n"
+						"Microsoft could have released that key material and documentation for MTPZ devices "
 						"as they are not interested in those anymore.\n\n"
-
-						"In this case I (as an app) can offer you to download keys from the Internet.\n"
+						"Because of the legal risks we can't bundle those keys, even though in some countries it's lawful to modify things to make them working again, "
+						"just because you own it.\n\n"
+				);
+#if QT_VERSION >= 0x050000
+				QMessageBox downloadKeys(QMessageBox::Question,
+					title,
+					header + tr(
+						"Alternatively I (as an app) can offer you to download keys from the Internet.\n"
 						"Can I download keys for you?\n\n"
 
 						"(Please press Yes only if all of the above is legal in your country or you simply don't care)."
@@ -243,6 +255,14 @@ bool MainWindow::reconnectToDevice()
 				if (r & QMessageBox::Yes) {
 					qDebug() << "YES";
 				}
+#else
+				QMessageBox downloadKeys(QMessageBox::Warning,
+					title,
+					header + tr(
+						"You can look for .mtpz-data file on the internet, download it and place it in your home directory."
+					));
+				downloadKeys.exec();
+#endif
 			}
 			break;
 		}
