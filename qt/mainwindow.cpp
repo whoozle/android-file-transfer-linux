@@ -37,6 +37,10 @@
 #include <QKeyEvent>
 #include <QFileDialog>
 #include <QSettings>
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QNetworkReply>
+#include <QUrl>
 #if QT_VERSION >= 0x050000
 #	include <QStandardPaths>
 #else
@@ -46,7 +50,7 @@
 
 MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
-	_ui(new Ui::MainWindow),
+	_ui(new Ui::MainWindow), _nam(),
 	_clipboard(QApplication::clipboard()),
 	_proxyModel(new QSortFilterProxyModel),
 	_storageModel(),
@@ -122,6 +126,40 @@ void MainWindow::closeEvent(QCloseEvent *event)
 	saveGeometry("main-window", *this);
 	settings.setValue("state/main-window", saveState());
 	QMainWindow::closeEvent(event);
+}
+
+void MainWindow::replyFinished(QNetworkReply * reply)
+{
+	qDebug() << "got reply " << reply << " with status " << reply->error();
+	auto title = tr("MTPZ Keys Download");
+	if (reply->error() != 0)
+	{
+		QMessageBox::warning(this, title, tr("Could not download keys, please find the error below:\n\n%1\n\nPlease look for .mtpz-data file on the internet and manually install it to your home directory.").arg(reply->errorString()));
+		return;
+	}
+	reply->open(QIODevice::ReadOnly);
+	QFile destination(getMtpzDataPath());
+	qDebug() << "writing to " << destination.fileName();
+	destination.open(QIODevice::WriteOnly);
+	QByteArray buffer;
+	int bufferSize = 4096;
+	while(!(buffer = reply->read(bufferSize)).isEmpty()){
+		destination.write(buffer);
+	}
+	destination.close();
+	reply->close();
+	QMessageBox::information(this, title, tr("Your MTPZ keys have been successfully installed.\n\nPlease restart the application to use them."));
+}
+
+QString MainWindow::getMtpzDataPath()
+{
+#if QT_VERSION >= 0x050000
+	auto path = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
+#else
+	auto path = QDesktopServices::storageLocation(QDesktopServices::HomeLocation);
+#endif
+	path += "/.mtpz-data";
+	return path;
 }
 
 bool MainWindow::reconnectToDevice()
@@ -222,13 +260,9 @@ bool MainWindow::reconnectToDevice()
 			_session = _device->OpenSession(1);
 			mtp::msg::DeviceInfo di = _session->GetDeviceInfo();
 			qDebug() << "device info" << fromUtf8(di.Manufacturer) << " " << fromUtf8(di.Model);
-#if QT_VERSION >= 0x050000
-			auto path = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
-#else
-			auto path = QDesktopServices::storageLocation(QDesktopServices::HomeLocation);
-#endif
+			auto path = getMtpzDataPath();
 			qDebug() << "writable home path: " << path;
-			_trustedApp = mtp::TrustedApp::Create(_session, toUtf8(path + "/.mtpz-data-"));
+			_trustedApp = mtp::TrustedApp::Create(_session, toUtf8(path));
 			if (_trustedApp && !_trustedApp->KeysLoaded()) {
 				QString title = tr("MTPZ Keys are Missing");
 				QString header = tr(
@@ -240,20 +274,25 @@ bool MainWindow::reconnectToDevice()
 						"Because of the legal risks we can't bundle those keys, even though in some countries it's lawful to modify things to make them working again, "
 						"just because you own it.\n\n"
 				);
-#if QT_VERSION >= 0x050000
+#ifdef MTPZ_DATA_SOURCE
 				QMessageBox downloadKeys(QMessageBox::Question,
 					title,
 					header + tr(
 						"Alternatively I (as an app) can offer you to download keys from the Internet.\n"
 						"Can I download keys for you?\n\n"
 
-						"(Please press Yes only if all of the above is legal in your country or you simply don't care)."
+						"(Please press Yes only if all of the above is legal in your country or you just don't care)."
 					),
 					QMessageBox::Yes | QMessageBox::No
 				);
 				int r = downloadKeys.exec();
 				if (r & QMessageBox::Yes) {
-					qDebug() << "YES";
+					qDebug() << "downloading keys";
+					if (!_nam) {
+						_nam = new QNetworkAccessManager(this);
+						connect(_nam, SIGNAL(finished(QNetworkReply*)), this, SLOT(replyFinished(QNetworkReply*)));
+					}
+					_nam->get(QNetworkRequest(QUrl(MTPZ_DATA_SOURCE)));
 				}
 #else
 				QMessageBox downloadKeys(QMessageBox::Warning,

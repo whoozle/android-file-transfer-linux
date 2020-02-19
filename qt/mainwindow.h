@@ -36,6 +36,8 @@ class FileUploader;
 
 class QSortFilterProxyModel;
 class QClipboard;
+class QNetworkAccessManager;
+class QNetworkReply;
 
 class MainWindow : public QMainWindow
 {
@@ -54,6 +56,7 @@ private:
 	QModelIndex mapIndex(const QModelIndex &index);
 	void saveGeometry(const QString &name, const QWidget &widget);
 	void restoreGeometry(const QString &name, QWidget &widget);
+	static QString getMtpzDataPath();
 
 private slots:
 	bool reconnectToDevice();
@@ -82,9 +85,11 @@ private slots:
 
 public slots:
 	void downloadFiles(const QString & path, const QVector<mtp::ObjectId> &objects);
+	void replyFinished(QNetworkReply*);
 
 private:
 	Ui::MainWindow *			_ui;
+	QNetworkAccessManager *		_nam;
 	QClipboard *				_clipboard;
 	QSortFilterProxyModel *		_proxyModel;
 	MtpStoragesModel *			_storageModel;
