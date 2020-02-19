@@ -58,6 +58,9 @@ else()
 	set(BUILD_QT_UI FALSE)
 endif()
 
+set(MTPZ_DATA_SOURCE "https://raw.githubusercontent.com/kbhomes/libmtp-zune/master/src/.mtpz-data")
+add_definitions(-DMTPZ_DATA_SOURCE=${MTPZ_DATA_SOURCE})
+
 if (BUILD_QT_UI)
   set(APP_NAME "android-file-transfer")
 
