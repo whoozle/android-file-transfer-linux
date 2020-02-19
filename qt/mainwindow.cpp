@@ -220,7 +220,30 @@ bool MainWindow::reconnectToDevice()
 			qDebug() << "device info" << fromUtf8(di.Manufacturer) << " " << fromUtf8(di.Model);
 			auto path = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
 			qDebug() << "writable home path: " << path;
-			_trustedApp = mtp::TrustedApp::Create(_session, toUtf8(path + "/.mtpz-data"));
+			_trustedApp = mtp::TrustedApp::Create(_session, toUtf8(path + "/.mtpz-data-"));
+			if (_trustedApp && !_trustedApp->KeysLoaded()) {
+				QMessageBox downloadKeys(QMessageBox::Question,
+					tr("MTPZ Keys are Missing"),
+					tr(
+						"It seems your computer is missing an important bit for talking with MTPZ device"
+						" — private keys and certificate material from Microsoft. "
+						"In some countries it's lawful to modify things to make them working again, "
+						"just because you own it.\n\n"
+						"On the other hand, Microsoft could have released key material for MTPZ devices "
+						"as they are not interested in those anymore.\n\n"
+
+						"In this case I (as an app) can offer you to download keys from the Internet.\n"
+						"Can I download keys for you?\n\n"
+
+						"(Please press Yes only if all of the above is legal in your country or you simply don't care)."
+					),
+					QMessageBox::Yes | QMessageBox::No
+				);
+				int r = downloadKeys.exec();
+				if (r & QMessageBox::Yes) {
+					qDebug() << "YES";
+				}
+			}
 			break;
 		}
 		catch(const mtp::usb::TimeoutException &ex)
