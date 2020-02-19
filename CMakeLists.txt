@@ -27,6 +27,12 @@ find_package ( Threads )
 option(BUILD_FUSE "Build fuse mount helper" ON)
 option(BUILD_MTPZ "Build with MTPZ support" ON)
 
+if (BUILD_SHARED_LIB)
+	set(LIB_NAME mtp-ng)
+else()
+	set(LIB_NAME mtp-ng-static)
+endif()
+
 if (BUILD_FUSE)
 	pkg_check_modules ( FUSE fuse )
 endif()
@@ -55,6 +61,7 @@ if (USB_BACKEND_LIBUSB)
 endif()
 
 add_definitions(-Wall -pthread)
+add_definitions(-D_LARGEFILE_SOURCE=1 -D_FILE_OFFSET_BITS=64)
 
 if (NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE Release)
@@ -63,9 +70,6 @@ endif()
 if (CMAKE_BUILD_TYPE STREQUAL Debug)
 	add_definitions(-ggdb)
 endif()
-
-include_directories(. ${CMAKE_SOURCE_DIR})
-include_directories(mtp/backend/posix)
 
 set(SOURCES
 	mtp/log.cpp
@@ -82,6 +86,8 @@ set(SOURCES
 
 	mtp/backend/posix/FileHandler.cpp
 	mtp/backend/posix/Exception.cpp
+
+	mtp/mtpz/TrustedApp.cpp
 )
 
 exec_program(git ARGS describe --tags OUTPUT_VARIABLE AFT_VERSION RETURN_VALUE GIT_STATUS)
@@ -98,10 +104,7 @@ configure_file(mtp/version.cpp.in ${VERSION_SRC})
 list(APPEND SOURCES ${VERSION_SRC})
 
 if (USB_BACKEND_LIBUSB)
-
 	pkg_check_modules(LIBUSB libusb-1.0 REQUIRED)
-	include_directories(${LIBUSB_INCLUDE_DIRS})
-	include_directories(mtp/backend/libusb)
 	add_definitions(-DUSB_BACKEND_LIBUSB)
 
 	list(APPEND SOURCES
@@ -115,7 +118,6 @@ elseif (USB_BACKEND_DARWIN)
 	find_library(CORE_LIBRARY CoreFoundation)
 	find_library(IOKIT_LIBRARY IOKit)
 	list(APPEND MTP_LIBRARIES ${IOKIT_LIBRARY} ${CORE_LIBRARY})
-	include_directories(mtp/backend/darwin)
 	list(APPEND SOURCES
 		mtp/backend/darwin/usb/Context.cpp
 		mtp/backend/darwin/usb/Device.cpp
@@ -124,7 +126,6 @@ elseif (USB_BACKEND_DARWIN)
 		mtp/backend/darwin/usb/Interface.cpp
 	)
 else()
-	include_directories(mtp/backend/linux)
 	list(APPEND SOURCES
 		mtp/backend/linux/usb/Endpoint.cpp
 		mtp/backend/linux/usb/Context.cpp
@@ -142,9 +143,9 @@ list(APPEND SOURCES
 if (BUILD_MTPZ)
 	include(FindOpenSSL)
 	if (OPENSSL_FOUND AND (OPENSSL_VERSION VERSION_GREATER_EQUAL 1.1))
+		set(_BUILD_MTPZ TRUE)
 		message(STATUS "building with MTPZ support")
 		add_definitions(-DMTPZ_ENABLED)
-		include_directories(${OPENSSL_INCLUDE_DIR})
 		list(APPEND MTP_LIBRARIES ${OPENSSL_CRYPTO_LIBRARY})
 		list(APPEND MTP_SHARED_LIBRARIES ${OPENSSL_CRYPTO_LIBRARY})
 	else()
@@ -152,26 +153,41 @@ if (BUILD_MTPZ)
 	endif()
 endif()
 
+if (BUILD_SHARED_LIB)
+	set(LIB_NAME mtp-ng)
+else()
+	set(LIB_NAME mtp-ng-static)
+endif()
 
 if (BUILD_SHARED_LIB)
-	add_library(mtp-ng SHARED ${SOURCES})
-	set_target_properties(mtp-ng PROPERTIES SOVERSION ${VERSION})
-	target_link_libraries(mtp-ng ${CMAKE_THREAD_LIBS_INIT} ${MTP_SHARED_LIBRARIES})
+	add_library(${LIB_NAME} SHARED ${SOURCES})
+	set_target_properties(${LIB_NAME} PROPERTIES SOVERSION ${VERSION})
+	target_link_libraries(${LIB_NAME} ${CMAKE_THREAD_LIBS_INIT} ${MTP_SHARED_LIBRARIES})
 
 	if (USB_BACKEND_LIBUSB)
-		target_link_libraries(mtp-ng ${LIBUSB_LIBRARIES})
+		target_link_libraries(${LIB_NAME} ${LIBUSB_LIBRARIES})
 	endif()
+else ()
+	add_library(${LIB_NAME} STATIC ${SOURCES})
+	target_link_libraries(${LIB_NAME} ${MTP_LIBRARIES})
+endif ()
 
-	list(INSERT MTP_LIBRARIES 0 mtp-ng)
-	install(TARGETS mtp-ng LIBRARY DESTINATION "lib${LIB_SUFFIX}" ARCHIVE DESTINATION "lib${LIB_SUFFIX}")
-else (BUILD_SHARED_LIB)
-	add_library(mtp-ng-static STATIC ${SOURCES})
-	target_link_libraries(mtp-ng-static ${MTP_LIBRARIES})
-	list(INSERT MTP_LIBRARIES 0 mtp-ng-static)
-	install(TARGETS mtp-ng-static LIBRARY DESTINATION "lib${LIB_SUFFIX}" ARCHIVE DESTINATION "lib${LIB_SUFFIX}")
-endif (BUILD_SHARED_LIB)
+list(INSERT MTP_LIBRARIES 0 ${LIB_NAME})
+install(TARGETS ${LIB_NAME} LIBRARY DESTINATION "lib${LIB_SUFFIX}" ARCHIVE DESTINATION "lib${LIB_SUFFIX}")
+target_include_directories(${LIB_NAME} PUBLIC ${CMAKE_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/mtp/backend/posix)
 
-add_definitions(-D_LARGEFILE_SOURCE=1 -D_FILE_OFFSET_BITS=64)
+if (_BUILD_MTPZ)
+	target_include_directories(${LIB_NAME} PRIVATE ${OPENSSL_INCLUDE_DIR})
+endif()
+
+if (USB_BACKEND_LIBUSB)
+	target_include_directories(${LIB_NAME} PUBLIC ${LIBUSB_INCLUDE_DIRS})
+	target_include_directories(${LIB_NAME} PUBLIC mtp/backend/libusb)
+elseif (USB_BACKEND_DARWIN)
+	target_include_directories(${LIB_NAME} PUBLIC mtp/backend/darwin)
+else()
+	target_include_directories(${LIB_NAME} PUBLIC mtp/backend/linux)
+endif()
 
 add_subdirectory(cli)
 
