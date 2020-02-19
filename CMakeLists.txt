@@ -23,9 +23,11 @@ include(CheckFunctionExists)
 include(CheckIncludeFiles)
 
 find_package ( Threads )
+find_package (Python COMPONENTS Development)
 
 option(BUILD_FUSE "Build fuse mount helper" ON)
 option(BUILD_MTPZ "Build with MTPZ support" ON)
+option(BUILD_PYTHON "Build python module" ON)
 
 if (BUILD_SHARED_LIB)
 	set(LIB_NAME mtp-ng)
@@ -40,6 +42,15 @@ endif()
 if (FUSE_FOUND)
 	message(STATUS "fuse found, building mount helper")
 	add_definitions(${FUSE_CFLAGS} -DFUSE_USE_VERSION=26)
+endif()
+
+if (PYTHON_FOUND)
+	find_package(pybind11)
+	if (pybind11_FOUND)
+		add_subdirectory(python)
+	else()
+		message(WARNING "pybind11 not found, skipping python bindings")
+	endif()
 endif()
 
 check_include_files (magic.h HAVE_MAGIC_H)
