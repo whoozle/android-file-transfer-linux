@@ -55,7 +55,7 @@ PYBIND11_MODULE(aftl, m) {
 		def("__repr__",
 			[](ObjectFormat f) -> std::string { return "ObjectFormat(" + std::to_string(static_cast<int>(f)) + ")"; })
 	;
-	py::enum_<ObjectProperty>(m, "ObjectProperty", "MTP Object property")
+	py::enum_<ObjectProperty>(m, "ObjectProperty", "MTP object property")
 		ENUM(ObjectProperty, StorageId)
 		ENUM(ObjectProperty, ObjectFormat)
 		ENUM(ObjectProperty, ProtectionStatus)
@@ -89,7 +89,50 @@ PYBIND11_MODULE(aftl, m) {
 		ENUM(ObjectProperty, MediaGUID)
 		ENUM(ObjectProperty, All)
 	;
-
+	py::enum_<DeviceProperty>(m, "DeviceProperty", "MTP device property")
+		ENUM(DeviceProperty, Undefined)
+		ENUM(DeviceProperty, BatteryLevel)
+		ENUM(DeviceProperty, FunctionalMode)
+		ENUM(DeviceProperty, ImageSize)
+		ENUM(DeviceProperty, CompressionSetting)
+		ENUM(DeviceProperty, WhiteBalance)
+		ENUM(DeviceProperty, RgbGain)
+		ENUM(DeviceProperty, FNumber)
+		ENUM(DeviceProperty, FocalLength)
+		ENUM(DeviceProperty, FocusDistance)
+		ENUM(DeviceProperty, FocusMode)
+		ENUM(DeviceProperty, ExposureMeteringMode)
+		ENUM(DeviceProperty, FlashMode)
+		ENUM(DeviceProperty, ExposureTime)
+		ENUM(DeviceProperty, ExposureProgramMode)
+		ENUM(DeviceProperty, ExposureIndex)
+		ENUM(DeviceProperty, ExposureBiasCompensation)
+		ENUM(DeviceProperty, Datetime)
+		ENUM(DeviceProperty, CaptureDelay)
+		ENUM(DeviceProperty, StillCaptureMode)
+		ENUM(DeviceProperty, Contrast)
+		ENUM(DeviceProperty, Sharpness)
+		ENUM(DeviceProperty, DigitalZoom)
+		ENUM(DeviceProperty, EffectMode)
+		ENUM(DeviceProperty, BurstNumber)
+		ENUM(DeviceProperty, BurstInterval)
+		ENUM(DeviceProperty, TimelapseNumber)
+		ENUM(DeviceProperty, TimelapseInterval)
+		ENUM(DeviceProperty, FocusMeteringMode)
+		ENUM(DeviceProperty, UploadUrl)
+		ENUM(DeviceProperty, Artist)
+		ENUM(DeviceProperty, CopyrightInfo)
+		ENUM(DeviceProperty, SynchronizationPartner)
+		ENUM(DeviceProperty, DeviceFriendlyName)
+		ENUM(DeviceProperty, Volume)
+		ENUM(DeviceProperty, SupportedFormatsOrdered)
+		ENUM(DeviceProperty, DeviceIcon)
+		ENUM(DeviceProperty, PlaybackRate)
+		ENUM(DeviceProperty, PlaybackObject)
+		ENUM(DeviceProperty, PlaybackContainerIndex)
+		ENUM(DeviceProperty, SessionInitiatorVersionInfo)
+		ENUM(DeviceProperty, PerceivedDeviceType)
+	;
 
 	py::class_<usb::DeviceDescriptor, usb::DeviceDescriptorPtr>(m, "DeviceDescriptor").
 		def_property_readonly("vendor_id", &usb::DeviceDescriptor::GetVendorId).
@@ -166,10 +209,16 @@ PYBIND11_MODULE(aftl, m) {
 
 		def("get_object_storage", &Session::GetObjectStorage).
 		def("get_object_parent", &Session::GetObjectParent).
-		def("abort_current_transaction", &Session::AbortCurrentTransaction, py::arg("timeout") = static_cast<int>(Session::DefaultTimeout)).
 		def("delete_object", &Session::DeleteObject).
 
-		def("get_partial_object", &Session::GetPartialObject)
+		def("get_partial_object", &Session::GetPartialObject).
+
+		def("get_device_property", &Session::GetDeviceProperty).
+		def("get_device_integer_property", &Session::GetDeviceIntegerProperty).
+		def("get_device_string_property", &Session::GetDeviceStringProperty).
+		def("set_device_property", (void (Session::*)(DeviceProperty, const std::string &)) &Session::SetDeviceProperty).
+		def("set_device_property", (void (Session::*)(DeviceProperty, const ByteArray &)) &Session::SetDeviceProperty).
+		def("abort_current_transaction", &Session::AbortCurrentTransaction, py::arg("timeout") = static_cast<int>(Session::DefaultTimeout))
 		;
 	;
 
@@ -201,12 +250,6 @@ PYBIND11_MODULE(aftl, m) {
 
 		//common properties shortcuts
 		ByteArray GetObjectPropertyList(ObjectId objectId, ObjectFormat format, ObjectProperty property, u32 groupCode, u32 depth, int timeout = LongTimeout);
-
-		ByteArray GetDeviceProperty(DeviceProperty property);
-		u64 GetDeviceIntegerProperty(DeviceProperty property);
-		std::string GetDeviceStringProperty(DeviceProperty property);
-		void SetDeviceProperty(DeviceProperty property, const ByteArray & value);
-		void SetDeviceProperty(DeviceProperty property, const std::string & value);
 
 #endif
 
