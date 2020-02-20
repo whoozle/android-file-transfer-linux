@@ -42,11 +42,28 @@ static void EnableDebug(bool enable) {
 
 PYBIND11_MODULE(aftl, m) {
 	m.doc() = "Android File Transfer for Linux python bindings";
-	m.def("debug", &EnableDebug);
+	m.def("debug", &EnableDebug, "Enables logs from MTP library");
+
+	py::class_<Session, SessionPtr> session(m, "Session");
+	py::class_<ObjectId> objectId(m, "ObjectId");
+
+#define ENUM(TYPE, NAME) .value(#NAME, TYPE :: NAME)
+
+	py::enum_<ObjectFormat>(m, "ObjectFormat", "MTP Object format for querying specific types of media, or Any")
+		ENUM(ObjectFormat, Any)
+		ENUM(ObjectFormat, Association).
+		def("__repr__",
+			[](ObjectFormat f) -> std::string { return "ObjectFormat(" + std::to_string(static_cast<int>(f)) + ")"; })
+	;
 
 	py::class_<usb::DeviceDescriptor, usb::DeviceDescriptorPtr>(m, "DeviceDescriptor").
 		def_property_readonly("vendor_id", &usb::DeviceDescriptor::GetVendorId).
-		def_property_readonly("product_id", &usb::DeviceDescriptor::GetProductId);
+		def_property_readonly("product_id", &usb::DeviceDescriptor::GetProductId).
+		def("__repr__",
+			[](const usb::DeviceDescriptor f) -> std::string {
+				return "DeviceDescriptor(" + std::to_string(f.GetVendorId()) + ":" + std::to_string(f.GetProductId()) + ")";
+			})
+		;
 	;
 
 	py::class_<Device, DevicePtr>(m, "Device").
@@ -60,11 +77,7 @@ PYBIND11_MODULE(aftl, m) {
 		def("__repr__",
 			[](const StorageId &id) { return "StorageId(" + std::to_string(id.Id) + ")"; });
 
-	py::class_<ObjectId>(m, "ObjectId").
-		def("__repr__",
-			[](const StorageId &id) { return "ObjectId(" + std::to_string(id.Id) + ")"; });
-
-	py::class_<Session, SessionPtr>(m, "Session").
+	session.
 		// def_readonly_static("DefaultTimeout", &Session::DefaultTimeout).
 		// def_readonly_static("LongTimeout", &Session::LongTimeout).
 
@@ -83,7 +96,7 @@ PYBIND11_MODULE(aftl, m) {
 			return result;
 		}).
 
-		def("get_object_ids", [](Session *self, StorageId storageId, ObjectFormat objectFormat, ObjectId parent, int timeout) -> std::vector<ObjectId> {
+		def("get_object_handles", [](Session *self, StorageId storageId, ObjectFormat objectFormat, ObjectId parent, int timeout) -> std::vector<ObjectId> {
 			std::vector<ObjectId> result;
 			auto objects = self->GetObjectHandles(storageId, objectFormat, parent, timeout);
 			result.reserve(objects.ObjectHandles.size());
@@ -93,6 +106,10 @@ PYBIND11_MODULE(aftl, m) {
 			return result;
 		}, py::arg("storageId"), py::arg("objectFormat") = ObjectFormat::Any, py::arg("parent") = Session::Root, py::arg("timeout") = static_cast<int>(Session::LongTimeout));
 	;
+
+	objectId.
+		def("__repr__",
+			[](const ObjectId &id) { return "ObjectId(" + std::to_string(id.Id) + ")"; });
 
 	py::class_<Session::NewObjectInfo>(m, "NewObjectInfo").
 		def_readonly("storage_id", &Session::NewObjectInfo::StorageId).
