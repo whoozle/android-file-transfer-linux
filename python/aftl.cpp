@@ -160,15 +160,9 @@ PYBIND11_MODULE(aftl, m) {
 		def("get_object_string_property", &Session::GetObjectStringProperty).
 		def("get_object_integer_property", &Session::GetObjectIntegerProperty).
 
-		def("set_object_property", [](Session * self, ObjectId objectId, ObjectProperty property, const ByteArray & value) -> void {
-			self->SetObjectProperty(objectId, property, value);
-		}).
-		def("set_object_string_property", [](Session * self, ObjectId id, ObjectProperty prop, const std::string & value) -> void {
-			self->SetObjectProperty(id, prop, value);
-		}).
-		def("set_object_integer_property", [](Session * self, ObjectId objectId, ObjectProperty property, u64 value) -> void {
-			self->SetObjectProperty(objectId, property, value);
-		}).
+		def("set_object_property", (void (Session::*)(ObjectId, ObjectProperty, u64)) &Session::SetObjectProperty).
+		def("set_object_property", (void (Session::*)(ObjectId, ObjectProperty, const std::string &)) &Session::SetObjectProperty).
+		def("set_object_property", (void (Session::*)(ObjectId, ObjectProperty, const ByteArray &)) &Session::SetObjectProperty).
 
 		def("get_object_storage", &Session::GetObjectStorage).
 		def("get_object_parent", &Session::GetObjectParent).
