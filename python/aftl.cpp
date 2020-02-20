@@ -56,8 +56,13 @@ PYBIND11_MODULE(aftl, m) {
 			py::arg("session_id") = 1, py::arg("timeout") = static_cast<int>(Session::DefaultTimeout))
 	;
 
-	py::class_<StorageId>(m, "StorageId");
-	py::class_<ObjectId>(m, "ObjectId");
+	py::class_<StorageId>(m, "StorageId").
+		def("__repr__",
+			[](const StorageId &id) { return "StorageId(" + std::to_string(id.Id) + ")"; });
+
+	py::class_<ObjectId>(m, "ObjectId").
+		def("__repr__",
+			[](const StorageId &id) { return "ObjectId(" + std::to_string(id.Id) + ")"; });
 
 	py::class_<Session, SessionPtr>(m, "Session").
 		// def_readonly_static("DefaultTimeout", &Session::DefaultTimeout).
@@ -71,11 +76,22 @@ PYBIND11_MODULE(aftl, m) {
 		def("get_storage_ids", [](Session * self) -> std::vector<StorageId> {
 			std::vector<StorageId> result;
 			auto sids = self->GetStorageIDs();
+			result.reserve(sids.StorageIDs.size());
 			for(auto & sid: sids.StorageIDs) {
 				result.push_back(sid);
 			}
 			return result;
-		});
+		}).
+
+		def("get_object_ids", [](Session *self, StorageId storageId, ObjectFormat objectFormat, ObjectId parent, int timeout) -> std::vector<ObjectId> {
+			std::vector<ObjectId> result;
+			auto objects = self->GetObjectHandles(storageId, objectFormat, parent, timeout);
+			result.reserve(objects.ObjectHandles.size());
+			for(auto & oid: objects.ObjectHandles) {
+				result.push_back(oid);
+			}
+			return result;
+		}, py::arg("storageId"), py::arg("objectFormat") = ObjectFormat::Any, py::arg("parent") = Session::Root, py::arg("timeout") = static_cast<int>(Session::LongTimeout));
 	;
 
 	py::class_<Session::NewObjectInfo>(m, "NewObjectInfo").
