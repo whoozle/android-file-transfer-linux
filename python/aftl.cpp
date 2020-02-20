@@ -4,6 +4,7 @@
 #include <mtp/ptp/Session.h>
 #include <usb/Context.h>
 #include <usb/Device.h>
+#include <mtp/log.h>
 
 namespace py = pybind11;
 
@@ -35,18 +36,13 @@ namespace pybind11 { namespace detail {
     };
 }} // namespace pybind11::detail
 
-static ByteArray GetTest() {
-	ByteArray data(3);
-	data[0] = 1;
-	data[1] = 2;
-	data[2] = 3;
-	return data;
-	py::bytes();
+static void EnableDebug(bool enable) {
+	g_debug = enable;
 }
 
 PYBIND11_MODULE(aftl, m) {
 	m.doc() = "Android File Transfer for Linux python bindings";
-	m.def("test", &GetTest);
+	m.def("debug", &EnableDebug);
 
 	py::class_<usb::DeviceDescriptor, usb::DeviceDescriptorPtr>(m, "DeviceDescriptor").
 		def_property_readonly("vendor_id", &usb::DeviceDescriptor::GetVendorId).
