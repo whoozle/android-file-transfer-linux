@@ -9,8 +9,32 @@ namespace py = pybind11;
 
 using namespace mtp;
 
+/* return back to pybind? */
+class bytearray : public py::object {
+	PYBIND11_OBJECT(bytearray, object, PyByteArray_Check);
+	bytearray(const ByteArray & data):
+		object(PyByteArray_FromStringAndSize(reinterpret_cast<const char *>(data.data()), data.size()), stolen_t { }) {
+	}
+
+    operator ByteArray() const {
+        unsigned char *buffer = reinterpret_cast<unsigned u8 *>(PyByteArray_AsString(m_ptr));
+        ssize_t size = PyByteArray_Size(m_ptr);
+        return buffer && size? ByteArray(buffer, buffer + size): ByteArray();
+    }
+};
+
+static ByteArray GetTest() {
+	ByteArray data(3);
+	data[0] = 1;
+	data[1] = 2;
+	data[2] = 3;
+	return data;
+	py::bytes();
+}
+
 PYBIND11_MODULE(aftl, m) {
 	m.doc() = "Android File Transfer for Linux python bindings";
+	m.def("test", &GetTest);
 
 	py::class_<usb::DeviceDescriptor, usb::DeviceDescriptorPtr>(m, "DeviceDescriptor").
 		def_property_readonly("vendor_id", &usb::DeviceDescriptor::GetVendorId).
