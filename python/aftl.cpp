@@ -55,6 +55,41 @@ PYBIND11_MODULE(aftl, m) {
 		def("__repr__",
 			[](ObjectFormat f) -> std::string { return "ObjectFormat(" + std::to_string(static_cast<int>(f)) + ")"; })
 	;
+	py::enum_<ObjectProperty>(m, "ObjectProperty", "MTP Object property")
+		ENUM(ObjectProperty, StorageId)
+		ENUM(ObjectProperty, ObjectFormat)
+		ENUM(ObjectProperty, ProtectionStatus)
+		ENUM(ObjectProperty, ObjectSize)
+		ENUM(ObjectProperty, AssociationType)
+		ENUM(ObjectProperty, AssociationDesc)
+		ENUM(ObjectProperty, ObjectFilename)
+		ENUM(ObjectProperty, DateCreated)
+		ENUM(ObjectProperty, DateModified)
+		ENUM(ObjectProperty, Keywords)
+		ENUM(ObjectProperty, ParentObject)
+		ENUM(ObjectProperty, AllowedFolderContents)
+		ENUM(ObjectProperty, Hidden)
+		ENUM(ObjectProperty, SystemObject)
+
+		ENUM(ObjectProperty, PersistentUniqueObjectId)
+		ENUM(ObjectProperty, SyncId)
+		ENUM(ObjectProperty, Name)
+		ENUM(ObjectProperty, Artist)
+		ENUM(ObjectProperty, DateAuthored)
+		ENUM(ObjectProperty, DateAdded)
+
+		ENUM(ObjectProperty, RepresentativeSampleFormat)
+		ENUM(ObjectProperty, RepresentativeSampleData)
+
+		ENUM(ObjectProperty, DisplayName)
+		ENUM(ObjectProperty, BodyText)
+		ENUM(ObjectProperty, Subject)
+		ENUM(ObjectProperty, Priority)
+
+		ENUM(ObjectProperty, MediaGUID)
+		ENUM(ObjectProperty, All)
+	;
+
 
 	py::class_<usb::DeviceDescriptor, usb::DeviceDescriptorPtr>(m, "DeviceDescriptor").
 		def_property_readonly("vendor_id", &usb::DeviceDescriptor::GetVendorId).
@@ -104,7 +139,13 @@ PYBIND11_MODULE(aftl, m) {
 				result.push_back(oid);
 			}
 			return result;
-		}, py::arg("storageId"), py::arg("objectFormat") = ObjectFormat::Any, py::arg("parent") = Session::Root, py::arg("timeout") = static_cast<int>(Session::LongTimeout));
+		}, py::arg("storageId"), py::arg("objectFormat") = ObjectFormat::Any, py::arg("parent") = Session::Root, py::arg("timeout") = static_cast<int>(Session::LongTimeout)).
+
+		def("get_object_string_property", &Session::GetObjectStringProperty).
+		def("get_object_integer_property", &Session::GetObjectIntegerProperty).
+		def("set_object_string_property", [](Session * self, ObjectId id, ObjectProperty prop, const std::string & value) -> void {
+			self->SetObjectProperty(id, prop, value);
+		});
 	;
 
 	objectId.
@@ -151,7 +192,6 @@ PYBIND11_MODULE(aftl, m) {
 
 		void SetObjectProperty(ObjectId objectId, ObjectProperty property, const ByteArray &value);
 		void SetObjectProperty(ObjectId objectId, ObjectProperty property, u64 value);
-		void SetObjectProperty(ObjectId objectId, ObjectProperty property, const std::string &value);
 		time_t GetObjectModificationTime(ObjectId id);
 
 		//common properties shortcuts
@@ -159,8 +199,6 @@ PYBIND11_MODULE(aftl, m) {
 		ObjectId GetObjectParent(ObjectId id);
 
 		ByteArray GetObjectProperty(ObjectId objectId, ObjectProperty property);
-		u64 GetObjectIntegerProperty(ObjectId objectId, ObjectProperty property);
-		std::string GetObjectStringProperty(ObjectId objectId, ObjectProperty property);
 
 		ByteArray GetObjectPropertyList(ObjectId objectId, ObjectFormat format, ObjectProperty property, u32 groupCode, u32 depth, int timeout = LongTimeout);
 
