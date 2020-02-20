@@ -9,19 +9,31 @@ namespace py = pybind11;
 
 using namespace mtp;
 
-/* return back to pybind? */
-class bytearray : public py::object {
-	PYBIND11_OBJECT(bytearray, object, PyByteArray_Check);
-	bytearray(const ByteArray & data):
-		object(PyByteArray_FromStringAndSize(reinterpret_cast<const char *>(data.data()), data.size()), stolen_t { }) {
-	}
+namespace pybind11 { namespace detail {
+    template <> struct type_caster<ByteArray> {
+    public:
+        PYBIND11_TYPE_CASTER(ByteArray, _("ByteArray"));
 
-    operator ByteArray() const {
-        unsigned char *buffer = reinterpret_cast<unsigned u8 *>(PyByteArray_AsString(m_ptr));
-        ssize_t size = PyByteArray_Size(m_ptr);
-        return buffer && size? ByteArray(buffer, buffer + size): ByteArray();
-    }
-};
+        bool load(handle src, bool) {
+            PyObject *source = src.ptr();
+			if (!PyByteArray_Check(source))
+				return false;
+
+			auto size = PyByteArray_Size(source);
+			u8 * ptr = reinterpret_cast<u8 *>(PyByteArray_AsString(source));
+			if (ptr && size)
+				value.assign(ptr, ptr + size);
+			else
+				value.clear();
+
+            return !PyErr_Occurred();
+        }
+
+        static handle cast(const ByteArray & src, return_value_policy /* policy */, handle /* parent */) {
+            return PyByteArray_FromStringAndSize(reinterpret_cast<const char *>(src.data()), src.size());
+        }
+    };
+}} // namespace pybind11::detail
 
 static ByteArray GetTest() {
 	ByteArray data(3);
