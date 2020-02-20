@@ -198,6 +198,15 @@ PYBIND11_MODULE(aftl, m) {
 			}
 			return result;
 		}, py::arg("storageId"), py::arg("objectFormat") = ObjectFormat::Any, py::arg("parent") = Session::Root, py::arg("timeout") = static_cast<int>(Session::LongTimeout)).
+		def("get_object_properties_supported", [](Session *self, ObjectId objectId) -> std::vector<ObjectProperty> {
+			std::vector<ObjectProperty> result;
+			auto props = self->GetObjectPropertiesSupported(objectId);
+			result.reserve(props.ObjectPropertyCodes.size());
+			for(auto prop: props.ObjectPropertyCodes) {
+				result.push_back(prop);
+			}
+			return result;
+		}).
 
 		def("get_object_property", &Session::GetObjectProperty).
 		def("get_object_string_property", &Session::GetObjectStringProperty).
@@ -211,7 +220,12 @@ PYBIND11_MODULE(aftl, m) {
 		def("get_object_parent", &Session::GetObjectParent).
 		def("delete_object", &Session::DeleteObject).
 
+		def("edit_object_supported", &Session::EditObjectSupported).
+		def("get_object_property_list_supported", &Session::GetObjectPropertyListSupported).
+		def("get_object_modification_time", &Session::GetObjectModificationTime).
+
 		def("get_partial_object", &Session::GetPartialObject).
+		def("edit_object", &Session::EditObject).
 
 		def("get_device_property", &Session::GetDeviceProperty).
 		def("get_device_integer_property", &Session::GetDeviceIntegerProperty).
@@ -235,18 +249,6 @@ PYBIND11_MODULE(aftl, m) {
 		void GetThumb(ObjectId objectId, const IObjectOutputStreamPtr &outputStream);
 		NewObjectInfo SendObjectInfo(const msg::ObjectInfo &objectInfo, StorageId storageId = AnyStorage, ObjectId parentObject = Device);
 		void SendObject(const IObjectInputStreamPtr &inputStream, int timeout = LongTimeout);
-
-		bool EditObjectSupported() const
-		{ return _editObjectSupported; }
-		bool GetObjectPropertyListSupported() const
-		{ return _getObjectPropertyListSupported; }
-
-		static ObjectEditSessionPtr EditObject(const SessionPtr &session, ObjectId objectId)
-		{ return std::make_shared<ObjectEditSession>(session, objectId); }
-
-		msg::ObjectPropertiesSupported GetObjectPropertiesSupported(ObjectId objectId);
-
-		time_t GetObjectModificationTime(ObjectId id);
 
 		//common properties shortcuts
 		ByteArray GetObjectPropertyList(ObjectId objectId, ObjectFormat format, ObjectProperty property, u32 groupCode, u32 depth, int timeout = LongTimeout);
