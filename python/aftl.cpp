@@ -112,6 +112,21 @@ PYBIND11_MODULE(aftl, m) {
 		def("__repr__",
 			[](const StorageId &id) { return "StorageId(" + std::to_string(id.Id) + ")"; });
 
+	objectId.
+		def("__repr__",
+			[](const ObjectId &id) { return "ObjectId(" + std::to_string(id.Id) + ")"; });
+
+	py::class_<Session::NewObjectInfo>(m, "NewObjectInfo").
+		def_readonly("storage_id", &Session::NewObjectInfo::StorageId).
+		def_readonly("parent_object_id", &Session::NewObjectInfo::ParentObjectId).
+		def_readonly("object_id", &Session::NewObjectInfo::ObjectId)
+	;
+
+	py::class_<Session::ObjectEditSession, Session::ObjectEditSessionPtr>(m, "ObjectEditSession").
+		def("truncate", &Session::ObjectEditSession::Truncate).
+		def("send", &Session::ObjectEditSession::Send)
+	;
+
 	session.
 		// def_readonly_static("DefaultTimeout", &Session::DefaultTimeout).
 		// def_readonly_static("LongTimeout", &Session::LongTimeout).
@@ -145,22 +160,10 @@ PYBIND11_MODULE(aftl, m) {
 		def("get_object_integer_property", &Session::GetObjectIntegerProperty).
 		def("set_object_string_property", [](Session * self, ObjectId id, ObjectProperty prop, const std::string & value) -> void {
 			self->SetObjectProperty(id, prop, value);
-		});
-	;
-
-	objectId.
-		def("__repr__",
-			[](const ObjectId &id) { return "ObjectId(" + std::to_string(id.Id) + ")"; });
-
-	py::class_<Session::NewObjectInfo>(m, "NewObjectInfo").
-		def_readonly("storage_id", &Session::NewObjectInfo::StorageId).
-		def_readonly("parent_object_id", &Session::NewObjectInfo::ParentObjectId).
-		def_readonly("object_id", &Session::NewObjectInfo::ObjectId)
-	;
-
-	py::class_<Session::ObjectEditSession, Session::ObjectEditSessionPtr>(m, "ObjectEditSession").
-		def("truncate", &Session::ObjectEditSession::Truncate).
-		def("send", &Session::ObjectEditSession::Send)
+		}).
+		def("get_object_storage", &Session::GetObjectStorage).
+		def("get_object_parent", &Session::GetObjectParent)
+		;
 	;
 
 #if 0
@@ -195,9 +198,6 @@ PYBIND11_MODULE(aftl, m) {
 		time_t GetObjectModificationTime(ObjectId id);
 
 		//common properties shortcuts
-		StorageId GetObjectStorage(ObjectId id);
-		ObjectId GetObjectParent(ObjectId id);
-
 		ByteArray GetObjectProperty(ObjectId objectId, ObjectProperty property);
 
 		ByteArray GetObjectPropertyList(ObjectId objectId, ObjectFormat format, ObjectProperty property, u32 groupCode, u32 depth, int timeout = LongTimeout);
