@@ -1,5 +1,6 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include <pybind11/chrono.h>
 #include <mtp/ptp/Device.h>
 #include <mtp/ptp/Session.h>
 #include <usb/Context.h>
@@ -9,6 +10,8 @@
 namespace py = pybind11;
 
 using namespace mtp;
+
+using system_clock = std::chrono::system_clock;
 
 namespace pybind11 { namespace detail {
     template <> struct type_caster<ByteArray> {
@@ -222,7 +225,10 @@ PYBIND11_MODULE(aftl, m) {
 
 		def("edit_object_supported", &Session::EditObjectSupported).
 		def("get_object_property_list_supported", &Session::GetObjectPropertyListSupported).
-		def("get_object_modification_time", &Session::GetObjectModificationTime).
+		def("get_object_modification_time", [](Session * self, ObjectId objectId) -> std::chrono::system_clock::time_point {
+			time_t t = self->GetObjectModificationTime(objectId);
+			return system_clock::from_time_t(t);
+		}).
 
 		def("get_partial_object", &Session::GetPartialObject).
 		def("edit_object", &Session::EditObject).
