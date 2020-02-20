@@ -156,13 +156,26 @@ PYBIND11_MODULE(aftl, m) {
 			return result;
 		}, py::arg("storageId"), py::arg("objectFormat") = ObjectFormat::Any, py::arg("parent") = Session::Root, py::arg("timeout") = static_cast<int>(Session::LongTimeout)).
 
+		def("get_object_property", &Session::GetObjectProperty).
 		def("get_object_string_property", &Session::GetObjectStringProperty).
 		def("get_object_integer_property", &Session::GetObjectIntegerProperty).
+
+		def("set_object_property", [](Session * self, ObjectId objectId, ObjectProperty property, const ByteArray & value) -> void {
+			self->SetObjectProperty(objectId, property, value);
+		}).
 		def("set_object_string_property", [](Session * self, ObjectId id, ObjectProperty prop, const std::string & value) -> void {
 			self->SetObjectProperty(id, prop, value);
 		}).
+		def("set_object_integer_property", [](Session * self, ObjectId objectId, ObjectProperty property, u64 value) -> void {
+			self->SetObjectProperty(objectId, property, value);
+		}).
+
 		def("get_object_storage", &Session::GetObjectStorage).
-		def("get_object_parent", &Session::GetObjectParent)
+		def("get_object_parent", &Session::GetObjectParent).
+		def("abort_current_transaction", &Session::AbortCurrentTransaction, py::arg("timeout") = static_cast<int>(Session::DefaultTimeout)).
+		def("delete_object", &Session::DeleteObject).
+
+		def("get_partial_object", &Session::GetPartialObject)
 		;
 	;
 
@@ -171,17 +184,14 @@ PYBIND11_MODULE(aftl, m) {
 		const msg::DeviceInfo & GetDeviceInfo() const
 		{ return _deviceInfo; }
 
-		msg::ObjectHandles GetObjectHandles(StorageId storageId = AllStorages, ObjectFormat objectFormat = ObjectFormat::Any, ObjectId parent = Device, int timeout = LongTimeout);
 		msg::StorageInfo GetStorageInfo(StorageId storageId);
 
 		NewObjectInfo CreateDirectory(const std::string &name, ObjectId parentId, StorageId storageId = AnyStorage, AssociationType type = AssociationType::GenericFolder);
 		msg::ObjectInfo GetObjectInfo(ObjectId objectId);
 		void GetObject(ObjectId objectId, const IObjectOutputStreamPtr &outputStream);
 		void GetThumb(ObjectId objectId, const IObjectOutputStreamPtr &outputStream);
-		ByteArray GetPartialObject(ObjectId objectId, u64 offset, u32 size);
 		NewObjectInfo SendObjectInfo(const msg::ObjectInfo &objectInfo, StorageId storageId = AnyStorage, ObjectId parentObject = Device);
 		void SendObject(const IObjectInputStreamPtr &inputStream, int timeout = LongTimeout);
-		void DeleteObject(ObjectId objectId, int timeout = LongTimeout);
 
 		bool EditObjectSupported() const
 		{ return _editObjectSupported; }
@@ -193,13 +203,9 @@ PYBIND11_MODULE(aftl, m) {
 
 		msg::ObjectPropertiesSupported GetObjectPropertiesSupported(ObjectId objectId);
 
-		void SetObjectProperty(ObjectId objectId, ObjectProperty property, const ByteArray &value);
-		void SetObjectProperty(ObjectId objectId, ObjectProperty property, u64 value);
 		time_t GetObjectModificationTime(ObjectId id);
 
 		//common properties shortcuts
-		ByteArray GetObjectProperty(ObjectId objectId, ObjectProperty property);
-
 		ByteArray GetObjectPropertyList(ObjectId objectId, ObjectFormat format, ObjectProperty property, u32 groupCode, u32 depth, int timeout = LongTimeout);
 
 		ByteArray GetDeviceProperty(DeviceProperty property);
@@ -207,8 +213,6 @@ PYBIND11_MODULE(aftl, m) {
 		std::string GetDeviceStringProperty(DeviceProperty property);
 		void SetDeviceProperty(DeviceProperty property, const ByteArray & value);
 		void SetDeviceProperty(DeviceProperty property, const std::string & value);
-
-		void AbortCurrentTransaction(int timeout = DefaultTimeout);
 
 #endif
 
