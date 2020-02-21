@@ -51,6 +51,7 @@ PYBIND11_MODULE(aftl, m) {
 	py::class_<ObjectId> objectId(m, "ObjectId");
 
 #define ENUM(TYPE, NAME) .value(#NAME, TYPE :: NAME)
+#define DICT(NAME) d[#NAME] = info . NAME
 
 	py::enum_<ObjectFormat>(m, "ObjectFormat", "MTP Object format for querying specific types of media, or Any")
 		ENUM(ObjectFormat, Any)
@@ -190,6 +191,21 @@ PYBIND11_MODULE(aftl, m) {
 				result.push_back(sid);
 			}
 			return result;
+		}).
+
+		def("get_storage_info", [](Session *self, StorageId storage) -> py::dict {
+			auto info = self->GetStorageInfo(storage);
+
+			py::dict d;
+			DICT(StorageType);
+			DICT(FilesystemType);
+			DICT(AccessCapability);
+			DICT(MaxCapacity);
+			DICT(FreeSpaceInBytes);
+			DICT(FreeSpaceInImages);
+			DICT(StorageDescription);
+			DICT(VolumeLabel);
+			return d;
 		}).
 
 		def("get_object_handles", [](Session *self, StorageId storageId, ObjectFormat objectFormat, ObjectId parent, int timeout) -> std::vector<ObjectId> {
