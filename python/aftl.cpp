@@ -39,6 +39,31 @@ namespace pybind11 { namespace detail {
     };
 }} // namespace pybind11::detail
 
+namespace
+{
+	struct PythonOutputStream final : public IObjectOutputStream
+	{
+		py::object Object;
+		bool Cancelled = false;
+
+		PythonOutputStream(py::object object): Object(object)
+		{ }
+
+		void Cancel() override
+		{ Cancelled = true; }
+		size_t Write(const u8* data, size_t size) override
+		{
+			if (Cancelled)
+				return 0;
+			auto write = Object.attr("write");
+			py::bytes payload(reinterpret_cast<const char *>(data), size);
+			write(payload).cast<long>();
+			return PyErr_Occurred()? 0: size;
+		}
+	};
+
+}
+
 static void EnableDebug(bool enable) {
 	g_debug = enable;
 }
@@ -327,6 +352,13 @@ PYBIND11_MODULE(aftl, m) {
 			return result;
 		}).
 
+		def("get_object", [](Session * self, ObjectId object, py::object stream) {
+			self->GetObject(object, std::make_shared<PythonOutputStream>(stream));
+		}).
+		def("get_thumb", [](Session * self, ObjectId object, py::object stream) {
+			self->GetThumb(object, std::make_shared<PythonOutputStream>(stream));
+		}).
+
 		def("get_object_property", &Session::GetObjectProperty).
 		def("get_object_string_property", &Session::GetObjectStringProperty).
 		def("get_object_integer_property", &Session::GetObjectIntegerProperty).
@@ -366,8 +398,6 @@ PYBIND11_MODULE(aftl, m) {
 
 #if 0
 
-		void GetObject(ObjectId objectId, const IObjectOutputStreamPtr &outputStream);
-		void GetThumb(ObjectId objectId, const IObjectOutputStreamPtr &outputStream);
 		void SendObject(const IObjectInputStreamPtr &inputStream, int timeout = LongTimeout);
 
 		//common properties shortcuts
