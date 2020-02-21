@@ -16,7 +16,8 @@ install:
     if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
       sudo apt-get -y install qt5-default libfuse-dev libmagic-dev
     elif [ "${TRAVIS_OS_NAME}" = "osx" ]; then
-      brew tap homebrew/cask && brew install qt5 homebrew/cask/osxfuse openssl@1.1
+      brew tap homebrew/cask && brew install qt5 homebrew/cask/osxfuse openssl@1.1 python@3
+      pip3 install pybind11
     fi
 
 script:
