@@ -148,6 +148,59 @@ PYBIND11_MODULE(aftl, m) {
 		ENUM(AssociationType, AncillaryData)
 	;
 
+	py::enum_<OperationCode>(m, "OperationCode", "MTP Operation Code")
+		ENUM(OperationCode, GetDeviceInfo)
+		ENUM(OperationCode, OpenSession)
+		ENUM(OperationCode, CloseSession)
+		ENUM(OperationCode, GetStorageIDs)
+		ENUM(OperationCode, GetStorageInfo)
+		ENUM(OperationCode, GetNumObjects)
+		ENUM(OperationCode, GetObjectHandles)
+		ENUM(OperationCode, GetObjectInfo)
+		ENUM(OperationCode, GetObject)
+		ENUM(OperationCode, GetThumb)
+		ENUM(OperationCode, DeleteObject)
+		ENUM(OperationCode, SendObjectInfo)
+		ENUM(OperationCode, SendObject)
+		ENUM(OperationCode, InitiateCapture)
+		ENUM(OperationCode, FormatStore)
+		ENUM(OperationCode, ResetDevice)
+		ENUM(OperationCode, SelfTest)
+		ENUM(OperationCode, SetObjectProtection)
+		ENUM(OperationCode, PowerDown)
+		ENUM(OperationCode, GetDevicePropDesc)
+		ENUM(OperationCode, GetDevicePropValue)
+		ENUM(OperationCode, SetDevicePropValue)
+		ENUM(OperationCode, ResetDevicePropValue)
+		ENUM(OperationCode, TerminateOpenCapture)
+		ENUM(OperationCode, MoveObject)
+		ENUM(OperationCode, CopyObject)
+		ENUM(OperationCode, GetPartialObject)
+		ENUM(OperationCode, InitiateOpenCapture)
+		ENUM(OperationCode, CancelTransaction)
+		ENUM(OperationCode, SendWMDRMPDAppRequest)
+		ENUM(OperationCode, GetWMDRMPDAppResponse)
+		ENUM(OperationCode, EnableTrustedFilesOperations)
+		ENUM(OperationCode, DisableTrustedFilesOperations)
+		ENUM(OperationCode, EndTrustedAppSession)
+		ENUM(OperationCode, GetPartialObject64)
+		ENUM(OperationCode, SendPartialObject)
+		ENUM(OperationCode, TruncateObject)
+		ENUM(OperationCode, BeginEditObject)
+		ENUM(OperationCode, EndEditObject)
+		ENUM(OperationCode, GetObjectPropsSupported)
+		ENUM(OperationCode, GetObjectPropDesc)
+		ENUM(OperationCode, GetObjectPropValue)
+		ENUM(OperationCode, SetObjectPropValue)
+		ENUM(OperationCode, GetObjectPropList)
+		ENUM(OperationCode, SetObjectPropList)
+		ENUM(OperationCode, GetInterdependentPropDesc)
+		ENUM(OperationCode, SendObjectPropList)
+		ENUM(OperationCode, GetObjectReferences)
+		ENUM(OperationCode, SetObjectReferences)
+		ENUM(OperationCode, Skip)
+	;
+
 	py::class_<usb::DeviceDescriptor, usb::DeviceDescriptorPtr>(m, "DeviceDescriptor").
 		def_property_readonly("vendor_id", &usb::DeviceDescriptor::GetVendorId).
 		def_property_readonly("product_id", &usb::DeviceDescriptor::GetProductId).
@@ -173,7 +226,7 @@ PYBIND11_MODULE(aftl, m) {
 		def("__repr__",
 			[](const ObjectId &id) { return "ObjectId(" + std::to_string(id.Id) + ")"; });
 
-	py::class_<Session::NewObjectInfo>(m, "NewObjectInfo").
+	py::class_<Session::NewObjectInfo>(m, "NewObjectInfo", "information about newly created object").
 		def_readonly("storage_id", &Session::NewObjectInfo::StorageId).
 		def_readonly("parent_object_id", &Session::NewObjectInfo::ParentObjectId).
 		def_readonly("object_id", &Session::NewObjectInfo::ObjectId)
@@ -253,6 +306,26 @@ PYBIND11_MODULE(aftl, m) {
 			return d;
 		}).
 
+		def("get_device_info", [](Session * self) {
+			auto info = self->GetDeviceInfo();
+			py::dict d;
+			DICT(StandardVersion);
+			DICT(VendorExtensionId);
+			DICT(VendorExtensionVersion);
+			DICT(VendorExtensionDesc);
+			DICT(FunctionalMode);
+			DICT(OperationsSupported);
+			DICT(EventsSupported);
+			DICT(DevicePropertiesSupported);
+			DICT(CaptureFormats);
+			DICT(ImageFormats);
+			DICT(Manufacturer);
+			DICT(Model);
+			DICT(DeviceVersion);
+			DICT(SerialNumber);
+			return d;
+		}).
+
 		def("get_object_properties_supported", [](Session *self, ObjectId objectId) -> std::vector<ObjectProperty> {
 			std::vector<ObjectProperty> result;
 			auto props = self->GetObjectPropertiesSupported(objectId);
@@ -295,9 +368,6 @@ PYBIND11_MODULE(aftl, m) {
 	;
 
 #if 0
-
-		const msg::DeviceInfo & GetDeviceInfo() const
-		{ return _deviceInfo; }
 
 		NewObjectInfo CreateDirectory(const std::string &name, ObjectId parentId, StorageId storageId = AnyStorage, AssociationType type = AssociationType::GenericFolder);
 		void GetObject(ObjectId objectId, const IObjectOutputStreamPtr &outputStream);
