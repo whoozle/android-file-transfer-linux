@@ -23,7 +23,7 @@ include(CheckFunctionExists)
 include(CheckIncludeFiles)
 
 find_package ( Threads )
-find_package (Python COMPONENTS Development)
+find_package (Python COMPONENTS Development QUIET)
 
 option(BUILD_FUSE "Build fuse mount helper" ON)
 option(BUILD_MTPZ "Build with MTPZ support" ON)
