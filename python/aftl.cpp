@@ -55,9 +55,7 @@ PYBIND11_MODULE(aftl, m) {
 
 	py::enum_<ObjectFormat>(m, "ObjectFormat", "MTP Object format for querying specific types of media, or Any")
 		ENUM(ObjectFormat, Any)
-		ENUM(ObjectFormat, Association).
-		def("__repr__",
-			[](ObjectFormat f) -> std::string { return "ObjectFormat(" + std::to_string(static_cast<int>(f)) + ")"; })
+		ENUM(ObjectFormat, Association)
 	;
 	py::enum_<ObjectProperty>(m, "ObjectProperty", "MTP object property")
 		ENUM(ObjectProperty, StorageId)
