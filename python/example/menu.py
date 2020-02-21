@@ -11,7 +11,7 @@ import aftl
 
 def get_storage_prompt(session, s):
 	info = session.get_storage_info(s)
-	name = info['StorageDescription']
+	name = info.StorageDescription
 	if not name:
 		name = repr(s)
 	return { 'name': name, 'value': s }
@@ -28,10 +28,10 @@ def get_storage(session):
 
 def get_object_prompt(session, object):
 	info = session.get_object_info(object)
-	name = info['Filename']
-	if info['ObjectFormat'] == aftl.ObjectFormat.Association:
+	name = info.Filename
+	if info.ObjectFormat == aftl.ObjectFormat.Association:
 		name += '/'
-	return {'name': name, 'value': (object, info['ObjectFormat']) }
+	return {'name': name, 'value': (object, info.ObjectFormat) }
 
 def get_object(session, storage, parent):
 	objects = session.get_object_handles(storage, aftl.ObjectFormat.Any, parent)
