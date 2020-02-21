@@ -5,7 +5,7 @@
 hierarchical prompt usage example
 """
 from __future__ import print_function, unicode_literals
-from PyInquirer import style_from_dict, Token, prompt
+from PyInquirer import style_from_dict, Token, prompt, Separator
 
 import aftl
 
@@ -45,6 +45,18 @@ def get_object(session, storage, parent):
 	answers = prompt(object_prompt)
 	return answers.get('object')
 
+def get_object_action(session):
+	action_prompt = {
+		'type': 'expand',
+		'name': 'action',
+		'message': 'Object Action (press h for help)',
+		'choices': [
+			{ 'key': 'b', 'name': 'Back', 'value': 'back' },
+			Separator(),
+			{ 'key': 'd', 'name': 'Download', 'value': 'download' },
+		]
+	}
+	return prompt(action_prompt).get('action')
 
 def main():
 	session = aftl.Device.find_first().open_session()
@@ -62,6 +74,17 @@ def main():
 
 			if object is None:
 				path.pop()
+				continue
+
+			while True:
+				action = get_object_action(session)
+				if action == 'back':
+					break
+
+				if action == 'download':
+					name = session.get_object_string_property(object, aftl.ObjectProperty.ObjectFilename)
+					with open(name, "wb") as f:
+						session.get_object(object, f)
 
 
 if __name__ == '__main__':
