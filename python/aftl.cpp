@@ -138,6 +138,16 @@ PYBIND11_MODULE(aftl, m) {
 		ENUM(DeviceProperty, PerceivedDeviceType)
 	;
 
+	py::enum_<AssociationType>(m, "AssociationType", "MTP Association Type")
+		ENUM(AssociationType, GenericFolder)
+		ENUM(AssociationType, Album)
+		ENUM(AssociationType, TimeSequence)
+		ENUM(AssociationType, HorizontalPanoramic)
+		ENUM(AssociationType, VerticalPanoramic)
+		ENUM(AssociationType, Panoramic2D)
+		ENUM(AssociationType, AncillaryData)
+	;
+
 	py::class_<usb::DeviceDescriptor, usb::DeviceDescriptorPtr>(m, "DeviceDescriptor").
 		def_property_readonly("vendor_id", &usb::DeviceDescriptor::GetVendorId).
 		def_property_readonly("product_id", &usb::DeviceDescriptor::GetProductId).
@@ -218,6 +228,31 @@ PYBIND11_MODULE(aftl, m) {
 			return result;
 		}, py::arg("storageId"), py::arg("objectFormat") = ObjectFormat::Any, py::arg("parent") = Session::Root, py::arg("timeout") = static_cast<int>(Session::LongTimeout)).
 
+		def("get_object_info", [](Session * self, ObjectId object) {
+			auto info = self->GetObjectInfo(object);
+
+			py::dict d;
+			DICT(ObjectFormat);
+			DICT(ProtectionStatus);
+			DICT(ObjectCompressedSize);
+			DICT(ThumbFormat);
+			DICT(ThumbCompressedSize);
+			DICT(ThumbPixWidth);
+			DICT(ThumbPixHeight);
+			DICT(ImagePixWidth);
+			DICT(ImagePixHeight);
+			DICT(ImageBitDepth);
+			DICT(ParentObject);
+			DICT(AssociationType);
+			DICT(AssociationDesc);
+			DICT(SequenceNumber);
+			DICT(Filename);
+			DICT(CaptureDate);
+			DICT(ModificationDate);
+			DICT(Keywords);
+			return d;
+		}).
+
 		def("get_object_properties_supported", [](Session *self, ObjectId objectId) -> std::vector<ObjectProperty> {
 			std::vector<ObjectProperty> result;
 			auto props = self->GetObjectPropertiesSupported(objectId);
@@ -264,10 +299,7 @@ PYBIND11_MODULE(aftl, m) {
 		const msg::DeviceInfo & GetDeviceInfo() const
 		{ return _deviceInfo; }
 
-		msg::StorageInfo GetStorageInfo(StorageId storageId);
-
 		NewObjectInfo CreateDirectory(const std::string &name, ObjectId parentId, StorageId storageId = AnyStorage, AssociationType type = AssociationType::GenericFolder);
-		msg::ObjectInfo GetObjectInfo(ObjectId objectId);
 		void GetObject(ObjectId objectId, const IObjectOutputStreamPtr &outputStream);
 		void GetThumb(ObjectId objectId, const IObjectOutputStreamPtr &outputStream);
 		NewObjectInfo SendObjectInfo(const msg::ObjectInfo &objectInfo, StorageId storageId = AnyStorage, ObjectId parentObject = Device);

@@ -9,22 +9,29 @@ from PyInquirer import style_from_dict, Token, prompt
 
 import aftl
 
+def get_storage_prompt(session, s):
+	info = session.get_storage_info(s)
+	name = info['StorageDescription']
+	if not name:
+		name = repr(s)
+	return { 'name': name, 'value': s }
+
 def get_storage(session):
 	storage_prompt = {
 		'type': 'list',
 		'name': 'storage',
 		'message': 'Select storage',
-		'choices': list(map(lambda s: { 'name': repr(s), 'value': s }, session.get_storage_ids())) + [{'name': 'Quit', 'value': None}]
+		'choices': list(map(lambda s: get_storage_prompt(session, s), session.get_storage_ids())) + [{'name': 'Quit', 'value': None}]
 	}
 	answers = prompt(storage_prompt)
 	return answers.get('storage')
 
 def get_object_prompt(session, object):
-	name = session.get_object_string_property(object, aftl.ObjectProperty.ObjectFilename)
-	type = aftl.ObjectFormat(session.get_object_integer_property(object, aftl.ObjectProperty.ObjectFormat))
-	if type == aftl.ObjectFormat.Association:
+	info = session.get_object_info(object)
+	name = info['Filename']
+	if info['ObjectFormat'] == aftl.ObjectFormat.Association:
 		name += '/'
-	return {'name': name, 'value': (object, type) }
+	return {'name': name, 'value': (object, info['ObjectFormat']) }
 
 def get_object(session, storage, parent):
 	objects = session.get_object_handles(storage, aftl.ObjectFormat.Any, parent)
