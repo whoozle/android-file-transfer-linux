@@ -50,153 +50,153 @@ PYBIND11_MODULE(aftl, m) {
 	py::class_<Session, SessionPtr> session(m, "Session");
 	py::class_<ObjectId> objectId(m, "ObjectId");
 
-#define ENUM(TYPE, NAME) .value(#NAME, TYPE :: NAME)
-#define DICT(NAME) d[#NAME] = info . NAME
+#define VALUE(TYPE, NAME) .value(#NAME, TYPE :: NAME)
+#define DEF_READONLY(TYPE, NAME) .def_readonly(#NAME, & TYPE :: NAME )
 
 	py::enum_<ObjectFormat>(m, "ObjectFormat", "MTP Object format for querying specific types of media, or Any")
-		ENUM(ObjectFormat, Any)
-		ENUM(ObjectFormat, Association)
+		VALUE(ObjectFormat, Any)
+		VALUE(ObjectFormat, Association)
 	;
 	py::enum_<ObjectProperty>(m, "ObjectProperty", "MTP object property")
-		ENUM(ObjectProperty, StorageId)
-		ENUM(ObjectProperty, ObjectFormat)
-		ENUM(ObjectProperty, ProtectionStatus)
-		ENUM(ObjectProperty, ObjectSize)
-		ENUM(ObjectProperty, AssociationType)
-		ENUM(ObjectProperty, AssociationDesc)
-		ENUM(ObjectProperty, ObjectFilename)
-		ENUM(ObjectProperty, DateCreated)
-		ENUM(ObjectProperty, DateModified)
-		ENUM(ObjectProperty, Keywords)
-		ENUM(ObjectProperty, ParentObject)
-		ENUM(ObjectProperty, AllowedFolderContents)
-		ENUM(ObjectProperty, Hidden)
-		ENUM(ObjectProperty, SystemObject)
+		VALUE(ObjectProperty, StorageId)
+		VALUE(ObjectProperty, ObjectFormat)
+		VALUE(ObjectProperty, ProtectionStatus)
+		VALUE(ObjectProperty, ObjectSize)
+		VALUE(ObjectProperty, AssociationType)
+		VALUE(ObjectProperty, AssociationDesc)
+		VALUE(ObjectProperty, ObjectFilename)
+		VALUE(ObjectProperty, DateCreated)
+		VALUE(ObjectProperty, DateModified)
+		VALUE(ObjectProperty, Keywords)
+		VALUE(ObjectProperty, ParentObject)
+		VALUE(ObjectProperty, AllowedFolderContents)
+		VALUE(ObjectProperty, Hidden)
+		VALUE(ObjectProperty, SystemObject)
 
-		ENUM(ObjectProperty, PersistentUniqueObjectId)
-		ENUM(ObjectProperty, SyncId)
-		ENUM(ObjectProperty, Name)
-		ENUM(ObjectProperty, Artist)
-		ENUM(ObjectProperty, DateAuthored)
-		ENUM(ObjectProperty, DateAdded)
+		VALUE(ObjectProperty, PersistentUniqueObjectId)
+		VALUE(ObjectProperty, SyncId)
+		VALUE(ObjectProperty, Name)
+		VALUE(ObjectProperty, Artist)
+		VALUE(ObjectProperty, DateAuthored)
+		VALUE(ObjectProperty, DateAdded)
 
-		ENUM(ObjectProperty, RepresentativeSampleFormat)
-		ENUM(ObjectProperty, RepresentativeSampleData)
+		VALUE(ObjectProperty, RepresentativeSampleFormat)
+		VALUE(ObjectProperty, RepresentativeSampleData)
 
-		ENUM(ObjectProperty, DisplayName)
-		ENUM(ObjectProperty, BodyText)
-		ENUM(ObjectProperty, Subject)
-		ENUM(ObjectProperty, Priority)
+		VALUE(ObjectProperty, DisplayName)
+		VALUE(ObjectProperty, BodyText)
+		VALUE(ObjectProperty, Subject)
+		VALUE(ObjectProperty, Priority)
 
-		ENUM(ObjectProperty, MediaGUID)
-		ENUM(ObjectProperty, All)
+		VALUE(ObjectProperty, MediaGUID)
+		VALUE(ObjectProperty, All)
 	;
 	py::enum_<DeviceProperty>(m, "DeviceProperty", "MTP device property")
-		ENUM(DeviceProperty, Undefined)
-		ENUM(DeviceProperty, BatteryLevel)
-		ENUM(DeviceProperty, FunctionalMode)
-		ENUM(DeviceProperty, ImageSize)
-		ENUM(DeviceProperty, CompressionSetting)
-		ENUM(DeviceProperty, WhiteBalance)
-		ENUM(DeviceProperty, RgbGain)
-		ENUM(DeviceProperty, FNumber)
-		ENUM(DeviceProperty, FocalLength)
-		ENUM(DeviceProperty, FocusDistance)
-		ENUM(DeviceProperty, FocusMode)
-		ENUM(DeviceProperty, ExposureMeteringMode)
-		ENUM(DeviceProperty, FlashMode)
-		ENUM(DeviceProperty, ExposureTime)
-		ENUM(DeviceProperty, ExposureProgramMode)
-		ENUM(DeviceProperty, ExposureIndex)
-		ENUM(DeviceProperty, ExposureBiasCompensation)
-		ENUM(DeviceProperty, Datetime)
-		ENUM(DeviceProperty, CaptureDelay)
-		ENUM(DeviceProperty, StillCaptureMode)
-		ENUM(DeviceProperty, Contrast)
-		ENUM(DeviceProperty, Sharpness)
-		ENUM(DeviceProperty, DigitalZoom)
-		ENUM(DeviceProperty, EffectMode)
-		ENUM(DeviceProperty, BurstNumber)
-		ENUM(DeviceProperty, BurstInterval)
-		ENUM(DeviceProperty, TimelapseNumber)
-		ENUM(DeviceProperty, TimelapseInterval)
-		ENUM(DeviceProperty, FocusMeteringMode)
-		ENUM(DeviceProperty, UploadUrl)
-		ENUM(DeviceProperty, Artist)
-		ENUM(DeviceProperty, CopyrightInfo)
-		ENUM(DeviceProperty, SynchronizationPartner)
-		ENUM(DeviceProperty, DeviceFriendlyName)
-		ENUM(DeviceProperty, Volume)
-		ENUM(DeviceProperty, SupportedFormatsOrdered)
-		ENUM(DeviceProperty, DeviceIcon)
-		ENUM(DeviceProperty, PlaybackRate)
-		ENUM(DeviceProperty, PlaybackObject)
-		ENUM(DeviceProperty, PlaybackContainerIndex)
-		ENUM(DeviceProperty, SessionInitiatorVersionInfo)
-		ENUM(DeviceProperty, PerceivedDeviceType)
+		VALUE(DeviceProperty, Undefined)
+		VALUE(DeviceProperty, BatteryLevel)
+		VALUE(DeviceProperty, FunctionalMode)
+		VALUE(DeviceProperty, ImageSize)
+		VALUE(DeviceProperty, CompressionSetting)
+		VALUE(DeviceProperty, WhiteBalance)
+		VALUE(DeviceProperty, RgbGain)
+		VALUE(DeviceProperty, FNumber)
+		VALUE(DeviceProperty, FocalLength)
+		VALUE(DeviceProperty, FocusDistance)
+		VALUE(DeviceProperty, FocusMode)
+		VALUE(DeviceProperty, ExposureMeteringMode)
+		VALUE(DeviceProperty, FlashMode)
+		VALUE(DeviceProperty, ExposureTime)
+		VALUE(DeviceProperty, ExposureProgramMode)
+		VALUE(DeviceProperty, ExposureIndex)
+		VALUE(DeviceProperty, ExposureBiasCompensation)
+		VALUE(DeviceProperty, Datetime)
+		VALUE(DeviceProperty, CaptureDelay)
+		VALUE(DeviceProperty, StillCaptureMode)
+		VALUE(DeviceProperty, Contrast)
+		VALUE(DeviceProperty, Sharpness)
+		VALUE(DeviceProperty, DigitalZoom)
+		VALUE(DeviceProperty, EffectMode)
+		VALUE(DeviceProperty, BurstNumber)
+		VALUE(DeviceProperty, BurstInterval)
+		VALUE(DeviceProperty, TimelapseNumber)
+		VALUE(DeviceProperty, TimelapseInterval)
+		VALUE(DeviceProperty, FocusMeteringMode)
+		VALUE(DeviceProperty, UploadUrl)
+		VALUE(DeviceProperty, Artist)
+		VALUE(DeviceProperty, CopyrightInfo)
+		VALUE(DeviceProperty, SynchronizationPartner)
+		VALUE(DeviceProperty, DeviceFriendlyName)
+		VALUE(DeviceProperty, Volume)
+		VALUE(DeviceProperty, SupportedFormatsOrdered)
+		VALUE(DeviceProperty, DeviceIcon)
+		VALUE(DeviceProperty, PlaybackRate)
+		VALUE(DeviceProperty, PlaybackObject)
+		VALUE(DeviceProperty, PlaybackContainerIndex)
+		VALUE(DeviceProperty, SessionInitiatorVersionInfo)
+		VALUE(DeviceProperty, PerceivedDeviceType)
 	;
 
 	py::enum_<AssociationType>(m, "AssociationType", "MTP Association Type")
-		ENUM(AssociationType, GenericFolder)
-		ENUM(AssociationType, Album)
-		ENUM(AssociationType, TimeSequence)
-		ENUM(AssociationType, HorizontalPanoramic)
-		ENUM(AssociationType, VerticalPanoramic)
-		ENUM(AssociationType, Panoramic2D)
-		ENUM(AssociationType, AncillaryData)
+		VALUE(AssociationType, GenericFolder)
+		VALUE(AssociationType, Album)
+		VALUE(AssociationType, TimeSequence)
+		VALUE(AssociationType, HorizontalPanoramic)
+		VALUE(AssociationType, VerticalPanoramic)
+		VALUE(AssociationType, Panoramic2D)
+		VALUE(AssociationType, AncillaryData)
 	;
 
 	py::enum_<OperationCode>(m, "OperationCode", "MTP Operation Code")
-		ENUM(OperationCode, GetDeviceInfo)
-		ENUM(OperationCode, OpenSession)
-		ENUM(OperationCode, CloseSession)
-		ENUM(OperationCode, GetStorageIDs)
-		ENUM(OperationCode, GetStorageInfo)
-		ENUM(OperationCode, GetNumObjects)
-		ENUM(OperationCode, GetObjectHandles)
-		ENUM(OperationCode, GetObjectInfo)
-		ENUM(OperationCode, GetObject)
-		ENUM(OperationCode, GetThumb)
-		ENUM(OperationCode, DeleteObject)
-		ENUM(OperationCode, SendObjectInfo)
-		ENUM(OperationCode, SendObject)
-		ENUM(OperationCode, InitiateCapture)
-		ENUM(OperationCode, FormatStore)
-		ENUM(OperationCode, ResetDevice)
-		ENUM(OperationCode, SelfTest)
-		ENUM(OperationCode, SetObjectProtection)
-		ENUM(OperationCode, PowerDown)
-		ENUM(OperationCode, GetDevicePropDesc)
-		ENUM(OperationCode, GetDevicePropValue)
-		ENUM(OperationCode, SetDevicePropValue)
-		ENUM(OperationCode, ResetDevicePropValue)
-		ENUM(OperationCode, TerminateOpenCapture)
-		ENUM(OperationCode, MoveObject)
-		ENUM(OperationCode, CopyObject)
-		ENUM(OperationCode, GetPartialObject)
-		ENUM(OperationCode, InitiateOpenCapture)
-		ENUM(OperationCode, CancelTransaction)
-		ENUM(OperationCode, SendWMDRMPDAppRequest)
-		ENUM(OperationCode, GetWMDRMPDAppResponse)
-		ENUM(OperationCode, EnableTrustedFilesOperations)
-		ENUM(OperationCode, DisableTrustedFilesOperations)
-		ENUM(OperationCode, EndTrustedAppSession)
-		ENUM(OperationCode, GetPartialObject64)
-		ENUM(OperationCode, SendPartialObject)
-		ENUM(OperationCode, TruncateObject)
-		ENUM(OperationCode, BeginEditObject)
-		ENUM(OperationCode, EndEditObject)
-		ENUM(OperationCode, GetObjectPropsSupported)
-		ENUM(OperationCode, GetObjectPropDesc)
-		ENUM(OperationCode, GetObjectPropValue)
-		ENUM(OperationCode, SetObjectPropValue)
-		ENUM(OperationCode, GetObjectPropList)
-		ENUM(OperationCode, SetObjectPropList)
-		ENUM(OperationCode, GetInterdependentPropDesc)
-		ENUM(OperationCode, SendObjectPropList)
-		ENUM(OperationCode, GetObjectReferences)
-		ENUM(OperationCode, SetObjectReferences)
-		ENUM(OperationCode, Skip)
+		VALUE(OperationCode, GetDeviceInfo)
+		VALUE(OperationCode, OpenSession)
+		VALUE(OperationCode, CloseSession)
+		VALUE(OperationCode, GetStorageIDs)
+		VALUE(OperationCode, GetStorageInfo)
+		VALUE(OperationCode, GetNumObjects)
+		VALUE(OperationCode, GetObjectHandles)
+		VALUE(OperationCode, GetObjectInfo)
+		VALUE(OperationCode, GetObject)
+		VALUE(OperationCode, GetThumb)
+		VALUE(OperationCode, DeleteObject)
+		VALUE(OperationCode, SendObjectInfo)
+		VALUE(OperationCode, SendObject)
+		VALUE(OperationCode, InitiateCapture)
+		VALUE(OperationCode, FormatStore)
+		VALUE(OperationCode, ResetDevice)
+		VALUE(OperationCode, SelfTest)
+		VALUE(OperationCode, SetObjectProtection)
+		VALUE(OperationCode, PowerDown)
+		VALUE(OperationCode, GetDevicePropDesc)
+		VALUE(OperationCode, GetDevicePropValue)
+		VALUE(OperationCode, SetDevicePropValue)
+		VALUE(OperationCode, ResetDevicePropValue)
+		VALUE(OperationCode, TerminateOpenCapture)
+		VALUE(OperationCode, MoveObject)
+		VALUE(OperationCode, CopyObject)
+		VALUE(OperationCode, GetPartialObject)
+		VALUE(OperationCode, InitiateOpenCapture)
+		VALUE(OperationCode, CancelTransaction)
+		VALUE(OperationCode, SendWMDRMPDAppRequest)
+		VALUE(OperationCode, GetWMDRMPDAppResponse)
+		VALUE(OperationCode, EnableTrustedFilesOperations)
+		VALUE(OperationCode, DisableTrustedFilesOperations)
+		VALUE(OperationCode, EndTrustedAppSession)
+		VALUE(OperationCode, GetPartialObject64)
+		VALUE(OperationCode, SendPartialObject)
+		VALUE(OperationCode, TruncateObject)
+		VALUE(OperationCode, BeginEditObject)
+		VALUE(OperationCode, EndEditObject)
+		VALUE(OperationCode, GetObjectPropsSupported)
+		VALUE(OperationCode, GetObjectPropDesc)
+		VALUE(OperationCode, GetObjectPropValue)
+		VALUE(OperationCode, SetObjectPropValue)
+		VALUE(OperationCode, GetObjectPropList)
+		VALUE(OperationCode, SetObjectPropList)
+		VALUE(OperationCode, GetInterdependentPropDesc)
+		VALUE(OperationCode, SendObjectPropList)
+		VALUE(OperationCode, GetObjectReferences)
+		VALUE(OperationCode, SetObjectReferences)
+		VALUE(OperationCode, Skip)
 	;
 
 	py::class_<usb::DeviceDescriptor, usb::DeviceDescriptorPtr>(m, "DeviceDescriptor").
@@ -230,10 +230,60 @@ PYBIND11_MODULE(aftl, m) {
 		def_readonly("object_id", &Session::NewObjectInfo::ObjectId)
 	;
 
+	py::class_<msg::ObjectInfo>(m, "ObjectInfo").
+		def(py::init<>())
+		DEF_READONLY(msg::ObjectInfo, ObjectFormat)
+		DEF_READONLY(msg::ObjectInfo, ProtectionStatus)
+		DEF_READONLY(msg::ObjectInfo, ObjectCompressedSize)
+		DEF_READONLY(msg::ObjectInfo, ThumbFormat)
+		DEF_READONLY(msg::ObjectInfo, ThumbCompressedSize)
+		DEF_READONLY(msg::ObjectInfo, ThumbPixWidth)
+		DEF_READONLY(msg::ObjectInfo, ThumbPixHeight)
+		DEF_READONLY(msg::ObjectInfo, ImagePixWidth)
+		DEF_READONLY(msg::ObjectInfo, ImagePixHeight)
+		DEF_READONLY(msg::ObjectInfo, ImageBitDepth)
+		DEF_READONLY(msg::ObjectInfo, ParentObject)
+		DEF_READONLY(msg::ObjectInfo, AssociationType)
+		DEF_READONLY(msg::ObjectInfo, AssociationDesc)
+		DEF_READONLY(msg::ObjectInfo, SequenceNumber)
+		DEF_READONLY(msg::ObjectInfo, Filename)
+		DEF_READONLY(msg::ObjectInfo, CaptureDate)
+		DEF_READONLY(msg::ObjectInfo, ModificationDate)
+		DEF_READONLY(msg::ObjectInfo, Keywords)
+	;
+
+	py::class_<msg::StorageInfo>(m, "StorageInfo")
+		DEF_READONLY(msg::StorageInfo, StorageType)
+		DEF_READONLY(msg::StorageInfo, FilesystemType)
+		DEF_READONLY(msg::StorageInfo, AccessCapability)
+		DEF_READONLY(msg::StorageInfo, MaxCapacity)
+		DEF_READONLY(msg::StorageInfo, FreeSpaceInBytes)
+		DEF_READONLY(msg::StorageInfo, FreeSpaceInImages)
+		DEF_READONLY(msg::StorageInfo, StorageDescription)
+		DEF_READONLY(msg::StorageInfo, VolumeLabel)
+	;
+	py::class_<msg::DeviceInfo>(m, "DeviceInfo")
+		DEF_READONLY(msg::DeviceInfo, StandardVersion)
+		DEF_READONLY(msg::DeviceInfo, VendorExtensionId)
+		DEF_READONLY(msg::DeviceInfo, VendorExtensionVersion)
+		DEF_READONLY(msg::DeviceInfo, VendorExtensionDesc)
+		DEF_READONLY(msg::DeviceInfo, FunctionalMode)
+		DEF_READONLY(msg::DeviceInfo, OperationsSupported)
+		DEF_READONLY(msg::DeviceInfo, EventsSupported)
+		DEF_READONLY(msg::DeviceInfo, DevicePropertiesSupported)
+		DEF_READONLY(msg::DeviceInfo, CaptureFormats)
+		DEF_READONLY(msg::DeviceInfo, ImageFormats)
+		DEF_READONLY(msg::DeviceInfo, Manufacturer)
+		DEF_READONLY(msg::DeviceInfo, Model)
+		DEF_READONLY(msg::DeviceInfo, DeviceVersion)
+		DEF_READONLY(msg::DeviceInfo, SerialNumber)
+	;
+
 	py::class_<Session::ObjectEditSession, Session::ObjectEditSessionPtr>(m, "ObjectEditSession").
 		def("truncate", &Session::ObjectEditSession::Truncate).
 		def("send", &Session::ObjectEditSession::Send)
 	;
+
 
 	session.
 		// def_readonly_static("DefaultTimeout", &Session::DefaultTimeout).
@@ -254,20 +304,7 @@ PYBIND11_MODULE(aftl, m) {
 			return result;
 		}).
 
-		def("get_storage_info", [](Session *self, StorageId storage) -> py::dict {
-			auto info = self->GetStorageInfo(storage);
-
-			py::dict d;
-			DICT(StorageType);
-			DICT(FilesystemType);
-			DICT(AccessCapability);
-			DICT(MaxCapacity);
-			DICT(FreeSpaceInBytes);
-			DICT(FreeSpaceInImages);
-			DICT(StorageDescription);
-			DICT(VolumeLabel);
-			return d;
-		}).
+		def("get_storage_info", &Session::GetStorageInfo).
 
 		def("get_object_handles", [](Session *self, StorageId storageId, ObjectFormat objectFormat, ObjectId parent, int timeout) -> std::vector<ObjectId> {
 			std::vector<ObjectId> result;
@@ -279,51 +316,7 @@ PYBIND11_MODULE(aftl, m) {
 			return result;
 		}, py::arg("storageId"), py::arg("objectFormat") = ObjectFormat::Any, py::arg("parent") = Session::Root, py::arg("timeout") = static_cast<int>(Session::LongTimeout)).
 
-		def("get_object_info", [](Session * self, ObjectId object) {
-			auto info = self->GetObjectInfo(object);
-
-			py::dict d;
-			DICT(ObjectFormat);
-			DICT(ProtectionStatus);
-			DICT(ObjectCompressedSize);
-			DICT(ThumbFormat);
-			DICT(ThumbCompressedSize);
-			DICT(ThumbPixWidth);
-			DICT(ThumbPixHeight);
-			DICT(ImagePixWidth);
-			DICT(ImagePixHeight);
-			DICT(ImageBitDepth);
-			DICT(ParentObject);
-			DICT(AssociationType);
-			DICT(AssociationDesc);
-			DICT(SequenceNumber);
-			DICT(Filename);
-			DICT(CaptureDate);
-			DICT(ModificationDate);
-			DICT(Keywords);
-			return d;
-		}).
-
-		def("get_device_info", [](Session * self) {
-			auto info = self->GetDeviceInfo();
-			py::dict d;
-			DICT(StandardVersion);
-			DICT(VendorExtensionId);
-			DICT(VendorExtensionVersion);
-			DICT(VendorExtensionDesc);
-			DICT(FunctionalMode);
-			DICT(OperationsSupported);
-			DICT(EventsSupported);
-			DICT(DevicePropertiesSupported);
-			DICT(CaptureFormats);
-			DICT(ImageFormats);
-			DICT(Manufacturer);
-			DICT(Model);
-			DICT(DeviceVersion);
-			DICT(SerialNumber);
-			return d;
-		}).
-
+		def("get_object_info", &Session::GetObjectInfo).
 		def("get_object_properties_supported", [](Session *self, ObjectId objectId) -> std::vector<ObjectProperty> {
 			std::vector<ObjectProperty> result;
 			auto props = self->GetObjectPropertiesSupported(objectId);
@@ -356,25 +349,27 @@ PYBIND11_MODULE(aftl, m) {
 		def("get_partial_object", &Session::GetPartialObject).
 		def("edit_object", &Session::EditObject).
 
+		def("get_device_info", &Session::GetDeviceInfo).
 		def("get_device_property", &Session::GetDeviceProperty).
 		def("get_device_integer_property", &Session::GetDeviceIntegerProperty).
 		def("get_device_string_property", &Session::GetDeviceStringProperty).
 		def("set_device_property", (void (Session::*)(DeviceProperty, const std::string &)) &Session::SetDeviceProperty).
 		def("set_device_property", (void (Session::*)(DeviceProperty, const ByteArray &)) &Session::SetDeviceProperty).
-		def("abort_current_transaction", &Session::AbortCurrentTransaction, py::arg("timeout") = static_cast<int>(Session::DefaultTimeout))
+		def("abort_current_transaction", &Session::AbortCurrentTransaction, py::arg("timeout") = static_cast<int>(Session::DefaultTimeout)).
+		def("create_directory", &Session::CreateDirectory, py::arg("name"), py::arg("parent"), py::arg("storage") = Session::AnyStorage, py::arg("association_type") = AssociationType::GenericFolder)
+		//def("send_object_info", &Session::SendObjectInfo, py::arg("name"), py::arg("parent"), py::arg("storage") = Session::AnyStorage, py::arg("association_type") = AssociationType::GenericFolder)
+		// NewObjectInfo SendObjectInfo(const msg::ObjectInfo &objectInfo, StorageId storageId = AnyStorage, ObjectId parentObject = Device);
+		// ByteArray GetObjectPropertyList(ObjectId objectId, ObjectFormat format, ObjectProperty property, u32 groupCode, u32 depth, int timeout = LongTimeout);
 		;
 	;
 
 #if 0
 
-		NewObjectInfo CreateDirectory(const std::string &name, ObjectId parentId, StorageId storageId = AnyStorage, AssociationType type = AssociationType::GenericFolder);
 		void GetObject(ObjectId objectId, const IObjectOutputStreamPtr &outputStream);
 		void GetThumb(ObjectId objectId, const IObjectOutputStreamPtr &outputStream);
-		NewObjectInfo SendObjectInfo(const msg::ObjectInfo &objectInfo, StorageId storageId = AnyStorage, ObjectId parentObject = Device);
 		void SendObject(const IObjectInputStreamPtr &inputStream, int timeout = LongTimeout);
 
 		//common properties shortcuts
-		ByteArray GetObjectPropertyList(ObjectId objectId, ObjectFormat format, ObjectProperty property, u32 groupCode, u32 depth, int timeout = LongTimeout);
 
 #endif
 
