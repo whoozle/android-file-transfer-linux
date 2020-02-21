@@ -341,6 +341,7 @@ PYBIND11_MODULE(aftl, m) {
 
 		def("edit_object_supported", &Session::EditObjectSupported).
 		def("get_object_property_list_supported", &Session::GetObjectPropertyListSupported).
+		def("get_object_property_list", &Session::GetObjectPropertyList).
 		def("get_object_modification_time", [](Session * self, ObjectId objectId) -> std::chrono::system_clock::time_point {
 			time_t t = self->GetObjectModificationTime(objectId);
 			return system_clock::from_time_t(t);
@@ -349,17 +350,17 @@ PYBIND11_MODULE(aftl, m) {
 		def("get_partial_object", &Session::GetPartialObject).
 		def("edit_object", &Session::EditObject).
 
+		def("create_directory", &Session::CreateDirectory, py::arg("name"), py::arg("parent"), py::arg("storage") = Session::AnyStorage, py::arg("association_type") = AssociationType::GenericFolder).
+		def("send_object_info", &Session::SendObjectInfo, py::arg("object_info"), py::arg("storage"), py::arg("parent")).
+
 		def("get_device_info", &Session::GetDeviceInfo).
 		def("get_device_property", &Session::GetDeviceProperty).
 		def("get_device_integer_property", &Session::GetDeviceIntegerProperty).
 		def("get_device_string_property", &Session::GetDeviceStringProperty).
 		def("set_device_property", (void (Session::*)(DeviceProperty, const std::string &)) &Session::SetDeviceProperty).
 		def("set_device_property", (void (Session::*)(DeviceProperty, const ByteArray &)) &Session::SetDeviceProperty).
-		def("abort_current_transaction", &Session::AbortCurrentTransaction, py::arg("timeout") = static_cast<int>(Session::DefaultTimeout)).
-		def("create_directory", &Session::CreateDirectory, py::arg("name"), py::arg("parent"), py::arg("storage") = Session::AnyStorage, py::arg("association_type") = AssociationType::GenericFolder)
-		//def("send_object_info", &Session::SendObjectInfo, py::arg("name"), py::arg("parent"), py::arg("storage") = Session::AnyStorage, py::arg("association_type") = AssociationType::GenericFolder)
-		// NewObjectInfo SendObjectInfo(const msg::ObjectInfo &objectInfo, StorageId storageId = AnyStorage, ObjectId parentObject = Device);
-		// ByteArray GetObjectPropertyList(ObjectId objectId, ObjectFormat format, ObjectProperty property, u32 groupCode, u32 depth, int timeout = LongTimeout);
+
+		def("abort_current_transaction", &Session::AbortCurrentTransaction, py::arg("timeout") = static_cast<int>(Session::DefaultTimeout))
 		;
 	;
 
