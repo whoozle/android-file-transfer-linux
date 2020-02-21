@@ -14,12 +14,12 @@ using namespace mtp;
 using system_clock = std::chrono::system_clock;
 
 namespace pybind11 { namespace detail {
-    template <> struct type_caster<ByteArray> {
-    public:
-        PYBIND11_TYPE_CASTER(ByteArray, _("ByteArray"));
+	template <> struct type_caster<ByteArray> {
+	public:
+		PYBIND11_TYPE_CASTER(ByteArray, _("ByteArray"));
 
-        bool load(handle src, bool) {
-            PyObject *source = src.ptr();
+		bool load(handle src, bool) {
+			PyObject *source = src.ptr();
 			if (!PyByteArray_Check(source))
 				return false;
 
@@ -30,23 +30,56 @@ namespace pybind11 { namespace detail {
 			else
 				value.clear();
 
-            return !PyErr_Occurred();
-        }
+			return !PyErr_Occurred();
+		}
 
-        static handle cast(const ByteArray & src, return_value_policy /* policy */, handle /* parent */) {
-            return PyByteArray_FromStringAndSize(reinterpret_cast<const char *>(src.data()), src.size());
-        }
-    };
+		static handle cast(const ByteArray & src, return_value_policy /* policy */, handle /* parent */) {
+			return PyByteArray_FromStringAndSize(reinterpret_cast<const char *>(src.data()), src.size());
+		}
+	};
 }} // namespace pybind11::detail
 
 namespace
 {
+	struct PythonInputStream final : public IObjectInputStream
+	{
+		py::object 	ReadMethod;
+		u64			Size;
+		bool 		Cancelled = false;
+
+		PythonInputStream(py::object object, u64 size):
+			ReadMethod(object.attr("read")),
+			Size(size)
+		{ }
+
+   		void Cancel() override
+		{ Cancelled = true; }
+
+		u64 GetSize() const override
+		{ return Size; }
+
+		size_t Read(u8 *data, size_t maxSize) override
+		{
+			if (Cancelled)
+				return 0;
+
+			py::bytes value = ReadMethod(maxSize);
+			char *buffer;
+			ssize_t size;
+			if (PYBIND11_BYTES_AS_STRING_AND_SIZE(value.ptr(), &buffer, &size) || !buffer || size > maxSize)
+				py::pybind11_fail("Unable to extract bytes contents!");
+
+			memcpy(data, buffer, size);
+			return PyErr_Occurred()? 0: size;
+		}
+	};
+
 	struct PythonOutputStream final : public IObjectOutputStream
 	{
-		py::object Object;
-		bool Cancelled = false;
+		py::object 	WriteMethod;
+		bool 		Cancelled = false;
 
-		PythonOutputStream(py::object object): Object(object)
+		PythonOutputStream(py::object object): WriteMethod(object.attr("write"))
 		{ }
 
 		void Cancel() override
@@ -55,9 +88,8 @@ namespace
 		{
 			if (Cancelled)
 				return 0;
-			auto write = Object.attr("write");
 			py::bytes payload(reinterpret_cast<const char *>(data), size);
-			write(payload).cast<long>();
+			WriteMethod(payload).cast<long>();
 			return PyErr_Occurred()? 0: size;
 		}
 	};
@@ -359,6 +391,10 @@ PYBIND11_MODULE(aftl, m) {
 			self->GetThumb(object, std::make_shared<PythonOutputStream>(stream));
 		}).
 
+		def("send_object", [](Session * self, py::object stream, long size, int timeout) {
+			self->SendObject(std::make_shared<PythonInputStream>(stream, size), timeout);
+		}, py::arg("stream"), py::arg("size"), py::arg("timeout") = static_cast<int>(Session::LongTimeout)).
+
 		def("get_object_property", &Session::GetObjectProperty).
 		def("get_object_string_property", &Session::GetObjectStringProperty).
 		def("get_object_integer_property", &Session::GetObjectIntegerProperty).
@@ -395,14 +431,4 @@ PYBIND11_MODULE(aftl, m) {
 		def("abort_current_transaction", &Session::AbortCurrentTransaction, py::arg("timeout") = static_cast<int>(Session::DefaultTimeout))
 		;
 	;
-
-#if 0
-
-		void SendObject(const IObjectInputStreamPtr &inputStream, int timeout = LongTimeout);
-
-		//common properties shortcuts
-
-#endif
-
-
 }
