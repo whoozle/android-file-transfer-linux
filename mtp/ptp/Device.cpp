@@ -87,6 +87,15 @@ namespace mtp
 		{
 			usb::ConfigurationPtr conf = desc->GetConfiguration(i);
 			int interfaces = conf->GetInterfaceCount();
+			if (interfaces == 0) {
+				debug("device not configured (no interfaces), setting configuration now...");
+				int index = conf->GetIndex();
+				conf.reset();
+				device->SetConfiguration(index);
+				debug("device configured, retrieving configuration descriptor again...");
+				conf = desc->GetConfiguration(i);
+				interfaces = conf->GetInterfaceCount();
+			}
 			debug("interfaces: ", interfaces);
 			for(int j = 0; j < interfaces; ++j)
 			{
