@@ -78,6 +78,7 @@ if (BUILD_QT_UI)
 	set(MACOSX_BUNDLE_RESOURCES "${CMAKE_CURRENT_BINARY_DIR}/${APP_NAME}.app/Contents/Resources")
 	execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${MACOSX_BUNDLE_RESOURCES})
 	set(MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)
+	message(STATUS "generated bundle info is in ${MACOSX_BUNDLE_INFO_PLIST}")
 	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in ${MACOSX_BUNDLE_INFO_PLIST})
 
 	set(APPLICATION_ICON ${CMAKE_SOURCE_DIR}/osx/android-file-transfer.icns)
@@ -90,6 +91,7 @@ if (BUILD_QT_UI)
   include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
   add_executable("${APP_NAME}" MACOSX_BUNDLE ${APPLICATION_ICON} ${SOURCES} ${HEADERS_MOC} ${FORMS_HEADERS} ${RESOURCES})
+  set_property(TARGET ${APP_NAME} PROPERTY MACOSX_BUNDLE_INFO_PLIST "${MACOSX_BUNDLE_INFO_PLIST}")
   target_link_libraries("${APP_NAME}" ${EXTRA_QT_LINK} ${MTP_LIBRARIES})
 
   install(TARGETS ${APP_NAME}
