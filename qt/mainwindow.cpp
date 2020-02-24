@@ -141,14 +141,11 @@ void MainWindow::replyFinished(QNetworkReply * reply)
 	QFile destination(getMtpzDataPath());
 	qDebug() << "writing to " << destination.fileName();
 	destination.open(QIODevice::WriteOnly);
-	QByteArray buffer;
-	int bufferSize = 4096;
-	while(!(buffer = reply->read(bufferSize)).isEmpty()){
-		if (destination.write(buffer) == -1) {
-			QMessageBox::warning(this, title, tr("Could not write keys, please find the error below:\n\n%1\n\nPlease look for .mtpz-data file on the internet and manually install it to your home directory.").arg(destination.errorString()));
-			break;
-		}
-	}
+	auto buffer = reply->readAll();
+
+	if (destination.write(buffer) == -1)
+		QMessageBox::warning(this, title, tr("Could not write keys, please find the error below:\n\n%1\n\nPlease look for .mtpz-data file on the internet and manually install it to your home directory.").arg(destination.errorString()));
+
 	destination.close();
 	reply->close();
 	QMessageBox::information(this, title, tr("Your MTPZ keys have been successfully installed.\n\nPlease restart the application to use them."));
