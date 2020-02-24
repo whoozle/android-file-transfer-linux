@@ -120,6 +120,7 @@ namespace mtp { namespace usb
 	void Device::SetConfiguration(int idx)
 	{
 		error("SetConfiguration(", idx, "): not implemented");
+		//IOCTL(_fd.Get(), USBDEVFS_SETCONFIGURATION, &idx); //this will crash your device forever
 	}
 
 	struct Device::Urb : usbdevfs_urb, Noncopyable
