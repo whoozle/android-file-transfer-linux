@@ -103,7 +103,7 @@ set(SOURCES
 	mtp/mtpz/TrustedApp.cpp
 )
 
-exec_program(git ARGS describe --tags OUTPUT_VARIABLE AFT_VERSION RETURN_VALUE GIT_STATUS)
+exec_program(git ARGS describe --tags --match='v*' OUTPUT_VARIABLE AFT_VERSION RETURN_VALUE GIT_STATUS)
 if (GIT_STATUS EQUAL 0)
 	string(REGEX MATCH "v([0-9a-fA-F.]+)-" _VERSION ${AFT_VERSION})
 	set(AFT_BASE_VERSION ${CMAKE_MATCH_1})
