@@ -144,7 +144,10 @@ void MainWindow::replyFinished(QNetworkReply * reply)
 	QByteArray buffer;
 	int bufferSize = 4096;
 	while(!(buffer = reply->read(bufferSize)).isEmpty()){
-		destination.write(buffer);
+		if (destination.write(buffer) == -1) {
+			QMessageBox::warning(this, title, tr("Could not write keys, please find the error below:\n\n%1\n\nPlease look for .mtpz-data file on the internet and manually install it to your home directory.").arg(destination.errorString()));
+			break;
+		}
 	}
 	destination.close();
 	reply->close();
