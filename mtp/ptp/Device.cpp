@@ -81,13 +81,13 @@ namespace mtp
 		}
 
 		int confs = desc->GetConfigurationsCount();
-		//debug("configurations: ", confs);
+		debug("configurations: ", confs);
 
 		for(int i = 0; i < confs; ++i)
 		{
 			usb::ConfigurationPtr conf = desc->GetConfiguration(i);
 			int interfaces = conf->GetInterfaceCount();
-			//debug("interfaces: ", interfaces);
+			debug("interfaces: ", interfaces);
 			for(int j = 0; j < interfaces; ++j)
 			{
 				usb::InterfacePtr iface = conf->GetInterface(device, conf, j, 0);
