@@ -42,7 +42,7 @@ namespace mtp { namespace usb
 	{ return 0; }
 
 	void Device::SetConfiguration(int idx)
-	{ }
+	{ USB_CALL((*_dev)->SetConfiguration(_dev, idx)); }
 
 	void Device::ClearHalt(const EndpointPtr & ep)
 	{ }
