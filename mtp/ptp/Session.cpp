@@ -189,7 +189,9 @@ namespace mtp
 
 	msg::ObjectPropertiesSupported Session::GetObjectPropertiesSupported(ObjectId objectId)
 	{
-		auto data = RunTransaction(_defaultTimeout, OperationCode::GetObjectPropsSupported, objectId.Id);
+		auto format = GetObjectIntegerProperty(objectId, ObjectProperty::ObjectFormat);
+		mtp::debug("querying supported properties for format 0x", mtp::hex(format));
+		auto data = RunTransaction(_defaultTimeout, OperationCode::GetObjectPropsSupported, format);
 		InputStream stream(data);
 		msg::ObjectPropertiesSupported ops;
 		ops.Read(stream);
