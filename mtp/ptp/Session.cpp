@@ -176,7 +176,6 @@ namespace mtp
 		if (_deviceInfo.Supports(OperationCode::SendObjectPropList))
 		{
 			//modern way of creating objects
-			NewObjectInfo noi;
 			ByteArray propList;
 			{
 				OutputStream os(propList);
@@ -186,10 +185,19 @@ namespace mtp
 				os.Write16(static_cast<u16>(DataTypeCode::String));
 				os.WriteString(name);
 			}
-			ByteArray response;
+			ByteArray responseData;
 			IObjectInputStreamPtr inputStream = std::make_shared<ByteArrayObjectInputStream>(propList);
-			RunTransactionWithDataRequest(_defaultTimeout, OperationCode::SendObjectPropList, response, inputStream, storageId.Id, parentId.Id, static_cast<u32>(ObjectFormat::Association), 0, 0);
-			HexDump("mkdir", response);
+			RunTransactionWithDataRequest(_defaultTimeout, OperationCode::SendObjectPropList, responseData, inputStream, storageId.Id, parentId.Id, static_cast<u32>(ObjectFormat::Association), 0, 0);
+
+			InputStream is(responseData);
+
+			msg::SendObjectPropListResponse response;
+			response.Read(is);
+
+			NewObjectInfo noi;
+			noi.StorageId = response.StorageId;
+			noi.ParentObjectId = response.ParentObjectId;
+			noi.ObjectId = response.ObjectId;
 			return noi;
 		}
 		else

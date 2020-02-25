@@ -225,6 +225,28 @@ namespace mtp { namespace msg
 		}
 	};
 
+	struct SendObjectPropListResponse
+	{
+		mtp::StorageId		StorageId;
+		mtp::ObjectId		ParentObjectId;
+		mtp::ObjectId		ObjectId;
+		u32					FailedPropertyIndex;
+
+		SendObjectPropListResponse():
+			StorageId(), ParentObjectId(), ObjectId(),
+			FailedPropertyIndex()
+		{ }
+
+		void Read(InputStream &stream)
+		{
+			stream >> StorageId;
+			stream >> ParentObjectId;
+			stream >> ObjectId;
+			stream >> FailedPropertyIndex;
+		}
+
+	};
+
 }}
 
 
