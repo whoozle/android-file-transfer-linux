@@ -19,6 +19,7 @@
 
 #include <mtp/ptp/PipePacketer.h>
 #include <mtp/ptp/Response.h>
+#include <mtp/ptp/EventCode.h>
 #include <mtp/ptp/InputStream.h>
 #include <mtp/ptp/ByteArrayObjectStream.h>
 #include <mtp/ptp/JoinedObjectStream.h>
@@ -100,7 +101,7 @@ namespace mtp
 		InputStream stream(interruptData);
 		ContainerType containerType;
 		u32 size;
-		u16 eventCode;
+		EventCode eventCode;
 		u32 sessionId;
 		u32 transactionId;
 		stream >> size;
