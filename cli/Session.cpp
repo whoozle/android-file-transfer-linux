@@ -34,6 +34,7 @@
 #include <set>
 
 #include <string.h>
+#include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/ioctl.h>
@@ -51,6 +52,9 @@ namespace
 		const char *b = prefix.c_str();
 		return strncasecmp(a, b, prefix.size()) == 0;
 	}
+
+	mtp::u64 FromHex(const std::string & str)
+	{ return strtoll(str.c_str(), NULL, 16); }
 }
 
 
@@ -111,6 +115,8 @@ namespace cli
 			make_function([this]() -> void { List(true, true); }));
 		AddCommand("lsext-r", "<path> lists objects in <path> [extended info, recursive]",
 			make_function([this](const Path &path) -> void { List(path, true, true); }));
+		AddCommand("ls-objects", "<object-format-hex>",
+			make_function([this](const std::string &format) -> void { ListObjects(format); }));
 
 		AddCommand("put", "put <file> <dir> uploads file to directory",
 			make_function([this](const LocalPath &path, const Path &dst) -> void { Put(path, dst); }));
@@ -1018,5 +1024,23 @@ namespace cli
 		int usedPercents = (1.0 * usedBytes / si.MaxCapacity) * 100;
 		print("used ", usedBytes, " (", usedPercents, "%), free ", si.FreeSpaceInBytes, " bytes of ", si.MaxCapacity);
 	}
+
+	void Session::ListObjects(const std::string & format)
+	{ ListObjects(mtp::ObjectFormat(FromHex(format))); }
+
+	void Session::ListObjects(mtp::ObjectFormat format)
+	{
+		mtp::print("querying all objects of format ", mtp::hex(format));
+		auto objects = _session->GetObjectHandles(mtp::Session::AllStorages, format, mtp::Session::Device);
+		auto & handles = objects.ObjectHandles;
+		for(auto id : handles)
+		{
+			std::string name;
+			try { name = _session->GetObjectStringProperty(id, mtp::ObjectProperty::ObjectFilename); }
+			catch(const std::exception & ex) { mtp::error("error getting filename: ", ex.what()); }
+			mtp::print(id.Id, "\t", name);
+		}
+	}
+
 
 }

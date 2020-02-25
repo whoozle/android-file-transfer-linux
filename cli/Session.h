@@ -114,6 +114,8 @@ namespace cli
 		void Put(mtp::ObjectId parentId, const LocalPath &src, const std::string &targetFilename = std::string());
 		void Put(const LocalPath &src, const Path &dst);
 		mtp::ObjectId MakeDirectory(mtp::ObjectId parentId, const std::string & name);
+		void ListObjects(const std::string & format);
+		void ListObjects(mtp::ObjectFormat format);
 		void ListProperties(mtp::ObjectId id);
 		void ListDeviceProperties();
 		void TestObjectPropertyList(const Path &path);
