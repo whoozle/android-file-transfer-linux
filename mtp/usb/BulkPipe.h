@@ -59,7 +59,7 @@ namespace mtp { namespace usb
 
 		DevicePtr GetDevice() const;
 
-		ByteArray ReadInterrupt();
+		ByteArray ReadInterrupt(int timeout);
 
 		void Read(const IObjectOutputStreamPtr &outputStream, int timeout = 10000);
 		void Write(const IObjectInputStreamPtr &inputStream, int timeout = 10000);

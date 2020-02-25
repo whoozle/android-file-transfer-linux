@@ -91,9 +91,9 @@ namespace mtp
 	void PipePacketer::ReadMessage(const IObjectOutputStreamPtr &outputStream, int timeout)
 	{ _pipe->Read(outputStream, timeout); }
 
-	void PipePacketer::PollEvent()
+	void PipePacketer::PollEvent(int timeout)
 	{
-		ByteArray interruptData = _pipe->ReadInterrupt();
+		ByteArray interruptData = _pipe->ReadInterrupt(timeout);
 		if (interruptData.empty())
 			return;
 
@@ -204,11 +204,6 @@ namespace mtp
 
 	void PipePacketer::Read(u32 transaction, const IObjectOutputStreamPtr &object, ResponseType &code, ByteArray &response, int timeout)
 	{
-		try
-		{ PollEvent(); }
-		catch(const std::exception &ex)
-		{ error("exception in interrupt: ", ex.what()); }
-
 		response.clear();
 
 		HeaderParserObjectOutputStreamPtr parser;

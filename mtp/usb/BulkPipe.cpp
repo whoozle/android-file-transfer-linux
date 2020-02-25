@@ -49,15 +49,11 @@ namespace mtp { namespace usb
 	DevicePtr BulkPipe::GetDevice() const
 	{ return _device; }
 
-	ByteArray BulkPipe::ReadInterrupt()
+	ByteArray BulkPipe::ReadInterrupt(int timeout)
 	{
-#if 0
 		ByteArrayObjectOutputStreamPtr s(new ByteArrayObjectOutputStream());
-		try { _device->ReadBulk(_interrupt, s, 0); } catch(const TimeoutException &ex) { return ByteArray(); }
+		try { _device->ReadBulk(_interrupt, s, timeout); } catch(const TimeoutException &ex) { return ByteArray(); }
 		return s->GetData();
-#else
-		return ByteArray();
-#endif
 	}
 
 	void BulkPipe::SetCurrentStream(const ICancellableStreamPtr &stream)

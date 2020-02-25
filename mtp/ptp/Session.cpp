@@ -112,6 +112,13 @@ namespace mtp
 	template<typename ... Args>
 	ByteArray Session::RunTransactionWithDataRequest(int timeout, OperationCode code, const IObjectInputStreamPtr & inputStream, Args && ... args)
 	{
+#if 0
+		try
+		{ _packeter.PollEvent(_defaultTimeout); }
+		catch(const std::exception &ex)
+		{ error("exception in interrupt: ", ex.what()); }
+#endif
+
 		scoped_mutex_lock l(_mutex);
 		Transaction transaction(this);
 		Send(OperationRequest(code, transaction.Id, std::forward<Args>(args) ... ), timeout);
