@@ -869,7 +869,8 @@ namespace cli
 		for(mtp::ObjectProperty prop: ops.ObjectPropertyCodes)
 		{
 			mtp::debug(mtp::hex(prop, 4), ":");
-			mtp::HexDump("property", _session->GetObjectProperty(id, prop), true);
+			mtp::HexDump("format", _session->GetObjectPropertyDesc(prop));
+			mtp::HexDump("value", _session->GetObjectProperty(id, prop), true);
 		}
 	}
 

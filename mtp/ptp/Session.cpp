@@ -196,8 +196,8 @@ namespace mtp
 		return ops;
 	}
 
-	ByteArray Session::GetObjectPropDesc(ObjectProperty code)
-	{ }
+	ByteArray Session::GetObjectPropertyDesc(ObjectProperty code)
+	{ return RunTransaction(_defaultTimeout, OperationCode::GetObjectPropDesc, static_cast<u32>(code)); }
 
 	void Session::GetObject(ObjectId objectId, const IObjectOutputStreamPtr &outputStream)
 	{
