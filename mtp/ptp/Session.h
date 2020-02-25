@@ -128,6 +128,7 @@ namespace mtp
 		std::string GetObjectStringProperty(ObjectId objectId, ObjectProperty property);
 
 		ByteArray GetObjectPropertyList(ObjectId objectId, ObjectFormat format, ObjectProperty property, u32 groupCode, u32 depth, int timeout = LongTimeout);
+		msg::SendObjectPropListResponse SendObjectPropList(StorageId storageId, ObjectId parentId, ObjectFormat format, u64 objectSize, const ByteArray & propList);
 
 		ByteArray GetDeviceProperty(DeviceProperty property);
 		u64 GetDeviceIntegerProperty(DeviceProperty property);

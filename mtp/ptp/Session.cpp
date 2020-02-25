@@ -171,6 +171,20 @@ namespace mtp
 		return gsi;
 	}
 
+	msg::SendObjectPropListResponse Session::SendObjectPropList(StorageId storageId, ObjectId parentId, ObjectFormat format, u64 objectSize, const ByteArray & propList)
+	{
+		ByteArray responseData;
+		IObjectInputStreamPtr inputStream = std::make_shared<ByteArrayObjectInputStream>(propList);
+		RunTransactionWithDataRequest(_defaultTimeout, OperationCode::SendObjectPropList, responseData, inputStream, storageId.Id, parentId.Id, static_cast<u32>(format), static_cast<u32>(objectSize >> 32), static_cast<u32>(objectSize));
+
+		msg::SendObjectPropListResponse response;
+		{
+			InputStream is(responseData);
+			response.Read(is);
+		}
+		return response;
+	}
+
 	Session::NewObjectInfo Session::CreateDirectory(const std::string &name, ObjectId parentId, StorageId storageId, AssociationType type)
 	{
 		if (_deviceInfo.Supports(OperationCode::SendObjectPropList))
@@ -185,14 +199,7 @@ namespace mtp
 				os.Write16(static_cast<u16>(DataTypeCode::String));
 				os.WriteString(name);
 			}
-			ByteArray responseData;
-			IObjectInputStreamPtr inputStream = std::make_shared<ByteArrayObjectInputStream>(propList);
-			RunTransactionWithDataRequest(_defaultTimeout, OperationCode::SendObjectPropList, responseData, inputStream, storageId.Id, parentId.Id, static_cast<u32>(ObjectFormat::Association), 0, 0);
-
-			InputStream is(responseData);
-
-			msg::SendObjectPropListResponse response;
-			response.Read(is);
+			auto response = SendObjectPropList(storageId, parentId, ObjectFormat::Association, 0, propList);
 
 			NewObjectInfo noi;
 			noi.StorageId = response.StorageId;
@@ -285,18 +292,8 @@ namespace mtp
 				os.Write16(static_cast<u16>(DataTypeCode::String));
 				os.WriteString(objectInfo.Filename);
 			}
-			ByteArray responseData;
-			IObjectInputStreamPtr inputStream = std::make_shared<ByteArrayObjectInputStream>(propList);
-			RunTransactionWithDataRequest(_defaultTimeout,
-				OperationCode::SendObjectPropList, responseData, inputStream,
-				storageId.Id, parentObject.Id, static_cast<u32>(objectInfo.ObjectFormat),
-				objectInfo.ObjectCompressedSize >> 32, objectInfo.ObjectCompressedSize);
 
-			msg::SendObjectPropListResponse response;
-			{
-				InputStream is(responseData);
-				response.Read(is);
-			}
+			auto response = SendObjectPropList(storageId, parentObject, objectInfo.ObjectFormat, objectInfo.ObjectCompressedSize, propList);
 
 			NewObjectInfo noi;
 			noi.StorageId = response.StorageId;
