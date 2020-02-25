@@ -166,16 +166,33 @@ namespace mtp
 
 	Session::NewObjectInfo Session::CreateDirectory(const std::string &name, ObjectId parentId, StorageId storageId, AssociationType type)
 	{
-		mtp::msg::ObjectInfo oi;
-		oi.Filename = name;
-		oi.ParentObject = parentId;
-		oi.StorageId = storageId;
-		oi.ObjectFormat = mtp::ObjectFormat::Association;
-		oi.AssociationType = type;
-		mtp::Session::NewObjectInfo noi = SendObjectInfo(oi, storageId, parentId);
-
-		//SendObject(std::make_shared<ByteArrayObjectInputStream>(ByteArray()));
-		return noi;
+		if (_deviceInfo.Supports(OperationCode::SendObjectPropList))
+		{
+			//modern way of creating objects
+			NewObjectInfo noi;
+			ByteArray propList;
+			{
+				OutputStream os(propList);
+				os.Write32(1); //number of props
+				os.Write32(0); //object handle
+				os.Write16(static_cast<u16>(ObjectProperty::ObjectFilename));
+				os.Write16(static_cast<u16>(DataTypeCode::String));
+				os.WriteString(name);
+			}
+			IObjectInputStreamPtr inputStream = std::make_shared<ByteArrayObjectInputStream>(propList);
+			RunTransactionWithDataRequest(_defaultTimeout, OperationCode::SendObjectPropList, inputStream, storageId.Id, parentId.Id, static_cast<u32>(ObjectFormat::Association), 0, 0);
+			return noi;
+		}
+		else
+		{
+			mtp::msg::ObjectInfo oi;
+			oi.Filename = name;
+			oi.ParentObject = parentId;
+			oi.StorageId = storageId;
+			oi.ObjectFormat = mtp::ObjectFormat::Association;
+			oi.AssociationType = type;
+			return SendObjectInfo(oi, storageId, parentId);
+		}
 	}
 
 	msg::ObjectInfo Session::GetObjectInfo(ObjectId objectId)
