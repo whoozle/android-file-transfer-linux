@@ -146,9 +146,9 @@ namespace mtp
 	private:
 		template<typename ... Args>
 		ByteArray RunTransaction(int timeout, OperationCode code, Args && ... args)
-		{ return RunTransactionWithDataRequest<Args...>(timeout, code, nullptr, std::forward<Args>(args) ... ); }
+		{ ByteArray response; return RunTransactionWithDataRequest<Args...>(timeout, code, response, nullptr, std::forward<Args>(args) ... ); }
 		template<typename ... Args>
-		ByteArray RunTransactionWithDataRequest(int timeout, OperationCode code, const IObjectInputStreamPtr & inputStream, Args && ... args);
+		ByteArray RunTransactionWithDataRequest(int timeout, OperationCode code, ByteArray & response, const IObjectInputStreamPtr & inputStream, Args && ... args);
 
 		void SetCurrentTransaction(Transaction *);
 
@@ -159,7 +159,8 @@ namespace mtp
 		void TruncateObject(ObjectId objectId, u64 size);
 		void EndEditObject(ObjectId objectId);
 
-		ByteArray Get(u32 transaction, int timeout = 0);
+		ByteArray Get(u32 transaction, ByteArray & response, int timeout = 0);
+
 		void Send(const OperationRequest &req, int timeout = 0);
 		void Close();
 	};

@@ -98,11 +98,11 @@ namespace mtp
 		//HexDump("payload", data);
 	}
 
-	ByteArray Session::Get(u32 transaction, int timeout)
+	ByteArray Session::Get(u32 transaction, ByteArray &response, int timeout)
 	{
 		if (timeout <= 0)
 			timeout = _defaultTimeout;
-		ByteArray data, response;
+		ByteArray data;
 		ResponseType responseCode;
 		_packeter.Read(transaction, data, responseCode, response, timeout);
 		CHECK_RESPONSE(responseCode);
@@ -110,7 +110,7 @@ namespace mtp
 	}
 
 	template<typename ... Args>
-	ByteArray Session::RunTransactionWithDataRequest(int timeout, OperationCode code, const IObjectInputStreamPtr & inputStream, Args && ... args)
+	ByteArray Session::RunTransactionWithDataRequest(int timeout, OperationCode code, ByteArray & response, const IObjectInputStreamPtr & inputStream, Args && ... args)
 	{
 #if 0
 		try
@@ -129,7 +129,7 @@ namespace mtp
 			_packeter.Write(std::make_shared<ByteArrayObjectInputStream>(container.Data), timeout);
 			_packeter.Write(inputStream, timeout);
 		}
-		return Get(transaction.Id);
+		return Get(transaction.Id, response);
 	}
 
 	msg::DeviceInfo Session::GetDeviceInfoImpl()
@@ -186,8 +186,10 @@ namespace mtp
 				os.Write16(static_cast<u16>(DataTypeCode::String));
 				os.WriteString(name);
 			}
+			ByteArray response;
 			IObjectInputStreamPtr inputStream = std::make_shared<ByteArrayObjectInputStream>(propList);
-			RunTransactionWithDataRequest(_defaultTimeout, OperationCode::SendObjectPropList, inputStream, storageId.Id, parentId.Id, static_cast<u32>(ObjectFormat::Association), 0, 0);
+			RunTransactionWithDataRequest(_defaultTimeout, OperationCode::SendObjectPropList, response, inputStream, storageId.Id, parentId.Id, static_cast<u32>(ObjectFormat::Association), 0, 0);
+			HexDump("mkdir", response);
 			return noi;
 		}
 		else
@@ -295,7 +297,8 @@ namespace mtp
 			Container container(req, inputStream);
 			_packeter.Write(std::make_shared<JoinedObjectInputStream>(std::make_shared<ByteArrayObjectInputStream>(container.Data), inputStream), timeout);
 		}
-		Get(transaction.Id);
+		ByteArray response;
+		Get(transaction.Id, response);
 	}
 
 	void Session::BeginEditObject(ObjectId objectId)
@@ -304,7 +307,8 @@ namespace mtp
 	void Session::SendPartialObject(ObjectId objectId, u64 offset, const ByteArray &data)
 	{
 		IObjectInputStreamPtr inputStream = std::make_shared<ByteArrayObjectInputStream>(data);
-		RunTransactionWithDataRequest(_defaultTimeout, OperationCode::SendPartialObject, inputStream, objectId.Id, offset, offset >> 32, data.size());
+		ByteArray response;
+		RunTransactionWithDataRequest(_defaultTimeout, OperationCode::SendPartialObject, response, inputStream, objectId.Id, offset, offset >> 32, data.size());
 	}
 
 	void Session::TruncateObject(ObjectId objectId, u64 size)
@@ -316,7 +320,8 @@ namespace mtp
 	void Session::SetObjectProperty(ObjectId objectId, ObjectProperty property, const ByteArray &value)
 	{
 		IObjectInputStreamPtr inputStream = std::make_shared<ByteArrayObjectInputStream>(value);
-		RunTransactionWithDataRequest(_defaultTimeout, OperationCode::SetObjectPropValue, inputStream, objectId.Id, (u16)property);
+		ByteArray response;
+		RunTransactionWithDataRequest(_defaultTimeout, OperationCode::SetObjectPropValue, response, inputStream, objectId.Id, (u16)property);
 	}
 
 	StorageId Session::GetObjectStorage(mtp::ObjectId id)
@@ -397,7 +402,8 @@ namespace mtp
 	void Session::SetDeviceProperty(DeviceProperty property, const ByteArray &value)
 	{
 		IObjectInputStreamPtr inputStream = std::make_shared<ByteArrayObjectInputStream>(value);
-		RunTransactionWithDataRequest(_defaultTimeout, OperationCode::SetDevicePropValue, inputStream, (u16)property);
+		ByteArray response;
+		RunTransactionWithDataRequest(_defaultTimeout, OperationCode::SetDevicePropValue, response, inputStream, (u16)property);
 	}
 
 	void Session::SetDeviceProperty(DeviceProperty property, const std::string &value)
@@ -429,7 +435,8 @@ namespace mtp
 	ByteArray Session::GenericOperation(OperationCode code, const ByteArray & payload)
 	{
 		IObjectInputStreamPtr inputStream = std::make_shared<ByteArrayObjectInputStream>(payload);
-		return RunTransactionWithDataRequest(_defaultTimeout, code, inputStream);
+		ByteArray response;
+		return RunTransactionWithDataRequest(_defaultTimeout, code, response, inputStream);
 	}
 
 	void Session::EnableSecureFileOperations(u32 cmac[4])
