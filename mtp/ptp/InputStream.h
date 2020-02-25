@@ -69,6 +69,12 @@ namespace mtp
 			return l | ((u64)h << 32);
 		}
 
+		u64 Read128() {
+			u64 l = Read64();
+			Skip(8); //fixme: truncated 128 bit value
+			return l;
+		}
+
 		std::string ReadString()
 		{ return ReadString(Read8()); }
 

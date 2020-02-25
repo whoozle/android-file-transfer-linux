@@ -859,6 +859,35 @@ namespace cli
 		print("mtp object format = ", hex(format, 4));
 	}
 
+	static void PrintFormat(mtp::ByteArray format)
+	{
+		using namespace mtp;
+		InputStream is(format);
+		u16 prop = is.Read16();
+		DataTypeCode type = DataTypeCode(is.Read16());
+		u16 rw = is.Read8();
+
+		std::string defValue;
+		switch(type)
+		{
+#define CASE(BITS) \
+			case mtp::DataTypeCode::Uint##BITS: \
+			case mtp::DataTypeCode::Int##BITS: \
+				defValue = std::to_string(is.Read##BITS ()); break
+			CASE(8); CASE(16); CASE(32); CASE(64); CASE(128);
+#undef CASE
+			case mtp::DataTypeCode::String:
+				defValue = is.ReadString(); break;
+			default:
+				throw std::runtime_error("invalid type " + std::to_string((u16)type));
+		}
+		u32 groupCode = is.Read32();
+		u8 formFlag = is.Read8();
+
+		debug("property ", hex(prop, 4), ", type: ", hex(type, 4), ", rw: ", rw, ", default: ", defValue, ", groupCode: ", groupCode, ", form flag: ", formFlag);
+		HexDump("raw", format, true);
+	}
+
 	void Session::ListProperties(mtp::ObjectId id)
 	{
 		auto format = _session->GetObjectIntegerProperty(id, mtp::ObjectProperty::ObjectFormat);
@@ -868,8 +897,7 @@ namespace cli
 		mtp::debug("properties supported: ");
 		for(mtp::ObjectProperty prop: ops.ObjectPropertyCodes)
 		{
-			mtp::debug(mtp::hex(prop, 4), ":");
-			mtp::HexDump("format", _session->GetObjectPropertyDesc(prop));
+			PrintFormat(_session->GetObjectPropertyDesc(prop));
 			mtp::HexDump("value", _session->GetObjectProperty(id, prop), true);
 		}
 	}
