@@ -27,6 +27,7 @@
 #include <mtp/ptp/ObjectId.h>
 #include <mtp/ptp/ObjectProperty.h>
 #include <mtp/ptp/OperationCode.h>
+#include <mtp/ptp/EventCode.h>
 #include <algorithm>
 
 namespace mtp { namespace msg
@@ -39,7 +40,7 @@ namespace mtp { namespace msg
 		std::string					VendorExtensionDesc;
 		u16							FunctionalMode;
 		std::vector<OperationCode>	OperationsSupported;
-		std::vector<u16>			EventsSupported;
+		std::vector<EventCode>		EventsSupported;
 		std::vector<DeviceProperty>	DevicePropertiesSupported;
 		std::vector<u16>			CaptureFormats;
 		std::vector<u16>			ImageFormats;
@@ -76,6 +77,12 @@ namespace mtp { namespace msg
 		{
 			auto i = std::find(DevicePropertiesSupported.begin(), DevicePropertiesSupported.end(), property);
 			return i != DevicePropertiesSupported.end();
+		}
+
+		bool Supports(EventCode event) const
+		{
+			auto i = std::find(EventsSupported.begin(), EventsSupported.end(), event);
+			return i != EventsSupported.end();
 		}
 	};
 
