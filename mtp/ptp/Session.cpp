@@ -292,10 +292,11 @@ namespace mtp
 				storageId.Id, parentObject.Id, static_cast<u32>(objectInfo.ObjectFormat),
 				objectInfo.ObjectCompressedSize >> 32, objectInfo.ObjectCompressedSize);
 
-			InputStream is(responseData);
-
 			msg::SendObjectPropListResponse response;
-			response.Read(is);
+			{
+				InputStream is(responseData);
+				response.Read(is);
+			}
 
 			NewObjectInfo noi;
 			noi.StorageId = response.StorageId;
