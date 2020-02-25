@@ -187,16 +187,17 @@ namespace mtp
 		return goi;
 	}
 
-	msg::ObjectPropertiesSupported Session::GetObjectPropertiesSupported(ObjectId objectId)
+	msg::ObjectPropertiesSupported Session::GetObjectPropertiesSupported(ObjectFormat format)
 	{
-		auto format = GetObjectIntegerProperty(objectId, ObjectProperty::ObjectFormat);
-		mtp::debug("querying supported properties for format 0x", mtp::hex(format));
-		auto data = RunTransaction(_defaultTimeout, OperationCode::GetObjectPropsSupported, format);
+		auto data = RunTransaction(_defaultTimeout, OperationCode::GetObjectPropsSupported, static_cast<u32>(format));
 		InputStream stream(data);
 		msg::ObjectPropertiesSupported ops;
 		ops.Read(stream);
 		return ops;
 	}
+
+	ByteArray Session::GetObjectPropDesc(ObjectProperty code)
+	{ }
 
 	void Session::GetObject(ObjectId objectId, const IObjectOutputStreamPtr &outputStream)
 	{

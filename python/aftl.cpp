@@ -374,9 +374,9 @@ PYBIND11_MODULE(aftl, m) {
 		}, py::arg("storageId"), py::arg("objectFormat") = ObjectFormat::Any, py::arg("parent") = Session::Root, py::arg("timeout") = static_cast<int>(Session::LongTimeout)).
 
 		def("get_object_info", &Session::GetObjectInfo).
-		def("get_object_properties_supported", [](Session *self, ObjectId objectId) -> std::vector<ObjectProperty> {
+		def("get_object_properties_supported", [](Session *self, ObjectFormat format) -> std::vector<ObjectProperty> {
 			std::vector<ObjectProperty> result;
-			auto props = self->GetObjectPropertiesSupported(objectId);
+			auto props = self->GetObjectPropertiesSupported(format);
 			result.reserve(props.ObjectPropertyCodes.size());
 			for(auto prop: props.ObjectPropertyCodes) {
 				result.push_back(prop);

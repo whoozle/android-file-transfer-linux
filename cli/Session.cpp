@@ -861,15 +861,16 @@ namespace cli
 
 	void Session::ListProperties(mtp::ObjectId id)
 	{
-		auto ops = _session->GetObjectPropertiesSupported(id);
-		std::stringstream ss;
-		ss << "properties supported: ";
+		auto format = _session->GetObjectIntegerProperty(id, mtp::ObjectProperty::ObjectFormat);
+		mtp::debug("querying supported properties for format 0x", mtp::hex(format));
+
+		auto ops = _session->GetObjectPropertiesSupported(mtp::ObjectFormat(format));
+		mtp::debug("properties supported: ");
 		for(mtp::ObjectProperty prop: ops.ObjectPropertyCodes)
 		{
-			ss << mtp::hex(prop, 4) << " ";
+			mtp::debug(mtp::hex(prop, 4), ":");
+			mtp::HexDump("property", _session->GetObjectProperty(id, prop), true);
 		}
-		ss << "\n";
-		mtp::print(ss.str());
 	}
 
 	void Session::ListDeviceProperties()
