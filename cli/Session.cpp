@@ -845,11 +845,7 @@ namespace cli
 
 	mtp::ObjectId Session::MakeDirectory(mtp::ObjectId parentId, const std::string & name)
 	{
-		using namespace mtp;
-		msg::ObjectInfo oi;
-		oi.Filename = name;
-		oi.ObjectFormat = ObjectFormat::Association;
-		auto noi = _session->SendObjectInfo(oi, GetUploadStorageId(), parentId);
+		auto noi = _session->CreateDirectory(name, _cd, GetUploadStorageId());
 		return noi.ObjectId;
 	}
 
