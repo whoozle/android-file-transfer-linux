@@ -273,7 +273,7 @@ namespace mtp { namespace usb
 				usbdevfs_urb * completedKernelUrb = static_cast<usbdevfs_urb *>(Reap(timeout));
 				if (urb->GetKernelUrb() != completedKernelUrb)
 				{
-					error("got unknown urb: ", completedKernelUrb);
+					error("got unknown urb: ", completedKernelUrb, " of size ", completedKernelUrb->buffer_length);
 					continue;
 				}
 				else
