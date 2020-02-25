@@ -864,21 +864,28 @@ namespace cli
 		u16 rw = is.Read8();
 
 		std::string defValue;
-		switch(type)
+		u32 groupCode = 0;
+		u8 formFlag = 0;
+		try
 		{
+			switch(type)
+			{
 #define CASE(BITS) \
-			case mtp::DataTypeCode::Uint##BITS: \
-			case mtp::DataTypeCode::Int##BITS: \
-				defValue = std::to_string(is.Read##BITS ()); break
-			CASE(8); CASE(16); CASE(32); CASE(64); CASE(128);
+				case mtp::DataTypeCode::Uint##BITS: \
+				case mtp::DataTypeCode::Int##BITS: \
+					defValue = std::to_string(is.Read##BITS ()); break
+				CASE(8); CASE(16); CASE(32); CASE(64); CASE(128);
 #undef CASE
-			case mtp::DataTypeCode::String:
-				defValue = is.ReadString(); break;
-			default:
-				throw std::runtime_error("invalid type " + std::to_string((u16)type));
+				case mtp::DataTypeCode::String:
+					defValue = is.ReadString(); break;
+				default:
+					throw std::runtime_error("invalid type " + std::to_string((u16)type));
+			}
+			groupCode = is.Read32();
+			formFlag = is.Read8();
 		}
-		u32 groupCode = is.Read32();
-		u8 formFlag = is.Read8();
+		catch(const std::exception & ex)
+		{ defValue = "<unknown type>"; }
 
 		debug("property ", hex(prop, 4), ", type: ", hex(type, 4), ", rw: ", rw, ", default: ", defValue, ", groupCode: ", groupCode, ", form flag: ", formFlag);
 		HexDump("raw", format, true);
