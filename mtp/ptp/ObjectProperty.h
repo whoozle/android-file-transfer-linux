@@ -77,6 +77,7 @@ namespace mtp
 		Artist						= 0xdc46,
 		DateAuthored				= 0xdc47,
 		DateAdded					= 0xdc4e,
+		NonConsumable				= 0xdc4f,
 
 		RepresentativeSampleFormat	= 0xdc81,
 		RepresentativeSampleData	= 0xdc86,
