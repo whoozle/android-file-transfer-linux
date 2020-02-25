@@ -790,7 +790,7 @@ namespace cli
 			msg::ObjectInfo oi;
 			oi.Filename = filename;
 			oi.ObjectFormat = ObjectFormatFromFilename(src);
-			oi.SetSize(stream->GetSize());
+			oi.ObjectCompressedSize = stream->GetSize();
 
 			if (_showEvents)
 			{

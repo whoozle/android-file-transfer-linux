@@ -272,6 +272,38 @@ namespace mtp
 	{
 		if (objectInfo.Filename.empty())
 			throw std::runtime_error("object filename must not be empty");
+
+		if (_deviceInfo.Supports(OperationCode::SendObjectPropList))
+		{
+			//modern way of creating objects
+			ByteArray propList;
+			{
+				OutputStream os(propList);
+				os.Write32(1); //number of props
+				os.Write32(0); //object handle
+				os.Write16(static_cast<u16>(ObjectProperty::ObjectFilename));
+				os.Write16(static_cast<u16>(DataTypeCode::String));
+				os.WriteString(objectInfo.Filename);
+			}
+			ByteArray responseData;
+			IObjectInputStreamPtr inputStream = std::make_shared<ByteArrayObjectInputStream>(propList);
+			RunTransactionWithDataRequest(_defaultTimeout,
+				OperationCode::SendObjectPropList, responseData, inputStream,
+				storageId.Id, parentObject.Id, static_cast<u32>(objectInfo.ObjectFormat),
+				objectInfo.ObjectCompressedSize >> 32, objectInfo.ObjectCompressedSize);
+
+			InputStream is(responseData);
+
+			msg::SendObjectPropListResponse response;
+			response.Read(is);
+
+			NewObjectInfo noi;
+			noi.StorageId = response.StorageId;
+			noi.ParentObjectId = response.ParentObjectId;
+			noi.ObjectId = response.ObjectId;
+			return noi;
+		}
+
 		scoped_mutex_lock l(_mutex);
 		Transaction transaction(this);
 		Send(OperationRequest(OperationCode::SendObjectInfo, transaction.Id, storageId.Id, parentObject.Id));

@@ -293,7 +293,7 @@ bool MtpObjectsModel::uploadFile(mtp::ObjectId parentObjectId, const QString &fi
 	mtp::msg::ObjectInfo oi;
 	oi.Filename = toUtf8(filename);
 	oi.ObjectFormat = objectFormat;
-	oi.SetSize(fileInfo.size());
+	oi.ObjectCompressedSize = fileInfo.size();
 	mtp::Session::NewObjectInfo noi;
 	try
 	{

@@ -138,7 +138,7 @@ namespace mtp { namespace msg
 		mtp::StorageId		StorageId;
 		mtp::ObjectFormat	ObjectFormat;
 		u16					ProtectionStatus;
-		u32					ObjectCompressedSize;
+		u64					ObjectCompressedSize;
 		u16					ThumbFormat;
 		u32					ThumbCompressedSize;
 		u32					ThumbPixWidth;
@@ -162,17 +162,14 @@ namespace mtp { namespace msg
 			SequenceNumber()
 		{ }
 
-		void SetSize(u64 size)
-		{
-			ObjectCompressedSize = (size > MaxObjectSize)? MaxObjectSize: size;
-		}
-
 		void Read(InputStream &stream)
 		{
 			stream >> StorageId;
 			stream >> ObjectFormat;
 			stream >> ProtectionStatus;
-			stream >> ObjectCompressedSize;
+			u32 objectCompressedSize;
+			stream >> objectCompressedSize;
+			ObjectCompressedSize = objectCompressedSize;
 			stream >> ThumbFormat;
 			stream >> ThumbCompressedSize;
 			stream >> ThumbPixWidth;
@@ -195,7 +192,8 @@ namespace mtp { namespace msg
 			stream << StorageId;
 			stream << ObjectFormat;
 			stream << ProtectionStatus;
-			stream << ObjectCompressedSize;
+			u32 objectCompressedSize = (ObjectCompressedSize > MaxObjectSize)? MaxObjectSize: ObjectCompressedSize;
+			stream << objectCompressedSize;
 			stream << ThumbFormat;
 			stream << ThumbCompressedSize;
 			stream << ThumbPixWidth;
