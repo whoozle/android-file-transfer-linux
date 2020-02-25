@@ -64,6 +64,8 @@ namespace mtp
 		Jp2				= 0x380f,
 		Jpx				= 0x3810,
 
+		Artist			= 0xb218,
+
 		//audio
 		Wma				= 0xb901,
 		Ogg				= 0xb902,
@@ -78,6 +80,7 @@ namespace mtp
 		_3gp			= 0xb984,
 
 		AudioAlbum		= 0xba03,
+		AVPlaylist		= 0xba05,
 
 		//playlists
 		Wpl				= 0xba10,
