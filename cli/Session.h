@@ -55,6 +55,7 @@ namespace cli
 		std::string					_prompt;
 		unsigned					_terminalWidth;
 		bool						_batterySupported;
+		bool						_deviceFriendlyNameSupported;
 
 		std::multimap<std::string, ICommandPtr> _commands;
 

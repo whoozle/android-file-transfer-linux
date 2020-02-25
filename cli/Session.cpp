@@ -302,6 +302,10 @@ namespace cli
 		{
 			std::stringstream ss;
 			ss << _gdi.Manufacturer << " " << _gdi.Model;
+			if (_deviceFriendlyNameSupported) {
+				auto name = _session->GetDeviceStringProperty(mtp::DeviceProperty::DeviceFriendlyName);
+				ss << " / " << name;
+			}
 			if (_batterySupported)
 			{
 				auto level = _session->GetDeviceIntegerProperty(mtp::DeviceProperty::BatteryLevel);
@@ -333,12 +337,13 @@ namespace cli
 			}
 			ss << "\n";
 			ss << "supported properties: ";
+
+			_batterySupported = _gdi.Supports(mtp::DeviceProperty::BatteryLevel);
+			_deviceFriendlyNameSupported = _gdi.Supports(mtp::DeviceProperty::DeviceFriendlyName);
+
 			for(DeviceProperty code : _gdi.DevicePropertiesSupported)
-			{
 				ss << hex(code, 4) << " ";
-				if (code == mtp::DeviceProperty::BatteryLevel)
-					_batterySupported = true;
-			}
+
 			ss << "\n";
 			debug(ss.str());
 		}
