@@ -524,8 +524,11 @@ namespace cli
 			{
 				try
 				{
-					msg::ObjectInfo info = _session->GetObjectInfo(objectId);
+					std::string filename;
 					if (extended)
+					{
+						msg::ObjectInfo info = _session->GetObjectInfo(objectId);
+						filename = info.Filename;
 						print(
 							std::left,
 							width(objectId, 10), " ",
@@ -537,11 +540,19 @@ namespace cli
 							width(!info.CaptureDate.empty()? FormatTime(info.CaptureDate): FormatTime(info.ModificationDate), 20), " ",
 							prefix + info.Filename, " "
 						);
+					}
 					else
-						print(std::left, width(objectId, 10), " ", prefix + info.Filename);
+					{
+						filename = _session->GetObjectStringProperty(objectId, ObjectProperty::ObjectFilename);
+						print(std::left, width(objectId, 10), " ", prefix + filename);
+					}
 
-					if (recursive && info.ObjectFormat == mtp::ObjectFormat::Association)
-						List(objectId, extended, recursive, prefix + info.Filename + "/");
+					if (recursive)
+					{
+						auto format = mtp::ObjectFormat(_session->GetObjectIntegerProperty(objectId, ObjectProperty::ObjectFormat));
+						if (format == mtp::ObjectFormat::Association)
+							List(objectId, extended, recursive, prefix + filename + "/");
+					}
 				}
 				catch(const std::exception &ex)
 				{
