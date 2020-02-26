@@ -87,6 +87,7 @@ endif()
 set(SOURCES
 	mtp/log.cpp
 	mtp/ByteArray.cpp
+	mtp/ptp/DataTypeCode.cpp
 	mtp/ptp/Device.cpp
 	mtp/ptp/DeviceProperty.cpp
 	mtp/ptp/ObjectFormat.cpp
