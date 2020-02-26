@@ -399,7 +399,7 @@ namespace mtp
 		u32 cmac[4];
 		_keys->SignSessionRequest(cmac, cmacKey);
 		_session->EnableSecureFileOperations(cmac);
-		debug("hanshake finished");
+		debug("handshake finished");
 	}
 
 	TrustedApp::KeysPtr TrustedApp::LoadKeys(const std::string & path)
