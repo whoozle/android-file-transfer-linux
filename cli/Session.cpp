@@ -341,7 +341,7 @@ namespace cli
 			ss << "supported op codes: ";
 			for(OperationCode code : _gdi.OperationsSupported)
 			{
-				ss << hex(code, 4) << " ";
+				ss << ToString(code) << " ";
 			}
 			ss << "\n";
 			ss << "supported properties: ";

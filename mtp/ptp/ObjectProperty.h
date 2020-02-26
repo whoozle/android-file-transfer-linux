@@ -58,7 +58,7 @@ namespace mtp
 	enum struct ObjectProperty : u16
 	{
 #define ENUM_VALUE(NAME, VALUE) ENUM_VALUE_DECL(NAME, VALUE)
-#		include "ObjectProperty.values.h"
+#		include <mtp/ptp/ObjectProperty.values.h>
 #undef ENUM_VALUE
 	};
 	DECLARE_ENUM(ObjectProperty, u16);
