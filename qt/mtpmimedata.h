@@ -17,8 +17,8 @@
     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-#ifndef MTPMIMEDATA_H
-#define MTPMIMEDATA_H
+#ifndef AFTL_QT_MTPMIMEDATA_H
+#define AFTL_QT_MTPMIMEDATA_H
 
 
 class MtpMimeData : public QMimeData

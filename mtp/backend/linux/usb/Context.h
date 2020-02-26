@@ -17,8 +17,8 @@
     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-#ifndef USB_CONTEXT_H
-#define USB_CONTEXT_H
+#ifndef AFTL_MTP_BACKEND_LINUX_USB_CONTEXT_H
+#define AFTL_MTP_BACKEND_LINUX_USB_CONTEXT_H
 
 #include <mtp/types.h>
 #include <usb/DeviceDescriptor.h>

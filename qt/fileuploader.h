@@ -17,8 +17,8 @@
     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-#ifndef FILEUPLOADER_H
-#define FILEUPLOADER_H
+#ifndef AFTL_QT_FILEUPLOADER_H
+#define AFTL_QT_FILEUPLOADER_H
 
 #include <QObject>
 #include <QThread>

@@ -17,8 +17,8 @@
     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-#ifndef UTILS
-#define UTILS
+#ifndef AFTL_QT_UTILS_H
+#define AFTL_QT_UTILS_H
 
 #include <QString>
 #include <string>

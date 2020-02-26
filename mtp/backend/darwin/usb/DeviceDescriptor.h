@@ -17,8 +17,8 @@
     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-#ifndef USB_DEVICE_H
-#define USB_DEVICE_H
+#ifndef AFTL_MTP_BACKEND_DARWIN_USB_DEVICEDESCRIPTOR_H
+#define AFTL_MTP_BACKEND_DARWIN_USB_DEVICEDESCRIPTOR_H
 
 #include <mtp/types.h>
 #include <usb/Device.h>

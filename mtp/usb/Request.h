@@ -17,8 +17,8 @@
     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-#ifndef AFT_USB_REQUEST_H
-#define	AFT_USB_REQUEST_H
+#ifndef AFTL_MTP_USB_REQUEST_H
+#define AFTL_MTP_USB_REQUEST_H
 
 #include <mtp/types.h>
 #include <mtp/ByteArray.h>

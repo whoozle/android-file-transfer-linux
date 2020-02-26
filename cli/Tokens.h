@@ -17,8 +17,8 @@
     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-#ifndef AFT_CLI_TOKENS_H
-#define AFT_CLI_TOKENS_H
+#ifndef AFTL_CLI_TOKENS_H
+#define AFTL_CLI_TOKENS_H
 
 #include <list>
 #include <string>

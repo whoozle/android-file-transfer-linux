@@ -17,8 +17,8 @@
     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-#ifndef AFS_MTP_DEMANGLE_H
-#define AFS_MTP_DEMANGLE_H
+#ifndef AFTL_MTP_DEMANGLE_H
+#define AFTL_MTP_DEMANGLE_H
 
 #include <cxxabi.h>
 #include <stdlib.h>

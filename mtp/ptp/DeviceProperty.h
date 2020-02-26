@@ -17,8 +17,8 @@
     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-#ifndef DEVICEPROPERTY_H
-#define	DEVICEPROPERTY_H
+#ifndef AFTL_MTP_PTP_DEVICEPROPERTY_H
+#define AFTL_MTP_PTP_DEVICEPROPERTY_H
 
 #include <mtp/types.h>
 #include <string>

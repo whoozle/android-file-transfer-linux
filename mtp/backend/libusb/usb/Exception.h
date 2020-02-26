@@ -17,8 +17,8 @@
     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-#ifndef MTP_EXCEPTION_H
-#define	MTP_EXCEPTION_H
+#ifndef AFTL_MTP_BACKEND_LIBUSB_USB_EXCEPTION_H
+#define AFTL_MTP_BACKEND_LIBUSB_USB_EXCEPTION_H
 
 #include <stdexcept>
 

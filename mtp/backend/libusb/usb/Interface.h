@@ -17,8 +17,8 @@
     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-#ifndef INTERFACE_H
-#define	INTERFACE_H
+#ifndef AFTL_MTP_BACKEND_LIBUSB_USB_INTERFACE_H
+#define AFTL_MTP_BACKEND_LIBUSB_USB_INTERFACE_H
 
 #include <mtp/types.h>
 #include <usb/Device.h>

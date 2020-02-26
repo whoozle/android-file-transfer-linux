@@ -1,5 +1,5 @@
-#ifndef AFTL_DATATYPE_CODE_H
-#define	AFTL_DATATYPE_CODE_H
+#ifndef AFTL_MTP_PTP_DATATYPECODE_H
+#define AFTL_MTP_PTP_DATATYPECODE_H
 
 #include <mtp/types.h>
 #include <string>

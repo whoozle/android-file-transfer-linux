@@ -17,8 +17,8 @@
     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-#ifndef PROGRESSBAR_H
-#define	PROGRESSBAR_H
+#ifndef AFTL_CLI_PROGRESSBAR_H
+#define AFTL_CLI_PROGRESSBAR_H
 
 #include <string>
 #include <mtp/types.h>

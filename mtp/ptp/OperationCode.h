@@ -17,8 +17,8 @@
     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-#ifndef OPERATIONCODE_H
-#define	OPERATIONCODE_H
+#ifndef AFTL_MTP_PTP_OPERATIONCODE_H
+#define AFTL_MTP_PTP_OPERATIONCODE_H
 
 #include <mtp/types.h>
 

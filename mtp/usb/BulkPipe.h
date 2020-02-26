@@ -17,8 +17,8 @@
     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-#ifndef BULKPIPE_H
-#define	BULKPIPE_H
+#ifndef AFTL_MTP_USB_BULKPIPE_H
+#define AFTL_MTP_USB_BULKPIPE_H
 
 #include <mtp/Token.h>
 #include <mtp/ByteArray.h>

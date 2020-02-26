@@ -17,8 +17,8 @@
     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-#ifndef QTOBJECTSTREAM_H
-#define QTOBJECTSTREAM_H
+#ifndef AFTL_QT_QTOBJECTSTREAM_H
+#define AFTL_QT_QTOBJECTSTREAM_H
 
 #include <QObject>
 #include <QFile>

@@ -17,8 +17,8 @@
     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-#ifndef AFT_PTP_OBJECTID_H
-#define AFT_PTP_OBJECTID_H
+#ifndef AFTL_MTP_PTP_OBJECTID_H
+#define AFTL_MTP_PTP_OBJECTID_H
 
 #include <mtp/types.h>
 

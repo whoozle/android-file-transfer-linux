@@ -17,8 +17,8 @@
     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-#ifndef MESSAGES_H
-#define	MESSAGES_H
+#ifndef AFTL_MTP_PTP_MESSAGES_H
+#define AFTL_MTP_PTP_MESSAGES_H
 
 #include <mtp/ptp/DeviceProperty.h>
 #include <mtp/ptp/InputStream.h>

@@ -17,8 +17,8 @@
     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-#ifndef AFTL_MTPZ_TRUSTEDAPP_H
-#define AFTL_MTPZ_TRUSTEDAPP_H
+#ifndef AFTL_MTP_MTPZ_TRUSTEDAPP_H
+#define AFTL_MTP_MTPZ_TRUSTEDAPP_H
 
 #include <mtp/types.h>
 #include <string>

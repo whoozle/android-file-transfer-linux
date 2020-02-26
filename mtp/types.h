@@ -17,8 +17,8 @@
     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-#ifndef TYPES_H
-#define	TYPES_H
+#ifndef AFTL_MTP_TYPES_H
+#define AFTL_MTP_TYPES_H
 
 #include <stdint.h>
 #include <errno.h>

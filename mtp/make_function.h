@@ -17,8 +17,8 @@
     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-#ifndef AFT_CLI_MAKE_FUNCTION_H
-#define AFT_CLI_MAKE_FUNCTION_H
+#ifndef AFTL_MTP_MAKE_FUNCTION_H
+#define AFTL_MTP_MAKE_FUNCTION_H
 
 #include <functional>
 

@@ -17,8 +17,8 @@
     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-#ifndef AFT_CLI_COMMAND_H
-#define AFT_CLI_COMMAND_H
+#ifndef AFTL_CLI_COMMAND_H
+#define AFTL_CLI_COMMAND_H
 
 #include <cli/Tokens.h>
 #include <cli/MakeTuple.h>

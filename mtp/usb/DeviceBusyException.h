@@ -17,8 +17,8 @@
     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-#ifndef USB_DEVICEBUSYEXCEPTION_H
-#define USB_DEVICEBUSYEXCEPTION_H
+#ifndef AFTL_MTP_USB_DEVICEBUSYEXCEPTION_H
+#define AFTL_MTP_USB_DEVICEBUSYEXCEPTION_H
 
 #include <stdexcept>
 #include <vector>

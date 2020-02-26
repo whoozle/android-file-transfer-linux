@@ -17,8 +17,8 @@
     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-#ifndef DEVICE_H
-#define	DEVICE_H
+#ifndef AFTL_MTP_BACKEND_LINUX_USB_DEVICE_H
+#define AFTL_MTP_BACKEND_LINUX_USB_DEVICE_H
 
 #include <mtp/types.h>
 #include <mtp/ByteArray.h>

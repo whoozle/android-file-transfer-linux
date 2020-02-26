@@ -17,8 +17,8 @@
     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-#ifndef IOBJECTSTREAM_H
-#define	IOBJECTSTREAM_H
+#ifndef AFTL_MTP_PTP_IOBJECTSTREAM_H
+#define AFTL_MTP_PTP_IOBJECTSTREAM_H
 
 #include <mtp/types.h>
 #include <atomic>

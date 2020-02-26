@@ -17,8 +17,8 @@
     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-#ifndef SESSION_H
-#define	SESSION_H
+#ifndef AFTL_MTP_PTP_SESSION_H
+#define AFTL_MTP_PTP_SESSION_H
 
 #include <mtp/usb/BulkPipe.h>
 #include <mtp/ptp/Messages.h>

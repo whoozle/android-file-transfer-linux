@@ -17,8 +17,8 @@
     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-#ifndef AFS_FUSE_EXCEPTION_H
-#define	AFS_FUSE_EXCEPTION_H
+#ifndef AFTL_FUSE_EXCEPTION_H
+#define AFTL_FUSE_EXCEPTION_H
 
 #include <stdexcept>
 #include <string>

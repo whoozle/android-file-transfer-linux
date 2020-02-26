@@ -17,8 +17,8 @@
     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-#ifndef OBJECTFORMAT_H
-#define	OBJECTFORMAT_H
+#ifndef AFTL_MTP_PTP_OBJECTFORMAT_H
+#define AFTL_MTP_PTP_OBJECTFORMAT_H
 
 #include <mtp/types.h>
 #include <string>

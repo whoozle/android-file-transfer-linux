@@ -17,8 +17,8 @@
     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-#ifndef AFT_CLI_SESSION_H
-#define AFT_CLI_SESSION_H
+#ifndef AFTL_CLI_SESSION_H
+#define AFTL_CLI_SESSION_H
 
 #include <mtp/ptp/Device.h>
 #include <mtp/ptp/Session.h>

@@ -1,5 +1,5 @@
-#ifndef AFTL_PTP_EVENT_CODE
-#define AFTL_PTP_EVENT_CODE
+#ifndef AFTL_MTP_PTP_EVENTCODE_H
+#define AFTL_MTP_PTP_EVENTCODE_H
 
 #include <mtp/types.h>
 

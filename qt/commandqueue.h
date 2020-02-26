@@ -17,8 +17,8 @@
     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-#ifndef COMMANDQUEUE_H
-#define COMMANDQUEUE_H
+#ifndef AFTL_QT_COMMANDQUEUE_H
+#define AFTL_QT_COMMANDQUEUE_H
 
 #include <QObject>
 #include <QQueue>

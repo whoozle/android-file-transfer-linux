@@ -17,8 +17,8 @@
     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-#ifndef USB_TYPES_H
-#define	USB_TYPES_H
+#ifndef AFTL_MTP_USB_TYPES_H
+#define AFTL_MTP_USB_TYPES_H
 
 namespace mtp { namespace usb
 {

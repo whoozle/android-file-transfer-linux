@@ -17,8 +17,8 @@
     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-#ifndef PIPEPACKETER_H
-#define PIPEPACKETER_H
+#ifndef AFTL_MTP_PTP_PIPEPACKETER_H
+#define AFTL_MTP_PTP_PIPEPACKETER_H
 
 #include <mtp/usb/BulkPipe.h>
 #include <mtp/ptp/IObjectStream.h>

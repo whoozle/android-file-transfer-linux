@@ -17,8 +17,8 @@
     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-#ifndef AFS_MTP_PTP_OBJECTPROPERTYLISTPARSER_H
-#define	AFS_MTP_PTP_OBJECTPROPERTYLISTPARSER_H
+#ifndef AFTL_MTP_PTP_OBJECTPROPERTYLISTPARSER_H
+#define AFTL_MTP_PTP_OBJECTPROPERTYLISTPARSER_H
 
 #include <mtp/ptp/ObjectId.h>
 #include <mtp/ptp/ObjectProperty.h>

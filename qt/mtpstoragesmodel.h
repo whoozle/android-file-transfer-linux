@@ -17,8 +17,8 @@
     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-#ifndef MTPSTORAGESMODEL_H
-#define MTPSTORAGESMODEL_H
+#ifndef AFTL_QT_MTPSTORAGESMODEL_H
+#define AFTL_QT_MTPSTORAGESMODEL_H
 
 #include <QAbstractListModel>
 #include <QPair>

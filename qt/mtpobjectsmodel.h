@@ -17,8 +17,8 @@
     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-#ifndef MTPOBJECTSMODEL_H
-#define MTPOBJECTSMODEL_H
+#ifndef AFTL_QT_MTPOBJECTSMODEL_H
+#define AFTL_QT_MTPOBJECTSMODEL_H
 
 #include <qabstractitemmodel.h>
 #include <mtp/ptp/Device.h>

@@ -17,8 +17,8 @@
     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-#ifndef JOINEDOBJECTSTREAM_H
-#define	JOINEDOBJECTSTREAM_H
+#ifndef AFTL_MTP_PTP_JOINEDOBJECTSTREAM_H
+#define AFTL_MTP_PTP_JOINEDOBJECTSTREAM_H
 
 #include <mtp/ptp/IObjectStream.h>
 

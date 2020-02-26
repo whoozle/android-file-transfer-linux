@@ -17,8 +17,8 @@
     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-#ifndef BYTEARRAY_H
-#define	BYTEARRAY_H
+#ifndef AFTL_MTP_BYTEARRAY_H
+#define AFTL_MTP_BYTEARRAY_H
 
 #include <mtp/types.h>
 #include <vector>

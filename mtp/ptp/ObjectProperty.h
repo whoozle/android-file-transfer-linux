@@ -17,8 +17,8 @@
     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-#ifndef OBJECTPROPERTY_H
-#define	OBJECTPROPERTY_H
+#ifndef AFTL_MTP_PTP_OBJECTPROPERTY_H
+#define AFTL_MTP_PTP_OBJECTPROPERTY_H
 
 #include <mtp/ptp/DataTypeCode.h>
 #include <mtp/ByteArray.h>

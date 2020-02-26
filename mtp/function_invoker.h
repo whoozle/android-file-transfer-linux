@@ -17,8 +17,8 @@
     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-#ifndef MTP_FUNCTION_INVOKER_H
-#define MTP_FUNCTION_INVOKER_H
+#ifndef AFTL_MTP_FUNCTION_INVOKER_H
+#define AFTL_MTP_FUNCTION_INVOKER_H
 
 #include <functional>
 

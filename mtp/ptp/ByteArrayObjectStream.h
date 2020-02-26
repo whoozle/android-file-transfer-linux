@@ -17,8 +17,8 @@
     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-#ifndef BYTEARRAYOBJECTSTREAM_H
-#define	BYTEARRAYOBJECTSTREAM_H
+#ifndef AFTL_MTP_PTP_BYTEARRAYOBJECTSTREAM_H
+#define AFTL_MTP_PTP_BYTEARRAYOBJECTSTREAM_H
 
 #include <mtp/ptp/IObjectStream.h>
 #include <mtp/ByteArray.h>

@@ -17,8 +17,8 @@
     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-#ifndef AFT_LOG_H
-#define AFT_LOG_H
+#ifndef AFTL_MTP_LOG_H
+#define AFTL_MTP_LOG_H
 
 #include <mtp/ByteArray.h>
 #include <mtp/types.h>

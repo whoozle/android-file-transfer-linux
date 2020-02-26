@@ -17,8 +17,8 @@
     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-#ifndef PROGRESSDIALOG_H
-#define PROGRESSDIALOG_H
+#ifndef AFTL_QT_PROGRESSDIALOG_H
+#define AFTL_QT_PROGRESSDIALOG_H
 
 #include <QDialog>
 
