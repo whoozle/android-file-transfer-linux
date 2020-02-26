@@ -103,7 +103,7 @@ namespace
 
 		void GetObjectInfo(ChildrenObjects &cache, mtp::ObjectId id)
 		{
-			mtp::msg::ObjectInfo oi = _session->GetObjectInfo(id);
+			auto oi = _session->GetObjectInfo(id);
 
 			FuseId inode = ToFuse(id);
 			cache.emplace(oi.Filename, inode);
@@ -310,7 +310,7 @@ namespace
 				storageId = _session->GetObjectStorage(parentId);
 			mtp::debug("   creating object in storage ", mtp::hex(storageId.Id), ", parent: ", mtp::hex(parentId.Id, 8));
 
-			mtp::Session::NewObjectInfo noi;
+			mtp::msg::NewObjectInfo noi;
 			if (format != mtp::ObjectFormat::Association)
 			{
 				mtp::msg::ObjectInfo oi;
