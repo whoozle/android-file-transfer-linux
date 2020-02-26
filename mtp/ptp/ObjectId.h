@@ -53,6 +53,13 @@ namespace mtp
 
 }
 
+namespace std
+{
+	template<> class hash<mtp::ObjectId>
+	{ public: size_t operator()(const mtp::ObjectId &id) const { return id.Id; } };
+	template<> class hash<mtp::StorageId>
+	{ public: size_t operator()(const mtp::StorageId &id) const { return id.Id; } };
+}
 #endif
 
 
