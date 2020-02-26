@@ -63,6 +63,13 @@ namespace mtp
 			return size;
 		}
 
+		void WriteData(const ByteArray & data)
+		{
+			_data.reserve(data.size() + _data.size());
+			for(auto b : data)
+				Write8(b);
+		}
+
 		void WriteString(const std::string &value)
 		{
 			if (value.empty())
