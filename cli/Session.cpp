@@ -896,7 +896,7 @@ namespace cli
 		{ defValue = "<unknown type>"; }
 
 		debug("property ", hex(prop, 4), ", type: ", hex(type, 4), ", rw: ", rw, ", default: ", defValue, ", groupCode: ", groupCode, ", form flag: ", formFlag);
-		HexDump("raw", format, true);
+		//HexDump("raw", format, true);
 	}
 
 	void Session::ListProperties(mtp::ObjectId id)
