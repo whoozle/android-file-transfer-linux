@@ -112,6 +112,7 @@ set(SOURCES
 	mtp/backend/posix/Exception.cpp
 
 	mtp/metadata/Metadata.cpp
+	mtp/metadata/Library.cpp
 
 	mtp/mtpz/TrustedApp.cpp
 )

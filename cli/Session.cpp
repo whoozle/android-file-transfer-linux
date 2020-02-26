@@ -31,6 +31,7 @@
 #include <mtp/mtpz/TrustedApp.h>
 
 #include <mtp/metadata/Metadata.h>
+#include <mtp/metadata/Library.h>
 
 #include <sstream>
 #include <set>
@@ -1066,11 +1067,18 @@ namespace cli
 
 	void Session::ZuneImport(const LocalPath & path)
 	{
-		auto meta = mtp::Metadata::Read(path);
+		using namespace mtp;
+		auto stream = std::make_shared<ObjectInputStream>(path);
+		stream->SetTotal(stream->GetSize());
+		try { stream->SetProgressReporter(ProgressBar(path, _terminalWidth / 3, _terminalWidth)); } catch(const std::exception &ex) { }
+
+		auto meta = Metadata::Read(path);
 		if (!meta)
 			throw std::runtime_error("no metadata");
 
-		mtp::print(meta->Artist, " / ", meta->Album, " (", meta->Year, ") / ", meta->Title);
+		print("metadata: ", meta->Artist, " / ", meta->Album, " (", meta->Year, ") / ", meta->Title);
+
+		Library library(_session);
 	}
 
 
