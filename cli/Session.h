@@ -155,6 +155,7 @@ namespace cli
 
 		void MakePath(const Path &path)
 		{ Resolve(path, true); }
+		void MakeArtist(const std::string & name);
 
 		void Delete(const Path &path)
 		{ Delete(Resolve(path)); }
