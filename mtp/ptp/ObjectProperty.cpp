@@ -65,7 +65,7 @@ namespace mtp
 					CASE(8); CASE(16); CASE(32); CASE(64); CASE(128);
 #undef CASE
 					case mtp::DataTypeCode::String:
-						ss << '"' << is.ReadString() << '"'; break;
+						ss << is.ReadString(); break;
 					default:
 						ss << "(value of unknown type " << ToString(type) << ")";
 				}
@@ -85,7 +85,7 @@ namespace mtp
 		if (type == DataTypeCode::ArrayUint16 && IsString(value))
 		{
 			u32 size = is.Read32();
-			ss << "[ " << is.ReadString(size) << " ]";
+			ss << is.ReadString(size);
 		} else
 			ToString(ss, is, type);
 		return ss.str();
