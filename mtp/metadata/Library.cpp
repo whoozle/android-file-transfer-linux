@@ -69,7 +69,12 @@ namespace mtp
 		ByteArray propList;
 		OutputStream os(propList);
 
-		os.Write32(2); //number of props
+		os.Write32(3); //number of props
+
+		os.Write32(0); //object handle
+		os.Write16(static_cast<u16>(ObjectProperty::ArtistId));
+		os.Write16(static_cast<u16>(DataTypeCode::Uint32));
+		os.Write32(artist->Id.Id);
 
 		os.Write32(0); //object handle
 		os.Write16(static_cast<u16>(ObjectProperty::Name));
@@ -81,10 +86,6 @@ namespace mtp
 		os.Write16(static_cast<u16>(DataTypeCode::String));
 		os.WriteString(artist->Name);
 
-		// os.Write32(0); //object handle
-		// os.Write16(static_cast<u16>(ObjectProperty::ArtistId));
-		// os.Write16(static_cast<u16>(DataTypeCode::Uint32));
-		// os.Write32(artist->Id.Id);
 
 		auto response = _session->SendObjectPropList(Session::AnyStorage, Session::Root, ObjectFormat::AudioAlbum, 0, propList);
 
