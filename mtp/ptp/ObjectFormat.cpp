@@ -136,6 +136,8 @@ namespace mtp
 			return mtp::ObjectFormat::Wmv;
 		else if (ext == "mp4")
 			return mtp::ObjectFormat::Mp4;
+		else if (ext == "m4a")
+			return mtp::ObjectFormat::M4a;
 		else if (ext == "3gp")
 			return mtp::ObjectFormat::_3gp;
 		else if (ext == "asf")
