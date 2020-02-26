@@ -340,9 +340,8 @@ namespace cli
 			std::stringstream ss;
 			ss << "supported op codes: ";
 			for(OperationCode code : _gdi.OperationsSupported)
-			{
 				ss << ToString(code) << " ";
-			}
+
 			ss << "\n";
 			ss << "supported properties: ";
 
@@ -525,7 +524,7 @@ namespace cli
 							width(objectId, 10), " ",
 							width(info.StorageId.Id, 10), " ",
 							std::right,
-							hex(info.ObjectFormat, 4), " ",
+							ToString(info.ObjectFormat), " ",
 							width(info.ObjectCompressedSize, 10), " ",
 							std::left,
 							width(!info.CaptureDate.empty()? FormatTime(info.CaptureDate): FormatTime(info.ModificationDate), 20), " ",
@@ -831,7 +830,7 @@ namespace cli
 				{
 					auto objectId = ResolveObjectChild(parentDir, filename);
 					ObjectFormat format = ObjectFormat(_session->GetObjectIntegerProperty(objectId, ObjectProperty::ObjectFormat));
-					print("format ", hex((int)format));
+					print("format ", ToString(format));
 					if (format != ObjectFormat::Association)
 						targetFilename = filename; //path exists and it's not directory
 				}
@@ -860,7 +859,7 @@ namespace cli
 	void Session::ShowType(const LocalPath &src)
 	{
 		mtp::ObjectFormat format = mtp::ObjectFormatFromFilename(src);
-		print("mtp object format = ", hex(format, 4));
+		mtp::print("mtp object format = ", ToString(format));
 	}
 
 	static void PrintFormat(mtp::ByteArray format)
@@ -901,10 +900,10 @@ namespace cli
 
 	void Session::ListProperties(mtp::ObjectId id)
 	{
-		auto format = _session->GetObjectIntegerProperty(id, mtp::ObjectProperty::ObjectFormat);
-		mtp::debug("querying supported properties for format 0x", mtp::hex(format));
+		mtp::ObjectFormat format = mtp::ObjectFormat(_session->GetObjectIntegerProperty(id, mtp::ObjectProperty::ObjectFormat));
+		mtp::debug("querying supported properties for format ", mtp::ToString(format));
 
-		auto ops = _session->GetObjectPropertiesSupported(mtp::ObjectFormat(format));
+		auto ops = _session->GetObjectPropertiesSupported(format);
 		mtp::debug("properties supported: ");
 		for(mtp::ObjectProperty prop: ops.ObjectPropertyCodes)
 		{
@@ -918,7 +917,7 @@ namespace cli
 		using namespace mtp;
 		for(DeviceProperty code : _gdi.DevicePropertiesSupported)
 		{
-			print("property code: ", hex(code, 4));
+			print("property: ", ToString(code));
 			ByteArray data = _session->GetDeviceProperty(code);
 			HexDump("value", data, true);
 		}
@@ -952,7 +951,7 @@ namespace cli
 	void Session::GetObjectPropertyList(mtp::ObjectId parent, const std::set<mtp::ObjectId> &originalObjectList, const mtp::ObjectProperty property)
 	{
 		using namespace mtp;
-		print("testing property 0x", hex(property, 4), "...");
+		print("testing property ", ToString(property), "...");
 
 		std::set<ObjectId> objectList;
 		ByteArray data = _session->GetObjectPropertyList(parent, ObjectFormat::Any, property, 0, 1);
@@ -967,7 +966,7 @@ namespace cli
 				objectList.insert(objectId);
 			else
 			{
-				print("extra property 0x", hex(p, 4), " returned for object ", objectId.Id, ", while querying property list 0x", mtp::hex(property, 4));
+				print("extra property 0x", ToString(p), " returned for object ", objectId.Id, ", while querying property list ", mtp::ToString(property));
 				ok = false;
 			}
 		});
@@ -977,14 +976,14 @@ namespace cli
 
 		if (!extraData.empty())
 		{
-			print("inconsistent GetObjectPropertyList for property 0x", mtp::hex(property, 4));
+			print("inconsistent GetObjectPropertyList for property 0x", mtp::ToString(property));
 			for(auto objectId : extraData)
 			{
-				print("missing 0x", mtp::hex(property, 4), " for object ", objectId);
+				print("missing 0x", mtp::ToString(property), " for object ", objectId);
 				ok = false;
 			}
 		}
-		print("getting object property list of type 0x", hex(property, 4), " ", ok? "PASSED": "FAILED");
+		print("getting object property list of type 0x", ToString(property), " ", ok? "PASSED": "FAILED");
 	}
 
 
@@ -1032,7 +1031,7 @@ namespace cli
 
 	void Session::ListObjects(mtp::ObjectFormat format)
 	{
-		mtp::print("querying all objects of format ", mtp::hex(format));
+		mtp::print("querying all objects of format ", mtp::ToString(format));
 		auto objects = _session->GetObjectHandles(mtp::Session::AllStorages, format, mtp::Session::Device);
 		auto & handles = objects.ObjectHandles;
 		for(auto id : handles)
