@@ -1079,6 +1079,19 @@ namespace cli
 		print("metadata: ", meta->Artist, " / ", meta->Album, " (", meta->Year, ") / ", meta->Title);
 
 		Library library(_session);
+		auto artist = library.GetArtist(meta->Artist);
+		if (!artist)
+			artist = library.CreateArtist(meta->Artist);
+		if (!artist)
+			throw std::runtime_error("can't create artist with name " + meta->Artist);
+		debug("got artist record");
+
+		auto album = library.GetAlbum(artist, meta->Album);
+		if (!album)
+			album = library.CreateAlbum(artist, meta->Album);
+		if (!artist)
+			throw std::runtime_error("can't create album with name " + meta->Album);
+		debug("got album record");
 	}
 
 

@@ -11,19 +11,50 @@ namespace mtp
 {
 	class Library
 	{
-		using ObjectNameMap = std::unordered_map<std::string, mtp::ObjectId>;
-
 		SessionPtr		_session;
-		ObjectNameMap 	_artists, _albums;
 
 	public:
+		struct Artist
+		{
+			ObjectId 		Id;
+			std::string 	Name;
+		};
+		DECLARE_PTR(Artist);
+
+		struct Album
+		{
+			ObjectId 		Id;
+			ArtistPtr		Artist;
+			std::string 	Name;
+			unsigned 		Year;
+		};
+		DECLARE_PTR(Album);
+
+	private:
+		using ArtistMap = std::unordered_map<std::string, ArtistPtr>;
+		ArtistMap _artists;
+
+		using AlbumKey = std::pair<ArtistPtr, std::string>;
+		struct AlbumKeyHash
+		{ size_t operator() (const AlbumKey & key) const {
+			return std::hash<ArtistPtr>()(key.first) + std::hash<std::string>()(key.second);
+		}};
+
+		using AlbumMap = std::unordered_map<AlbumKey, AlbumPtr, AlbumKeyHash>;
+		AlbumMap _albums;
+
+	public:
+
 		Library(const mtp::SessionPtr & session);
 
-		ObjectId GetArtist(const std::string & name)
-		{ auto it = _artists.find(name); return it != _artists.end()? it->second: ObjectId(); }
+		//search by Metadata?
+		ArtistPtr GetArtist(const std::string & name)
+		{ auto it = _artists.find(name); return it != _artists.end()? it->second: ArtistPtr(); }
+		ArtistPtr CreateArtist(const std::string & name);
 
-		ObjectId GetAlbum(const std::string & name)
-		{ auto it = _albums.find(name); return it != _albums.end()? it->second: ObjectId(); }
+		AlbumPtr GetAlbum(const ArtistPtr & artist, const std::string & name)
+		{ auto it = _albums.find(std::make_pair(artist, name)); return it != _albums.end()? it->second: AlbumPtr(); }
+		AlbumPtr CreateAlbum(const ArtistPtr & artist, const std::string & name);
 	};
 }
 
