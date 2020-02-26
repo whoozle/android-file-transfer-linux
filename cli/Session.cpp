@@ -318,7 +318,8 @@ namespace cli
 			ss << _gdi.Manufacturer << " " << _gdi.Model;
 			if (_deviceFriendlyNameSupported) {
 				auto name = _session->GetDeviceStringProperty(mtp::DeviceProperty::DeviceFriendlyName);
-				ss << " / " << name;
+				if (!name.empty())
+					ss << " / " << name;
 			}
 			if (_batterySupported)
 			{
