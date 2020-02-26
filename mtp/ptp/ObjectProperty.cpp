@@ -15,28 +15,44 @@ namespace mtp
 	}
 	namespace
 	{
+		template <typename T>
+		void ArrayToString(std::stringstream & ss, InputStream & is, u32 size)
+		{
+			ss << "[ ";
+			while(size--) {
+				T value;
+				is >> value;
+				ss << value;
+				if (size)
+					ss << " ";
+			}
+			ss << "]";
+		}
+
 		void ToString(std::stringstream & ss, InputStream & is, DataTypeCode type)
 		{
 			if (IsArray(type))
 			{
-				ss << "[";
 				u32 size = is.Read32();
 
-				while(size--)
+				switch(type)
 				{
-					switch(type)
-					{
-#define CASE(BITS) \
-					case DataTypeCode::ArrayUint##BITS: \
-					case DataTypeCode::ArrayInt##BITS: \
-						ss << is.Read##BITS (); if (size) ss << ", "; break;
-					CASE(8); CASE(16); CASE(32); CASE(64); CASE(128);
+#define CASE(CODE, TYPE) case CODE : ArrayToString<TYPE>(ss, is, size); break
+				CASE(DataTypeCode::ArrayInt8, s8);
+				CASE(DataTypeCode::ArrayInt16, s16);
+				CASE(DataTypeCode::ArrayInt32, s32);
+				CASE(DataTypeCode::ArrayInt64, s64);
+				CASE(DataTypeCode::ArrayUint16, u16);
+				CASE(DataTypeCode::ArrayUint32, u32);
+				CASE(DataTypeCode::ArrayUint64, u64);
+				case DataTypeCode::ArrayUint8:
+					HexDump(ss, "value", size, is);
+					break;
 #undef CASE
-					default:
-						ss << "(value of unknown type " << ToString(type) << ")";
-					}
+
+				default:
+					ss << "(value of unknown type " << ToString(type) << ")";
 				}
-				ss << "]";
 			}
 			else
 			{
@@ -55,13 +71,23 @@ namespace mtp
 				}
 			}
 		}
+
+		bool IsString(const ByteArray & value)
+		{
+			return true;
+		}
 	}
 
 	std::string ToString(DataTypeCode type, const ByteArray & value)
 	{
 		std::stringstream ss;
 		InputStream is(value);
-		ToString(ss, is, type);
+		if (type == DataTypeCode::ArrayUint16 && IsString(value))
+		{
+			u32 size = is.Read32();
+			ss << "[ " << is.ReadString(size) << " ]";
+		} else
+			ToString(ss, is, type);
 		return ss.str();
 	}
 

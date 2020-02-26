@@ -28,9 +28,6 @@ namespace mtp
 {
 	using ByteArray = std::vector<u8>; //! \typedef ByteArray : vector of bytes
 	DECLARE_PTR(ByteArray);
-
-	//! output hex dump to debug channel
-	void HexDump(const std::string &prefix, const ByteArray &data, bool force = false);
 }
 
 #endif	/* BYTEARRAY_H */

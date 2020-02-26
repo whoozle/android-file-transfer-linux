@@ -134,6 +134,18 @@ namespace mtp
 	inline InputStream & operator >> (InputStream &stream, u64 &value)
 	{ value = stream.Read64(); return stream; }
 
+	inline InputStream & operator >> (InputStream &stream, s8 &value)
+	{ value = stream.Read8(); return stream; }
+
+	inline InputStream & operator >> (InputStream &stream, s16 &value)
+	{ value = stream.Read16(); return stream; }
+
+	inline InputStream & operator >> (InputStream &stream, s32 &value)
+	{ value = stream.Read32(); return stream; }
+
+	inline InputStream & operator >> (InputStream &stream, s64 &value)
+	{ value = stream.Read64(); return stream; }
+
 	inline InputStream & operator >> (InputStream &stream, std::string &value)
 	{ value = stream.ReadString(); return stream; }
 

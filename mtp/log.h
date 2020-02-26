@@ -20,8 +20,9 @@
 #ifndef AFT_LOG_H
 #define AFT_LOG_H
 
+#include <mtp/ByteArray.h>
 #include <mtp/types.h>
-
+#include <string>
 #include <iostream>
 #include <iomanip>
 #include <sstream>
@@ -35,6 +36,7 @@ inline std::ostream & operator << (std::ostream & stream, unsigned char v)
 
 namespace mtp
 {
+	class InputStream;
 
 	inline std::ostream & operator << (std::ostream & stream, unsigned char v)
 	{
@@ -117,6 +119,10 @@ namespace mtp
 		if (g_debug)
 			error(value, args...);
 	}
+
+	//! output hex dump to debug channel
+	void HexDump(const std::string &prefix, const ByteArray &data, bool force = false);
+	void HexDump(std::stringstream & ss, const std::string &prefix, size_t size, InputStream & is);
 }
 
 #endif
