@@ -31,6 +31,7 @@ namespace mtp
 		DECLARE_PTR(Album);
 
 	private:
+		ObjectId _artistsFolder;
 		using ArtistMap = std::unordered_map<std::string, ArtistPtr>;
 		ArtistMap _artists;
 
@@ -40,6 +41,7 @@ namespace mtp
 			return std::hash<ArtistPtr>()(key.first) + std::hash<std::string>()(key.second);
 		}};
 
+		ObjectId _albumsFolder;
 		using AlbumMap = std::unordered_map<AlbumKey, AlbumPtr, AlbumKeyHash>;
 		AlbumMap _albums;
 

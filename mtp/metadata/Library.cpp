@@ -6,6 +6,21 @@ namespace mtp
 
 	Library::Library(const mtp::SessionPtr & session): _session(session)
 	{
+		msg::ObjectHandles rootFolders = _session->GetObjectHandles(Session::AllStorages, mtp::ObjectFormat::Association, Session::Root);
+		for (auto id : rootFolders.ObjectHandles) {
+			auto name = _session->GetObjectStringProperty(id, ObjectProperty::ObjectFilename);
+			if (name == "Artists")
+				_artistsFolder = id;
+			else if (name == "Albums")
+				_albumsFolder = id;
+		}
+
+		if (_artistsFolder == ObjectId() || _albumsFolder == ObjectId())
+			throw std::runtime_error("fixme: restore standard folder structure");
+
+		debug("artists folder: ", _artistsFolder.Id);
+		debug("albums folder: ", _albumsFolder.Id);
+
 		using namespace mtp;
 		{
 			auto artists = _session->GetObjectHandles(Session::AllStorages, ObjectFormat::Artist, Session::Device);
@@ -87,7 +102,7 @@ namespace mtp
 		os.WriteString(artist->Name);
 
 
-		auto response = _session->SendObjectPropList(Session::AnyStorage, Session::Root, ObjectFormat::AudioAlbum, 0, propList);
+		auto response = _session->SendObjectPropList(Session::AnyStorage, Session::Device, ObjectFormat::AudioAlbum, 0, propList);
 
 		auto album = std::make_shared<Album>();
 		album->Id = response.ObjectId;
