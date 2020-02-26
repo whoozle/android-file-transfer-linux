@@ -62,8 +62,12 @@ namespace mtp
 					case DataTypeCode::Uint##BITS: \
 					case DataTypeCode::Int##BITS: \
 						ss << is.Read##BITS (); break;
-					CASE(8); CASE(16); CASE(32); CASE(64); CASE(128);
+					CASE(8); CASE(16); CASE(32); CASE(64);
 #undef CASE
+					case mtp::DataTypeCode::Uint128:
+					case mtp::DataTypeCode::Int128:
+						HexDump(ss, "value", 16, is);
+						break;
 					case mtp::DataTypeCode::String:
 						ss << is.ReadString(); break;
 					default:
