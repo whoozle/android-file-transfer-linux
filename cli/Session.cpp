@@ -174,7 +174,9 @@ namespace cli
 		AddCommand("storage-info", "<storage-id> displays storage information",
 			make_function([this](const StoragePath &path) -> void { DisplayStorageInfo(path); }));
 
-		AddCommand("zune-import", "file",
+		AddCommand("zune-init", "load media library",
+			make_function([this]() -> void { ZuneInit(); }));
+		AddCommand("zune-import", "<file> import file using metadata",
 			make_function([this](const LocalPath &path) -> void { ZuneImport(path); }));
 
 		AddCommand("test-property-list", "test GetObjectPropList on given object",
@@ -1049,8 +1051,18 @@ namespace cli
 		}
 	}
 
+	void Session::ZuneInit()
+	{
+		if (!_library)
+			_library = std::make_shared<mtp::Library>(_session);
+	}
+
 	void Session::ZuneImport(const LocalPath & path)
 	{
+		ZuneInit();
+		if (!_library)
+			throw std::runtime_error("library failed to initialise");
+
 		using namespace mtp;
 		auto stream = std::make_shared<ObjectInputStream>(path);
 		stream->SetTotal(stream->GetSize());
@@ -1062,25 +1074,24 @@ namespace cli
 
 		print("metadata: ", meta->Artist, " / ", meta->Album, " (", meta->Year, ") / ", meta->Title);
 
-		Library library(_session);
-		auto artist = library.GetArtist(meta->Artist);
+		auto artist = _library->GetArtist(meta->Artist);
 		if (!artist)
-			artist = library.CreateArtist(meta->Artist);
+			artist = _library->CreateArtist(meta->Artist);
 		if (!artist)
 			throw std::runtime_error("can't create artist with name " + meta->Artist);
 		debug("got artist record");
 
-		auto album = library.GetAlbum(artist, meta->Album);
+		auto album = _library->GetAlbum(artist, meta->Album);
 		if (!album)
-			album = library.CreateAlbum(artist, meta->Album);
-		if (!artist)
+			album = _library->CreateAlbum(artist, meta->Album);
+		if (!album)
 			throw std::runtime_error("can't create album with name " + meta->Album);
 
 		debug("got album record");
 
 		ObjectFormat format = ObjectFormatFromFilename(path);
 		debug("track format: " + ToString(format));
-		library.CreateTrack(artist, album, format, meta->Title, path, stream->GetSize());
+		_library->CreateTrack(artist, album, format, meta->Title, path, stream->GetSize());
 		_session->SendObject(stream);
 	}
 

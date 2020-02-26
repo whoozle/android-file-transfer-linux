@@ -35,6 +35,8 @@ namespace mtp
 {
 	class TrustedApp;
 	DECLARE_PTR(TrustedApp);
+	class Library;
+	DECLARE_PTR(Library);
 }
 
 namespace cli
@@ -44,6 +46,7 @@ namespace cli
 		mtp::DevicePtr				_device;
 		mtp::SessionPtr				_session;
 		mtp::TrustedAppPtr			_trustedApp;
+		mtp::LibraryPtr				_library;
 		mtp::msg::DeviceInfo		_gdi;
 		mtp::StorageId				_cs; //current storage
 		std::string					_csName; //current storage name
@@ -167,6 +170,8 @@ namespace cli
 		{ ListProperties(Resolve(path)); }
 
 		static void ShowType(const LocalPath &src);
+
+		void ZuneInit();
 		void ZuneImport(const LocalPath & path);
 
 		template <typename ...Args>
