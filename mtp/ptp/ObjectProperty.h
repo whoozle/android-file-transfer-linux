@@ -78,9 +78,13 @@ namespace mtp
 		DateAuthored				= 0xdc47,
 		DateAdded					= 0xdc4e,
 		NonConsumable				= 0xdc4f,
+		AlbumName					= 0xdc9a,
 
 		RepresentativeSampleFormat	= 0xdc81,
 		RepresentativeSampleData	= 0xdc86,
+
+		Track 						= 0xdc8b,
+		Genre 						= 0xdc8c,
 
 		DisplayName					= 0xdce0,
 		BodyText					= 0xdce1,
