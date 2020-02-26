@@ -162,6 +162,15 @@ namespace mtp
 		s >> value;
 		return value;
 	}
+
+	template<typename ResponseType>
+	ResponseType ParseResponse(const ByteArray & data)
+	{
+		ResponseType response;
+		InputStream is(data);
+		response.Read(is);
+		return response;
+	}
 }
 
 

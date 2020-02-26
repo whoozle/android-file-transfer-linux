@@ -167,10 +167,10 @@ PYBIND11_MODULE(aftl, m) {
 		def("__repr__",
 			[](const ObjectId &id) { return "ObjectId(" + std::to_string(id.Id) + ")"; });
 
-	py::class_<Session::NewObjectInfo>(m, "NewObjectInfo", "information about newly created object").
-		def_readonly("storage_id", &Session::NewObjectInfo::StorageId).
-		def_readonly("parent_object_id", &Session::NewObjectInfo::ParentObjectId).
-		def_readonly("object_id", &Session::NewObjectInfo::ObjectId)
+	py::class_<msg::NewObjectInfo>(m, "NewObjectInfo", "information about newly created object").
+		def_readonly("storage_id", &msg::NewObjectInfo::StorageId).
+		def_readonly("parent_object_id", &msg::NewObjectInfo::ParentObjectId).
+		def_readonly("object_id", &msg::NewObjectInfo::ObjectId)
 	;
 
 	py::class_<msg::ObjectInfo>(m, "ObjectInfo").

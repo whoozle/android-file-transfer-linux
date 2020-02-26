@@ -133,59 +133,27 @@ namespace mtp
 	}
 
 	msg::DeviceInfo Session::GetDeviceInfoImpl()
-	{
-		auto data = RunTransaction(_defaultTimeout, OperationCode::GetDeviceInfo);
-		InputStream stream(data); //operation code + session id
-		msg::DeviceInfo gdi;
-		gdi.Read(stream);
-		return gdi;
-	}
+	{ return ParseResponse<msg::DeviceInfo>(RunTransaction(_defaultTimeout, OperationCode::GetDeviceInfo)); }
 
 
 	msg::ObjectHandles Session::GetObjectHandles(StorageId storageId, ObjectFormat objectFormat, ObjectId parent, int timeout)
-	{
-		auto data = RunTransaction(timeout, OperationCode::GetObjectHandles, storageId.Id, static_cast<u32>(objectFormat), parent.Id);
-		InputStream stream(data);
-
-		msg::ObjectHandles goh;
-		goh.Read(stream);
-		return goh;
-	}
+	{ return ParseResponse<msg::ObjectHandles>(RunTransaction(timeout, OperationCode::GetObjectHandles, storageId.Id, static_cast<u32>(objectFormat), parent.Id)); }
 
 	msg::StorageIDs Session::GetStorageIDs()
-	{
-		auto data = RunTransaction(_defaultTimeout, OperationCode::GetStorageIDs);
-		InputStream stream(data);
-
-		msg::StorageIDs gsi;
-		gsi.Read(stream);
-		return gsi;
-	}
+	{ return ParseResponse<msg::StorageIDs>(RunTransaction(_defaultTimeout, OperationCode::GetStorageIDs)); }
 
 	msg::StorageInfo Session::GetStorageInfo(StorageId storageId)
-	{
-		auto data = RunTransaction(_defaultTimeout, OperationCode::GetStorageInfo, storageId.Id);
-		InputStream stream(data);
-		msg::StorageInfo gsi;
-		gsi.Read(stream);
-		return gsi;
-	}
+	{ return ParseResponse<msg::StorageInfo>(RunTransaction(_defaultTimeout, OperationCode::GetStorageInfo, storageId.Id)); }
 
 	msg::SendObjectPropListResponse Session::SendObjectPropList(StorageId storageId, ObjectId parentId, ObjectFormat format, u64 objectSize, const ByteArray & propList)
 	{
 		ByteArray responseData;
 		IObjectInputStreamPtr inputStream = std::make_shared<ByteArrayObjectInputStream>(propList);
 		RunTransactionWithDataRequest(_defaultTimeout, OperationCode::SendObjectPropList, responseData, inputStream, storageId.Id, parentId.Id, static_cast<u32>(format), static_cast<u32>(objectSize >> 32), static_cast<u32>(objectSize));
-
-		msg::SendObjectPropListResponse response;
-		{
-			InputStream is(responseData);
-			response.Read(is);
-		}
-		return response;
+		return ParseResponse<msg::SendObjectPropListResponse>(responseData);
 	}
 
-	Session::NewObjectInfo Session::CreateDirectory(const std::string &name, ObjectId parentId, StorageId storageId, AssociationType type)
+	msg::NewObjectInfo Session::CreateDirectory(const std::string &name, ObjectId parentId, StorageId storageId, AssociationType type)
 	{
 		if (_deviceInfo.Supports(OperationCode::SendObjectPropList))
 		{
@@ -201,7 +169,7 @@ namespace mtp
 			}
 			auto response = SendObjectPropList(storageId, parentId, ObjectFormat::Association, 0, propList);
 
-			NewObjectInfo noi;
+			msg::NewObjectInfo noi;
 			noi.StorageId = response.StorageId;
 			noi.ParentObjectId = response.ParentObjectId;
 			noi.ObjectId = response.ObjectId;
@@ -220,22 +188,10 @@ namespace mtp
 	}
 
 	msg::ObjectInfo Session::GetObjectInfo(ObjectId objectId)
-	{
-		auto data = RunTransaction(_defaultTimeout, OperationCode::GetObjectInfo, objectId.Id);
-		InputStream stream(data);
-		msg::ObjectInfo goi;
-		goi.Read(stream);
-		return goi;
-	}
+	{ return ParseResponse<msg::ObjectInfo>(RunTransaction(_defaultTimeout, OperationCode::GetObjectInfo, objectId.Id)); }
 
 	msg::ObjectPropertiesSupported Session::GetObjectPropertiesSupported(ObjectFormat format)
-	{
-		auto data = RunTransaction(_defaultTimeout, OperationCode::GetObjectPropsSupported, static_cast<u32>(format));
-		InputStream stream(data);
-		msg::ObjectPropertiesSupported ops;
-		ops.Read(stream);
-		return ops;
-	}
+	{ return ParseResponse<msg::ObjectPropertiesSupported>(RunTransaction(_defaultTimeout, OperationCode::GetObjectPropsSupported, static_cast<u32>(format))); }
 
 	ByteArray Session::GetObjectPropertyDesc(ObjectProperty code)
 	{ return RunTransaction(_defaultTimeout, OperationCode::GetObjectPropDesc, static_cast<u32>(code)); }
@@ -275,7 +231,7 @@ namespace mtp
 	}
 
 
-	Session::NewObjectInfo Session::SendObjectInfo(const msg::ObjectInfo &objectInfo, StorageId storageId, ObjectId parentObject)
+	msg::NewObjectInfo Session::SendObjectInfo(const msg::ObjectInfo &objectInfo, StorageId storageId, ObjectId parentObject)
 	{
 		if (objectInfo.Filename.empty())
 			throw std::runtime_error("object filename must not be empty");
@@ -295,7 +251,7 @@ namespace mtp
 
 			auto response = SendObjectPropList(storageId, parentObject, objectInfo.ObjectFormat, objectInfo.ObjectCompressedSize, propList);
 
-			NewObjectInfo noi;
+			msg::NewObjectInfo noi;
 			noi.StorageId = response.StorageId;
 			noi.ParentObjectId = response.ParentObjectId;
 			noi.ObjectId = response.ObjectId;
@@ -317,12 +273,7 @@ namespace mtp
 		_packeter.Read(transaction.Id, data, responseCode, response, _defaultTimeout);
 		//HexDump("response", response);
 		CHECK_RESPONSE(responseCode);
-		InputStream stream(response);
-		NewObjectInfo noi;
-		stream >> noi.StorageId;
-		stream >> noi.ParentObjectId;
-		stream >> noi.ObjectId;
-		return noi;
+		return ParseResponse<msg::NewObjectInfo>(response);
 	}
 
 	void Session::SendObject(const IObjectInputStreamPtr &inputStream, int timeout)
@@ -465,8 +416,11 @@ namespace mtp
 	void Session::DeleteObject(ObjectId objectId, int timeout)
 	{ RunTransaction(timeout, OperationCode::DeleteObject, objectId.Id, 0); }
 
+	msg::DevicePropertyDesc Session::GetDevicePropertyDesc(DeviceProperty property)
+	{ return ParseResponse<msg::DevicePropertyDesc>(RunTransaction(_defaultTimeout, OperationCode::GetDevicePropDesc, static_cast<u32>(property))); }
+
 	ByteArray Session::GetDeviceProperty(DeviceProperty property)
-	{ return RunTransaction(_defaultTimeout, OperationCode::GetDevicePropValue, (u16)property); }
+	{ return RunTransaction(_defaultTimeout, OperationCode::GetDevicePropValue, static_cast<u32>(property)); }
 
 	ByteArray Session::GenericOperation(OperationCode code)
 	{ return RunTransaction(_defaultTimeout, code); }

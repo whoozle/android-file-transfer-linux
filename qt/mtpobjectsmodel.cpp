@@ -242,7 +242,7 @@ mtp::ObjectId MtpObjectsModel::createDirectory(mtp::ObjectId parentObjectId, con
 		return _rows.at(existingDir.row()).ObjectId;
 
 	mtp::StorageId storageId = _storageId != mtp::Session::AllStorages? _storageId: mtp::Session::AnyStorage;
-	mtp::Session::NewObjectInfo noi = _session->CreateDirectory(toUtf8(name), parentObjectId, storageId, type);
+	auto noi = _session->CreateDirectory(toUtf8(name), parentObjectId, storageId, type);
 	if (parentObjectId == _parentObjectId)
 	{
 		beginInsertRows(QModelIndex(), _rows.size(), _rows.size());
@@ -294,7 +294,7 @@ bool MtpObjectsModel::uploadFile(mtp::ObjectId parentObjectId, const QString &fi
 	oi.Filename = toUtf8(filename);
 	oi.ObjectFormat = objectFormat;
 	oi.ObjectCompressedSize = fileInfo.size();
-	mtp::Session::NewObjectInfo noi;
+	mtp::msg::NewObjectInfo noi;
 	try
 	{
 		noi = _session->SendObjectInfo(oi, _storageId != mtp::Session::AllStorages? _storageId: mtp::Session::AnyStorage, parentObjectId);

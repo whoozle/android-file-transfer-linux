@@ -62,13 +62,6 @@ namespace mtp
 		static const ObjectId Device;
 		static const ObjectId Root;
 
-		struct NewObjectInfo
-		{
-			mtp::StorageId		StorageId;
-			mtp::ObjectId		ParentObjectId;
-			mtp::ObjectId		ObjectId;
-		};
-
 		///sub-session object which handles partial writes and truncation
 		class ObjectEditSession : Noncopyable
 		{
@@ -94,12 +87,12 @@ namespace mtp
 		msg::StorageIDs GetStorageIDs();
 		msg::StorageInfo GetStorageInfo(StorageId storageId);
 
-		NewObjectInfo CreateDirectory(const std::string &name, ObjectId parentId, StorageId storageId = AnyStorage, AssociationType type = AssociationType::GenericFolder);
+		msg::NewObjectInfo CreateDirectory(const std::string &name, ObjectId parentId, StorageId storageId = AnyStorage, AssociationType type = AssociationType::GenericFolder);
 		msg::ObjectInfo GetObjectInfo(ObjectId objectId);
 		void GetObject(ObjectId objectId, const IObjectOutputStreamPtr &outputStream);
 		void GetThumb(ObjectId objectId, const IObjectOutputStreamPtr &outputStream);
 		ByteArray GetPartialObject(ObjectId objectId, u64 offset, u32 size);
-		NewObjectInfo SendObjectInfo(const msg::ObjectInfo &objectInfo, StorageId storageId = AnyStorage, ObjectId parentObject = Device);
+		msg::NewObjectInfo SendObjectInfo(const msg::ObjectInfo &objectInfo, StorageId storageId = AnyStorage, ObjectId parentObject = Device);
 		void SendObject(const IObjectInputStreamPtr &inputStream, int timeout = LongTimeout);
 		void DeleteObject(ObjectId objectId, int timeout = LongTimeout);
 
@@ -130,6 +123,7 @@ namespace mtp
 		ByteArray GetObjectPropertyList(ObjectId objectId, ObjectFormat format, ObjectProperty property, u32 groupCode, u32 depth, int timeout = LongTimeout);
 		msg::SendObjectPropListResponse SendObjectPropList(StorageId storageId, ObjectId parentId, ObjectFormat format, u64 objectSize, const ByteArray & propList);
 
+		msg::DevicePropertyDesc GetDevicePropertyDesc(DeviceProperty property);
 		ByteArray GetDeviceProperty(DeviceProperty property);
 		u64 GetDeviceIntegerProperty(DeviceProperty property);
 		std::string GetDeviceStringProperty(DeviceProperty property);

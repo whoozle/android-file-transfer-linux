@@ -245,6 +245,39 @@ namespace mtp { namespace msg
 
 	};
 
+	struct DevicePropertyDesc
+	{
+		DeviceProperty 	Property;
+		DataTypeCode	Type;
+		bool			Writeable;
+
+		DevicePropertyDesc(): Property(), Type(DataTypeCode::Undefined), Writeable()
+		{ }
+
+		void Read(InputStream &stream)
+		{
+			stream >> Property;
+			stream >> Type;
+			u8 writeable;
+			stream >> writeable;
+			Writeable = writeable;
+		}
+	};
+
+	struct NewObjectInfo
+	{
+		mtp::StorageId		StorageId;
+		mtp::ObjectId		ParentObjectId;
+		mtp::ObjectId		ObjectId;
+
+		void Read(InputStream & is)
+		{
+			is >> StorageId;
+			is >> ParentObjectId;
+			is >> ObjectId;
+		}
+	};
+
 }}
 
 
