@@ -15,13 +15,11 @@ namespace mtp
 	}
 	namespace
 	{
-		void ToString(std::stringstream & ss, DataTypeCode type, const ByteArray & value)
+		void ToString(std::stringstream & ss, InputStream & is, DataTypeCode type)
 		{
-			InputStream is(value);
 			if (IsArray(type))
 			{
 				ss << "[";
-				InputStream is(value);
 				u32 size = is.Read32();
 
 				while(size--)
@@ -62,7 +60,8 @@ namespace mtp
 	std::string ToString(DataTypeCode type, const ByteArray & value)
 	{
 		std::stringstream ss;
-		ToString(ss, type, value);
+		InputStream is(value);
+		ToString(ss, is, type);
 		return ss.str();
 	}
 
