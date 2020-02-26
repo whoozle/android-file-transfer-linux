@@ -1,4 +1,5 @@
 #include <mtp/metadata/Library.h>
+#include <mtp/ptp/Session.h>
 #include <mtp/log.h>
 
 namespace mtp
@@ -53,6 +54,9 @@ namespace mtp
 			}
 		}
 	}
+
+	Library::~Library()
+	{ }
 
 	Library::ArtistPtr Library::CreateArtist(const std::string & name)
 	{

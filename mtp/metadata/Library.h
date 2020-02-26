@@ -1,14 +1,18 @@
 #ifndef AFTL_MTP_METADATA_LIBRARY_H
 #define AFTL_MTP_METADATA_LIBRARY_H
 
+#include <mtp/ptp/ObjectId.h>
+#include <mtp/ptp/ObjectFormat.h>
 #include <mtp/types.h>
-#include <mtp/ptp/Session.h>
 #include <memory>
 #include <string>
 #include <unordered_map>
 
 namespace mtp
 {
+	class Session;
+	DECLARE_PTR(Session);
+
 	class Library
 	{
 		SessionPtr		_session;
@@ -48,6 +52,7 @@ namespace mtp
 	public:
 
 		Library(const mtp::SessionPtr & session);
+		~Library();
 
 		//search by Metadata?
 		ArtistPtr GetArtist(const std::string & name)
