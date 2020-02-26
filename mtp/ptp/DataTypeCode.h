@@ -13,7 +13,9 @@ namespace mtp
 #undef ENUM_VALUE
 	};
 	DECLARE_ENUM(DataTypeCode, u16);
-	std::string ToString(DataTypeCode property);
+
+	bool IsArray(DataTypeCode type);
+	std::string ToString(DataTypeCode type);
 
 }
 
