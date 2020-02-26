@@ -916,9 +916,9 @@ namespace cli
 		using namespace mtp;
 		for(DeviceProperty code : _gdi.DevicePropertiesSupported)
 		{
-			print("property: ", ToString(code));
-			ByteArray data = _session->GetDeviceProperty(code);
-			HexDump("value", data, true);
+			auto desc = _session->GetDevicePropertyDesc(code);
+			ByteArray value = _session->GetDeviceProperty(code);
+			print("property: ", ToString(code), " ", ToString(desc.Type), " ", ToString(desc.Type, value));
 		}
 	}
 
