@@ -862,7 +862,7 @@ namespace cli
 		mtp::print("mtp object format = ", ToString(format));
 	}
 
-	static void PrintFormat(mtp::ByteArray format)
+	static void PrintFormat(const mtp::ByteArray & format, const mtp::ByteArray & value)
 	{
 		using namespace mtp;
 		InputStream is(format);
@@ -894,7 +894,7 @@ namespace cli
 		catch(const std::exception & ex)
 		{ defValue = "<unknown type>"; }
 
-		debug("property ", mtp::ToString(ObjectProperty(prop)), ", type: ", ToString(type), ", rw: ", rw, ", default: ", defValue, ", groupCode: ", groupCode, ", form flag: ", formFlag);
+		debug("property ", mtp::ToString(ObjectProperty(prop)), ", type: ", ToString(type), ", rw: ", rw, ", default: ", defValue, ", groupCode: ", groupCode, ", form flag: ", formFlag, ", value: ", ToString(type, value));
 		//HexDump("raw", format, true);
 	}
 
@@ -907,8 +907,7 @@ namespace cli
 		mtp::debug("properties supported: ");
 		for(mtp::ObjectProperty prop: ops.ObjectPropertyCodes)
 		{
-			PrintFormat(_session->GetObjectPropertyDesc(prop));
-			mtp::HexDump("value", _session->GetObjectProperty(id, prop), true);
+			PrintFormat(_session->GetObjectPropertyDesc(prop), _session->GetObjectProperty(id, prop));
 		}
 	}
 

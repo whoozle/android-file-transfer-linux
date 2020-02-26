@@ -21,6 +21,7 @@
 #define	OBJECTPROPERTY_H
 
 #include <mtp/ptp/DataTypeCode.h>
+#include <mtp/ByteArray.h>
 #include <mtp/types.h>
 #include <string>
 
@@ -36,6 +37,7 @@ namespace mtp
 	DECLARE_ENUM(ObjectProperty, u16);
 
 	std::string ToString(ObjectProperty property);
+	std::string ToString(DataTypeCode type, const ByteArray & value);
 
 }
 
