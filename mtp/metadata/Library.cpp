@@ -4,6 +4,12 @@
 
 namespace mtp
 {
+	namespace
+	{
+		ByteArray ArtistUUID 	= { 0x00, 0x08, 0x8f, 0xa7, 0x00, 0x06, 0xdb, 0x11, 0x89, 0xca, 0x00, 0x19, 0xb9, 0x2a, 0x39, 0x33 };
+		//ByteArray AlbumUUID 	= { 0x00, 0xb6, 0xe8, 0x33, 0x00, 0x01, 0xdb, 0x11, 0x89, 0xca, 0x00, 0x19, 0xb9, 0x2a, 0x39, 0x33 };
+		ByteArray AlbumUUID 	= { 0x06, 0x27, 0x6d, 0x0d, 0x00, 0x01, 0xdb, 0x11, 0x89, 0xca, 0x00, 0x19, 0xb9, 0x2a, 0x39, 0x33 };
+	}
 
 	Library::Library(const mtp::SessionPtr & session): _session(session)
 	{
@@ -66,11 +72,22 @@ namespace mtp
 		ByteArray propList;
 		OutputStream os(propList);
 
-		os.Write32(1); //number of props
+		os.Write32(3); //number of props
+
 		os.Write32(0); //object handle
 		os.Write16(static_cast<u16>(ObjectProperty::Name));
 		os.Write16(static_cast<u16>(DataTypeCode::String));
 		os.WriteString(name);
+
+		os.Write32(0); //object handle
+		os.Write16(static_cast<u16>(ObjectProperty::ContentTypeUUID));
+		os.Write16(static_cast<u16>(DataTypeCode::Uint128));
+		os.WriteData(ArtistUUID);
+
+		os.Write32(0); //object handle
+		os.Write16(static_cast<u16>(ObjectProperty::ObjectFilename));
+		os.Write16(static_cast<u16>(DataTypeCode::String));
+		os.WriteString(name + ".art");
 
 		auto response = _session->SendObjectPropList(Session::AnyStorage, Session::Device, ObjectFormat::Artist, 0, propList);
 		auto artist = std::make_shared<Artist>();
@@ -88,7 +105,12 @@ namespace mtp
 		ByteArray propList;
 		OutputStream os(propList);
 
-		os.Write32(3); //number of props
+		os.Write32(5); //number of props
+
+		os.Write32(0); //object handle
+		os.Write16(static_cast<u16>(ObjectProperty::ParentObject));
+		os.Write16(static_cast<u16>(DataTypeCode::Uint32));
+		os.Write32(_artistsFolder.Id);
 
 		os.Write32(0); //object handle
 		os.Write16(static_cast<u16>(ObjectProperty::ArtistId));
@@ -101,10 +123,14 @@ namespace mtp
 		os.WriteString(name);
 
 		os.Write32(0); //object handle
-		os.Write16(static_cast<u16>(ObjectProperty::Artist));
-		os.Write16(static_cast<u16>(DataTypeCode::String));
-		os.WriteString(artist->Name);
+		os.Write16(static_cast<u16>(ObjectProperty::ContentTypeUUID));
+		os.Write16(static_cast<u16>(DataTypeCode::Uint128));
+		os.WriteData(AlbumUUID);
 
+		os.Write32(0); //object handle
+		os.Write16(static_cast<u16>(ObjectProperty::ObjectFilename));
+		os.Write16(static_cast<u16>(DataTypeCode::String));
+		os.WriteString(artist->Name + "--" + name + ".alb");
 
 		auto response = _session->SendObjectPropList(Session::AnyStorage, Session::Device, ObjectFormat::AudioAlbum, 0, propList);
 
