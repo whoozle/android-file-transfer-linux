@@ -1,7 +1,9 @@
 #include <mtp/metadata/Metadata.h>
 
-#include <fileref.h>
-#include <tag.h>
+#ifdef HAVE_TAGLIB
+#	include <fileref.h>
+#	include <tag.h>
+#endif
 
 namespace mtp
 {
