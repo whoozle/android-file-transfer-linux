@@ -111,8 +111,9 @@ PYBIND11_MODULE(aftl, m) {
 #define DEF_READONLY(TYPE, NAME) .def_readonly(#NAME, & TYPE :: NAME )
 
 	py::enum_<ObjectFormat>(m, "ObjectFormat", "MTP Object format for querying specific types of media, or Any")
-		VALUE(ObjectFormat, Any)
-		VALUE(ObjectFormat, Association)
+#define ENUM_VALUE(NAME, _) VALUE(ObjectFormat, NAME)
+#		include <mtp/ptp/ObjectFormat.values.h>
+#undef ENUM_VALUE
 	;
 	py::enum_<ObjectProperty>(m, "ObjectProperty", "MTP object property")
 #define ENUM_VALUE(NAME, _) VALUE(ObjectProperty, NAME)

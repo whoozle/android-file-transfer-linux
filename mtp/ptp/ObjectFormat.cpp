@@ -18,6 +18,7 @@
 */
 
 #include <mtp/ptp/ObjectFormat.h>
+#include <mtp/log.h>
 #include <algorithm>
 #include <ctype.h>
 #include <map>
@@ -161,4 +162,15 @@ namespace mtp
 		size_t r = strftime(buf, sizeof(buf), "%Y%m%dT%H%M%SZ", &bdt);
 		return std::string(buf, r);
 	}
+
+	std::string ToString(ObjectFormat property)
+	{
+		switch(property)
+		{
+#			define ENUM_VALUE(NAME, VALUE) ENUM_VALUE_TO_STRING(ObjectFormat, NAME, VALUE)
+#			include <mtp/ptp/ObjectFormat.values.h>
+			ENUM_VALUE_TO_STRING_DEFAULT(ObjectFormat, property, 4);
+		}
+	}
+
 }
