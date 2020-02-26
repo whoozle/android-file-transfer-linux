@@ -167,6 +167,7 @@ namespace cli
 		{ ListProperties(Resolve(path)); }
 
 		static void ShowType(const LocalPath &src);
+		void ZuneImport(const LocalPath & path);
 
 		template <typename ...Args>
 		void AddCommand(const std::string &name, const std::string &help, std::function<void(Args...)> && callback)

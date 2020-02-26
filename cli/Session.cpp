@@ -30,6 +30,8 @@
 #include <mtp/version.h>
 #include <mtp/mtpz/TrustedApp.h>
 
+#include <mtp/metadata/Metadata.h>
+
 #include <sstream>
 #include <set>
 
@@ -172,6 +174,9 @@ namespace cli
 			make_function([this]() -> void { DisplayDeviceInfo(); }));
 		AddCommand("storage-info", "<storage-id> displays storage information",
 			make_function([this](const StoragePath &path) -> void { DisplayStorageInfo(path); }));
+
+		AddCommand("zune-import", "file",
+			make_function([this](const LocalPath &path) -> void { ZuneImport(path); }));
 
 		AddCommand("test-property-list", "test GetObjectPropList on given object",
 			make_function([this](const Path &path) -> void { TestObjectPropertyList(path); }));
@@ -1057,6 +1062,15 @@ namespace cli
 		}
 		auto response = _session->SendObjectPropList(GetUploadStorageId(), _cd, mtp::ObjectFormat::Artist, 0, propList);
 		mtp::debug("new artist: ", mtp::hex(response.ObjectId.Id));
+	}
+
+	void Session::ZuneImport(const LocalPath & path)
+	{
+		auto meta = mtp::Metadata::Read(path);
+		if (!meta)
+			throw std::runtime_error("no metadata");
+
+		mtp::print(meta->Artist, " / ", meta->Album, " (", meta->Year, ") / ", meta->Title);
 	}
 
 

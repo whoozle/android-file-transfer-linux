@@ -28,6 +28,7 @@ find_package (Python COMPONENTS Development QUIET)
 option(BUILD_FUSE "Build fuse mount helper" ON)
 option(BUILD_MTPZ "Build with MTPZ support" ON)
 option(BUILD_PYTHON "Build python module" ON)
+option(BUILD_TAGLIB "Build with taglib support" ON)
 
 if (BUILD_SHARED_LIB)
 	set(LIB_NAME mtp-ng)
@@ -37,6 +38,13 @@ endif()
 
 if (BUILD_FUSE)
 	pkg_check_modules ( FUSE fuse )
+endif()
+
+if (BUILD_TAGLIB)
+	pkg_check_modules (TAGLIB taglib)
+	if (TAGLIB_FOUND)
+		add_definitions(-DHAVE_TAGLIB=1)
+	endif()
 endif()
 
 if (FUSE_FOUND)
@@ -102,6 +110,8 @@ set(SOURCES
 
 	mtp/backend/posix/FileHandler.cpp
 	mtp/backend/posix/Exception.cpp
+
+	mtp/metadata/Metadata.cpp
 
 	mtp/mtpz/TrustedApp.cpp
 )
@@ -198,6 +208,11 @@ target_include_directories(${LIB_NAME} PUBLIC ${CMAKE_SOURCE_DIR} ${CMAKE_SOURCE
 
 if (_BUILD_MTPZ)
 	target_include_directories(${LIB_NAME} PRIVATE ${OPENSSL_INCLUDE_DIR})
+endif()
+
+if (TAGLIB_FOUND)
+	target_include_directories(${LIB_NAME} PRIVATE ${TAGLIB_INCLUDE_DIRS})
+	list(APPEND MTP_LIBRARIES ${TAGLIB_LINK_LIBRARIES})
 endif()
 
 if (USB_BACKEND_LIBUSB)
