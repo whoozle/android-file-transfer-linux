@@ -22,7 +22,8 @@ namespace mtp
 			{
 				ss << "[";
 				InputStream is(value);
-				u32 size;
+				u32 size = is.Read32();
+
 				while(size--)
 				{
 					switch(type)

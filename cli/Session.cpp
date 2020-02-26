@@ -918,7 +918,7 @@ namespace cli
 		{
 			auto desc = _session->GetDevicePropertyDesc(code);
 			ByteArray value = _session->GetDeviceProperty(code);
-			print("property: ", ToString(code), " ", ToString(desc.Type), " ", ToString(desc.Type, value));
+			print("property: ", ToString(code), " ", ToString(desc.Type), " ", desc.Writeable? "rw ": "ro ", ToString(desc.Type, value));
 		}
 	}
 
