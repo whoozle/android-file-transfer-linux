@@ -56,6 +56,8 @@ namespace mtp
 
 	enum struct ObjectProperty : u16
 	{
+		ArtistId					= 0xdab9,
+
 		StorageId					= 0xdc01,
 		ObjectFormat				= 0xdc02,
 		ProtectionStatus			= 0xdc03,
@@ -78,13 +80,16 @@ namespace mtp
 		DateAuthored				= 0xdc47,
 		DateAdded					= 0xdc4e,
 		NonConsumable				= 0xdc4f,
-		AlbumName					= 0xdc9a,
 
 		RepresentativeSampleFormat	= 0xdc81,
 		RepresentativeSampleData	= 0xdc86,
 
 		Track 						= 0xdc8b,
 		Genre 						= 0xdc8c,
+
+		UseCount					= 0xdc91,
+		SkipCount					= 0xdc92,
+		AlbumName					= 0xdc9a,
 
 		DisplayName					= 0xdce0,
 		BodyText					= 0xdce1,
