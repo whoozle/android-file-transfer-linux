@@ -158,8 +158,6 @@ namespace cli
 			make_function([this](const Path &path) -> void { MakeDirectory(path); }));
 		AddCommand("mkpath", "<path> create directory structure specified in path",
 			make_function([this](const Path &path) -> void { MakePath(path); }));
-		AddCommand("mkartist", "<name> create artist with given name",
-			make_function([this](const std::string & name) -> void { MakeArtist(name); }));
 		AddCommand("type", "<path> shows type of file (recognized by libmagic/extension)",
 			make_function([](const LocalPath &path) -> void { ShowType(path); }));
 
@@ -1049,21 +1047,6 @@ namespace cli
 			catch(const std::exception & ex) { mtp::error("error getting name: ", ex.what()); }
 			mtp::print(id.Id, "\t", filename, "\t", name);
 		}
-	}
-
-	void Session::MakeArtist(const std::string & name)
-	{
-		mtp::ByteArray propList;
-		{
-			mtp::OutputStream os(propList);
-			os.Write32(1); //number of props
-			os.Write32(0); //object handle
-			os.Write16(static_cast<mtp::u16>(mtp::ObjectProperty::Name));
-			os.Write16(static_cast<mtp::u16>(mtp::DataTypeCode::String));
-			os.WriteString(name);
-		}
-		auto response = _session->SendObjectPropList(GetUploadStorageId(), _cd, mtp::ObjectFormat::Artist, 0, propList);
-		mtp::print("new artist: ", mtp::hex(response.ObjectId.Id));
 	}
 
 	void Session::ZuneImport(const LocalPath & path)
