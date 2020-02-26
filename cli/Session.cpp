@@ -350,7 +350,7 @@ namespace cli
 			_deviceFriendlyNameSupported = _gdi.Supports(mtp::DeviceProperty::DeviceFriendlyName);
 
 			for(DeviceProperty code : _gdi.DevicePropertiesSupported)
-				ss << hex(code, 4) << " ";
+				ss << ToString(code) << " ";
 
 			ss << "\n";
 			debug(ss.str());

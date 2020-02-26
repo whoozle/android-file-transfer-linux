@@ -24,6 +24,7 @@
 
 #include <iostream>
 #include <iomanip>
+#include <sstream>
 
 //I love libstdc++!
 inline std::ostream & operator << (std::ostream & stream, unsigned char v)
@@ -62,6 +63,13 @@ namespace mtp
 				stream.flags(oldFlags);
 				stream.fill(oldFill);
 				return stream;
+			}
+
+			std::string ToString() const
+			{
+				std::stringstream ss;
+				(*this) >> ss;
+				return ss.str();
 			}
 		};
 	}

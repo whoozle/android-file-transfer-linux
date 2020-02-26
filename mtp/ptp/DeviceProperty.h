@@ -20,55 +20,21 @@
 #ifndef DEVICEPROPERTY_H
 #define	DEVICEPROPERTY_H
 
+#include <mtp/types.h>
+#include <string>
+
 namespace mtp
 {
 
+#define ENUM_VALUE(NAME, VALUE) ENUM_VALUE_DECL(NAME, VALUE)
 	enum struct DeviceProperty : u16
 	{
-		Undefined					= 0x5000,
-		BatteryLevel				= 0x5001,
-		FunctionalMode				= 0x5002,
-		ImageSize					= 0x5003,
-		CompressionSetting			= 0x5004,
-		WhiteBalance				= 0x5005,
-		RgbGain						= 0x5006,
-		FNumber						= 0x5007,
-		FocalLength					= 0x5008,
-		FocusDistance				= 0x5009,
-		FocusMode					= 0x500a,
-		ExposureMeteringMode		= 0x500b,
-		FlashMode					= 0x500c,
-		ExposureTime				= 0x500d,
-		ExposureProgramMode			= 0x500e,
-		ExposureIndex				= 0x500f,
-		ExposureBiasCompensation	= 0x5010,
-		Datetime					= 0x5011,
-		CaptureDelay				= 0x5012,
-		StillCaptureMode			= 0x5013,
-		Contrast					= 0x5014,
-		Sharpness					= 0x5015,
-		DigitalZoom					= 0x5016,
-		EffectMode					= 0x5017,
-		BurstNumber					= 0x5018,
-		BurstInterval				= 0x5019,
-		TimelapseNumber				= 0x501a,
-		TimelapseInterval			= 0x501b,
-		FocusMeteringMode			= 0x501c,
-		UploadUrl					= 0x501d,
-		Artist						= 0x501e,
-		CopyrightInfo				= 0x501f,
-		SynchronizationPartner		= 0xd401,
-		DeviceFriendlyName			= 0xd402,
-		Volume						= 0xd403,
-		SupportedFormatsOrdered		= 0xd404,
-		DeviceIcon					= 0xd405,
-		PlaybackRate				= 0xd410,
-		PlaybackObject				= 0xd411,
-		PlaybackContainerIndex		= 0xd412,
-		SessionInitiatorVersionInfo	= 0xd406,
-		PerceivedDeviceType			= 0xd407
+#		include "DeviceProperty.values.h"
 	};
+#undef ENUM_VALUE
 	DECLARE_ENUM(DeviceProperty, u16);
+
+	std::string ToString(DeviceProperty property);
 
 }
 
