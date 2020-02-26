@@ -90,6 +90,7 @@ set(SOURCES
 	mtp/ptp/Device.cpp
 	mtp/ptp/DeviceProperty.cpp
 	mtp/ptp/ObjectFormat.cpp
+	mtp/ptp/ObjectProperty.cpp
 	mtp/ptp/PipePacketer.cpp
 	mtp/ptp/Response.cpp
 	mtp/ptp/Session.cpp

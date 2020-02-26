@@ -895,7 +895,7 @@ namespace cli
 		catch(const std::exception & ex)
 		{ defValue = "<unknown type>"; }
 
-		debug("property ", hex(prop, 4), ", type: ", hex(type, 4), ", rw: ", rw, ", default: ", defValue, ", groupCode: ", groupCode, ", form flag: ", formFlag);
+		debug("property ", mtp::ToString(ObjectProperty(prop)), ", type: ", hex(type, 4), ", rw: ", rw, ", default: ", defValue, ", groupCode: ", groupCode, ", form flag: ", formFlag);
 		//HexDump("raw", format, true);
 	}
 

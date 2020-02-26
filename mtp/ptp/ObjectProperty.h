@@ -21,6 +21,7 @@
 #define	OBJECTPROPERTY_H
 
 #include <mtp/types.h>
+#include <string>
 
 namespace mtp
 {
@@ -56,53 +57,13 @@ namespace mtp
 
 	enum struct ObjectProperty : u16
 	{
-		ArtistId					= 0xdab9,
-		AlbumId						= 0xdabb,
-
-		StorageId					= 0xdc01,
-		ObjectFormat				= 0xdc02,
-		ProtectionStatus			= 0xdc03,
-		ObjectSize					= 0xdc04,
-		AssociationType				= 0xdc05,
-		AssociationDesc				= 0xdc06,
-		ObjectFilename				= 0xdc07,
-		DateCreated					= 0xdc08,
-		DateModified				= 0xdc09,
-		Keywords					= 0xdc0a,
-		ParentObject				= 0xdc0b,
-		AllowedFolderContents		= 0xdc0c,
-		Hidden						= 0xdc0d,
-		SystemObject				= 0xdc0e,
-
-		PersistentUniqueObjectId	= 0xdc41,
-		SyncId						= 0xdc42,
-		Name						= 0xdc44,
-		Artist						= 0xdc46,
-		DateAuthored				= 0xdc47,
-		DateAdded					= 0xdc4e,
-		NonConsumable				= 0xdc4f,
-
-		RepresentativeSampleFormat	= 0xdc81,
-		RepresentativeSampleData	= 0xdc86,
-		Duration 					= 0xdc89,
-
-		Track 						= 0xdc8b,
-		Genre 						= 0xdc8c,
-
-		UseCount					= 0xdc91,
-		SkipCount					= 0xdc92,
-		AlbumName					= 0xdc9a,
-
-		DisplayName					= 0xdce0,
-		BodyText					= 0xdce1,
-		Subject						= 0xdce2,
-		Priority					= 0xdce3,
-
-		TimeBookmark				= 0xdd62,
-		MediaGUID					= 0xdd72,
-		All							= 0xffff
+#define ENUM_VALUE(NAME, VALUE) ENUM_VALUE_DECL(NAME, VALUE)
+#		include "ObjectProperty.values.h"
+#undef ENUM_VALUE
 	};
 	DECLARE_ENUM(ObjectProperty, u16);
+
+	std::string ToString(ObjectProperty property);
 
 }
 

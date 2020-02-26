@@ -115,38 +115,9 @@ PYBIND11_MODULE(aftl, m) {
 		VALUE(ObjectFormat, Association)
 	;
 	py::enum_<ObjectProperty>(m, "ObjectProperty", "MTP object property")
-		VALUE(ObjectProperty, StorageId)
-		VALUE(ObjectProperty, ObjectFormat)
-		VALUE(ObjectProperty, ProtectionStatus)
-		VALUE(ObjectProperty, ObjectSize)
-		VALUE(ObjectProperty, AssociationType)
-		VALUE(ObjectProperty, AssociationDesc)
-		VALUE(ObjectProperty, ObjectFilename)
-		VALUE(ObjectProperty, DateCreated)
-		VALUE(ObjectProperty, DateModified)
-		VALUE(ObjectProperty, Keywords)
-		VALUE(ObjectProperty, ParentObject)
-		VALUE(ObjectProperty, AllowedFolderContents)
-		VALUE(ObjectProperty, Hidden)
-		VALUE(ObjectProperty, SystemObject)
-
-		VALUE(ObjectProperty, PersistentUniqueObjectId)
-		VALUE(ObjectProperty, SyncId)
-		VALUE(ObjectProperty, Name)
-		VALUE(ObjectProperty, Artist)
-		VALUE(ObjectProperty, DateAuthored)
-		VALUE(ObjectProperty, DateAdded)
-
-		VALUE(ObjectProperty, RepresentativeSampleFormat)
-		VALUE(ObjectProperty, RepresentativeSampleData)
-
-		VALUE(ObjectProperty, DisplayName)
-		VALUE(ObjectProperty, BodyText)
-		VALUE(ObjectProperty, Subject)
-		VALUE(ObjectProperty, Priority)
-
-		VALUE(ObjectProperty, MediaGUID)
-		VALUE(ObjectProperty, All)
+#define ENUM_VALUE(NAME, _) VALUE(ObjectProperty, NAME)
+#		include <mtp/ptp/ObjectProperty.values.h>
+#undef ENUM_VALUE
 	;
 	py::enum_<DeviceProperty>(m, "DeviceProperty", "MTP device property")
 #define ENUM_VALUE(NAME, _) VALUE(DeviceProperty, NAME)

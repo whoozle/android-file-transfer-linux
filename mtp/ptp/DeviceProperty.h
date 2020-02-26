@@ -26,12 +26,12 @@
 namespace mtp
 {
 
-#define ENUM_VALUE(NAME, VALUE) ENUM_VALUE_DECL(NAME, VALUE)
 	enum struct DeviceProperty : u16
 	{
+#define ENUM_VALUE(NAME, VALUE) ENUM_VALUE_DECL(NAME, VALUE)
 #		include "DeviceProperty.values.h"
-	};
 #undef ENUM_VALUE
+	};
 	DECLARE_ENUM(DeviceProperty, u16);
 
 	std::string ToString(DeviceProperty property);

@@ -84,8 +84,8 @@ namespace mtp
 	{ BASETYPE value; stream >> value; format = static_cast<TYPE>(value); return stream; }
 
 #define ENUM_VALUE_DECL(NAME, VALUE) NAME = VALUE ,
-#define ENUM_VALUE_TO_STRING(TYPE, NAME, VALUE) case TYPE :: NAME : return #TYPE "." #NAME ;
-#define ENUM_VALUE_TO_STRING_DEFAULT(TYPE, VALUE, PADDING) default: return #TYPE "." + hex(static_cast<unsigned>( VALUE ), PADDING ).ToString();
+#define ENUM_VALUE_TO_STRING(TYPE, NAME, VALUE) case TYPE :: NAME : return #NAME ;
+#define ENUM_VALUE_TO_STRING_DEFAULT(TYPE, VALUE, PADDING) default: return hex(static_cast<unsigned>( VALUE ), PADDING ).ToString();
 
 
 #endif
