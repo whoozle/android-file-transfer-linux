@@ -112,4 +112,44 @@ namespace mtp
 		return album;
 	}
 
+	void Library::CreateTrack(ArtistPtr artist, AlbumPtr album, ObjectFormat type, const std::string &name, const std::string &filename, size_t size)
+	{
+		ByteArray propList;
+		OutputStream os(propList);
+
+		os.Write32(6); //number of props
+
+		os.Write32(0); //object handle
+		os.Write16(static_cast<u16>(ObjectProperty::ArtistId));
+		os.Write16(static_cast<u16>(DataTypeCode::Uint32));
+		os.Write32(artist->Id.Id);
+
+		os.Write32(0); //object handle
+		os.Write16(static_cast<u16>(ObjectProperty::Artist));
+		os.Write16(static_cast<u16>(DataTypeCode::String));
+		os.WriteString(artist->Name);
+
+		os.Write32(0); //object handle
+		os.Write16(static_cast<u16>(ObjectProperty::AlbumId));
+		os.Write16(static_cast<u16>(DataTypeCode::Uint32));
+		os.Write32(album->Id.Id);
+
+		os.Write32(0); //object handle
+		os.Write16(static_cast<u16>(ObjectProperty::AlbumName));
+		os.Write16(static_cast<u16>(DataTypeCode::String));
+		os.WriteString(album->Name);
+
+		os.Write32(0); //object handle
+		os.Write16(static_cast<u16>(ObjectProperty::Name));
+		os.Write16(static_cast<u16>(DataTypeCode::String));
+		os.WriteString(name);
+
+		os.Write32(0); //object handle
+		os.Write16(static_cast<u16>(ObjectProperty::ObjectFilename));
+		os.Write16(static_cast<u16>(DataTypeCode::String));
+		os.WriteString(filename);
+
+		_session->SendObjectPropList(Session::AnyStorage, Session::Device, type, size, propList);
+	}
+
 }

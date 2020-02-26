@@ -1091,7 +1091,13 @@ namespace cli
 			album = library.CreateAlbum(artist, meta->Album);
 		if (!artist)
 			throw std::runtime_error("can't create album with name " + meta->Album);
+
 		debug("got album record");
+
+		ObjectFormat format = ObjectFormatFromFilename(path);
+		debug("track format: " + ToString(format));
+		library.CreateTrack(artist, album, format, meta->Title, path, stream->GetSize());
+		_session->SendObject(stream);
 	}
 
 
