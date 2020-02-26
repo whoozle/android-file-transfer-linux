@@ -899,17 +899,17 @@ namespace cli
 		catch(const std::exception & ex)
 		{ defValue = "<unknown type>"; }
 
-		debug("property ", mtp::ToString(ObjectProperty(prop)), ", type: ", ToString(type), ", rw: ", rw, ", default: ", defValue, ", groupCode: ", groupCode, ", form flag: ", formFlag, ", value: ", ToString(type, value));
+		print("property ", mtp::ToString(ObjectProperty(prop)), ", type: ", ToString(type), ", rw: ", rw, ", default: ", defValue, ", groupCode: ", groupCode, ", form flag: ", formFlag, ", value: ", ToString(type, value));
 		//HexDump("raw", format, true);
 	}
 
 	void Session::ListProperties(mtp::ObjectId id)
 	{
 		mtp::ObjectFormat format = mtp::ObjectFormat(_session->GetObjectIntegerProperty(id, mtp::ObjectProperty::ObjectFormat));
-		mtp::debug("querying supported properties for format ", mtp::ToString(format));
+		mtp::print("querying supported properties for format ", mtp::ToString(format));
 
 		auto ops = _session->GetObjectPropertiesSupported(format);
-		mtp::debug("properties supported: ");
+		mtp::print("properties supported: ");
 		for(mtp::ObjectProperty prop: ops.ObjectPropertyCodes)
 		{
 			PrintFormat(_session->GetObjectPropertyDesc(prop), _session->GetObjectProperty(id, prop));
@@ -1061,7 +1061,7 @@ namespace cli
 			os.WriteString(name);
 		}
 		auto response = _session->SendObjectPropList(GetUploadStorageId(), _cd, mtp::ObjectFormat::Artist, 0, propList);
-		mtp::debug("new artist: ", mtp::hex(response.ObjectId.Id));
+		mtp::print("new artist: ", mtp::hex(response.ObjectId.Id));
 	}
 
 	void Session::ZuneImport(const LocalPath & path)
