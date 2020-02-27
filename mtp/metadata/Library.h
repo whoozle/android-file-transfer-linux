@@ -62,7 +62,7 @@ namespace mtp
 		AlbumPtr GetAlbum(const ArtistPtr & artist, const std::string & name)
 		{ auto it = _albums.find(std::make_pair(artist, name)); return it != _albums.end()? it->second: AlbumPtr(); }
 		AlbumPtr CreateAlbum(const ArtistPtr & artist, const std::string & name);
-		void CreateTrack(ArtistPtr artist, AlbumPtr album, ObjectFormat type, const std::string &name, const std::string &filename, size_t size);
+		ObjectId CreateTrack(ArtistPtr artist, AlbumPtr album, ObjectFormat type, const std::string &name, const std::string &filename, size_t size);
 	};
 }
 

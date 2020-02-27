@@ -161,7 +161,7 @@ namespace mtp
 		return album;
 	}
 
-	void Library::CreateTrack(ArtistPtr artist, AlbumPtr album, ObjectFormat type, const std::string &name, const std::string &filename, size_t size)
+	ObjectId Library::CreateTrack(ArtistPtr artist, AlbumPtr album, ObjectFormat type, const std::string &name, const std::string &filename, size_t size)
 	{
 		ByteArray propList;
 		OutputStream os(propList);
@@ -198,7 +198,8 @@ namespace mtp
 		os.Write16(static_cast<u16>(DataTypeCode::String));
 		os.WriteString(filename);
 
-		_session->SendObjectPropList(Session::AnyStorage, Session::Device, type, size, propList);
+		auto response = _session->SendObjectPropList(Session::AnyStorage, Session::Device, type, size, propList);
+		return response.ObjectId;
 	}
 
 }
