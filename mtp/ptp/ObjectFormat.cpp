@@ -67,7 +67,7 @@ namespace mtp
 				MAP_TYPE("audio/audio/x-wav",	ObjectFormat::Aiff);
 				MAP_TYPE("video/x-ms-asf",		ObjectFormat::Asf);
 				MAP_TYPE("audio/mp4",			ObjectFormat::Mp4);
-				MAP_TYPE("application/x-mpegurl", ObjectFormat::M3u);
+				MAP_TYPE("application/x-mpegurl", ObjectFormat::M3uPlaylist);
 #undef MAP_TYPE
 			}
 
@@ -101,7 +101,7 @@ namespace mtp
 		//libmagic missing mime type for m3u files
 		auto ext = GetExtension(filename);
 		if (ext == "m3u")
-			return mtp::ObjectFormat::M3u;
+			return mtp::ObjectFormat::M3uPlaylist;
 
 		static Magic magic;
 		{

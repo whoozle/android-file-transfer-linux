@@ -42,7 +42,7 @@ namespace mtp
 			}
 		}
 		{
-			auto albums = _session->GetObjectHandles(Session::AllStorages, ObjectFormat::AudioAlbum, Session::Device);
+			auto albums = _session->GetObjectHandles(Session::AllStorages, ObjectFormat::AbstractAudioAlbum, Session::Device);
 			for (auto id : albums.ObjectHandles)
 			{
 				auto name = _session->GetObjectStringProperty(id, ObjectProperty::Name);
@@ -132,7 +132,7 @@ namespace mtp
 		os.Write16(static_cast<u16>(DataTypeCode::String));
 		os.WriteString(artist->Name + "--" + name + ".alb");
 
-		auto response = _session->SendObjectPropList(Session::AnyStorage, Session::Device, ObjectFormat::AudioAlbum, 0, propList);
+		auto response = _session->SendObjectPropList(Session::AnyStorage, Session::Device, ObjectFormat::AbstractAudioAlbum, 0, propList);
 
 		auto album = std::make_shared<Album>();
 		album->Id = response.ObjectId;

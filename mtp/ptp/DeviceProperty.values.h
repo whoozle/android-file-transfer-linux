@@ -1,6 +1,6 @@
 ENUM_VALUE(Undefined, 0x5000)
 ENUM_VALUE(BatteryLevel, 0x5001)
-ENUM_VALUE(FunctionalMode, 0x5002)
+ENUM_VALUE(FunctionalMode, 0x5002) //0 - normal, 1 - sleeping
 ENUM_VALUE(ImageSize, 0x5003)
 ENUM_VALUE(CompressionSetting, 0x5004)
 ENUM_VALUE(WhiteBalance, 0x5005)
@@ -30,6 +30,7 @@ ENUM_VALUE(FocusMeteringMode, 0x501c)
 ENUM_VALUE(UploadUrl, 0x501d)
 ENUM_VALUE(Artist, 0x501e)
 ENUM_VALUE(CopyrightInfo, 0x501f)
+
 ENUM_VALUE(SynchronizationPartner, 0xd401)
 ENUM_VALUE(DeviceFriendlyName, 0xd402)
 ENUM_VALUE(Volume, 0xd403)
@@ -38,5 +39,7 @@ ENUM_VALUE(DeviceIcon, 0xd405)
 ENUM_VALUE(PlaybackRate, 0xd410)
 ENUM_VALUE(PlaybackObject, 0xd411)
 ENUM_VALUE(PlaybackContainerIndex, 0xd412)
+ENUM_VALUE(PlaybackPosition, 0xd413)
+
 ENUM_VALUE(SessionInitiatorVersionInfo, 0xd406)
 ENUM_VALUE(PerceivedDeviceType, 0xd407)

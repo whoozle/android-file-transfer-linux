@@ -158,7 +158,7 @@ MtpObjectsModel::ThumbnailPtr MtpObjectsModel::Row::GetThumbnail(mtp::SessionPtr
 bool MtpObjectsModel::Row::IsAssociation(mtp::SessionPtr session)
 {
 	mtp::ObjectFormat format = GetInfo(session)->ObjectFormat;
-	return format == mtp::ObjectFormat::Association || format == mtp::ObjectFormat::AudioAlbum;
+	return format == mtp::ObjectFormat::Association;
 }
 
 void MtpObjectsModel::rename(int idx, const QString &fileName)
