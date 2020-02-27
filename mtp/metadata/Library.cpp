@@ -9,6 +9,15 @@ namespace mtp
 		ByteArray ArtistUUID 	= { 0x00, 0x08, 0x8f, 0xa7, 0x00, 0x06, 0xdb, 0x11, 0x89, 0xca, 0x00, 0x19, 0xb9, 0x2a, 0x39, 0x33 };
 		//ByteArray AlbumUUID 	= { 0x00, 0xb6, 0xe8, 0x33, 0x00, 0x01, 0xdb, 0x11, 0x89, 0xca, 0x00, 0x19, 0xb9, 0x2a, 0x39, 0x33 };
 		ByteArray AlbumUUID 	= { 0x06, 0x27, 0x6d, 0x0d, 0x00, 0x01, 0xdb, 0x11, 0x89, 0xca, 0x00, 0x19, 0xb9, 0x2a, 0x39, 0x33 };
+		ByteArray JPEG = {
+			0xFF, 0xD8, 0xFF, 0xE0, 0x00, 0x10, 0x4A, 0x46, 0x49, 0x46, 0x00, 0x01, 0x01, 0x01, 0x00, 0x48, 0x00, 0x48, 0x00, 0x00,
+			0xFF, 0xDB, 0x00, 0x43, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+			0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+			0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+			0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xC2, 0x00, 0x0B, 0x08, 0x00, 0x01, 0x00, 0x01, 0x01, 0x01,
+			0x11, 0x00, 0xFF, 0xC4, 0x00, 0x14, 0x10, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+			0x00, 0x00, 0x00, 0x00, 0xFF, 0xDA, 0x00, 0x08, 0x01, 0x01, 0x00, 0x01, 0x3F, 0x10,
+		};
 	}
 
 	Library::Library(const mtp::SessionPtr & session): _session(session)
@@ -72,17 +81,17 @@ namespace mtp
 		ByteArray propList;
 		OutputStream os(propList);
 
-		os.Write32(3); //number of props
+		os.Write32(2); //number of props
 
 		os.Write32(0); //object handle
 		os.Write16(static_cast<u16>(ObjectProperty::Name));
 		os.Write16(static_cast<u16>(DataTypeCode::String));
 		os.WriteString(name);
 
-		os.Write32(0); //object handle
-		os.Write16(static_cast<u16>(ObjectProperty::ContentTypeUUID));
-		os.Write16(static_cast<u16>(DataTypeCode::Uint128));
-		os.WriteData(ArtistUUID);
+		// os.Write32(0); //object handle
+		// os.Write16(static_cast<u16>(ObjectProperty::ContentTypeUUID));
+		// os.Write16(static_cast<u16>(DataTypeCode::Uint128));
+		// os.WriteData(ArtistUUID);
 
 		os.Write32(0); //object handle
 		os.Write16(static_cast<u16>(ObjectProperty::ObjectFilename));
@@ -105,32 +114,42 @@ namespace mtp
 		ByteArray propList;
 		OutputStream os(propList);
 
-		os.Write32(5); //number of props
-
-		os.Write32(0); //object handle
-		os.Write16(static_cast<u16>(ObjectProperty::ParentObject));
-		os.Write16(static_cast<u16>(DataTypeCode::Uint32));
-		os.Write32(_artistsFolder.Id);
+		os.Write32(3); //number of props
 
 		os.Write32(0); //object handle
 		os.Write16(static_cast<u16>(ObjectProperty::ArtistId));
 		os.Write16(static_cast<u16>(DataTypeCode::Uint32));
 		os.Write32(artist->Id.Id);
 
+		// os.Write32(0); //object handle
+		// os.Write16(static_cast<u16>(ObjectProperty::Artist));
+		// os.Write16(static_cast<u16>(DataTypeCode::String));
+		// os.WriteString(artist->Name);
+
 		os.Write32(0); //object handle
 		os.Write16(static_cast<u16>(ObjectProperty::Name));
 		os.Write16(static_cast<u16>(DataTypeCode::String));
 		os.WriteString(name);
 
-		os.Write32(0); //object handle
-		os.Write16(static_cast<u16>(ObjectProperty::ContentTypeUUID));
-		os.Write16(static_cast<u16>(DataTypeCode::Uint128));
-		os.WriteData(AlbumUUID);
+		// os.Write32(0); //object handle
+		// os.Write16(static_cast<u16>(ObjectProperty::ContentTypeUUID));
+		// os.Write16(static_cast<u16>(DataTypeCode::Uint128));
+		// os.WriteData(AlbumUUID);
 
 		os.Write32(0); //object handle
 		os.Write16(static_cast<u16>(ObjectProperty::ObjectFilename));
 		os.Write16(static_cast<u16>(DataTypeCode::String));
 		os.WriteString(artist->Name + "--" + name + ".alb");
+
+		// os.Write32(0); //object handle
+		// os.Write16(static_cast<u16>(ObjectProperty::RepresentativeSampleFormat));
+		// os.Write16(static_cast<u16>(DataTypeCode::Uint16));
+		// os.Write16(static_cast<u16>(ObjectFormat::ExifJpeg));
+
+		// os.Write32(0); //object handle
+		// os.Write16(static_cast<u16>(ObjectProperty::RepresentativeSampleData));
+		// os.Write16(static_cast<u16>(DataTypeCode::ArrayUint8));
+		// os.WriteData(JPEG);
 
 		auto response = _session->SendObjectPropList(Session::AnyStorage, Session::Device, ObjectFormat::AbstractAudioAlbum, 0, propList);
 
@@ -147,27 +166,27 @@ namespace mtp
 		ByteArray propList;
 		OutputStream os(propList);
 
-		os.Write32(6); //number of props
+		os.Write32(4); //number of props
 
 		os.Write32(0); //object handle
 		os.Write16(static_cast<u16>(ObjectProperty::ArtistId));
 		os.Write16(static_cast<u16>(DataTypeCode::Uint32));
 		os.Write32(artist->Id.Id);
 
-		os.Write32(0); //object handle
-		os.Write16(static_cast<u16>(ObjectProperty::Artist));
-		os.Write16(static_cast<u16>(DataTypeCode::String));
-		os.WriteString(artist->Name);
+		// os.Write32(0); //object handle
+		// os.Write16(static_cast<u16>(ObjectProperty::Artist));
+		// os.Write16(static_cast<u16>(DataTypeCode::String));
+		// os.WriteString(artist->Name);
 
 		os.Write32(0); //object handle
 		os.Write16(static_cast<u16>(ObjectProperty::AlbumId));
 		os.Write16(static_cast<u16>(DataTypeCode::Uint32));
 		os.Write32(album->Id.Id);
 
-		os.Write32(0); //object handle
-		os.Write16(static_cast<u16>(ObjectProperty::AlbumName));
-		os.Write16(static_cast<u16>(DataTypeCode::String));
-		os.WriteString(album->Name);
+		// os.Write32(0); //object handle
+		// os.Write16(static_cast<u16>(ObjectProperty::AlbumName));
+		// os.Write16(static_cast<u16>(DataTypeCode::String));
+		// os.WriteString(album->Name);
 
 		os.Write32(0); //object handle
 		os.Write16(static_cast<u16>(ObjectProperty::Name));
