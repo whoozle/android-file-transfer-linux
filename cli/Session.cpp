@@ -174,6 +174,8 @@ namespace cli
 		AddCommand("storage-info", "<storage-id> displays storage information",
 			make_function([this](const StoragePath &path) -> void { DisplayStorageInfo(path); }));
 
+		AddCommand("get-refs", "returns object-associated refs",
+			make_function([this](const StoragePath &path) -> void { GetObjectReferences(path); }));
 		AddCommand("zune-init", "load media library",
 			make_function([this]() -> void { ZuneInit(); }));
 		AddCommand("zune-import", "<file> import file using metadata",
@@ -1059,6 +1061,16 @@ namespace cli
 			try { name = _session->GetObjectStringProperty(id, mtp::ObjectProperty::Name); }
 			catch(const std::exception & ex) { mtp::error("error getting name: ", ex.what()); }
 			mtp::print(id.Id, "\t", filename, "\t", name);
+		}
+	}
+
+	void Session::GetObjectReferences(const Path & src)
+	{
+		using namespace mtp;
+		auto refs = _session->GetObjectReferences(Resolve(src));
+		for (auto id: refs.ObjectHandles)
+		{
+			debug(id.Id, "\t", _session->GetObjectStringProperty(id, ObjectProperty::ObjectFilename));
 		}
 	}
 

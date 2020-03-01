@@ -168,6 +168,7 @@ namespace cli
 
 		void ListProperties(const Path &path)
 		{ ListProperties(Resolve(path)); }
+		void GetObjectReferences(const Path & src);
 
 		static void ShowType(const LocalPath &src);
 
