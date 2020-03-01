@@ -48,6 +48,10 @@ namespace mtp
 		{ _session->GenericOperation(OperationCode::DisableTrustedFilesOperations); }
 		catch(const std::exception& ex)
 		{ error("DisableTrustedFilesOperations failed: ", ex.what()); }
+		try
+		{ _session->GenericOperation(OperationCode::EndTrustedAppSession); }
+		catch(const std::exception& ex)
+		{ error("EndTrustedAppSession failed: ", ex.what()); }
 	}
 
 	TrustedAppPtr TrustedApp::Create(const SessionPtr & session, const std::string &mtpzDataPath)
