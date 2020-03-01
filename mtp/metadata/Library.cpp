@@ -166,7 +166,7 @@ namespace mtp
 		ByteArray propList;
 		OutputStream os(propList);
 
-		os.Write32(4); //number of props
+		os.Write32(3); //number of props
 
 		os.Write32(0); //object handle
 		os.Write16(static_cast<u16>(ObjectProperty::ArtistId));
@@ -178,10 +178,10 @@ namespace mtp
 		// os.Write16(static_cast<u16>(DataTypeCode::String));
 		// os.WriteString(artist->Name);
 
-		os.Write32(0); //object handle
-		os.Write16(static_cast<u16>(ObjectProperty::AlbumId));
-		os.Write16(static_cast<u16>(DataTypeCode::Uint32));
-		os.Write32(album->Id.Id);
+		// os.Write32(0); //object handle
+		// os.Write16(static_cast<u16>(ObjectProperty::AlbumId));
+		// os.Write16(static_cast<u16>(DataTypeCode::Uint32));
+		// os.Write32(album->Id.Id);
 
 		// os.Write32(0); //object handle
 		// os.Write16(static_cast<u16>(ObjectProperty::AlbumName));
