@@ -1,3 +1,4 @@
+ENUM_VALUE(HostEUI64Array, 0xd920)
 ENUM_VALUE(ContentTypeUUID, 0xda97) //see WPD_OBJECT_CONTENT_TYPE
 ENUM_VALUE(ArtistId, 0xdab9)
 ENUM_VALUE(AlbumId, 0xdabb)

@@ -31,6 +31,8 @@ ENUM_VALUE(UploadUrl, 0x501d)
 ENUM_VALUE(Artist, 0x501e)
 ENUM_VALUE(CopyrightInfo, 0x501f)
 
+ENUM_VALUE(DeviceEUI64, 0xd210)
+
 ENUM_VALUE(SynchronizationPartner, 0xd401)
 ENUM_VALUE(DeviceFriendlyName, 0xd402)
 ENUM_VALUE(Volume, 0xd403)

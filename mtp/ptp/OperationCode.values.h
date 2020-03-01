@@ -40,8 +40,14 @@ ENUM_VALUE(JanusCleanDataStore, 0x9108)
 ENUM_VALUE(JanusGetLicenseState, 0x9109)
 ENUM_VALUE(JanusSendCommand, 0x910a)
 ENUM_VALUE(JanusSendRequest, 0x910b)
+ENUM_VALUE(ProcessWCFObject, 0x9122)
 
-ENUM_VALUE(WmpGetModifiedPuids, 0x9201)
+ENUM_VALUE(OpenMediaSession, 0x9170)
+ENUM_VALUE(CloseMediaSession, 0x9171)
+ENUM_VALUE(GetNextDataBlock, 0x9172)
+ENUM_VALUE(SetCurrentTimePosition, 0x9173)
+
+ENUM_VALUE(WMPMetadataRoundTrip, 0x9201)
 ENUM_VALUE(WmpGetAcquiredContent, 0x9202)
 
 ENUM_VALUE(SendWMDRMPDAppRequest, 0x9212)
@@ -49,6 +55,9 @@ ENUM_VALUE(GetWMDRMPDAppResponse, 0x9213)
 ENUM_VALUE(EnableTrustedFilesOperations, 0x9214)
 ENUM_VALUE(DisableTrustedFilesOperations, 0x9215)
 ENUM_VALUE(EndTrustedAppSession, 0x9216)
+
+ENUM_VALUE(SendTinyCLRData, 0x9401)
+ENUM_VALUE(GetTinyCLRData, 0x9402)
 
 ENUM_VALUE(GetPartialObject64, 0x95c1)
 ENUM_VALUE(SendPartialObject, 0x95c2)

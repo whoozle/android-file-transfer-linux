@@ -29,6 +29,8 @@ ENUM_VALUE(TiffIt, 0x380e)
 ENUM_VALUE(Jp2, 0x380f)
 ENUM_VALUE(Jpx, 0x3810)
 
+ENUM_VALUE(NetworkAssociation, 0xb102)
+
 ENUM_VALUE(M4a, 0xb215)
 ENUM_VALUE(Artist, 0xb218)
 
