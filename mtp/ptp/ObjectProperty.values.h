@@ -1,4 +1,6 @@
+ENUM_VALUE(BuyFlag, 0xd901)
 ENUM_VALUE(HostEUI64Array, 0xd920)
+
 ENUM_VALUE(ContentTypeUUID, 0xda97) //see WPD_OBJECT_CONTENT_TYPE
 ENUM_VALUE(ArtistId, 0xdab9)
 ENUM_VALUE(AlbumId, 0xdabb)
@@ -63,7 +65,7 @@ ENUM_VALUE(OriginalReleaseDate, 0xdc99)
 ENUM_VALUE(AlbumName, 0xdc9a)
 ENUM_VALUE(AlbumArtist, 0xdc9b)
 ENUM_VALUE(Mood, 0xdc9c)
-ENUM_VALUE(DrmProtection, 0xdc9d)
+ENUM_VALUE(DrmProtectionStatus, 0xdc9d)
 ENUM_VALUE(Subdescription, 0xdc9e)
 
 ENUM_VALUE(IsCropped, 0xdcd1)
