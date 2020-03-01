@@ -18,70 +18,29 @@
 */
 
 #include <mtp/ptp/Response.h>
+#include <mtp/log.h>
 #include <stdio.h>
 
 namespace mtp
 {
 #	define R(NAME) case ResponseType::NAME: return #NAME
 
+	std::string ToString(ResponseType responseType)
+	{
+		switch(responseType)
+		{
+#			define ENUM_VALUE(NAME, VALUE) ENUM_VALUE_TO_STRING(ResponseType, NAME, VALUE)
+#			include <mtp/ptp/ResponseType.values.h>
+			ENUM_VALUE_TO_STRING_DEFAULT(ResponseType, responseType, 4);
+		}
+	}
+
 	namespace
 	{
-		std::string GetResponseName(ResponseType r)
-		{
-			switch(r)
-			{
-				R(OK);
-				R(GeneralError);
-				R(SessionNotOpen);
-				R(InvalidTransaction);
-				R(OperationNotSupported);
-				R(ParameterNotSupported);
-				R(IncompleteTransfer);
-				R(InvalidStorageID);
-				R(InvalidObjectHandle);
-				R(DevicePropNotSupported);
-				R(InvalidObjectFormatCode);
-				R(StoreFull);
-				R(ObjectWriteProtected);
-				R(StoreReadOnly);
-				R(AccessDenied);
-				R(NoThumbnailPresent);
-				R(SelfTestFailed);
-				R(PartialDeletion);
-				R(StoreNotAvailable);
-				R(SpecificationByFormatUnsupported);
-				R(NoValidObjectInfo);
-				R(InvalidCodeFormat);
-				R(UnknownVendorCode);
-				R(CaptureAlreadyTerminated);
-				R(DeviceBusy);
-				R(InvalidParentObject);
-				R(InvalidDevicePropFormat);
-				R(InvalidDevicePropValue);
-				R(InvalidParameter);
-				R(SessionAlreadyOpen);
-				R(TransactionCancelled);
-				R(SpecificationOfDestinationUnsupported);
-				R(InvalidObjectPropCode);
-				R(InvalidObjectPropFormat);
-				R(InvalidObjectPropValue);
-				R(InvalidObjectReference);
-				R(GroupNotSupported);
-				R(InvalidDataset);
-				R(UnsupportedSpecByGroup);
-				R(UnsupportedSpecByDepth);
-				R(ObjectTooLarge);
-				R(ObjectPropNotSupported);
-
-				default:
-					return "Unknown";
-			}
-		}
-
 		std::string FormatMessage(ResponseType r)
 		{
 			char buf[1024];
-			snprintf(buf, sizeof(buf), "invalid response code %s (0x%04hx)", GetResponseName(r).c_str(), static_cast<unsigned short>(r));
+			snprintf(buf, sizeof(buf), "invalid response code %s (0x%04hx)", ToString(r).c_str(), static_cast<unsigned short>(r));
 			return buf;
 		}
 	}
