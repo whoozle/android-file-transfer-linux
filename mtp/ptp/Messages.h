@@ -94,6 +94,11 @@ namespace mtp { namespace msg
 		{
 			stream >> ObjectHandles;
 		}
+
+		void Write(OutputStream & stream) const
+		{
+			stream.WriteArray(ObjectHandles);
+		}
 	};
 
 	struct StorageIDs //! MTP StorageIDs message

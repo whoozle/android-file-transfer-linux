@@ -135,6 +135,9 @@ namespace mtp
 		ByteArray GenericOperation(OperationCode code);
 		ByteArray GenericOperation(OperationCode code, const ByteArray & payload);
 
+		void SetObjectReferences(ObjectId objectId, const msg::ObjectHandles &objects);
+		msg::ObjectHandles GetObjectReferences(ObjectId objectId);
+
 		//windows specific
 		void EnableSecureFileOperations(u32 cmac1[4]);
 

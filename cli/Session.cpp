@@ -1102,8 +1102,12 @@ namespace cli
 
 		ObjectFormat format = ObjectFormatFromFilename(path);
 		debug("track format: " + ToString(format));
-		_library->CreateTrack(artist, album, format, meta->Title, path, stream->GetSize());
+		auto songId = _library->CreateTrack(artist, album, format, meta->Title, path, stream->GetSize());
 		_session->SendObject(stream);
+
+		msg::ObjectHandles handles = _session->GetObjectReferences(album->Id);
+		handles.ObjectHandles.push_back(songId);
+		_session->SetObjectReferences(album->Id, handles);
 	}
 
 

@@ -459,4 +459,18 @@ namespace mtp
 		_packeter.Abort(transactionId, timeout);
 	}
 
+	void Session::SetObjectReferences(ObjectId objectId, const msg::ObjectHandles & objects)
+	{
+		ByteArray data;
+		OutputStream out(data);
+		objects.Write(out);
+
+		IObjectInputStreamPtr inputStream = std::make_shared<ByteArrayObjectInputStream>(data);
+		ByteArray response;
+		RunTransactionWithDataRequest(_defaultTimeout, OperationCode::SetObjectReferences, response, inputStream, objectId.Id);
+	}
+
+	msg::ObjectHandles Session::GetObjectReferences(ObjectId objectId)
+	{ return ParseResponse<msg::ObjectHandles>(RunTransaction(_defaultTimeout, OperationCode::GetObjectReferences, objectId.Id)); }
+
 }
