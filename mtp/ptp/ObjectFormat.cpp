@@ -165,6 +165,17 @@ namespace mtp
 		return std::string(buf, r);
 	}
 
+	std::string ConvertYear(int year)
+	{
+		struct tm bdt = {};
+		bdt.tm_mday = 1;
+		bdt.tm_year = year - 1900;
+		auto ts = mktime(&bdt);
+		if (ts == (time_t) -1)
+			throw std::runtime_error("mktime failed");
+		return ConvertDateTime(ts);
+	}
+
 	std::string ToString(ObjectFormat property)
 	{
 		switch(property)

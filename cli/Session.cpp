@@ -1106,7 +1106,7 @@ namespace cli
 
 		auto album = _library->GetAlbum(artist, meta->Album);
 		if (!album)
-			album = _library->CreateAlbum(artist, meta->Album);
+			album = _library->CreateAlbum(artist, meta->Album, meta->Year);
 		if (!album)
 			throw std::runtime_error("can't create album with name " + meta->Album);
 

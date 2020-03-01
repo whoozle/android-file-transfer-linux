@@ -41,15 +41,16 @@ namespace mtp
 			{
 				auto name = _session->GetObjectStringProperty(id, ObjectProperty::Name);
 				auto artistName = _session->GetObjectStringProperty(id, ObjectProperty::Artist);
+				auto albumDate = _session->GetObjectStringProperty(id, ObjectProperty::DateAuthored);
 				auto artist = GetArtist(artistName);
 				if (!artist)
 					error("invalid artist name in album ", name);
 
-				debug("album: ", name, "\t", id.Id);
+				debug("album: ", name, "\t", id.Id, "\t", albumDate);
 				auto album = std::make_shared<Album>();
 				album->Name = name;
 				album->Id = id;
-				album->Year = 0;
+				album->Year = ConvertDateTime(albumDate);
 				_albums.insert(std::make_pair(std::make_pair(artist, name), album));
 			}
 		}
@@ -86,7 +87,7 @@ namespace mtp
 		return artist;
 	}
 
-	Library::AlbumPtr Library::CreateAlbum(const ArtistPtr & artist, const std::string & name)
+	Library::AlbumPtr Library::CreateAlbum(const ArtistPtr & artist, const std::string & name, int year)
 	{
 		if (name.empty() || !artist)
 			return nullptr;
@@ -94,7 +95,7 @@ namespace mtp
 		ByteArray propList;
 		OutputStream os(propList);
 
-		os.Write32(3); //number of props
+		os.Write32(year? 4: 3); //number of props
 
 		os.Write32(0); //object handle
 		os.Write16(static_cast<u16>(ObjectProperty::ArtistId));
@@ -110,6 +111,14 @@ namespace mtp
 		os.Write16(static_cast<u16>(ObjectProperty::ObjectFilename));
 		os.Write16(static_cast<u16>(DataTypeCode::String));
 		os.WriteString(artist->Name + "--" + name + ".alb");
+
+		if (year)
+		{
+			os.Write32(0); //object handle
+			os.Write16(static_cast<u16>(ObjectProperty::DateAuthored));
+			os.Write16(static_cast<u16>(DataTypeCode::String));
+			os.WriteString(ConvertYear(year));
+		}
 
 		auto response = _session->SendObjectPropList(Session::AnyStorage, Session::Device, ObjectFormat::AbstractAudioAlbum, 0, propList);
 

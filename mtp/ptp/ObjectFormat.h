@@ -56,6 +56,7 @@ namespace mtp
 	ObjectFormat ObjectFormatFromFilename(const std::string &filename);
 	time_t ConvertDateTime(const std::string &timespec);
 	std::string ConvertDateTime(time_t);
+	std::string ConvertYear(int year);
 
 }
 

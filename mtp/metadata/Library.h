@@ -30,7 +30,7 @@ namespace mtp
 			ObjectId 		Id;
 			ArtistPtr		Artist;
 			std::string 	Name;
-			unsigned 		Year;
+			time_t	 		Year;
 		};
 		DECLARE_PTR(Album);
 
@@ -61,7 +61,7 @@ namespace mtp
 
 		AlbumPtr GetAlbum(const ArtistPtr & artist, const std::string & name)
 		{ auto it = _albums.find(std::make_pair(artist, name)); return it != _albums.end()? it->second: AlbumPtr(); }
-		AlbumPtr CreateAlbum(const ArtistPtr & artist, const std::string & name);
+		AlbumPtr CreateAlbum(const ArtistPtr & artist, const std::string & name, int year);
 		ObjectId CreateTrack(ArtistPtr artist, AlbumPtr album, ObjectFormat type, const std::string &name, const std::string &filename, size_t size);
 	};
 }
