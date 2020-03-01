@@ -16,6 +16,7 @@ namespace mtp
 	class Library
 	{
 		SessionPtr		_session;
+		StorageId		_storage;
 
 	public:
 		struct Artist
@@ -36,6 +37,9 @@ namespace mtp
 
 	private:
 		ObjectId _artistsFolder;
+		ObjectId _albumsFolder;
+		ObjectId _musicFolder;
+
 		using ArtistMap = std::unordered_map<std::string, ArtistPtr>;
 		ArtistMap _artists;
 
@@ -45,7 +49,6 @@ namespace mtp
 			return std::hash<ArtistPtr>()(key.first) + std::hash<std::string>()(key.second);
 		}};
 
-		ObjectId _albumsFolder;
 		using AlbumMap = std::unordered_map<AlbumKey, AlbumPtr, AlbumKeyHash>;
 		AlbumMap _albums;
 

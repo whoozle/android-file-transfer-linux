@@ -7,6 +7,13 @@ namespace mtp
 
 	Library::Library(const mtp::SessionPtr & session): _session(session)
 	{
+		auto storages = _session->GetStorageIDs();
+		if (storages.StorageIDs.empty())
+			throw std::runtime_error("no storages found");
+
+		_storage = storages.StorageIDs[0]; //picking up first storage.
+		//zune fails to create artist/album without storage id
+
 		msg::ObjectHandles rootFolders = _session->GetObjectHandles(Session::AllStorages, mtp::ObjectFormat::Association, Session::Root);
 		for (auto id : rootFolders.ObjectHandles) {
 			auto name = _session->GetObjectStringProperty(id, ObjectProperty::ObjectFilename);
@@ -14,9 +21,11 @@ namespace mtp
 				_artistsFolder = id;
 			else if (name == "Albums")
 				_albumsFolder = id;
+			else if (name == "Music")
+				_musicFolder = id;
 		}
 
-		if (_artistsFolder == ObjectId() || _albumsFolder == ObjectId())
+		if (_artistsFolder == ObjectId() || _albumsFolder == ObjectId() || _musicFolder == ObjectId())
 			throw std::runtime_error("fixme: restore standard folder structure");
 
 		debug("artists folder: ", _artistsFolder.Id);
@@ -79,7 +88,7 @@ namespace mtp
 		os.Write16(static_cast<u16>(DataTypeCode::String));
 		os.WriteString(name + ".art");
 
-		auto response = _session->SendObjectPropList(Session::AnyStorage, Session::Device, ObjectFormat::Artist, 0, propList);
+		auto response = _session->SendObjectPropList(_storage, _artistsFolder, ObjectFormat::Artist, 0, propList);
 		auto artist = std::make_shared<Artist>();
 		artist->Id = response.ObjectId;
 		artist->Name = name;
@@ -120,7 +129,7 @@ namespace mtp
 			os.WriteString(ConvertYear(year));
 		}
 
-		auto response = _session->SendObjectPropList(Session::AnyStorage, Session::Device, ObjectFormat::AbstractAudioAlbum, 0, propList);
+		auto response = _session->SendObjectPropList(_storage, _albumsFolder, ObjectFormat::AbstractAudioAlbum, 0, propList);
 
 		auto album = std::make_shared<Album>();
 		album->Id = response.ObjectId;
