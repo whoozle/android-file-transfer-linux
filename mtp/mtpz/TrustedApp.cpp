@@ -73,13 +73,19 @@ namespace mtp
 
 		void Update()
 		{
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
+			BN_free(rsa->n); rsa->n = mod;
+			BN_free(rsa->e); rsa->e = exp;
+			BN_free(rsa->d); rsa->d = pkey;
+#else
 			if (RSA_set0_key(rsa, mod, exp, pkey))
 			{
 				debug("created RSA key");
-				mod = exp = pkey = NULL;
 			}
 			else
 				throw std::runtime_error("failed to create RSA key");
+#endif
+			mod = exp = pkey = NULL;
 		}
 
 		~Keys() {
