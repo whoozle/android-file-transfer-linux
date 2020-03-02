@@ -173,7 +173,7 @@ list(APPEND SOURCES
 
 if (BUILD_MTPZ)
 	include(FindOpenSSL)
-	if (OPENSSL_FOUND AND (OPENSSL_VERSION VERSION_GREATER_EQUAL 1.1))
+	if (OPENSSL_FOUND)
 		set(_BUILD_MTPZ TRUE)
 		message(STATUS "building with MTPZ support")
 		add_definitions(-DMTPZ_ENABLED)
