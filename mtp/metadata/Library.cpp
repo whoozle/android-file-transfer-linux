@@ -14,15 +14,18 @@ namespace mtp
 		_storage = storages.StorageIDs[0]; //picking up first storage.
 		//zune fails to create artist/album without storage id
 
-		msg::ObjectHandles rootFolders = _session->GetObjectHandles(Session::AllStorages, mtp::ObjectFormat::Association, Session::Root);
-		for (auto id : rootFolders.ObjectHandles) {
-			auto name = _session->GetObjectStringProperty(id, ObjectProperty::ObjectFilename);
-			if (name == "Artists")
-				_artistsFolder = id;
-			else if (name == "Albums")
-				_albumsFolder = id;
-			else if (name == "Music")
-				_musicFolder = id;
+		{
+			msg::ObjectHandles rootFolders = _session->GetObjectHandles(Session::AllStorages, mtp::ObjectFormat::Association, Session::Root);
+			for (auto id : rootFolders.ObjectHandles)
+			{
+				auto name = _session->GetObjectStringProperty(id, ObjectProperty::ObjectFilename);
+				if (name == "Artists")
+					_artistsFolder = id;
+				else if (name == "Albums")
+					_albumsFolder = id;
+				else if (name == "Music")
+					_musicFolder = id;
+			}
 		}
 		if (_artistsFolder == ObjectId())
 			_artistsFolder = _session->CreateDirectory("Artists", Session::Root, _storage).ObjectId;

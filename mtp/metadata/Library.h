@@ -22,6 +22,7 @@ namespace mtp
 		struct Artist
 		{
 			ObjectId 		Id;
+			ObjectId		MusicFolderId;
 			std::string 	Name;
 		};
 		DECLARE_PTR(Artist);
@@ -29,6 +30,7 @@ namespace mtp
 		struct Album
 		{
 			ObjectId 		Id;
+			ObjectId		MusicFolderId;
 			ArtistPtr		Artist;
 			std::string 	Name;
 			time_t	 		Year;
