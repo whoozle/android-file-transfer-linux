@@ -24,12 +24,16 @@ namespace mtp
 			else if (name == "Music")
 				_musicFolder = id;
 		}
-
-		if (_artistsFolder == ObjectId() || _albumsFolder == ObjectId() || _musicFolder == ObjectId())
-			throw std::runtime_error("fixme: restore standard folder structure");
+		if (_artistsFolder == ObjectId())
+			_artistsFolder = _session->CreateDirectory("Artists", Session::Root, _storage).ObjectId;
+		if (_albumsFolder == ObjectId())
+			_albumsFolder = _session->CreateDirectory("Albums", Session::Root, _storage).ObjectId;
+		if (_musicFolder == ObjectId())
+			_musicFolder = _session->CreateDirectory("Music", Session::Root, _storage).ObjectId;
 
 		debug("artists folder: ", _artistsFolder.Id);
 		debug("albums folder: ", _albumsFolder.Id);
+		debug("music folder: ", _musicFolder.Id);
 
 		using namespace mtp;
 		{
