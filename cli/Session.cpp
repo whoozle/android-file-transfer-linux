@@ -946,8 +946,16 @@ namespace cli
 		for(DeviceProperty code : _gdi.DevicePropertiesSupported)
 		{
 			auto desc = _session->GetDevicePropertyDesc(code);
-			ByteArray value = _session->GetDeviceProperty(code);
-			print("property: ", ToString(code), " ", ToString(desc.Type), " ", desc.Writeable? "rw ": "ro ", ToString(desc.Type, value));
+			if (code == DeviceProperty::PerceivedDeviceType)
+			{
+				auto value = _session->GetDeviceIntegerProperty(code);
+				print("property: ", ToString(code), " ", ToString(desc.Type), " ", desc.Writeable? "rw ": "ro ", ToString(PerceivedDeviceType(value)));
+			}
+			else
+			{
+				ByteArray value = _session->GetDeviceProperty(code);
+				print("property: ", ToString(code), " ", ToString(desc.Type), " ", desc.Writeable? "rw ": "ro ", ToString(desc.Type, value));
+			}
 		}
 	}
 

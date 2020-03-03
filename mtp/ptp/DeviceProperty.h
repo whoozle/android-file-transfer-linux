@@ -25,6 +25,13 @@
 
 namespace mtp
 {
+	enum struct PerceivedDeviceType : u32
+	{
+#define ENUM_VALUE(NAME, VALUE) ENUM_VALUE_DECL(NAME, VALUE)
+#		include "PerceivedDeviceType.values.h"
+#undef ENUM_VALUE
+	};
+	std::string ToString(PerceivedDeviceType property);
 
 	enum struct DeviceProperty : u16
 	{
