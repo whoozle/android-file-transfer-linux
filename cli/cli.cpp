@@ -172,37 +172,51 @@ int main(int argc, char **argv)
 		exit(0);
 	}
 
-	auto mtp = Device::FindFirst(claimInterface, resetDevice);
-	if (!mtp)
+	usb::ContextPtr ctx(new usb::Context);
+	cli::SessionPtr session;
+
+	for (usb::DeviceDescriptorPtr desc : ctx->GetDevices())
 	{
-		error("no mtp device found");
-		exit(1);
+		try
+		{
+			session.reset();
+			auto device = Device::Open(ctx, desc, claimInterface, resetDevice);
+			if (!device)
+				continue;
+			session = std::make_shared<cli::Session>(device, showPrompt);
+			if (session->SetFirstStorage())
+				break;
+			else
+			{
+				error("your device may be locked or does not have any storage available");
+				session.reset();
+				device.reset();
+			}
+		}
+		catch(const std::exception &ex)
+		{ error("Device::Find failed:", ex.what()); }
 	}
+	ctx.reset();
 
 	try
 	{
 		bool hasCommands = optind >= argc;
-		cli::Session session(mtp, showPrompt);
-		gSession.store(&session);
-		if (!session.SetFirstStorage())
-		{
-			error("your device may be locked or does not have any storage available");
-			exit(2);
-		}
-		session.ShowEvents(showEvents);
+		gSession.store(session.get());
+		session->ShowEvents(showEvents);
 
-		if (forceInteractive || (session.IsInteractive() && hasCommands))
+		if (forceInteractive || (session->IsInteractive() && hasCommands))
 		{
-			session.InteractiveInput();
+			session->InteractiveInput();
 		}
 		else
 		{
 			for(int i = optind; i < argc; ++i)
 			{
-				session.ProcessCommand(argv[i]);
+				session->ProcessCommand(argv[i]);
 			}
 		}
 		gSession.store(nullptr);
+		session.reset();
 
 		exit(0);
 	}

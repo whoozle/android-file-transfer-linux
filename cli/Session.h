@@ -179,6 +179,7 @@ namespace cli
 		void AddCommand(const std::string &name, const std::string &help, std::function<void(Args...)> && callback)
 		{ _commands.insert(std::make_pair(name, ICommandPtr(new Command<Args...>(help, std::move(callback))))); }
 	};
+	DECLARE_PTR(Session);
 }
 
 #endif
