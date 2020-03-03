@@ -42,7 +42,6 @@ namespace mtp
 		KeysPtr		_keys;
 
 	public:
-		static bool Supported();
 		static bool Probe(const SessionPtr & session);
 
 		~TrustedApp();
