@@ -176,10 +176,14 @@ namespace cli
 
 		AddCommand("get-refs", "returns object-associated refs",
 			make_function([this](const StoragePath &path) -> void { GetObjectReferences(path); }));
-		AddCommand("zune-init", "load media library",
-			make_function([this]() -> void { ZuneInit(); }));
-		AddCommand("zune-import", "<file> import file using metadata",
-			make_function([this](const LocalPath &path) -> void { ZuneImport(path); }));
+
+		if (_gdi.Supports(OperationCode::SendObjectPropList) && _gdi.Supports(OperationCode::SetObjectReferences))
+		{
+			AddCommand("zune-init", "load media library",
+				make_function([this]() -> void { ZuneInit(); }));
+			AddCommand("zune-import", "<file> import file using metadata",
+				make_function([this](const LocalPath &path) -> void { ZuneImport(path); }));
+		}
 
 		AddCommand("test-property-list", "test GetObjectPropList on given object",
 			make_function([this](const Path &path) -> void { TestObjectPropertyList(path); }));
