@@ -179,7 +179,6 @@ int main(int argc, char **argv)
 	{
 		try
 		{
-			session.reset();
 			auto device = Device::Open(ctx, desc, claimInterface, resetDevice);
 			if (!device)
 				continue;
