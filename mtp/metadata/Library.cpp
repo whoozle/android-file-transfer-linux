@@ -1,6 +1,7 @@
 #include <mtp/metadata/Library.h>
 #include <mtp/ptp/Session.h>
 #include <mtp/log.h>
+#include <unordered_map>
 
 namespace mtp
 {
@@ -37,6 +38,19 @@ namespace mtp
 		debug("artists folder: ", _artistsFolder.Id);
 		debug("albums folder: ", _albumsFolder.Id);
 		debug("music folder: ", _musicFolder.Id);
+
+		std::unordered_map<std::string, ObjectId> musicFolders;
+		{
+			debug("reading music folders");
+			msg::ObjectHandles folders = _session->GetObjectHandles(_storage, mtp::ObjectFormat::Association, _musicFolder);
+			musicFolders.reserve(folders.ObjectHandles.size());
+
+			for(auto id : folders.ObjectHandles)
+			{
+				auto name = _session->GetObjectStringProperty(id, ObjectProperty::ObjectFilename);
+				musicFolders.insert(std::make_pair(name, id));
+			}
+		}
 
 		using namespace mtp;
 		{
