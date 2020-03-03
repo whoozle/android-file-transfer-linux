@@ -351,9 +351,14 @@ namespace cli
 			for(OperationCode code : _gdi.OperationsSupported)
 				ss << ToString(code) << " ";
 
-			ss << "\n";
-			ss << "supported properties: ";
+			ss << "\nsupported capture formats: ";
+			for(auto code : _gdi.CaptureFormats)
+				ss << ToString(code) << " ";
+			ss << "\nsupported image formats: ";
+			for(auto code : _gdi.ImageFormats)
+				ss << ToString(code) << " ";
 
+			ss << "\nsupported properties: ";
 			_batterySupported = _gdi.Supports(mtp::DeviceProperty::BatteryLevel);
 			_deviceFriendlyNameSupported = _gdi.Supports(mtp::DeviceProperty::DeviceFriendlyName);
 

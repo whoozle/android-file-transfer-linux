@@ -42,8 +42,8 @@ namespace mtp { namespace msg
 		std::vector<OperationCode>	OperationsSupported;
 		std::vector<EventCode>		EventsSupported;
 		std::vector<DeviceProperty>	DevicePropertiesSupported;
-		std::vector<u16>			CaptureFormats;
-		std::vector<u16>			ImageFormats;
+		std::vector<ObjectFormat>	CaptureFormats;
+		std::vector<ObjectFormat>	ImageFormats;
 		std::string					Manufacturer;
 		std::string					Model;
 		std::string					DeviceVersion;
