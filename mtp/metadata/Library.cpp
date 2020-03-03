@@ -62,6 +62,12 @@ namespace mtp
 				auto artist = std::make_shared<Artist>();
 				artist->Id = id;
 				artist->Name = name;
+				auto it = musicFolders.find(name);
+				if (it != musicFolders.end())
+					artist->MusicFolderId = it->second;
+				else
+					artist->MusicFolderId = _session->CreateDirectory(name, _musicFolder, _storage).ObjectId;
+
 				_artists.insert(std::make_pair(name, artist));
 			}
 		}
