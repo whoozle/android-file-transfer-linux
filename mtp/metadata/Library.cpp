@@ -211,7 +211,7 @@ namespace mtp
 		ByteArray propList;
 		OutputStream os(propList);
 
-		os.Write32(3); //number of props
+		os.Write32(3 + (!genre.empty()? 1: 0) + (trackIndex? 1: 0)); //number of props
 
 		os.Write32(0); //object handle
 		os.Write16(static_cast<u16>(ObjectProperty::ArtistId));
@@ -222,6 +222,22 @@ namespace mtp
 		os.Write16(static_cast<u16>(ObjectProperty::Name));
 		os.Write16(static_cast<u16>(DataTypeCode::String));
 		os.WriteString(name);
+
+		if (trackIndex)
+		{
+			os.Write32(0); //object handle
+			os.Write16(static_cast<u16>(ObjectProperty::Track));
+			os.Write16(static_cast<u16>(DataTypeCode::Uint16));
+			os.Write16(trackIndex);
+		}
+
+		if (!genre.empty())
+		{
+			os.Write32(0); //object handle
+			os.Write16(static_cast<u16>(ObjectProperty::Genre));
+			os.Write16(static_cast<u16>(DataTypeCode::String));
+			os.WriteString(genre);
+		}
 
 		os.Write32(0); //object handle
 		os.Write16(static_cast<u16>(ObjectProperty::ObjectFilename));
