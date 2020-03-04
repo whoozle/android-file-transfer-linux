@@ -74,6 +74,8 @@ namespace mtp
 				_artists.insert(std::make_pair(name, artist));
 			}
 		}
+
+		std::unordered_map<ArtistPtr, NameToObjectIdMap> albumFolders;
 		{
 			auto albums = _session->GetObjectHandles(Session::AllStorages, ObjectFormat::AbstractAudioAlbum, Session::Device);
 			for (auto id : albums.ObjectHandles)
@@ -88,8 +90,23 @@ namespace mtp
 				debug("album: ", name, "\t", id.Id, "\t", albumDate);
 				auto album = std::make_shared<Album>();
 				album->Name = name;
+				album->Artist = artist;
 				album->Id = id;
 				album->Year = ConvertDateTime(albumDate);
+				if (albumFolders.find(artist) == albumFolders.end()) {
+					albumFolders[artist] = ListAssociations(artist->MusicFolderId);
+				}
+				auto it = albumFolders.find(artist);
+				if (it == albumFolders.end())
+					throw std::runtime_error("no iterator after insert, internal error");
+
+				const auto & albums = it->second;
+				auto alit = albums.find(name);
+				if (alit != albums.end())
+					album->MusicFolderId = alit->second;
+				else
+					album->MusicFolderId = _session->CreateDirectory(name, artist->MusicFolderId, _storage).ObjectId;
+
 				_albums.insert(std::make_pair(std::make_pair(artist, name), album));
 			}
 		}
