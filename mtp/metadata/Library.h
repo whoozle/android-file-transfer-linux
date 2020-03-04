@@ -65,14 +65,12 @@ namespace mtp
 		~Library();
 
 		//search by Metadata?
-		ArtistPtr GetArtist(const std::string & name)
-		{ auto it = _artists.find(name); return it != _artists.end()? it->second: ArtistPtr(); }
-		ArtistPtr CreateArtist(const std::string & name);
+		ArtistPtr GetArtist(std::string name);
+		ArtistPtr CreateArtist(std::string name);
 
-		AlbumPtr GetAlbum(const ArtistPtr & artist, const std::string & name)
-		{ auto it = _albums.find(std::make_pair(artist, name)); return it != _albums.end()? it->second: AlbumPtr(); }
-		AlbumPtr CreateAlbum(const ArtistPtr & artist, const std::string & name, int year);
-		ObjectId CreateTrack(ArtistPtr artist, AlbumPtr album, ObjectFormat type, const std::string &name, const std::string & genre, int trackIndex, const std::string &filename, size_t size);
+		AlbumPtr GetAlbum(const ArtistPtr & artist, std::string name);
+		AlbumPtr CreateAlbum(ArtistPtr artist, std::string name, int year);
+		ObjectId CreateTrack(ArtistPtr artist, AlbumPtr album, ObjectFormat type, std::string name, const std::string & genre, int trackIndex, const std::string &filename, size_t size);
 	};
 }
 

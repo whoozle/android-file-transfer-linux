@@ -5,6 +5,12 @@
 
 namespace mtp
 {
+	namespace
+	{
+		const std::string UknownArtist	("UknownArtist");
+		const std::string UknownAlbum	("UknownAlbum");
+	}
+
 	Library::NameToObjectIdMap Library::ListAssociations(ObjectId parentId)
 	{
 		NameToObjectIdMap list;
@@ -126,10 +132,20 @@ namespace mtp
 	Library::~Library()
 	{ }
 
-	Library::ArtistPtr Library::CreateArtist(const std::string & name)
+	Library::ArtistPtr Library::GetArtist(std::string name)
 	{
 		if (name.empty())
-			return nullptr;
+			name = UknownArtist;
+
+		auto it = _artists.find(name);
+		return it != _artists.end()? it->second: ArtistPtr();
+	}
+
+
+	Library::ArtistPtr Library::CreateArtist(std::string name)
+	{
+		if (name.empty())
+			name = UknownArtist;
 
 		ByteArray propList;
 		OutputStream os(propList);
@@ -157,15 +173,27 @@ namespace mtp
 		return artist;
 	}
 
-	Library::AlbumPtr Library::CreateAlbum(const ArtistPtr & artist, const std::string & name, int year)
+	Library::AlbumPtr Library::GetAlbum(const ArtistPtr & artist, std::string name)
 	{
-		if (name.empty() || !artist)
-			return nullptr;
+		if (name.empty())
+			name = UknownAlbum;
+
+		auto it = _albums.find(std::make_pair(artist, name));
+		return it != _albums.end()? it->second: AlbumPtr();
+	}
+
+	Library::AlbumPtr Library::CreateAlbum(ArtistPtr artist, std::string name, int year)
+	{
+		if (!artist)
+			throw std::runtime_error("artists is required");
+
+		if (name.empty())
+			name = UknownAlbum;
 
 		ByteArray propList;
 		OutputStream os(propList);
 
-		os.Write32(year? 4: 3); //number of props
+		os.Write32(3 + (year? 1: 0)); //number of props
 
 		os.Write32(0); //object handle
 		os.Write16(static_cast<u16>(ObjectProperty::ArtistId));
@@ -205,7 +233,7 @@ namespace mtp
 
 	ObjectId Library::CreateTrack(ArtistPtr artist, AlbumPtr album,
 		ObjectFormat type,
-		const std::string &name, const std::string & genre, int trackIndex,
+		std::string name, const std::string & genre, int trackIndex,
 		const std::string &filename, size_t size)
 	{
 		ByteArray propList;
