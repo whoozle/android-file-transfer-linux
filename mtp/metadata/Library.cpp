@@ -214,7 +214,7 @@ namespace mtp
 		os.Write16(static_cast<u16>(DataTypeCode::String));
 		os.WriteString(filename);
 
-		auto response = _session->SendObjectPropList(Session::AnyStorage, Session::Device, type, size, propList);
+		auto response = _session->SendObjectPropList(_storage, album->MusicFolderId, type, size, propList);
 		return response.ObjectId;
 	}
 
