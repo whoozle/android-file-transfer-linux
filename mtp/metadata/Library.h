@@ -57,6 +57,8 @@ namespace mtp
 		using NameToObjectIdMap = std::unordered_map<std::string, ObjectId>;
 		NameToObjectIdMap ListAssociations(ObjectId parentId);
 
+		ObjectId GetOrCreate(ObjectId parentId, const std::string &name);
+
 	public:
 
 		Library(const mtp::SessionPtr & session);

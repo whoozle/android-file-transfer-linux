@@ -19,6 +19,17 @@ namespace mtp
 		return list;
 	}
 
+	ObjectId Library::GetOrCreate(ObjectId parentId, const std::string &name)
+	{
+		auto objects = _session->GetObjectHandles(_storage, mtp::ObjectFormat::Association, parentId);
+		for (auto id : objects.ObjectHandles)
+		{
+			auto oname = _session->GetObjectStringProperty(id, ObjectProperty::ObjectFilename);
+			if (name == oname)
+				return id;
+		}
+		return _session->CreateDirectory(name, parentId, _storage).ObjectId;
+	}
 
 	Library::Library(const mtp::SessionPtr & session): _session(session)
 	{
@@ -136,7 +147,7 @@ namespace mtp
 		os.WriteString(name + ".art");
 
 		auto artist = std::make_shared<Artist>();
-		artist->MusicFolderId = _session->CreateDirectory(name, _musicFolder, _storage).ObjectId;
+		artist->MusicFolderId = GetOrCreate(_musicFolder, name);
 
 		artist->Name = name;
 		auto response = _session->SendObjectPropList(_storage, _artistsFolder, ObjectFormat::Artist, 0, propList);
@@ -183,7 +194,7 @@ namespace mtp
 		album->Artist = artist;
 		album->Name = name;
 		album->Year = year;
-		album->MusicFolderId = _session->CreateDirectory(name, artist->MusicFolderId, _storage).ObjectId;
+		album->MusicFolderId = GetOrCreate(artist->MusicFolderId, name);
 
 		auto response = _session->SendObjectPropList(_storage, _albumsFolder, ObjectFormat::AbstractAudioAlbum, 0, propList);
 		album->Id = response.ObjectId;
