@@ -135,10 +135,13 @@ namespace mtp
 		os.Write16(static_cast<u16>(DataTypeCode::String));
 		os.WriteString(name + ".art");
 
-		auto response = _session->SendObjectPropList(_storage, _artistsFolder, ObjectFormat::Artist, 0, propList);
 		auto artist = std::make_shared<Artist>();
-		artist->Id = response.ObjectId;
+		artist->MusicFolderId = _session->CreateDirectory(name, _musicFolder, _storage).ObjectId;
+
 		artist->Name = name;
+		auto response = _session->SendObjectPropList(_storage, _artistsFolder, ObjectFormat::Artist, 0, propList);
+		artist->Id = response.ObjectId;
+
 		_artists.insert(std::make_pair(name, artist));
 		return artist;
 	}
@@ -176,12 +179,15 @@ namespace mtp
 			os.WriteString(ConvertYear(year));
 		}
 
-		auto response = _session->SendObjectPropList(_storage, _albumsFolder, ObjectFormat::AbstractAudioAlbum, 0, propList);
-
 		auto album = std::make_shared<Album>();
-		album->Id = response.ObjectId;
 		album->Artist = artist;
 		album->Name = name;
+		album->Year = year;
+		album->MusicFolderId = _session->CreateDirectory(name, artist->MusicFolderId, _storage).ObjectId;
+
+		auto response = _session->SendObjectPropList(_storage, _albumsFolder, ObjectFormat::AbstractAudioAlbum, 0, propList);
+		album->Id = response.ObjectId;
+
 		_albums.insert(std::make_pair(std::make_pair(artist, name), album));
 		return album;
 	}
