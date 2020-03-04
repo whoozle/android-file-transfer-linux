@@ -5,6 +5,20 @@
 
 namespace mtp
 {
+	Library::NameToObjectIdMap Library::ListAssociations(ObjectId parentId)
+	{
+		NameToObjectIdMap list;
+		auto folders = _session->GetObjectHandles(_storage, mtp::ObjectFormat::Association, parentId);
+		list.reserve(folders.ObjectHandles.size());
+
+		for(auto id : folders.ObjectHandles)
+		{
+			auto name = _session->GetObjectStringProperty(id, ObjectProperty::ObjectFilename);
+			list.insert(std::make_pair(name, id));
+		}
+		return list;
+	}
+
 
 	Library::Library(const mtp::SessionPtr & session): _session(session)
 	{
@@ -39,18 +53,7 @@ namespace mtp
 		debug("albums folder: ", _albumsFolder.Id);
 		debug("music folder: ", _musicFolder.Id);
 
-		std::unordered_map<std::string, ObjectId> musicFolders;
-		{
-			debug("reading music folders");
-			msg::ObjectHandles folders = _session->GetObjectHandles(_storage, mtp::ObjectFormat::Association, _musicFolder);
-			musicFolders.reserve(folders.ObjectHandles.size());
-
-			for(auto id : folders.ObjectHandles)
-			{
-				auto name = _session->GetObjectStringProperty(id, ObjectProperty::ObjectFilename);
-				musicFolders.insert(std::make_pair(name, id));
-			}
-		}
+		auto musicFolders = ListAssociations(_musicFolder);
 
 		using namespace mtp;
 		{

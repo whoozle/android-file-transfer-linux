@@ -54,6 +54,9 @@ namespace mtp
 		using AlbumMap = std::unordered_map<AlbumKey, AlbumPtr, AlbumKeyHash>;
 		AlbumMap _albums;
 
+		using NameToObjectIdMap = std::unordered_map<std::string, ObjectId>;
+		NameToObjectIdMap ListAssociations(ObjectId parentId);
+
 	public:
 
 		Library(const mtp::SessionPtr & session);
