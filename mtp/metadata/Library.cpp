@@ -192,7 +192,10 @@ namespace mtp
 		return album;
 	}
 
-	ObjectId Library::CreateTrack(ArtistPtr artist, AlbumPtr album, ObjectFormat type, const std::string &name, const std::string &filename, size_t size)
+	ObjectId Library::CreateTrack(ArtistPtr artist, AlbumPtr album,
+		ObjectFormat type,
+		const std::string &name, const std::string & genre, int trackIndex,
+		const std::string &filename, size_t size)
 	{
 		ByteArray propList;
 		OutputStream os(propList);

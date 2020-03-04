@@ -1130,8 +1130,10 @@ namespace cli
 		debug("got album record");
 
 		ObjectFormat format = ObjectFormatFromFilename(path);
+		auto slashpos = path.rfind('/');
+		auto filename = slashpos != path.npos? path.substr(slashpos + 1): std::string(path);
 		debug("track format: " + ToString(format));
-		auto songId = _library->CreateTrack(artist, album, format, meta->Title, path, stream->GetSize());
+		auto songId = _library->CreateTrack(artist, album, format, meta->Title, meta->Genre, meta->Track, filename, stream->GetSize());
 		_session->SendObject(stream);
 
 		msg::ObjectHandles handles = _session->GetObjectReferences(album->Id);
