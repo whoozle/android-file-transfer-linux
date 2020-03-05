@@ -113,7 +113,7 @@ if (BUILD_QT_UI)
 	message(STATUS "Macdeployqt path: ${MACDEPLOYQT_TOOL}")
 	install (CODE "
 			 message(STATUS \"Running deploy Qt tool: ${MACDEPLOYQT_TOOL}\")
-			 execute_process(COMMAND \"${MACDEPLOYQT_TOOL}\" ${CMAKE_INSTALL_PREFIX}/android-file-transfer.app ERROR_QUIET)
+			 execute_process(COMMAND \"${MACDEPLOYQT_TOOL}\" ${CMAKE_INSTALL_PREFIX}/android-file-transfer.app)
 			 execute_process(COMMAND \"${CMAKE_INSTALL_NAME_TOOL}\" -add_rpath @executable_path/../Frameworks \"${CMAKE_INSTALL_PREFIX}/${APP_NAME}.app/Contents/MacOS/${APP_NAME}\")
 			 " COMPONENT Runtime)
   else()
