@@ -84,13 +84,6 @@ if (BUILD_QT_UI)
 	set(MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)
 	message(STATUS "generated bundle info is in ${MACOSX_BUNDLE_INFO_PLIST}")
 	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in ${MACOSX_BUNDLE_INFO_PLIST})
-	set(MACOSX_BUNDLE_LIBS)
-	if (OPENSSL_FOUND)
-		list(APPEND MACOSX_BUNDLE_LIBS /usr/local/opt/openssl@1.1/lib/libcrypto.1.1.dylib)
-	endif()
-	if (TAGLIB_FOUND)
-		list(APPEND MACOSX_BUNDLE_LIBS /usr/local/opt/taglib/lib/libtag.1.dylib)
-	endif()
 
 	set(APPLICATION_ICON ${CMAKE_SOURCE_DIR}/osx/android-file-transfer.icns)
 	set_source_files_properties(${APPLICATION_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
@@ -110,8 +103,12 @@ if (BUILD_QT_UI)
 		  BUNDLE DESTINATION .)
 
   if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-	add_custom_command(TARGET ${APP_NAME} POST_BUILD COMMAND ${OTOOL_BIN} -L "$<TARGET_FILE:${APP_NAME}>")
 	set(MACOSX_BUNDLE_ROOT_DIR "${CMAKE_INSTALL_PREFIX}/${APP_NAME}.app")
+	set(MACOSX_BUNDLE_APP_PATH "${MACOSX_BUNDLE_ROOT_DIR}/Contents/MacOS/${APP_NAME}")
+
+	add_custom_command(TARGET ${APP_NAME} POST_BUILD
+		COMMAND ${OTOOL_BIN} -L "$<TARGET_FILE:${APP_NAME}>"
+	)
 	if (Qt5Widgets_FOUND)
 	  set(MACDEPLOYQT_TOOL ${Qt5Widgets_DIR}/../../../bin/macdeployqt)
 	else()
@@ -119,12 +116,25 @@ if (BUILD_QT_UI)
 	  set(MACDEPLOYQT_TOOL ${QT_BIN_DIR})
 	endif()
 	message(STATUS "Macdeployqt path: ${MACDEPLOYQT_TOOL}")
-	set(MACOSX_BUNDLE_APP_PATH "${MACOSX_BUNDLE_ROOT_DIR}/Contents/MacOS/${APP_NAME}")
+
+	if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+		set(MACOSX_BUNDLE_LIBS_INSTALL)
+		foreach(DYNLIB ${MACOSX_BUNDLE_LIBS})
+			message(STATUS "additional bundle lib ${DYNLIB}")
+			set(MACOSX_BUNDLE_LIBS_INSTALL "
+				${MACOSX_BUNDLE_LIBS_INSTALL}
+				get_filename_component(DYNLIB_NAME \"${DYNLIB}\" NAME)
+				file(INSTALL \"${DYNLIB}\" DESTINATION \"${MACOSX_BUNDLE_ROOT_DIR}\"
+				execute_process(COMMAND \"${CMAKE_INSTALL_NAME_TOOL}\" -change \"${DYNLIB_NAME}\" \"@executable_path/../Frameworks/${DYNLIB_NAME}\")
+			")
+		endforeach()
+	endif()
 
 	install (CODE "
 			 message(STATUS \"Running deploy Qt tool: ${MACDEPLOYQT_TOOL}\")
 			 execute_process(COMMAND \"${MACDEPLOYQT_TOOL}\" ${MACOSX_BUNDLE_ROOT_DIR})
-			 execute_process(COMMAND \"${CMAKE_INSTALL_NAME_TOOL}\" -add_rpath @executable_path/../Frameworks \"${MACOSX_BUNDLE_APP_PATH}\")
+			 execute_process(COMMAND ${CMAKE_INSTALL_NAME_TOOL} -add_rpath \"@executable_path/../Frameworks/\" \"${MACOSX_BUNDLE_APP_PATH}\")
+			 ${MACOSX_BUNDLE_LIBS_INSTALL}
 			 execute_process(COMMAND \"${OTOOL_BIN}\" -L \"${MACOSX_BUNDLE_APP_PATH}\")
 			 " COMPONENT Runtime)
   else()

@@ -49,3 +49,7 @@ endif()
 add_executable(aft-mtp-cli ${CLI_SOURCES})
 target_link_libraries(aft-mtp-cli ${MTP_LIBRARIES} ${CLI_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 install(TARGETS aft-mtp-cli RUNTIME DESTINATION bin)
+
+if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+	add_custom_command(TARGET aft-mtp-cli POST_BUILD COMMAND ${CMAKE_INSTALL_NAME_TOOL} -add_rpath "@executable_path/../Frameworks/" $<TARGET_FILE:aft-mtp-cli>)
+endif()

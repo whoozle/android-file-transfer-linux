@@ -237,3 +237,13 @@ if (BUILD_QT_UI)
 endif()
 
 add_custom_target(uninstall COMMAND xargs rm < install_manifest.txt)
+
+if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+	set(MACOSX_BUNDLE_LIBS)
+	if (OPENSSL_FOUND)
+		list(APPEND MACOSX_BUNDLE_LIBS /usr/local/opt/openssl@1.1/lib/libcrypto.1.1.dylib)
+	endif()
+	if (TAGLIB_FOUND)
+		list(APPEND MACOSX_BUNDLE_LIBS /usr/local/opt/taglib/lib/libtag.1.dylib)
+	endif()
+endif()
