@@ -84,6 +84,7 @@ if (BUILD_QT_UI)
 	set(MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)
 	message(STATUS "generated bundle info is in ${MACOSX_BUNDLE_INFO_PLIST}")
 	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in ${MACOSX_BUNDLE_INFO_PLIST})
+	message(STATUS "taglib libdir: ${TAGLIB_LIBDIR}")
 
 	set(APPLICATION_ICON ${CMAKE_SOURCE_DIR}/osx/android-file-transfer.icns)
 	set_source_files_properties(${APPLICATION_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
