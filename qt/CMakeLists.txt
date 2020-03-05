@@ -103,7 +103,7 @@ if (BUILD_QT_UI)
 		  BUNDLE DESTINATION .)
 
   if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-	add_custom_command(TARGET ${APP_NAME} POST_BUILD COMMAND ${OTOOL_BIN} -L)
+	add_custom_command(TARGET ${APP_NAME} POST_BUILD COMMAND ${OTOOL_BIN} -L ${APP_NAME})
 	if (Qt5Widgets_FOUND)
 	  set(MACDEPLOYQT_TOOL ${Qt5Widgets_DIR}/../../../bin/macdeployqt)
 	else()
