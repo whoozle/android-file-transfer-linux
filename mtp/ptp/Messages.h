@@ -84,6 +84,12 @@ namespace mtp { namespace msg
 			auto i = std::find(EventsSupported.begin(), EventsSupported.end(), event);
 			return i != EventsSupported.end();
 		}
+
+		bool Supports(ObjectFormat format) const
+		{
+			auto i = std::find(ImageFormats.begin(), ImageFormats.end(), format);
+			return i != ImageFormats.end();
+		}
 	};
 
 	struct ObjectHandles //! MTP ObjectHandles message

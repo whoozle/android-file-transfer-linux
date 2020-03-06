@@ -64,6 +64,8 @@ namespace mtp
 		Library(const mtp::SessionPtr & session);
 		~Library();
 
+		static bool Supported(const mtp::SessionPtr & session);
+
 		//search by Metadata?
 		ArtistPtr GetArtist(std::string name);
 		ArtistPtr CreateArtist(std::string name);

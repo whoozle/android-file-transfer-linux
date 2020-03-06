@@ -177,7 +177,7 @@ namespace cli
 		AddCommand("get-refs", "returns object-associated refs",
 			make_function([this](const StoragePath &path) -> void { GetObjectReferences(path); }));
 
-		if (_gdi.Supports(OperationCode::SendObjectPropList) && _gdi.Supports(OperationCode::SetObjectReferences))
+		if (Library::Supported(_session))
 		{
 			AddCommand("zune-init", "load media library",
 				make_function([this]() -> void { ZuneInit(); }));

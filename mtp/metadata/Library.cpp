@@ -276,4 +276,14 @@ namespace mtp
 		return response.ObjectId;
 	}
 
+	bool Library::Supported(const mtp::SessionPtr & session)
+	{
+		auto & gdi = session->GetDeviceInfo();
+		return
+			gdi.Supports(OperationCode::SendObjectPropList) &&
+			gdi.Supports(OperationCode::SetObjectReferences) &&
+			gdi.Supports(ObjectFormat::Artist) && gdi.Supports(ObjectFormat::AbstractAudioAlbum);
+		;
+	}
+
 }
