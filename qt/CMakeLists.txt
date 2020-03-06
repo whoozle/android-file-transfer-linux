@@ -119,7 +119,7 @@ if (BUILD_QT_UI)
 			get_filename_component(DYNLIB_NAME "${DYNLIB}" NAME)
 			set(MACOSX_BUNDLE_LIBS_PRE_INSTALL "
 				${MACOSX_BUNDLE_LIBS_PRE_INSTALL}
-				file(INSTALL \"${DYNLIB}\" DESTINATION \"${MACOSX_BUNDLE_ROOT_DIR}/Contents/Frameworks\")
+				file(INSTALL \"${DYNLIB}\" DESTINATION \"${MACOSX_BUNDLE_ROOT_DIR}/Contents/Frameworks\" FOLLOW_SYMLINK_CHAIN)
 				message(STATUS \"qt: fixing ${DYNLIB_NAME}\")
 				execute_process(COMMAND \"${CMAKE_INSTALL_NAME_TOOL}\" -change \"${DYNLIB_NAME}\" \"@executable_path/../Frameworks/${DYNLIB_NAME}\" \"${MACOSX_BUNDLE_APP_PATH}\")
 			")
