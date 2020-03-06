@@ -58,10 +58,10 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 		set(MACOSX_BUNDLE_LIBS_INSTALL "
 			${MACOSX_BUNDLE_LIBS_INSTALL}
 			execute_process(COMMAND \"${CMAKE_INSTALL_NAME_TOOL}\" -change \"${DYNLIB_NAME}\" \"@executable_path/../Frameworks/${DYNLIB_NAME}\" \"$<TARGET_FILE:aft-mtp-cli>\")
-		")
+			" PARENT_SCOPE)
 	endforeach()
 	set(MACOSX_BUNDLE_LIBS_INSTALL "
 		${MACOSX_BUNDLE_LIBS_INSTALL}
 		execute_process(COMMAND \"${OTOOL_BIN}\" -L \"$<TARGET_FILE:aft-mtp-cli>\")
-	")
+	" PARENT_SCOPE)
 endif()
