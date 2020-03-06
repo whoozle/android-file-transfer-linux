@@ -52,4 +52,5 @@ install(TARGETS aft-mtp-cli RUNTIME DESTINATION bin)
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 	add_custom_command(TARGET aft-mtp-cli POST_BUILD COMMAND ${CMAKE_INSTALL_NAME_TOOL} -add_rpath "@executable_path/../Frameworks/" $<TARGET_FILE:aft-mtp-cli>)
+	add_custom_command(TARGET aft-mtp-cli POST_BUILD COMMAND ${OTOOL_BIN} -L "$<TARGET_FILE:aft-mtp-cli>")
 endif()

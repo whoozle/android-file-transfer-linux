@@ -13,6 +13,7 @@ message(STATUS "building for ${CMAKE_SYSTEM_NAME}")
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 	set(USB_BACKEND_DARWIN TRUE)
 	set(CMAKE_OSX_DEPLOYMENT_TARGET 10.13)
+	find_program(OTOOL_BIN otool)
 endif()
 
 cmake_minimum_required(VERSION 2.8)
