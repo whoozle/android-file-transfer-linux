@@ -55,7 +55,6 @@ if (BUILD_QT_UI AND (${CMAKE_SYSTEM_NAME} MATCHES "Darwin"))
 	add_custom_command(TARGET aft-mtp-cli POST_BUILD COMMAND ${OTOOL_BIN} -L $<TARGET_FILE:aft-mtp-cli>)
 	set(AFT_MTP_CLI_PATH "${MACOSX_BUNDLE_ROOT_DIR}/Contents/SharedSupport/bin/aft-mtp-cli")
 	foreach(DYNLIB ${MACOSX_BUNDLE_LIBS})
-		message(STATUS "cli: additional bundle lib ${DYNLIB}")
 		get_filename_component(DYNLIB_NAME "${DYNLIB}" NAME)
 		set(MACOSX_BUNDLE_LIBS_INSTALL "
 			${MACOSX_BUNDLE_LIBS_INSTALL}
