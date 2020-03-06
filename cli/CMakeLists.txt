@@ -66,7 +66,7 @@ if (BUILD_QT_UI AND (${CMAKE_SYSTEM_NAME} MATCHES "Darwin"))
 			${MACOSX_BUNDLE_LIBS_INSTALL}
 			message(STATUS \"cli: fixing ${DYNLIB_NAME}\")
 			execute_process(COMMAND \"${CMAKE_INSTALL_NAME_TOOL}\" -change \"${DYNLIB_NAME}\" \"@executable_path/../Frameworks/${DYNLIB_NAME}\" \"${AFT_MTP_CLI_PATH}\")
-			" PARENT_SCOPE)
+			")
 	endforeach()
 	set(MACOSX_BUNDLE_LIBS_INSTALL "
 		${MACOSX_BUNDLE_LIBS_INSTALL}
