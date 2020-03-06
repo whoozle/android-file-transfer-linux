@@ -52,6 +52,7 @@ install(TARGETS aft-mtp-cli RUNTIME DESTINATION bin)
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 	add_custom_command(TARGET aft-mtp-cli POST_BUILD COMMAND ${CMAKE_INSTALL_NAME_TOOL} -add_rpath "@executable_path/../Frameworks/" $<TARGET_FILE:aft-mtp-cli>)
+	add_custom_command(TARGET aft-mtp-cli POST_BUILD COMMAND ${OTOOL_BIN} -L "$<TARGET_FILE:aft-mtp-cli>")
 	foreach(DYNLIB ${MACOSX_BUNDLE_LIBS})
 		message(STATUS "cli: additional bundle lib ${DYNLIB}")
 		set(MACOSX_BUNDLE_LIBS_INSTALL "
@@ -59,5 +60,8 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 			execute_process(COMMAND \"${CMAKE_INSTALL_NAME_TOOL}\" -change \"${DYNLIB_NAME}\" \"@executable_path/../Frameworks/${DYNLIB_NAME}\" \"$<TARGET_FILE:aft-mtp-cli>\")
 		")
 	endforeach()
-	add_custom_command(TARGET aft-mtp-cli POST_BUILD COMMAND ${OTOOL_BIN} -L "$<TARGET_FILE:aft-mtp-cli>")
+	set(MACOSX_BUNDLE_LIBS_INSTALL "
+		${MACOSX_BUNDLE_LIBS_INSTALL}
+		execute_process(COMMAND \"${OTOOL_BIN}\" -L \"$<TARGET_FILE:aft-mtp-cli>\")
+	")
 endif()
