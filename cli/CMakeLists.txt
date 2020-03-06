@@ -53,10 +53,10 @@ install(TARGETS aft-mtp-cli RUNTIME DESTINATION bin)
 if (BUILD_QT_UI AND (${CMAKE_SYSTEM_NAME} MATCHES "Darwin"))
 	set(MACOSX_BUNDLE_LIBS_INSTALL "
 	${MACOSX_BUNDLE_LIBS_INSTALL}
-	file(INSTALL ${CMAKE_CURRENT_BINARY_DIR}/aft-mtp-cli DESTINATION \"${MACOSX_BUNDLE_ROOT_DIR}/Content/MacOS\")
+	file(INSTALL ${CMAKE_CURRENT_BINARY_DIR}/aft-mtp-cli DESTINATION \"${MACOSX_BUNDLE_ROOT_DIR}/Contents/MacOS\")
 	")
 
-	set(AFT_MTP_CLI_PATH "${MACOSX_BUNDLE_ROOT_DIR}/Content/MacOS/aft-mtp-cli")
+	set(AFT_MTP_CLI_PATH "${MACOSX_BUNDLE_ROOT_DIR}/Contents/MacOS/aft-mtp-cli")
 	add_custom_command(TARGET aft-mtp-cli POST_BUILD COMMAND ${CMAKE_INSTALL_NAME_TOOL} -add_rpath "@executable_path/../Frameworks/" $<TARGET_FILE:aft-mtp-cli>)
 	add_custom_command(TARGET aft-mtp-cli POST_BUILD COMMAND ${OTOOL_BIN} -L $<TARGET_FILE:aft-mtp-cli>)
 	foreach(DYNLIB ${MACOSX_BUNDLE_LIBS})
