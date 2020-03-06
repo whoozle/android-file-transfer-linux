@@ -50,7 +50,7 @@ add_executable(aft-mtp-cli ${CLI_SOURCES})
 target_link_libraries(aft-mtp-cli ${MTP_LIBRARIES} ${CLI_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 install(TARGETS aft-mtp-cli RUNTIME DESTINATION bin)
 
-if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+if (BUILD_QT_UI AND (${CMAKE_SYSTEM_NAME} MATCHES "Darwin"))
 	set(AFT_MTP_CLI_PATH $<TARGET_FILE:aft-mtp-cli>)
 	add_custom_command(TARGET aft-mtp-cli POST_BUILD COMMAND ${CMAKE_INSTALL_NAME_TOOL} -add_rpath "@executable_path/../Frameworks/" ${AFT_MTP_CLI_PATH})
 	add_custom_command(TARGET aft-mtp-cli POST_BUILD COMMAND ${OTOOL_BIN} -L "$<TARGET_FILE:aft-mtp-cli>")
