@@ -98,22 +98,11 @@ if (BUILD_QT_UI)
 		  BUNDLE DESTINATION .)
 
   if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-	set(MACOSX_BUNDLE_ROOT_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_PROJECT_NAME}.app")
 	set(MACOSX_BUNDLE_APP_PATH "${MACOSX_BUNDLE_ROOT_DIR}/Contents/MacOS/${CMAKE_PROJECT_NAME}")
-	set(MACOSX_BUNDLE_SBIN_PATH "${MACOSX_BUNDLE_ROOT_DIR}/Contents/SharedSupport/bin")
-	message(STATUS "bundle root dir: ${MACOSX_BUNDLE_ROOT_DIR}")
 
-	add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD COMMAND ${OTOOL_BIN} -L "$<TARGET_FILE:${CMAKE_PROJECT_NAME}>")
-	add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_INSTALL_NAME_TOOL} -add_rpath "@executable_path/../Frameworks/" $<TARGET_FILE:${CMAKE_PROJECT_NAME}>)
-
-	add_custom_command(TARGET aft-mtp-cli POST_BUILD COMMAND ${CMAKE_INSTALL_NAME_TOOL} -add_rpath "@executable_path/../../Frameworks/" $<TARGET_FILE:aft-mtp-cli>)
-	add_custom_command(TARGET aft-mtp-cli POST_BUILD COMMAND ${OTOOL_BIN} -L $<TARGET_FILE:aft-mtp-cli>)
-
-	if (FUSE_FOUND)
-		add_custom_command(TARGET aft-mtp-mount POST_BUILD COMMAND ${CMAKE_INSTALL_NAME_TOOL} -add_rpath "@executable_path/../../Frameworks/" $<TARGET_FILE:aft-mtp-mount>)
-		add_custom_command(TARGET aft-mtp-mount POST_BUILD COMMAND ${OTOOL_BIN} -L $<TARGET_FILE:aft-mtp-mount>)
-	endif()
-
+	add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
+		COMMAND ${OTOOL_BIN} -L "$<TARGET_FILE:${CMAKE_PROJECT_NAME}>"
+	)
 	if (Qt5Widgets_FOUND)
 	  set(MACDEPLOYQT_TOOL ${Qt5Widgets_DIR}/../../../bin/macdeployqt)
 	else()
@@ -122,47 +111,25 @@ if (BUILD_QT_UI)
 	endif()
 	message(STATUS "Macdeployqt path: ${MACDEPLOYQT_TOOL}")
 
-	set(MACOSX_BUNDLE_LIBS_INSTALL "
-		file(INSTALL \"${CMAKE_CURRENT_BINARY_DIR}/aft-mtp-cli\" DESTINATION \"${MACOSX_BUNDLE_ROOT_DIR}/Contents/SharedSupport/bin\")
-	")
-
-	foreach(DYNLIB ${MACOSX_BUNDLE_LIBS})
-		message(STATUS "additional bundle lib ${DYNLIB}")
-		get_filename_component(DYNLIB_NAME "${DYNLIB}" NAME)
-		set(MACOSX_BUNDLE_LIBS_INSTALL "
-			${MACOSX_BUNDLE_LIBS_INSTALL}
-			file(INSTALL \"${DYNLIB}\" DESTINATION \"${MACOSX_BUNDLE_ROOT_DIR}/Contents/Frameworks\" FOLLOW_SYMLINK_CHAIN)
-
-			message(STATUS \"qt: fixing ${DYNLIB_NAME}\")
-			execute_process(COMMAND \"${CMAKE_INSTALL_NAME_TOOL}\" -change \"${DYNLIB_NAME}\" \"@executable_path/../Frameworks/${DYNLIB_NAME}\" \"${MACOSX_BUNDLE_APP_PATH}\")
-
-			message(STATUS \"cli: fixing ${DYNLIB_NAME}\")
-			execute_process(COMMAND \"${CMAKE_INSTALL_NAME_TOOL}\" -change \"${DYNLIB_NAME}\" \"@executable_path/../../Frameworks/${DYNLIB_NAME}\" \"${MACOSX_BUNDLE_SBIN_PATH}/aft-mtp-cli\")
-		")
-		if (FUSE_FOUND)
-			set(MACOSX_BUNDLE_LIBS_INSTALL "
-				${MACOSX_BUNDLE_LIBS_INSTALL}
-				message(STATUS \"fuse: fixing ${DYNLIB_NAME}\")
-				execute_process(COMMAND \"${CMAKE_INSTALL_NAME_TOOL}\" -change \"${DYNLIB_NAME}\" \"@executable_path/../../Frameworks/${DYNLIB_NAME}\" \"${MACOSX_BUNDLE_SBIN_PATH}/aft-mtp-mount\")
+	if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+		add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_INSTALL_NAME_TOOL} -add_rpath "@executable_path/../Frameworks/" $<TARGET_FILE:${CMAKE_PROJECT_NAME}>)
+		set(MACOSX_BUNDLE_LIBS_PRE_INSTALL)
+		foreach(DYNLIB ${MACOSX_BUNDLE_LIBS})
+			message(STATUS "additional bundle lib ${DYNLIB}")
+			get_filename_component(DYNLIB_NAME "${DYNLIB}" NAME)
+			set(MACOSX_BUNDLE_LIBS_PRE_INSTALL "
+				${MACOSX_BUNDLE_LIBS_PRE_INSTALL}
+				file(INSTALL \"${DYNLIB}\" DESTINATION \"${MACOSX_BUNDLE_ROOT_DIR}/Contents/Frameworks\" FOLLOW_SYMLINK_CHAIN)
+				message(STATUS \"qt: fixing ${DYNLIB_NAME}\")
+				execute_process(COMMAND \"${CMAKE_INSTALL_NAME_TOOL}\" -change \"${DYNLIB_NAME}\" \"@executable_path/../Frameworks/${DYNLIB_NAME}\" \"${MACOSX_BUNDLE_APP_PATH}\")
 			")
-		endif()
-	endforeach()
-
-	set(MACOSX_BUNDLE_LIBS_INSTALL "
-		${MACOSX_BUNDLE_LIBS_INSTALL}
-		execute_process(COMMAND \"${OTOOL_BIN}\" -L \"${MACOSX_BUNDLE_SBIN_PATH}/aft-mtp-cli\")
-	")
-
-	if (FUSE_FOUND)
-		set(MACOSX_BUNDLE_LIBS_INSTALL "
-			${MACOSX_BUNDLE_LIBS_INSTALL}
-			execute_process(COMMAND \"${OTOOL_BIN}\" -L \"${MACOSX_BUNDLE_SBIN_PATH}/aft-mtp-mount\")
-		")
+		endforeach()
 	endif()
 
 	install (CODE "
 			 message(STATUS \"Running deploy Qt tool: ${MACDEPLOYQT_TOOL}\")
 			 execute_process(COMMAND \"${MACDEPLOYQT_TOOL}\" ${MACOSX_BUNDLE_ROOT_DIR})
+			 ${MACOSX_BUNDLE_LIBS_PRE_INSTALL}
 			 ${MACOSX_BUNDLE_LIBS_INSTALL}
 			 execute_process(COMMAND \"${OTOOL_BIN}\" -L \"${MACOSX_BUNDLE_APP_PATH}\")
 			 " COMPONENT Runtime)
