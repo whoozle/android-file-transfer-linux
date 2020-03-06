@@ -51,9 +51,9 @@ target_link_libraries(aft-mtp-cli ${MTP_LIBRARIES} ${CLI_LIBRARIES} ${CMAKE_THRE
 install(TARGETS aft-mtp-cli RUNTIME DESTINATION bin)
 
 if (BUILD_QT_UI AND (${CMAKE_SYSTEM_NAME} MATCHES "Darwin"))
-	set(AFT_MTP_CLI_PATH $<TARGET_FILE:aft-mtp-cli>)
-	add_custom_command(TARGET aft-mtp-cli POST_BUILD COMMAND ${CMAKE_INSTALL_NAME_TOOL} -add_rpath "@executable_path/../Frameworks/" ${AFT_MTP_CLI_PATH})
-	add_custom_command(TARGET aft-mtp-cli POST_BUILD COMMAND ${OTOOL_BIN} -L "$<TARGET_FILE:aft-mtp-cli>")
+	set(AFT_MTP_CLI_PATH ${CMAKE_CURRENT_BINARY_DIR}/aft-mtp-cli)
+	add_custom_command(TARGET aft-mtp-cli POST_BUILD COMMAND ${CMAKE_INSTALL_NAME_TOOL} -add_rpath "@executable_path/../Frameworks/" "${AFT_MTP_CLI_PATH}")
+	add_custom_command(TARGET aft-mtp-cli POST_BUILD COMMAND ${OTOOL_BIN} -L "${AFT_MTP_CLI_PATH}")
 	foreach(DYNLIB ${MACOSX_BUNDLE_LIBS})
 		message(STATUS "cli: additional bundle lib ${DYNLIB}")
 		set(MACOSX_BUNDLE_LIBS_INSTALL "
@@ -63,6 +63,7 @@ if (BUILD_QT_UI AND (${CMAKE_SYSTEM_NAME} MATCHES "Darwin"))
 	endforeach()
 	set(MACOSX_BUNDLE_LIBS_INSTALL "
 		${MACOSX_BUNDLE_LIBS_INSTALL}
-		execute_process(COMMAND \"${OTOOL_BIN}\" -L \"$<TARGET_FILE:aft-mtp-cli>\")
+		file(INSTALL  DESTINATION \"${MACOSX_BUNDLE_ROOT_DIR}/Content/MacOS\")
+		execute_process(COMMAND \"${OTOOL_BIN}\" -L \"${AFT_MTP_CLI_PATH}\")
 	" PARENT_SCOPE)
 endif()
