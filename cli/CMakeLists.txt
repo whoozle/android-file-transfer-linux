@@ -54,14 +54,17 @@ if (BUILD_QT_UI AND (${CMAKE_SYSTEM_NAME} MATCHES "Darwin"))
 	add_custom_command(TARGET aft-mtp-cli POST_BUILD COMMAND ${CMAKE_INSTALL_NAME_TOOL} -add_rpath "@executable_path/../Frameworks/" $<TARGET_FILE:aft-mtp-cli>)
 	add_custom_command(TARGET aft-mtp-cli POST_BUILD COMMAND ${OTOOL_BIN} -L $<TARGET_FILE:aft-mtp-cli>)
 	set(AFT_MTP_CLI_PATH "${MACOSX_BUNDLE_ROOT_DIR}/Contents/SharedSupport/bin/aft-mtp-cli")
+	set(MACOSX_BUNDLE_LIBS_INSTALL "
+		${MACOSX_BUNDLE_LIBS_INSTALL}
+		file(INSTALL \"${CMAKE_CURRENT_BINARY_DIR}/aft-mtp-cli\" DESTINATION \"${MACOSX_BUNDLE_ROOT_DIR}/Contents/SharedSupport/bin\")
+	")
 	foreach(DYNLIB ${MACOSX_BUNDLE_LIBS})
 		get_filename_component(DYNLIB_NAME "${DYNLIB}" NAME)
 		set(MACOSX_BUNDLE_LIBS_INSTALL "
 			${MACOSX_BUNDLE_LIBS_INSTALL}
-			file(INSTALL \"${CMAKE_CURRENT_BINARY_DIR}/aft-mtp-cli\" DESTINATION \"${MACOSX_BUNDLE_ROOT_DIR}/Contents/SharedSupport/bin\")
 			message(STATUS \"cli: fixing ${DYNLIB_NAME}\")
 			execute_process(COMMAND \"${CMAKE_INSTALL_NAME_TOOL}\" -change \"${DYNLIB}\" \"@executable_path/../Frameworks/${DYNLIB_NAME}\" \"${AFT_MTP_CLI_PATH}\")
-			")
+		")
 	endforeach()
 	set(MACOSX_BUNDLE_LIBS_INSTALL "
 		${MACOSX_BUNDLE_LIBS_INSTALL}
