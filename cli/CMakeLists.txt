@@ -61,7 +61,7 @@ if (BUILD_QT_UI AND (${CMAKE_SYSTEM_NAME} MATCHES "Darwin"))
 			${MACOSX_BUNDLE_LIBS_INSTALL}
 			file(INSTALL \"${CMAKE_CURRENT_BINARY_DIR}/aft-mtp-cli\" DESTINATION \"${MACOSX_BUNDLE_ROOT_DIR}/Contents/SharedSupport/bin\")
 			message(STATUS \"cli: fixing ${DYNLIB_NAME}\")
-			execute_process(COMMAND \"${CMAKE_INSTALL_NAME_TOOL}\" -change \"${DYNLIB_NAME}\" \"@executable_path/../../Frameworks/${DYNLIB_NAME}\" \"${AFT_MTP_CLI_PATH}\")
+			execute_process(COMMAND \"${CMAKE_INSTALL_NAME_TOOL}\" -change \"${DYNLIB}\" \"@executable_path/../../Frameworks/${DYNLIB_NAME}\" \"${AFT_MTP_CLI_PATH}\")
 			")
 	endforeach()
 	set(MACOSX_BUNDLE_LIBS_INSTALL "
