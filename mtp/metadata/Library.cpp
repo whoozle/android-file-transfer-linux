@@ -43,6 +43,12 @@ namespace mtp
 		if (storages.StorageIDs.empty())
 			throw std::runtime_error("no storages found");
 
+		_artistSupported = _session->GetDeviceInfo().Supports(ObjectFormat::Artist);
+		{
+			auto propsSupported = _session->GetObjectPropertiesSupported(ObjectFormat::AbstractAudioAlbum);
+			_albumDateAuthoredSupported = std::find(propsSupported.ObjectPropertyCodes.begin(), propsSupported.ObjectPropertyCodes.end(), ObjectProperty::DateAuthored) != propsSupported.ObjectPropertyCodes.end();
+		}
+
 		_storage = storages.StorageIDs[0]; //picking up first storage.
 		//zune fails to create artist/album without storage id
 
@@ -59,21 +65,23 @@ namespace mtp
 					_musicFolder = id;
 			}
 		}
-		if (_artistsFolder == ObjectId())
+		if (_artistSupported && _artistsFolder == ObjectId())
 			_artistsFolder = _session->CreateDirectory("Artists", Session::Root, _storage).ObjectId;
 		if (_albumsFolder == ObjectId())
 			_albumsFolder = _session->CreateDirectory("Albums", Session::Root, _storage).ObjectId;
 		if (_musicFolder == ObjectId())
 			_musicFolder = _session->CreateDirectory("Music", Session::Root, _storage).ObjectId;
 
-		debug("artists folder: ", _artistsFolder.Id);
+		debug("artists folder: ", _artistsFolder != ObjectId()? _artistsFolder.Id: 0);
 		debug("albums folder: ", _albumsFolder.Id);
 		debug("music folder: ", _musicFolder.Id);
 
 		auto musicFolders = ListAssociations(_musicFolder);
 
 		using namespace mtp;
+		if (_artistSupported)
 		{
+			debug("getting artists...");
 			auto artists = _session->GetObjectHandles(Session::AllStorages, ObjectFormat::Artist, Session::Device);
 			for (auto id : artists.ObjectHandles)
 			{
@@ -94,22 +102,27 @@ namespace mtp
 
 		std::unordered_map<ArtistPtr, NameToObjectIdMap> albumFolders;
 		{
+			debug("getting albums...");
 			auto albums = _session->GetObjectHandles(Session::AllStorages, ObjectFormat::AbstractAudioAlbum, Session::Device);
 			for (auto id : albums.ObjectHandles)
 			{
 				auto name = _session->GetObjectStringProperty(id, ObjectProperty::Name);
 				auto artistName = _session->GetObjectStringProperty(id, ObjectProperty::Artist);
-				auto albumDate = _session->GetObjectStringProperty(id, ObjectProperty::DateAuthored);
+				std::string albumDate;
+
+				if (_albumDateAuthoredSupported)
+					albumDate = _session->GetObjectStringProperty(id, ObjectProperty::DateAuthored);
+
 				auto artist = GetArtist(artistName);
 				if (!artist)
-					error("invalid artist name in album ", name);
+					artist = CreateArtist(artistName);
 
 				debug("album: ", name, "\t", id.Id, "\t", albumDate);
 				auto album = std::make_shared<Album>();
 				album->Name = name;
 				album->Artist = artist;
 				album->Id = id;
-				album->Year = ConvertDateTime(albumDate);
+				album->Year = !albumDate.empty()? ConvertDateTime(albumDate): 0;
 				if (albumFolders.find(artist) == albumFolders.end()) {
 					albumFolders[artist] = ListAssociations(artist->MusicFolderId);
 				}
@@ -147,27 +160,30 @@ namespace mtp
 		if (name.empty())
 			name = UknownArtist;
 
-		ByteArray propList;
-		OutputStream os(propList);
-
-		os.Write32(2); //number of props
-
-		os.Write32(0); //object handle
-		os.Write16(static_cast<u16>(ObjectProperty::Name));
-		os.Write16(static_cast<u16>(DataTypeCode::String));
-		os.WriteString(name);
-
-		os.Write32(0); //object handle
-		os.Write16(static_cast<u16>(ObjectProperty::ObjectFilename));
-		os.Write16(static_cast<u16>(DataTypeCode::String));
-		os.WriteString(name + ".art");
-
 		auto artist = std::make_shared<Artist>();
+		artist->Name = name;
 		artist->MusicFolderId = GetOrCreate(_musicFolder, name);
 
-		artist->Name = name;
-		auto response = _session->SendObjectPropList(_storage, _artistsFolder, ObjectFormat::Artist, 0, propList);
-		artist->Id = response.ObjectId;
+		if (_artistSupported)
+		{
+			ByteArray propList;
+			OutputStream os(propList);
+
+			os.Write32(2); //number of props
+
+			os.Write32(0); //object handle
+			os.Write16(static_cast<u16>(ObjectProperty::Name));
+			os.Write16(static_cast<u16>(DataTypeCode::String));
+			os.WriteString(name);
+
+			os.Write32(0); //object handle
+			os.Write16(static_cast<u16>(ObjectProperty::ObjectFilename));
+			os.Write16(static_cast<u16>(DataTypeCode::String));
+			os.WriteString(name + ".art");
+
+			auto response = _session->SendObjectPropList(_storage, _artistsFolder, ObjectFormat::Artist, 0, propList);
+			artist->Id = response.ObjectId;
+		}
 
 		_artists.insert(std::make_pair(name, artist));
 		return artist;
@@ -195,10 +211,20 @@ namespace mtp
 
 		os.Write32(3 + (year? 1: 0)); //number of props
 
-		os.Write32(0); //object handle
-		os.Write16(static_cast<u16>(ObjectProperty::ArtistId));
-		os.Write16(static_cast<u16>(DataTypeCode::Uint32));
-		os.Write32(artist->Id.Id);
+		if (_artistSupported)
+		{
+			os.Write32(0); //object handle
+			os.Write16(static_cast<u16>(ObjectProperty::ArtistId));
+			os.Write16(static_cast<u16>(DataTypeCode::Uint32));
+			os.Write32(artist->Id.Id);
+		}
+		else
+		{
+			os.Write32(0); //object handle
+			os.Write16(static_cast<u16>(ObjectProperty::Artist));
+			os.Write16(static_cast<u16>(DataTypeCode::String));
+			os.WriteString(artist->Name);
+		}
 
 		os.Write32(0); //object handle
 		os.Write16(static_cast<u16>(ObjectProperty::Name));
@@ -241,10 +267,21 @@ namespace mtp
 
 		os.Write32(3 + (!genre.empty()? 1: 0) + (trackIndex? 1: 0)); //number of props
 
-		os.Write32(0); //object handle
-		os.Write16(static_cast<u16>(ObjectProperty::ArtistId));
-		os.Write16(static_cast<u16>(DataTypeCode::Uint32));
-		os.Write32(artist->Id.Id);
+		if (_artistSupported)
+		{
+			os.Write32(0); //object handle
+			os.Write16(static_cast<u16>(ObjectProperty::ArtistId));
+			os.Write16(static_cast<u16>(DataTypeCode::Uint32));
+			os.Write32(artist->Id.Id);
+		}
+		else
+		{
+			os.Write32(0); //object handle
+			os.Write16(static_cast<u16>(ObjectProperty::Artist));
+			os.Write16(static_cast<u16>(DataTypeCode::String));
+			os.WriteString(artist->Name);
+		}
+
 
 		os.Write32(0); //object handle
 		os.Write16(static_cast<u16>(ObjectProperty::Name));
@@ -282,7 +319,7 @@ namespace mtp
 		return
 			gdi.Supports(OperationCode::SendObjectPropList) &&
 			gdi.Supports(OperationCode::SetObjectReferences) &&
-			gdi.Supports(ObjectFormat::Artist) && gdi.Supports(ObjectFormat::AbstractAudioAlbum);
+			gdi.Supports(ObjectFormat::AbstractAudioAlbum);
 		;
 	}
 

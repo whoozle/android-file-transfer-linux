@@ -41,6 +41,8 @@ namespace mtp
 		ObjectId _artistsFolder;
 		ObjectId _albumsFolder;
 		ObjectId _musicFolder;
+		bool _artistSupported;
+		bool _albumDateAuthoredSupported;
 
 		using ArtistMap = std::unordered_map<std::string, ArtistPtr>;
 		ArtistMap _artists;
