@@ -56,7 +56,7 @@ namespace mtp
 				MAP_TYPE("inode/directory",		ObjectFormat::Association);
 				MAP_TYPE("audio/mpeg",			ObjectFormat::Mp3);
 				MAP_TYPE("text/plain",			ObjectFormat::Text);
-				MAP_TYPE("image/jpeg",			ObjectFormat::Jfif);
+				MAP_TYPE("image/jpeg",			ObjectFormat::ExifJpeg);
 				MAP_TYPE("image/gif",			ObjectFormat::Gif);
 				MAP_TYPE("image/x-ms-bmp",		ObjectFormat::Bmp);
 				MAP_TYPE("image/png",			ObjectFormat::Png);
@@ -115,7 +115,7 @@ namespace mtp
 		else if (ext == "txt")
 			return mtp::ObjectFormat::Text;
 		else if (ext == "jpeg" || ext == "jpg")
-			return mtp::ObjectFormat::Jfif;
+			return mtp::ObjectFormat::ExifJpeg;
 		else if (ext == "gif")
 			return mtp::ObjectFormat::Gif;
 		else if (ext == "bmp")
