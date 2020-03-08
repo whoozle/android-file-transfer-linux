@@ -76,6 +76,7 @@ namespace mtp
 		AlbumPtr CreateAlbum(ArtistPtr artist, std::string name, int year);
 		ObjectId CreateTrack(ArtistPtr artist, AlbumPtr album, ObjectFormat type, std::string name, const std::string & genre, int trackIndex, const std::string &filename, size_t size);
 	};
+	DECLARE_PTR(Library);
 }
 
 #endif
