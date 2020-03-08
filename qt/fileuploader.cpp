@@ -25,6 +25,7 @@
 #include <QDir>
 #include <QDirIterator>
 #include <QDebug>
+#include <mtp/metadata/Library.h>
 
 FileUploader::FileUploader(MtpObjectsModel * model, QObject *parent) :
 	QObject(parent),
@@ -47,6 +48,9 @@ FileUploader::~FileUploader()
 	_workerThread.quit();
 	_workerThread.wait();
 }
+
+void FileUploader::setLibrary(const mtp::LibraryPtr & library)
+{ _library = library; }
 
 void FileUploader::onProgress(qint64 current)
 {

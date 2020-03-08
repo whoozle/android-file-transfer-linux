@@ -23,6 +23,8 @@
 #include <QObject>
 #include <QThread>
 #include <QDateTime>
+#include <mtp/types.h>
+#include <memory>
 
 class MtpObjectsModel;
 struct Command;
@@ -31,6 +33,8 @@ class CommandQueue;
 namespace mtp
 {
 	struct ObjectId;
+	class Library;
+	DECLARE_PTR(Library);
 }
 
 class FileUploader : public QObject
@@ -44,6 +48,7 @@ private:
 	qint64				_total;
 	QDateTime			_startedAt;
 	bool				_aborted;
+	mtp::LibraryPtr		_library;
 
 private slots:
 	void onProgress(qint64 current);
@@ -53,8 +58,10 @@ private slots:
 public:
 	explicit FileUploader(MtpObjectsModel * model, QObject *parent = 0);
 	~FileUploader();
+	void setLibrary(const mtp::LibraryPtr & library);
 
 	void upload(QStringList files);
+	void importMusic(QString path);
 	void download(const QString &path, const QVector<mtp::ObjectId> & objectIds);
 
 public slots:
