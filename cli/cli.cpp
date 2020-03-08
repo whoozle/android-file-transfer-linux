@@ -196,6 +196,8 @@ int main(int argc, char **argv)
 		{ error("Device::Find failed:", ex.what()); }
 	}
 	ctx.reset();
+	if (!session)
+		exit(1);
 
 	try
 	{
