@@ -20,14 +20,24 @@
 #ifndef AFTL_QT_MAINWINDOW_H
 #define AFTL_QT_MAINWINDOW_H
 
-#include <mtp/ptp/Device.h>
-#include <mtp/mtpz/TrustedApp.h>
 #include <QMainWindow>
 #include <QModelIndex>
 #include <QVector>
+#include <mtp/ptp/ObjectId.h>
+#include <mtp/types.h>
 
 namespace Ui {
-class MainWindow;
+	class MainWindow;
+}
+namespace mtp {
+	class Device;
+	DECLARE_PTR(Device);
+	class TrustedApp;
+	DECLARE_PTR(TrustedApp);
+	class Library;
+	DECLARE_PTR(Library);
+	class Session;
+	DECLARE_PTR(Session);
 }
 
 class MtpObjectsModel;
@@ -102,6 +112,7 @@ private:
 	mtp::DevicePtr				_device;
 	mtp::SessionPtr				_session;
 	mtp::TrustedAppPtr			_trustedApp;
+	mtp::LibraryPtr				_mediaLibrary;
 };
 
 #endif // MAINWINDOW_H

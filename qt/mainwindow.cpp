@@ -26,10 +26,14 @@
 #include "mtpstoragesmodel.h"
 #include "fileuploader.h"
 #include "utils.h"
-#include <usb/Context.h>
+#include <mtp/metadata/Library.h>
+#include <mtp/mtpz/TrustedApp.h>
+#include <mtp/ptp/Device.h>
+#include <mtp/ptp/Session.h>
 #include <mtp/usb/TimeoutException.h>
 #include <mtp/usb/DeviceBusyException.h>
 #include <mtp/usb/DeviceNotFoundException.h>
+#include <usb/Context.h>
 #include <QClipboard>
 #include <QDebug>
 #include <QSortFilterProxyModel>
