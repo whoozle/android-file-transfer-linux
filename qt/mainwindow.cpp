@@ -395,6 +395,8 @@ void MainWindow::showEvent(QShowEvent *)
 			_mediaLibrary = std::make_shared<mtp::Library>(_session);
 			_ui->actionUpload_Album->setVisible(false);
 		}
+		else
+			_ui->actionImport_Music->setVisible(false);
 	}
 }
 

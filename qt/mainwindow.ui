@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>671</width>
-    <height>588</height>
+    <width>839</width>
+    <height>621</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -56,7 +56,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>671</width>
+     <width>839</width>
      <height>34</height>
     </rect>
    </property>
@@ -100,6 +100,7 @@
    <addaction name="actionUploadDirectory"/>
    <addaction name="actionUpload"/>
    <addaction name="actionShowThumbnails"/>
+   <addaction name="actionImport_Music"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionUpload">
@@ -229,6 +230,11 @@
    </property>
    <property name="toolTip">
     <string>Show Thumbnails of images where available</string>
+   </property>
+  </action>
+  <action name="actionImport_Music">
+   <property name="text">
+    <string>Import Music</string>
    </property>
   </action>
  </widget>
