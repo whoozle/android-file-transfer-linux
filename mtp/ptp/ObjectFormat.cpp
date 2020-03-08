@@ -145,6 +145,26 @@ namespace mtp
 			return ObjectFormat::Undefined;
 	}
 
+	bool IsAudioFormat(ObjectFormat format)
+	{
+		switch(format)
+		{
+			case ObjectFormat::Aiff:
+			case ObjectFormat::Wav:
+			case ObjectFormat::Mp3:
+			case ObjectFormat::M4a:
+			case ObjectFormat::UndefinedAudio:
+			case ObjectFormat::Wma:
+			case ObjectFormat::Ogg:
+			case ObjectFormat::Aac:
+			case ObjectFormat::Audible:
+			case ObjectFormat::Flac:
+				return true;
+			default:
+				return false;
+		}
+	}
+
 	time_t ConvertDateTime(const std::string &timespec)
 	{
 		struct tm time = {};

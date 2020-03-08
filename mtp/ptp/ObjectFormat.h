@@ -54,6 +54,7 @@ namespace mtp
 	DECLARE_ENUM(AssociationType, u16);
 
 	ObjectFormat ObjectFormatFromFilename(const std::string &filename);
+	bool IsAudioFormat(ObjectFormat format);
 	time_t ConvertDateTime(const std::string &timespec);
 	std::string ConvertDateTime(time_t);
 	std::string ConvertYear(int year);
