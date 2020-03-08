@@ -385,9 +385,15 @@ void MainWindow::showEvent(QShowEvent *)
 		onStorageChanged(_ui->storageList->currentIndex());
 		qDebug() << "session opened, starting";
 		_proxyModel->setSourceModel(_objectModel);
+		if (_trustedApp && _trustedApp->KeysLoaded())
+		{
+			qDebug() << "keys loaded, authenticated";
+			_trustedApp->Authenticate();
+		}
 		if (mtp::Library::Supported(_session)) {
 			qDebug() << "creating media library";
 			_mediaLibrary = std::make_shared<mtp::Library>(_session);
+			_ui->actionUpload_Album->setVisible(false);
 		}
 	}
 }
