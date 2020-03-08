@@ -208,8 +208,9 @@ namespace mtp
 
 		ByteArray propList;
 		OutputStream os(propList);
+		bool sendYear = year != 0 && _albumDateAuthoredSupported;
 
-		os.Write32(3 + (year? 1: 0)); //number of props
+		os.Write32(3 + (sendYear? 1: 0)); //number of props
 
 		if (_artistSupported)
 		{
@@ -236,7 +237,7 @@ namespace mtp
 		os.Write16(static_cast<u16>(DataTypeCode::String));
 		os.WriteString(artist->Name + "--" + name + ".alb");
 
-		if (year)
+		if (sendYear)
 		{
 			os.Write32(0); //object handle
 			os.Write16(static_cast<u16>(ObjectProperty::DateAuthored));
