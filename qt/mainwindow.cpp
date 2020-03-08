@@ -80,6 +80,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(_ui->actionCreateDirectory, SIGNAL(triggered()), SLOT(createDirectory()));
 	connect(_ui->actionUploadDirectory, SIGNAL(triggered()), SLOT(uploadDirectories()));
 	connect(_ui->actionUpload_Album, SIGNAL(triggered()), SLOT(uploadAlbum()));
+	connect(_ui->actionImport_Music, SIGNAL(triggered()), SLOT(importMusic()));
 	connect(_ui->actionUpload, SIGNAL(triggered()), SLOT(uploadFiles()));
 	connect(_ui->actionRename, SIGNAL(triggered()), SLOT(renameFile()));
 	connect(_ui->actionDownload, SIGNAL(triggered()), SLOT(downloadFiles()));
@@ -713,6 +714,37 @@ void MainWindow::uploadAlbum()
 	}
 }
 
+void MainWindow::importMusic()
+{
+	QFileDialog d(this);
+	QSettings settings;
+	{
+		QVariant ld = settings.value("the-latest-directory");
+		if (ld.isValid())
+			d.setDirectory(ld.toString());
+	}
+
+	d.setAcceptMode(QFileDialog::AcceptOpen);
+	d.setFileMode(QFileDialog::Directory);
+	d.setOption(QFileDialog::ShowDirsOnly, true);
+	d.setOption(QFileDialog::ReadOnly, true);
+	restoreGeometry("import-music", d);
+	if (!d.exec())
+		return;
+
+	saveGeometry("import-music", d);
+	settings.setValue("the-latest-directory", d.directory().absolutePath());
+	QStringList selected = d.selectedFiles();
+	if (selected.isEmpty())
+		return;
+
+	for(const auto &path : selected)
+	{
+		importMusic(path);
+		back();
+	}
+}
+
 namespace
 {
 	int GetScore(const QString &str_)
@@ -776,6 +808,11 @@ void MainWindow::uploadAlbum(QString dirPath)
 			files.push_back(dir.canonicalPath() + "/" + file);
 	}
 	uploadFiles(files);
+}
+
+void MainWindow::importMusic(QString path)
+{
+	qDebug() << "import music from " << path;
 }
 
 void MainWindow::validateClipboard()

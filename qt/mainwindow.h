@@ -82,6 +82,8 @@ private slots:
 	void uploadDirectories();
 	void uploadAlbum();
 	void uploadAlbum(QString path);
+	void importMusic();
+	void importMusic(QString path);
 	void downloadFiles();
 	void renameFile();
 	void deleteFiles();
