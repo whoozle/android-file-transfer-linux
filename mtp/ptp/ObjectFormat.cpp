@@ -65,7 +65,6 @@ namespace mtp
 				MAP_TYPE("audio/x-flac",		ObjectFormat::Flac);
 				MAP_TYPE("audio/x-m4a",			ObjectFormat::Aac);
 				MAP_TYPE("audio/audio/x-wav",	ObjectFormat::Aiff);
-				MAP_TYPE("video/x-ms-asf",		ObjectFormat::Asf);
 				MAP_TYPE("audio/mp4",			ObjectFormat::Mp4);
 				MAP_TYPE("application/x-mpegurl", ObjectFormat::M3uPlaylist);
 #undef MAP_TYPE
