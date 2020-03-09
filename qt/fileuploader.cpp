@@ -183,6 +183,11 @@ void FileUploader::download(const QString &rootPath, const QVector<mtp::ObjectId
 	emit executeCommand(new FinishQueue(currentParentId));
 }
 
+void FileUploader::importMusic(const QString & path)
+{
+	qDebug() << "importMusic " << path;
+}
+
 void FileUploader::abort()
 {
 	qDebug() << "abort request";

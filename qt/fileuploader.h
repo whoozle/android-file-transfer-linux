@@ -61,7 +61,7 @@ public:
 	void setLibrary(const mtp::LibraryPtr & library);
 
 	void upload(QStringList files);
-	void importMusic(QString path);
+	void importMusic(const QString & path);
 	void download(const QString &path, const QVector<mtp::ObjectId> & objectIds);
 
 public slots:

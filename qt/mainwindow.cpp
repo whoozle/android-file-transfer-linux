@@ -814,6 +814,7 @@ void MainWindow::uploadAlbum(QString dirPath)
 void MainWindow::importMusic(QString path)
 {
 	qDebug() << "import music from " << path;
+	_uploader->importMusic(path);
 }
 
 void MainWindow::validateClipboard()
