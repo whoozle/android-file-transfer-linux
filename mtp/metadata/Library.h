@@ -7,6 +7,7 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 
 namespace mtp
 {
@@ -34,6 +35,7 @@ namespace mtp
 			ArtistPtr		Artist;
 			std::string 	Name;
 			time_t	 		Year;
+			std::unordered_set<ObjectId> Refs;
 		};
 		DECLARE_PTR(Album);
 

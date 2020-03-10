@@ -130,6 +130,12 @@ namespace mtp
 				if (it == albumFolders.end())
 					throw std::runtime_error("no iterator after insert, internal error");
 
+				{
+					auto refs = _session->GetObjectReferences(id);
+					for (auto id : refs.ObjectHandles)
+						album->Refs.insert(id);
+				}
+
 				const auto & albums = it->second;
 				auto alit = albums.find(name);
 				if (alit != albums.end())
