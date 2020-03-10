@@ -204,7 +204,7 @@ namespace mtp
 		return it != _albums.end()? it->second: AlbumPtr();
 	}
 
-	Library::AlbumPtr Library::CreateAlbum(ArtistPtr artist, std::string name, int year)
+	Library::AlbumPtr Library::CreateAlbum(const ArtistPtr & artist, std::string name, int year)
 	{
 		if (!artist)
 			throw std::runtime_error("artists is required");
@@ -264,7 +264,8 @@ namespace mtp
 		return album;
 	}
 
-	ObjectId Library::CreateTrack(ArtistPtr artist, AlbumPtr album,
+	ObjectId Library::CreateTrack(const ArtistPtr & artist,
+		const AlbumPtr & album,
 		ObjectFormat type,
 		std::string name, const std::string & genre, int trackIndex,
 		const std::string &filename, size_t size)
