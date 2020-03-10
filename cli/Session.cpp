@@ -1136,9 +1136,7 @@ namespace cli
 		auto songId = _library->CreateTrack(artist, album, format, meta->Title, meta->Genre, meta->Track, filename, stream->GetSize());
 		_session->SendObject(stream);
 
-		msg::ObjectHandles handles = _session->GetObjectReferences(album->Id);
-		handles.ObjectHandles.push_back(songId);
-		_session->SetObjectReferences(album->Id, handles);
+		_library->AddTrack(album, songId);
 	}
 
 
