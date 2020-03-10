@@ -132,8 +132,7 @@ namespace mtp
 
 				{
 					auto refs = _session->GetObjectReferences(id);
-					for (auto id : refs.ObjectHandles)
-						album->Refs.insert(id);
+					std::copy(refs.ObjectHandles.begin(), refs.ObjectHandles.end(), std::inserter(album->Refs, album->Refs.begin()));
 				}
 
 				const auto & albums = it->second;
@@ -320,6 +319,17 @@ namespace mtp
 		auto response = _session->SendObjectPropList(_storage, album->MusicFolderId, type, size, propList);
 		return response.ObjectId;
 	}
+
+	void Library::AddTrack(AlbumPtr album, ObjectId id)
+	{
+		auto & refs = album->Refs;
+		msg::ObjectHandles handles;
+		std::copy(refs.begin(), refs.end(), std::back_inserter(handles.ObjectHandles));
+		handles.ObjectHandles.push_back(id);
+		_session->SetObjectReferences(album->Id, handles);
+		refs.insert(id);
+	}
+
 
 	bool Library::Supported(const mtp::SessionPtr & session)
 	{
