@@ -48,7 +48,6 @@ private:
 	qint64				_total;
 	QDateTime			_startedAt;
 	bool				_aborted;
-	mtp::LibraryPtr		_library;
 
 private slots:
 	void onProgress(qint64 current);

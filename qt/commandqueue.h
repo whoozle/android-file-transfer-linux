@@ -30,6 +30,12 @@
 class MtpObjectsModel;
 class CommandQueue;
 
+namespace mtp
+{
+	class Library;
+	DECLARE_PTR(Library);
+}
+
 struct Command
 {
 	virtual ~Command() = default;
@@ -85,6 +91,7 @@ private:
 	MtpObjectsModel *				_model;
 	qint64							_completedFilesSize;
 	QMap<QString, mtp::ObjectId>	_directories;
+	mtp::LibraryPtr					_library;
 	volatile bool					_aborted;
 
 public:
@@ -93,6 +100,8 @@ public:
 
 	MtpObjectsModel *model() const
 	{ return _model; }
+
+	void setLibrary(const mtp::LibraryPtr library);
 
 	void createDirectory(const QString &path);
 	void uploadFile(const QString &file);

@@ -20,12 +20,15 @@
 #include "commandqueue.h"
 #include "mtpobjectsmodel.h"
 #include "utils.h"
+
 #include <QFileInfo>
 #include <QDebug>
 #include <QDir>
 #include <QDirIterator>
 #include <QApplication>
+
 #include <mtp/metadata/Metadata.h>
+#include <mtp/metadata/Library.h>
 
 void FinishQueue::execute(CommandQueue &queue)
 { queue.finish(DirectoryId); }
@@ -162,6 +165,9 @@ CommandQueue::~CommandQueue()
 {
 	qDebug() << "upload worker stopped";
 }
+
+void CommandQueue::setLibrary(const mtp::LibraryPtr library)
+{ _library = library; }
 
 void CommandQueue::execute(Command *ptr)
 {
