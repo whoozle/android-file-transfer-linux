@@ -151,6 +151,7 @@ void CommandQueue::importFile(const QString &filename)
 		metadata->Title, metadata->Genre,
 		metadata->Track, toUtf8(fi.fileName()), fi.size());
 
+	start(fi.fileName());
 	_model->sendFile(filename);
 
 	_library->AddTrack(album, songId);
