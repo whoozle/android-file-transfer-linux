@@ -25,6 +25,7 @@
 #include <QMap>
 #include <mtp/ptp/ObjectId.h>
 #include <mtp/ptp/ObjectFormat.h>
+#include <mtp/metadata/Library.h>
 
 class MtpObjectsModel;
 class CommandQueue;
@@ -62,6 +63,12 @@ struct UploadFile : public FileCommand
 	void execute(CommandQueue &queue);
 };
 
+struct ImportFile : public FileCommand
+{
+	ImportFile(const QString &filename) : FileCommand(filename) { }
+	void execute(CommandQueue &queue);
+};
+
 struct DownloadFile : public FileCommand
 {
 	mtp::ObjectId			ObjectId;
@@ -90,6 +97,7 @@ public:
 	void createDirectory(const QString &path);
 	void uploadFile(const QString &file);
 	void downloadFile(const QString &filename, mtp::ObjectId objectId);
+	void importFile(const QString &file);
 
 public slots:
 	void onFileProgress(qint64, qint64);

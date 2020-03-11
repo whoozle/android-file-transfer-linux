@@ -814,7 +814,19 @@ void MainWindow::uploadAlbum(QString dirPath)
 void MainWindow::importMusic(QString path)
 {
 	qDebug() << "import music from " << path;
+
+	ProgressDialog progressDialog(this);
+	progressDialog.setWindowTitle(tr("Importing Progress"));
+	progressDialog.show();
+
+	connect(_uploader, SIGNAL(uploadProgress(float)), &progressDialog, SLOT(setValue(float)));
+	connect(_uploader, SIGNAL(uploadSpeed(qint64)), &progressDialog, SLOT(setSpeed(qint64)));
+	connect(_uploader, SIGNAL(uploadStarted(QString)), &progressDialog, SLOT(setFilename(QString)));
+	connect(_uploader, SIGNAL(finished()), &progressDialog, SLOT(accept()));
+	connect(&progressDialog, SIGNAL(abort()), _uploader, SLOT(abort()));
 	_uploader->importMusic(path);
+
+	progressDialog.exec();
 }
 
 void MainWindow::validateClipboard()

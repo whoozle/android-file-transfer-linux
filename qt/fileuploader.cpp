@@ -214,7 +214,7 @@ void FileUploader::importMusic(const QString & path)
 
 				if (fi.isFile())
 				{
-					//commands.push_back(new ImportFile(next));
+					commands.push_back(new ImportFile(next));
 					_total += fi.size();
 				}
 				else if (fi.isDir())
@@ -225,7 +225,7 @@ void FileUploader::importMusic(const QString & path)
 		}
 		else if (currentFileInfo.isFile())
 		{
-			//commands.push_back(new ImportFile(currentFile));
+			commands.push_back(new ImportFile(currentFile));
 			_total += currentFileInfo.size();
 		}
 	}

@@ -25,6 +25,7 @@
 #include <QDir>
 #include <QDirIterator>
 #include <QApplication>
+#include <mtp/metadata/Metadata.h>
 
 void FinishQueue::execute(CommandQueue &queue)
 { queue.finish(DirectoryId); }
@@ -37,6 +38,9 @@ void MakeDirectory::execute(CommandQueue &queue)
 
 void DownloadFile::execute(CommandQueue &queue)
 { queue.downloadFile(Filename, ObjectId); }
+
+void ImportFile::execute(CommandQueue &queue)
+{ queue.importFile(Filename); }
 
 void CommandQueue::downloadFile(const QString &filename, mtp::ObjectId objectId)
 {
@@ -88,6 +92,24 @@ void CommandQueue::uploadFile(const QString &filename)
 	} catch(const std::exception &ex)
 	{ qDebug() << "uploading file " << filename << " failed: " << fromUtf8(ex.what()); }
 
+	addProgress(fi.size());
+}
+
+void CommandQueue::importFile(const QString &filename)
+{
+	if (_aborted)
+		return;
+
+	QFileInfo fi(filename);
+
+	std::string utfFile = toUtf8(filename);
+	mtp::ObjectFormat format = mtp::ObjectFormatFromFilename(utfFile);
+	if (!mtp::IsAudioFormat(format)) {
+		addProgress(fi.size());
+		return;
+	}
+
+	qDebug() << "import: " << filename;
 	addProgress(fi.size());
 }
 
