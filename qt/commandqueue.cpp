@@ -127,6 +127,7 @@ void CommandQueue::importFile(const QString &filename)
 		", genre: " << fromUtf8(metadata->Genre) <<
 		", size: " << fi.size();
 
+
 	auto artist = _library->GetArtist(metadata->Artist);
 	if (!artist)
 		artist = _library->CreateArtist(metadata->Artist);
@@ -142,6 +143,11 @@ void CommandQueue::importFile(const QString &filename)
 	if (!album)
 	{
 		qDebug() << "can't create album";
+		return;
+	}
+
+	if (_library->HasTrack(album, metadata->Title, metadata->Track)) {
+		qDebug() << "skipping" << filename << ", already uploaded";
 		return;
 	}
 

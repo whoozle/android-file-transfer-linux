@@ -117,7 +117,7 @@ namespace mtp
 				if (!artist)
 					artist = CreateArtist(artistName);
 
-				debug("album: ", name, "\t", id.Id, "\t", albumDate);
+				debug("album: ", artistName, " -- ", name, "\t", id.Id, "\t", albumDate);
 				auto album = std::make_shared<Album>();
 				album->Name = name;
 				album->Artist = artist;
