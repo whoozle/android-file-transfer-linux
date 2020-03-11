@@ -316,6 +316,19 @@ bool MtpObjectsModel::uploadFile(mtp::ObjectId parentObjectId, const QString &fi
 	return true;
 }
 
+bool MtpObjectsModel::sendFile(const QString &filePath)
+{
+	try
+	{
+		std::shared_ptr<QtObjectInputStream> object(new QtObjectInputStream(filePath));
+		connect(object.get(), SIGNAL(positionChanged(qint64,qint64)), this, SIGNAL(filePositionChanged(qint64,qint64)));
+		_session->SendObject(object);
+		return true;
+	}
+	catch(const std::exception &ex)
+	{ qWarning() << "failed to send file " << fromUtf8(ex.what()); return false; }
+}
+
 bool MtpObjectsModel::downloadFile(const QString &filePath, mtp::ObjectId objectId)
 {
 	auto object = std::make_shared<QtObjectOutputStream>(filePath);

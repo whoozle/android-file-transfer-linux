@@ -104,6 +104,7 @@ public:
 	bool uploadFile(mtp::ObjectId parentObjectId, const QString &filePath, QString filename = QString());
 	bool uploadFile(const QString &filePath, QString filename = QString())
 	{ return uploadFile(_parentObjectId, filePath, filename); }
+	bool sendFile(const QString &filePath);
 	bool downloadFile(const QString &filePath, mtp::ObjectId objectId);
 	void rename(int idx, const QString &fileName);
 	ObjectInfo getInfoById(mtp::ObjectId objectId) const;

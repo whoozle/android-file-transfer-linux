@@ -29,6 +29,7 @@
 
 #include <mtp/metadata/Metadata.h>
 #include <mtp/metadata/Library.h>
+#include <mtp/scope_guard.h>
 
 void FinishQueue::execute(CommandQueue &queue)
 { queue.finish(DirectoryId); }
@@ -104,24 +105,52 @@ void CommandQueue::importFile(const QString &filename)
 		return;
 
 	QFileInfo fi(filename);
+
+	mtp::scope_guard r([this, &fi]() { addProgress(fi.size()); });
 	std::string utfFilename = toUtf8(filename);
 	mtp::ObjectFormat format = mtp::ObjectFormatFromFilename(utfFilename);
 
-	if (!mtp::IsAudioFormat(format)) {
-		addProgress(fi.size());
+	if (!mtp::IsAudioFormat(format))
 		return;
-	}
 
 	auto metadata = mtp::Metadata::Read(utfFilename);
 
 	qDebug() << "import: " << filename <<
+		fromUtf8(mtp::ToString(format)) <<
 		", artist: " << fromUtf8(metadata->Artist) <<
 		", album: " << fromUtf8(metadata->Album) <<
 		", title: " << fromUtf8(metadata->Title) <<
 		", year: " << metadata->Year <<
 		", track: " << metadata->Track <<
 		", genre: " << fromUtf8(metadata->Genre);
-	addProgress(fi.size());
+
+	auto artist = _library->GetArtist(metadata->Artist);
+	if (!artist)
+		artist = _library->CreateArtist(metadata->Artist);
+	if (!artist)
+	{
+		qDebug() << "can't create artist";
+		return;
+	}
+
+	auto album = _library->GetAlbum(artist, metadata->Album);
+	if (!album)
+		album = _library->CreateAlbum(artist, metadata->Album, metadata->Year);
+	if (!album)
+	{
+		qDebug() << "can't create album";
+		return;
+	}
+
+	auto songId = _library->CreateTrack(
+		artist, album,
+		format,
+		metadata->Title, metadata->Genre,
+		metadata->Track, toUtf8(fi.fileName()), fi.size());
+
+	_model->sendFile(filename);
+
+	_library->AddTrack(album, songId);
 }
 
 void CommandQueue::createDirectory(const QString &srcPath)
