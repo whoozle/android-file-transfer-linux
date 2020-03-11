@@ -211,15 +211,8 @@ void FileUploader::importMusic(const QString & path)
 				if (filename == "." || filename == "..")
 					continue;
 
-				if (fi.isFile())
-				{
-					commands.push_back(new ImportFile(next));
-					_total += fi.size();
-				}
-				else if (fi.isDir())
-				{
+				if (fi.isFile() || fi.isDir())
 					files.push_back(next);
-				}
 			}
 		}
 		else if (currentFileInfo.isFile())
