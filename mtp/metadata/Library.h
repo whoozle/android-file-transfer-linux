@@ -36,8 +36,16 @@ namespace mtp
 			std::string 	Name;
 			time_t	 		Year;
 			std::unordered_set<ObjectId> Refs;
+			std::unordered_multimap<std::string, int> Tracks;
 		};
 		DECLARE_PTR(Album);
+
+		struct NewTrackInfo
+		{
+			ObjectId		Id;
+			std::string 	Name;
+			int				Index;
+		};
 
 	private:
 		ObjectId _artistsFolder;
@@ -76,8 +84,9 @@ namespace mtp
 
 		AlbumPtr GetAlbum(const ArtistPtr & artist, std::string name);
 		AlbumPtr CreateAlbum(const ArtistPtr & artist, std::string name, int year);
-		ObjectId CreateTrack(const ArtistPtr & artist, const AlbumPtr & album, ObjectFormat type, std::string name, const std::string & genre, int trackIndex, const std::string &filename, size_t size);
-		void AddTrack(AlbumPtr album, ObjectId id);
+		bool HasTrack(const AlbumPtr & album, const std::string &name, int trackIndex);
+		NewTrackInfo CreateTrack(const ArtistPtr & artist, const AlbumPtr & album, ObjectFormat type, std::string name, const std::string & genre, int trackIndex, const std::string &filename, size_t size);
+		void AddTrack(AlbumPtr album, const NewTrackInfo &ti);
 	};
 	DECLARE_PTR(Library);
 }

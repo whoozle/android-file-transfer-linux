@@ -131,8 +131,15 @@ namespace mtp
 					throw std::runtime_error("no iterator after insert, internal error");
 
 				{
-					auto refs = _session->GetObjectReferences(id);
-					std::copy(refs.ObjectHandles.begin(), refs.ObjectHandles.end(), std::inserter(album->Refs, album->Refs.begin()));
+					auto refs = _session->GetObjectReferences(id).ObjectHandles;
+					std::copy(refs.begin(), refs.end(), std::inserter(album->Refs, album->Refs.begin()));
+					for(auto trackId : refs)
+					{
+						auto name = _session->GetObjectStringProperty(trackId, ObjectProperty::Name);
+						auto index = _session->GetObjectIntegerProperty(trackId, ObjectProperty::Track);
+						debug("[", index, "]: ", name);
+						album->Tracks.insert(std::make_pair(name, index));
+					}
 				}
 
 				const auto & albums = it->second;
@@ -263,7 +270,23 @@ namespace mtp
 		return album;
 	}
 
-	ObjectId Library::CreateTrack(const ArtistPtr & artist,
+	bool Library::HasTrack(const AlbumPtr & album, const std::string &name, int trackIndex)
+	{
+		if (!album)
+			return false;
+
+		auto & tracks = album->Tracks;
+		auto it = tracks.find(name);
+		if (it == tracks.end())
+			return false;
+
+		if (trackIndex <= 0 || it->second <= 0)
+			return true;
+
+		return trackIndex == it->second;
+	}
+
+	Library::NewTrackInfo Library::CreateTrack(const ArtistPtr & artist,
 		const AlbumPtr & album,
 		ObjectFormat type,
 		std::string name, const std::string & genre, int trackIndex,
@@ -317,17 +340,27 @@ namespace mtp
 		os.WriteString(filename);
 
 		auto response = _session->SendObjectPropList(_storage, album->MusicFolderId, type, size, propList);
-		return response.ObjectId;
+		NewTrackInfo ti;
+		ti.Id = response.ObjectId;
+		ti.Name = name;
+		ti.Index = trackIndex;
+		return ti;
 	}
 
-	void Library::AddTrack(AlbumPtr album, ObjectId id)
+	void Library::AddTrack(AlbumPtr album, const NewTrackInfo & ti)
 	{
+		if (!album)
+			return;
+
 		auto & refs = album->Refs;
+		auto & tracks = album->Tracks;
+
 		msg::ObjectHandles handles;
 		std::copy(refs.begin(), refs.end(), std::back_inserter(handles.ObjectHandles));
-		handles.ObjectHandles.push_back(id);
+		handles.ObjectHandles.push_back(ti.Id);
 		_session->SetObjectReferences(album->Id, handles);
-		refs.insert(id);
+		refs.insert(ti.Id);
+		tracks.insert(std::make_pair(ti.Name, ti.Index));
 	}
 
 
