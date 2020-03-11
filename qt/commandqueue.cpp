@@ -101,15 +101,23 @@ void CommandQueue::importFile(const QString &filename)
 		return;
 
 	QFileInfo fi(filename);
+	std::string utfFilename = toUtf8(filename);
+	mtp::ObjectFormat format = mtp::ObjectFormatFromFilename(utfFilename);
 
-	std::string utfFile = toUtf8(filename);
-	mtp::ObjectFormat format = mtp::ObjectFormatFromFilename(utfFile);
 	if (!mtp::IsAudioFormat(format)) {
 		addProgress(fi.size());
 		return;
 	}
 
-	qDebug() << "import: " << filename;
+	auto metadata = mtp::Metadata::Read(utfFilename);
+
+	qDebug() << "import: " << filename <<
+		", artist: " << fromUtf8(metadata->Artist) <<
+		", album: " << fromUtf8(metadata->Album) <<
+		", title: " << fromUtf8(metadata->Title) <<
+		", year: " << metadata->Year <<
+		", track: " << metadata->Track <<
+		", genre: " << fromUtf8(metadata->Genre);
 	addProgress(fi.size());
 }
 
