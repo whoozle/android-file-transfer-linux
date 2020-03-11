@@ -187,6 +187,62 @@ void FileUploader::download(const QString &rootPath, const QVector<mtp::ObjectId
 void FileUploader::importMusic(const QString & path)
 {
 	qDebug() << "importMusic " << path;
+
+	_model->moveToThread(&_workerThread);
+	_total = 0;
+
+	QStringList files;
+	files.push_back(path);
+
+	QList<Command *> commands;
+	while(!files.empty())
+	{
+		QString currentFile = files.front();
+		files.pop_front();
+		QFileInfo currentFileInfo(currentFile);
+		if (currentFileInfo.isDir())
+		{
+			qDebug() << "going into subdirectory" << currentFile;
+			QDirIterator it(currentFile, QDirIterator::Subdirectories);
+			while(it.hasNext())
+			{
+				QString next = it.next();
+				QFileInfo fi(next);
+				QString filename = fi.fileName();
+				if (filename == "." || filename == "..")
+					continue;
+
+				if (fi.isFile())
+				{
+					//commands.push_back(new ImportFile(next));
+					_total += fi.size();
+				}
+				else if (fi.isDir())
+				{
+					files.push_back(next);
+				}
+			}
+		}
+		else if (currentFileInfo.isFile())
+		{
+			//commands.push_back(new ImportFile(currentFile));
+			_total += currentFileInfo.size();
+		}
+	}
+	qDebug() << "uploading" << _total << "bytes";
+	if (_total < 1)
+		_total = 1;
+
+	_startedAt = QDateTime::currentDateTime();
+	_aborted = false;
+
+	for(auto command: commands)
+	{
+		if (_aborted)
+			break;
+		emit executeCommand(command);
+	}
+	emit executeCommand(new FinishQueue(mtp::Session::Root));
 }
 
 void FileUploader::abort()
