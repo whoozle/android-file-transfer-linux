@@ -101,7 +101,7 @@ void CommandQueue::uploadFile(const QString &filename)
 
 void CommandQueue::importFile(const QString &filename)
 {
-	if (_aborted)
+	if (_aborted || !_library)
 		return;
 
 	QFileInfo fi(filename);
@@ -114,15 +114,18 @@ void CommandQueue::importFile(const QString &filename)
 		return;
 
 	auto metadata = mtp::Metadata::Read(utfFilename);
+	if (!metadata)
+		return;
 
 	qDebug() << "import: " << filename <<
-		fromUtf8(mtp::ToString(format)) <<
+		", format: " << fromUtf8(mtp::ToString(format)) <<
 		", artist: " << fromUtf8(metadata->Artist) <<
 		", album: " << fromUtf8(metadata->Album) <<
 		", title: " << fromUtf8(metadata->Title) <<
 		", year: " << metadata->Year <<
 		", track: " << metadata->Track <<
-		", genre: " << fromUtf8(metadata->Genre);
+		", genre: " << fromUtf8(metadata->Genre) <<
+		", size: " << fi.size();
 
 	auto artist = _library->GetArtist(metadata->Artist);
 	if (!artist)

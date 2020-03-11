@@ -383,7 +383,6 @@ void MainWindow::showEvent(QShowEvent *)
 		}
 		_ui->storageList->setModel(_storageModel);
 		_objectModel->setSession(_session);
-		_uploader->setLibrary(_mediaLibrary);
 		onStorageChanged(_ui->storageList->currentIndex());
 		qDebug() << "session opened, starting";
 		_proxyModel->setSourceModel(_objectModel);
@@ -395,6 +394,7 @@ void MainWindow::showEvent(QShowEvent *)
 		if (mtp::Library::Supported(_session)) {
 			qDebug() << "creating media library";
 			_mediaLibrary = std::make_shared<mtp::Library>(_session);
+			_uploader->setLibrary(_mediaLibrary);
 			_ui->actionUpload_Album->setVisible(false);
 		}
 		else
