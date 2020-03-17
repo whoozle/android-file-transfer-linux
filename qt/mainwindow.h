@@ -97,6 +97,8 @@ private slots:
 	void pasteFromClipboard();
 	bool confirmOverwrite(const QString &file);
 	void showThumbnails(bool enable);
+	void attachCover();
+	void removeCover();
 
 public slots:
 	void downloadFiles(const QString & path, const QVector<mtp::ObjectId> &objects);

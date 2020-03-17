@@ -90,6 +90,8 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(_ui->actionRefresh, SIGNAL(triggered()), SLOT(refresh()));
 	connect(_ui->actionPaste, SIGNAL(triggered()), SLOT(pasteFromClipboard()));
 	connect(_ui->actionShowThumbnails, SIGNAL(triggered(bool)), SLOT(showThumbnails(bool)));
+	connect(_ui->actionRemoveCover, SIGNAL(triggered(bool)), SLOT(removeCover()));
+	connect(_ui->actionAttachCover, SIGNAL(triggered(bool)), SLOT(attachCover()));
 
 	connect(_objectModel, SIGNAL(onFilesDropped(QStringList)), SLOT(uploadFiles(QStringList)));
 	connect(_objectModel, SIGNAL(existingFileOverwrite(QString)), SLOT(confirmOverwrite(QString)), Qt::BlockingQueuedConnection);
@@ -549,8 +551,9 @@ void MainWindow::showContextMenu ( const QPoint & pos )
 	}
 	if (showRSMenu) {
 		menu.addSeparator();
+		if (rows.size() == 1)
+			menu.addAction(_ui->actionAttachCover);
 		menu.addAction(_ui->actionRemoveCover);
-		menu.addAction(_ui->actionAttachCover);
 	}
 
 	menu.exec(_ui->listView->mapToGlobal(pos));
@@ -902,4 +905,78 @@ void MainWindow::showThumbnails(bool enable)
 	_ui->listView->setFlow(enable? QListView::LeftToRight: QListView::TopToBottom);
 	_ui->listView->setViewMode(enable? QListView::IconMode: QListView::ListMode);
 	_objectModel->enableThumbnail(enable, maxSize); //resets model/size hints, etc
+}
+
+void MainWindow::attachCover()
+{
+	QItemSelectionModel *selection =_ui->listView->selectionModel();
+	QModelIndexList rows = selection->selectedRows();
+	if (rows.empty())
+		return;
+
+	auto targetObjectId = _objectModel->objectIdAt(rows.at(0).row());
+	qDebug() << "attaching cover to object " << targetObjectId.Id;
+
+	QFileDialog d(this);
+
+	QSettings settings;
+	{
+		QVariant ld = settings.value("the-latest-directory");
+		if (ld.isValid())
+			d.setDirectory(ld.toString());
+	}
+
+	d.setAcceptMode(QFileDialog::AcceptOpen);
+	d.setFileMode(QFileDialog::ExistingFile);
+	d.setOption(QFileDialog::ShowDirsOnly, false);
+	d.setOption(QFileDialog::ReadOnly, true);
+	restoreGeometry("upload-files", d);
+	if (!d.exec())
+		return;
+
+	saveGeometry("upload-files", d);
+	settings.setValue("the-latest-directory", d.directory().absolutePath());
+	auto files = d.selectedFiles();
+	if (files.empty())
+		return;
+
+	QFile file(files.at(0));
+	if (!file.open(QIODevice::ReadOnly)) {
+		QMessageBox::warning(this, tr("Attach Cover"), tr("Could not open selected file"));
+		return;
+	}
+	auto buffer = file.readAll();
+	qDebug() << "read " << buffer.size() << " bytes of cover file";
+	file.close();
+
+	mtp::ByteArray value;
+	mtp::OutputStream out(value);
+	out.WriteArray(buffer);
+	try { _session->SetObjectProperty(targetObjectId, mtp::ObjectProperty::RepresentativeSampleData, value); }
+	catch (const std::exception & ex)
+	{
+		QMessageBox::warning(this, tr("Attach Cover"), tr("Could not attach cover: %1").arg(ex.what()));
+	}
+}
+
+void MainWindow::removeCover()
+{
+	QItemSelectionModel *selection =_ui->listView->selectionModel();
+	QModelIndexList rows = selection->selectedRows();
+
+	mtp::ByteArray value;
+	mtp::OutputStream out(value);
+	out.Write32(0); //empty array
+
+	for(QModelIndex row : rows)
+	{
+		row = mapIndex(row);
+		auto id = _objectModel->objectIdAt(row.row());
+		try
+		{
+			_session->SetObjectProperty(id, mtp::ObjectProperty::RepresentativeSampleData, value);
+		}
+		catch(const std::exception & ex)
+		{ qWarning() << "failed to remove cover:" << ex.what(); }
+	}
 }
