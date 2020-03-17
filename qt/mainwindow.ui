@@ -100,7 +100,7 @@
    <addaction name="actionUploadDirectory"/>
    <addaction name="actionUpload"/>
    <addaction name="actionShowThumbnails"/>
-   <addaction name="actionImport_Music"/>
+   <addaction name="actionImportMusic"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionUpload">
