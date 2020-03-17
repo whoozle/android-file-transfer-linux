@@ -165,6 +165,13 @@ namespace mtp
 		}
 	}
 
+	bool IsImageFormat(ObjectFormat format)
+	{
+		u16 type = static_cast<u16>(format) >> 8;
+		return type == 0x38;
+	}
+
+
 	time_t ConvertDateTime(const std::string &timespec)
 	{
 		struct tm time = {};
