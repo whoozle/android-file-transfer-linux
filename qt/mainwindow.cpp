@@ -933,7 +933,8 @@ void MainWindow::attachCover()
 	if (rows.empty())
 		return;
 
-	auto targetObjectId = _objectModel->objectIdAt(rows.at(0).row());
+	auto row = mapIndex(rows.at(0));
+	auto targetObjectId = _objectModel->objectIdAt(row.row());
 	qDebug() << "attaching cover to object " << targetObjectId.Id;
 
 	QFileDialog d(this);
