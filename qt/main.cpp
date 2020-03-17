@@ -66,6 +66,12 @@ int main(int argc, char *argv[])
 	app.installTranslator(&aTranslator);
 
 	MainWindow w;
+
+	for (int i = 0; i < argc; ++i) {
+		if (strcmp(argv[i], "-R") == 0)
+			w.enableDeviceReset(true);
+	}
+
 	w.show();
 
 	if (!w.started())

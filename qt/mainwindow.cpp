@@ -59,7 +59,8 @@ MainWindow::MainWindow(QWidget *parent) :
 	_proxyModel(new QSortFilterProxyModel),
 	_storageModel(),
 	_objectModel(new MtpObjectsModel()),
-	_uploader(new FileUploader(_objectModel, this))
+	_uploader(new FileUploader(_objectModel, this)),
+	_resetDevice(false)
 {
 	_ui->setupUi(this);
 	setWindowIcon(QIcon(":/android-file-transfer.png"));
@@ -172,7 +173,7 @@ bool MainWindow::reconnectToDevice()
 	_session.reset();
 	_device.reset();
 	bool claimInterface = true;
-	bool resetDevice = false;
+	bool resetDevice = _resetDevice;
 
 	mtp::usb::ContextPtr ctx(new mtp::usb::Context);
 

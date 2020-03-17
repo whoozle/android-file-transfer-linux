@@ -60,6 +60,9 @@ public:
 	bool started() const
 	{ return _device != 0; }
 
+	void enableDeviceReset(bool enable)
+	{ _resetDevice = enable; }
+
 private:
 	void showEvent(QShowEvent *e);
 	void closeEvent(QCloseEvent *event);
@@ -115,6 +118,7 @@ private:
 	mtp::SessionPtr				_session;
 	mtp::TrustedAppPtr			_trustedApp;
 	mtp::LibraryPtr				_mediaLibrary;
+	bool						_resetDevice;
 };
 
 #endif // MAINWINDOW_H
