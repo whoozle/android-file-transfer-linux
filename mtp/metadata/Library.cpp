@@ -276,14 +276,14 @@ namespace mtp
 			return false;
 
 		auto & tracks = album->Tracks;
-		auto it = tracks.find(name);
-		if (it == tracks.end())
-			return false;
+		auto range = tracks.equal_range(name);
+		for(auto i = range.first; i != range.second; ++i)
+		{
+			if (i->second == trackIndex)
+				return true;
+		}
 
-		if (trackIndex <= 0 || it->second <= 0)
-			return true;
-
-		return trackIndex == it->second;
+		return false;
 	}
 
 	Library::NewTrackInfo Library::CreateTrack(const ArtistPtr & artist,
