@@ -57,7 +57,7 @@
      <x>0</x>
      <y>0</y>
      <width>839</width>
-     <height>34</height>
+     <height>39</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -96,7 +96,7 @@
    <addaction name="actionGo_Down"/>
    <addaction name="actionRefresh"/>
    <addaction name="actionCreateDirectory"/>
-   <addaction name="actionUpload_Album"/>
+   <addaction name="actionUploadAlbum"/>
    <addaction name="actionUploadDirectory"/>
    <addaction name="actionUpload"/>
    <addaction name="actionShowThumbnails"/>
@@ -152,7 +152,7 @@
     <string>Return</string>
    </property>
   </action>
-  <action name="actionUpload_Album">
+  <action name="actionUploadAlbum">
    <property name="text">
     <string>Upload Album</string>
    </property>
@@ -232,9 +232,19 @@
     <string>Show Thumbnails of images where available</string>
    </property>
   </action>
-  <action name="actionImport_Music">
+  <action name="actionImportMusic">
    <property name="text">
     <string>Import Music</string>
+   </property>
+  </action>
+  <action name="actionRemoveCover">
+   <property name="text">
+    <string>Remove Cover</string>
+   </property>
+  </action>
+  <action name="actionAttachCover">
+   <property name="text">
+    <string>Attach Cover</string>
    </property>
   </action>
  </widget>

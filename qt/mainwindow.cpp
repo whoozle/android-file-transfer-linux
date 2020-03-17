@@ -80,8 +80,8 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(_ui->actionGo_Down, SIGNAL(triggered()), SLOT(down()));
 	connect(_ui->actionCreateDirectory, SIGNAL(triggered()), SLOT(createDirectory()));
 	connect(_ui->actionUploadDirectory, SIGNAL(triggered()), SLOT(uploadDirectories()));
-	connect(_ui->actionUpload_Album, SIGNAL(triggered()), SLOT(uploadAlbum()));
-	connect(_ui->actionImport_Music, SIGNAL(triggered()), SLOT(importMusic()));
+	connect(_ui->actionUploadAlbum, SIGNAL(triggered()), SLOT(uploadAlbum()));
+	connect(_ui->actionImportMusic, SIGNAL(triggered()), SLOT(importMusic()));
 	connect(_ui->actionUpload, SIGNAL(triggered()), SLOT(uploadFiles()));
 	connect(_ui->actionRename, SIGNAL(triggered()), SLOT(renameFile()));
 	connect(_ui->actionDownload, SIGNAL(triggered()), SLOT(downloadFiles()));
@@ -396,10 +396,10 @@ void MainWindow::showEvent(QShowEvent *)
 			qDebug() << "creating media library";
 			_mediaLibrary = std::make_shared<mtp::Library>(_session);
 			_uploader->setLibrary(_mediaLibrary);
-			_ui->actionUpload_Album->setVisible(false);
+			_ui->actionUploadAlbum->setVisible(false);
 		}
 		else
-			_ui->actionImport_Music->setVisible(false);
+			_ui->actionImportMusic->setVisible(false);
 	}
 }
 
