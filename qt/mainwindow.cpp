@@ -146,9 +146,13 @@ void MainWindow::replyFinished(QNetworkReply * reply)
 		return;
 	}
 	reply->open(QIODevice::ReadOnly);
-	QFile destination(getMtpzDataPath());
+	auto mtpzDataPath = getMtpzDataPath();
+	QFile destination(mtpzDataPath);
 	qDebug() << "writing to " << destination.fileName();
-	destination.open(QIODevice::WriteOnly);
+	if (!destination.open(QIODevice::WriteOnly)) {
+		QMessageBox::warning(this, title, tr("Could not write keys to %1").arg(mtpzDataPath));
+		return;
+	}
 	auto buffer = reply->readAll();
 
 	if (destination.write(buffer) == -1)
