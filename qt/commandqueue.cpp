@@ -211,7 +211,10 @@ void CommandQueue::setLibrary(const mtp::LibraryPtr library)
 void CommandQueue::execute(Command *ptr)
 {
 	std::unique_ptr<Command> cmd(ptr);
-	cmd->execute(*this);
+	try
+	{ cmd->execute(*this); }
+	catch(const std::exception & ex)
+	{ qWarning() << "exception in command queue: " << ex.what(); }
 }
 
 void CommandQueue::start(const QString &filename)
