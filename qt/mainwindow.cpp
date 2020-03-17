@@ -522,6 +522,37 @@ void MainWindow::showContextMenu ( const QPoint & pos )
 	menu.addAction(_ui->actionRename);
 	menu.addAction(_ui->actionDownload);
 	menu.addAction(_ui->actionDelete);
+
+	bool showRSMenu = false;
+
+	std::unordered_set<mtp::ObjectFormat> visited;
+	for(QModelIndex row : rows)
+	{
+		row = mapIndex(row);
+		auto id = _objectModel->objectIdAt(row.row());
+		try {
+			mtp::ObjectFormat format = static_cast<mtp::ObjectFormat>(_session->GetObjectIntegerProperty(id, mtp::ObjectProperty::ObjectFormat));
+			if (visited.find(format) != visited.end())
+				continue;
+
+			visited.insert(format);
+			auto supportedProperties = _session->GetObjectPropertiesSupported(format);
+			auto & properties = supportedProperties.ObjectPropertyCodes;
+			auto it = std::find(properties.begin(), properties.end(), mtp::ObjectProperty::RepresentativeSampleData);
+			if (it != properties.end()) {
+				showRSMenu = true;
+				break;
+			}
+		} catch (const std::exception & ex) {
+			qWarning() << "checking representative sample failed";
+		}
+	}
+	if (showRSMenu) {
+		menu.addSeparator();
+		menu.addAction(_ui->actionRemoveCover);
+		menu.addAction(_ui->actionAttachCover);
+	}
+
 	menu.exec(_ui->listView->mapToGlobal(pos));
 }
 
