@@ -113,14 +113,20 @@ void CommandQueue::importFile(const QString &filename)
 	if (mtp::IsImageFormat(format))
 	{
 		qDebug() << "image: " << filename;
-		mtp::Library::AlbumPtr album;
-		QString bestPath;
-		for(auto & kv : _albums)
-		{
-			if (!filename.startsWith(kv.first))
-				continue;
-			qDebug() << "POSSIBLE MATCH " << fromUtf8(kv.second->Name);
+		int score = GetCoverScore(fi.baseName());
+		qDebug() << "image cover score: " << score << " for " << fi.baseName();
+		auto dir = fi.dir().path();
+		auto it = _covers.find(dir);
+		if (it == _covers.end()) {
+			Cover cover;
+			cover.Score = score;
+			cover.Path = filename;
+			_covers.insert(std::make_pair(dir, std::move(cover)));
+		} else if (score > it->second.Score) {
+			it->second.Score = score;
+			it->second.Path = filename;
 		}
+
 		return;
 	}
 
@@ -251,6 +257,38 @@ void CommandQueue::finish(mtp::ObjectId directoryId)
 		model()->setParent(directoryId);
 	} catch(const std::exception &ex)
 	{ qDebug() << "finalizing commands failed: " << fromUtf8(ex.what()); }
+
+	for(auto & akv : _albums)
+	{
+		auto & albumPath = akv.first;
+		auto & album = akv.second;
+
+		qDebug() << "looking for a cover for album " << fromUtf8(akv.second->Name);
+
+		QString bestPath;
+		for(auto & ckv : _covers)
+		{
+			auto & cover = ckv.second;
+
+			if (cover.Path.startsWith(albumPath) && albumPath.size() > bestPath.size()) {
+				bestPath = cover.Path;
+			}
+		}
+
+		if (bestPath.isEmpty())
+			continue;
+
+		QFile file(bestPath);
+		if (!file.open(QIODevice::ReadOnly))
+			continue;
+
+		auto buffer = file.readAll();
+		mtp::ByteArray value(buffer.begin(), buffer.end());
+		try { _model->session()->SetObjectPropertyAsArray(album->Id, mtp::ObjectProperty::RepresentativeSampleData, value); }
+		catch(const std::exception & ex)
+		{ qWarning() << "setting cover failed: " << ex.what(); }
+	}
+	_covers.clear();
 
 	_model->moveToThread(QApplication::instance()->thread());
 	_completedFilesSize = 0;

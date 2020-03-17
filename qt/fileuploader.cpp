@@ -203,6 +203,7 @@ void FileUploader::importMusic(const QString & path)
 		{
 			qDebug() << "going into subdirectory" << currentFile;
 			QDirIterator it(currentFile, QDirIterator::Subdirectories);
+			QStringList dirs;
 			while(it.hasNext())
 			{
 				QString next = it.next();
@@ -211,9 +212,12 @@ void FileUploader::importMusic(const QString & path)
 				if (filename == "." || filename == "..")
 					continue;
 
-				if (fi.isFile() || fi.isDir())
+				if (fi.isFile())
 					files.push_back(next);
+				else if (fi.isDir())
+					dirs.push_back(next);
 			}
+			files += dirs;
 		}
 		else if (currentFileInfo.isFile())
 		{
