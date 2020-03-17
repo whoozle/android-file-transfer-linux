@@ -60,7 +60,8 @@ MainWindow::MainWindow(QWidget *parent) :
 	_storageModel(),
 	_objectModel(new MtpObjectsModel()),
 	_uploader(new FileUploader(_objectModel, this)),
-	_resetDevice(false)
+	_resetDevice(false),
+	_networkReply()
 {
 	_ui->setupUi(this);
 	setWindowIcon(QIcon(":/android-file-transfer.png"));
@@ -136,8 +137,21 @@ void MainWindow::closeEvent(QCloseEvent *event)
 	QMainWindow::closeEvent(event);
 }
 
+void MainWindow::replyReadyRead()
+{
+	if (!_networkReply) {
+		qWarning() << "replyReadyRead called without network reply object";
+		return;
+	}
+
+	auto data = _networkReply->read(128 * 1024);
+	qDebug() << "read: " << data.size() << " bytes...";
+	_networkReplyBody.append(data);
+}
+
 void MainWindow::replyFinished(QNetworkReply * reply)
 {
+	_networkReply = NULL;
 	qDebug() << "got reply " << reply << " with status " << reply->error();
 	auto title = tr("MTPZ Keys Download");
 	if (reply->error() != 0)
@@ -153,13 +167,13 @@ void MainWindow::replyFinished(QNetworkReply * reply)
 		QMessageBox::warning(this, title, tr("Could not write keys to %1").arg(mtpzDataPath));
 		return;
 	}
-	auto buffer = reply->readAll();
 
-	if (destination.write(buffer) == -1)
+	if (destination.write(_networkReplyBody) == -1)
 		QMessageBox::warning(this, title, tr("Could not write keys, please find the error below:\n\n%1\n\nPlease look for .mtpz-data file on the internet and manually install it to your home directory.").arg(destination.errorString()));
 
 	destination.close();
 	reply->close();
+	reply->deleteLater();
 	QMessageBox::information(this, title, tr("Your MTPZ keys have been successfully installed.\n\nPlease restart the application to use them."));
 }
 
@@ -304,7 +318,8 @@ bool MainWindow::reconnectToDevice()
 						_nam = new QNetworkAccessManager(this);
 						connect(_nam, SIGNAL(finished(QNetworkReply*)), this, SLOT(replyFinished(QNetworkReply*)));
 					}
-					_nam->get(QNetworkRequest(QUrl(MTPZ_DATA_SOURCE)));
+					_networkReply = _nam->get(QNetworkRequest(QUrl(MTPZ_DATA_SOURCE)));
+					connect(_networkReply, SIGNAL(readyRead()), this, SLOT(replyReadyRead()));
 				}
 #else
 				QMessageBox downloadKeys(QMessageBox::Warning,

@@ -23,6 +23,7 @@
 #include <QMainWindow>
 #include <QModelIndex>
 #include <QVector>
+#include <QByteArray>
 #include <mtp/ptp/ObjectId.h>
 #include <mtp/types.h>
 
@@ -102,6 +103,7 @@ private slots:
 
 public slots:
 	void downloadFiles(const QString & path, const QVector<mtp::ObjectId> &objects);
+	void replyReadyRead();
 	void replyFinished(QNetworkReply*);
 
 private:
@@ -121,6 +123,8 @@ private:
 	mtp::TrustedAppPtr			_trustedApp;
 	mtp::LibraryPtr				_mediaLibrary;
 	bool						_resetDevice;
+	QNetworkReply *				_networkReply;
+	QByteArray					_networkReplyBody;
 };
 
 #endif // MAINWINDOW_H
