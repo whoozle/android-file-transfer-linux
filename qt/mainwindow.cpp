@@ -796,7 +796,6 @@ void MainWindow::importMusic()
 	for(const auto &path : selected)
 	{
 		importMusic(path);
-		back();
 	}
 }
 
