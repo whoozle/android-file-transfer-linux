@@ -24,6 +24,7 @@
 #include <QLocale>
 #include <QMessageBox>
 #include <QTranslator>
+#include <mtp/log.h>
 
 namespace
 {
@@ -70,6 +71,8 @@ int main(int argc, char *argv[])
 	for (int i = 0; i < argc; ++i) {
 		if (strcmp(argv[i], "-R") == 0)
 			w.enableDeviceReset(true);
+		else if (strcmp(argv[i], "-v") == 0)
+			mtp::g_debug = true;
 	}
 
 	w.show();
