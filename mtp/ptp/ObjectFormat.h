@@ -61,4 +61,10 @@ namespace mtp
 
 }
 
+namespace std
+{
+	template<> struct hash<mtp::ObjectFormat>
+	{ public: size_t operator()(mtp::ObjectFormat format) const { return static_cast<size_t>(format); } };
+}
+
 #endif
