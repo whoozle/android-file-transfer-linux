@@ -273,7 +273,7 @@ bool MainWindow::reconnectToDevice()
 			mtp::msg::DeviceInfo di = _session->GetDeviceInfo();
 			qDebug() << "device info" << fromUtf8(di.Manufacturer) << " " << fromUtf8(di.Model);
 			auto path = getMtpzDataPath();
-			qDebug() << "writable home path: " << path;
+			qDebug() << "mtpz-data path: " << path;
 			_trustedApp = mtp::TrustedApp::Create(_session, toUtf8(path));
 			if (_trustedApp && !_trustedApp->KeysLoaded()) {
 				QString title = tr("MTPZ Keys are Missing");
