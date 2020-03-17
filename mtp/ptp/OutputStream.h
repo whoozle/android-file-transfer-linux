@@ -112,14 +112,17 @@ namespace mtp
 			Write16(0);
 		}
 
-		template<typename ElementType>
-		void WriteArray(const std::vector<ElementType> &array)
+		template<typename ArrayType>
+		void WriteArray(const ArrayType & array)
 		{
 			Write32(array.size());
-			for(const auto &el : array)
+			for(const auto & el : array)
 				(*this) << el;
 		}
 	};
+
+	inline OutputStream & operator << (OutputStream &stream, char value)
+	{ stream.Write8(value); return stream; }
 
 	inline OutputStream & operator << (OutputStream &stream, u8 value)
 	{ stream.Write8(value); return stream; }
