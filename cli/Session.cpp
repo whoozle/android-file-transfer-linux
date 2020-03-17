@@ -914,6 +914,14 @@ namespace cli
 #undef CASE
 				case mtp::DataTypeCode::String:
 					defValue = is.ReadString(); break;
+				case mtp::DataTypeCode::ArrayUint8:
+					{
+						u32 size = is.Read32();
+						std::stringstream ss;
+						HexDump(ss, "raw bytes", size, is);
+						defValue = ss.str();
+					}
+					break;
 				default:
 					throw std::runtime_error("invalid type " + std::to_string((u16)type));
 			}
