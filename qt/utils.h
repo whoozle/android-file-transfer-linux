@@ -34,5 +34,25 @@ inline std::string toUtf8(const QString &str)
 	return std::string(utf8.data(), utf8.size());
 }
 
+inline int GetCoverScore(const QString &str_)
+{
+	QString str = str_.toLower();
+	int score = 0;
+	if (str.contains("art"))
+		score += 1;
+	if (str.contains("album"))
+		score += 1;
+	if (str.contains("cover"))
+		score += 2;
+	if (str.contains("large"))
+		score += 2;
+	if (str.contains("small"))
+		score += 1;
+	if (str.contains("folder"))
+		score += 1;
+	return score;
+}
+
+
 #endif // UTILS
 

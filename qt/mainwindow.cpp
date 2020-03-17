@@ -801,28 +801,9 @@ void MainWindow::importMusic()
 
 namespace
 {
-	int GetScore(const QString &str_)
-	{
-		QString str = str_.toLower();
-		int score = 0;
-		if (str.contains("art"))
-			score += 1;
-		if (str.contains("album"))
-			score += 1;
-		if (str.contains("cover"))
-			score += 2;
-		if (str.contains("large"))
-			score += 2;
-		if (str.contains("small"))
-			score += 1;
-		if (str.contains("folder"))
-			score += 1;
-		return score;
-	}
-
 	bool HeuristicLess(const QString &s1, const QString &s2)
 	{
-		return GetScore(s1) > GetScore(s2);
+		return GetCoverScore(s1) > GetCoverScore(s2);
 	}
 }
 
