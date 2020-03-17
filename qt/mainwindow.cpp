@@ -949,10 +949,8 @@ void MainWindow::attachCover()
 	qDebug() << "read " << buffer.size() << " bytes of cover file";
 	file.close();
 
-	mtp::ByteArray value;
-	mtp::OutputStream out(value);
-	out.WriteArray(buffer);
-	try { _session->SetObjectProperty(targetObjectId, mtp::ObjectProperty::RepresentativeSampleData, value); }
+	mtp::ByteArray value(buffer.begin(), buffer.end());
+	try { _session->SetObjectPropertyAsArray(targetObjectId, mtp::ObjectProperty::RepresentativeSampleData, value); }
 	catch (const std::exception & ex)
 	{
 		QMessageBox::warning(this, tr("Attach Cover"), tr("Could not attach cover: %1").arg(ex.what()));
@@ -965,17 +963,13 @@ void MainWindow::removeCover()
 	QModelIndexList rows = selection->selectedRows();
 
 	mtp::ByteArray value;
-	mtp::OutputStream out(value);
-	out.Write32(0); //empty array
 
 	for(QModelIndex row : rows)
 	{
 		row = mapIndex(row);
 		auto id = _objectModel->objectIdAt(row.row());
 		try
-		{
-			_session->SetObjectProperty(id, mtp::ObjectProperty::RepresentativeSampleData, value);
-		}
+		{ _session->SetObjectPropertyAsArray(id, mtp::ObjectProperty::RepresentativeSampleData, value); }
 		catch(const std::exception & ex)
 		{ qWarning() << "failed to remove cover:" << ex.what(); }
 	}

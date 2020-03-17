@@ -110,6 +110,7 @@ namespace mtp
 		void SetObjectProperty(ObjectId objectId, ObjectProperty property, const ByteArray &value);
 		void SetObjectProperty(ObjectId objectId, ObjectProperty property, u64 value);
 		void SetObjectProperty(ObjectId objectId, ObjectProperty property, const std::string &value);
+		void SetObjectPropertyAsArray(ObjectId objectId, ObjectProperty property, const ByteArray &value);
 		time_t GetObjectModificationTime(ObjectId id);
 
 		//common properties shortcuts

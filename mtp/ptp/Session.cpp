@@ -357,6 +357,18 @@ namespace mtp
 		SetObjectProperty(objectId, property, ByteArray(data.begin(), data.begin() + i));
 	}
 
+	void Session::SetObjectPropertyAsArray(ObjectId objectId, ObjectProperty property, const ByteArray &value)
+	{
+		auto n = value.size();
+
+		ByteArray array;
+		OutputStream out(array);
+		array.reserve(n + 4);
+		out.WriteArray(value);
+
+		SetObjectProperty(objectId, property, array);
+	}
+
 	std::string Session::GetObjectStringProperty(ObjectId objectId, ObjectProperty property)
 	{
 		return ReadSingleString(GetObjectProperty(objectId, property));
