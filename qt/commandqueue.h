@@ -91,6 +91,7 @@ private:
 	MtpObjectsModel *				_model;
 	qint64							_completedFilesSize;
 	QMap<QString, mtp::ObjectId>	_directories;
+	std::map<QString, mtp::Library::AlbumPtr> _albums;
 	mtp::LibraryPtr					_library;
 	volatile bool					_aborted;
 

@@ -110,6 +110,20 @@ void CommandQueue::importFile(const QString &filename)
 	std::string utfFilename = toUtf8(filename);
 	mtp::ObjectFormat format = mtp::ObjectFormatFromFilename(utfFilename);
 
+	if (mtp::IsImageFormat(format))
+	{
+		qDebug() << "image: " << filename;
+		mtp::Library::AlbumPtr album;
+		QString bestPath;
+		for(auto & kv : _albums)
+		{
+			if (!filename.startsWith(kv.first))
+				continue;
+			qDebug() << "POSSIBLE MATCH " << fromUtf8(kv.second->Name);
+		}
+		return;
+	}
+
 	if (!mtp::IsAudioFormat(format))
 		return;
 
@@ -144,6 +158,13 @@ void CommandQueue::importFile(const QString &filename)
 	{
 		qDebug() << "can't create album";
 		return;
+	}
+
+	auto dir = fi.dir().path();
+	if (_albums.find(dir)== _albums.end())
+	{
+		qDebug() << "registering " << dir << " as a path to album";
+		_albums.insert(std::make_pair(dir, album));
 	}
 
 	if (_library->HasTrack(album, metadata->Title, metadata->Track)) {
@@ -234,6 +255,7 @@ void CommandQueue::finish(mtp::ObjectId directoryId)
 	_model->moveToThread(QApplication::instance()->thread());
 	_completedFilesSize = 0;
 	_directories.clear();
+	_albums.clear();
 	_aborted = false;
 	emit finished();
 }
