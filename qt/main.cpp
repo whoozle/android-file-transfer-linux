@@ -56,6 +56,8 @@ int main(int argc, char *argv[])
 	QCoreApplication::setOrganizationDomain("whoozle.github.io");
 	QCoreApplication::setOrganizationName("whoozle.github.io");
 
+	QGuiApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+
 	QTranslator qtTranslator;
 
 	qtTranslator.load("qt_" + QLocale::system().name(),
