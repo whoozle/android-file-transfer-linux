@@ -99,7 +99,7 @@ private:
 		int			Score;
 	};
 
-	std::unordered_map<QString, Cover> _covers;
+	std::map<QString, Cover> 		_covers;
 	mtp::LibraryPtr					_library;
 	volatile bool					_aborted;
 
