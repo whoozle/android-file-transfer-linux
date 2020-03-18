@@ -21,6 +21,7 @@ set(SOURCES main.cpp
 	createdirectorydialog.cpp
 	renamedialog.cpp
 	qtobjectstream.cpp
+	utils.cpp
 )
 
 set(HEADERS mainwindow.h
