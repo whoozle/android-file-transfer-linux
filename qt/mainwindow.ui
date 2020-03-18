@@ -112,10 +112,6 @@
    </property>
   </action>
   <action name="actionCreateDirectory">
-   <property name="icon">
-    <iconset theme="folder-new">
-     <normaloff>.</normaloff>.</iconset>
-   </property>
    <property name="text">
     <string>&amp;CreateDirectory</string>
    </property>
@@ -129,10 +125,6 @@
    </property>
   </action>
   <action name="actionBack">
-   <property name="icon">
-    <iconset theme="go-previous">
-     <normaloff>.</normaloff>.</iconset>
-   </property>
    <property name="text">
     <string>&amp;Back</string>
    </property>
@@ -141,10 +133,6 @@
    </property>
   </action>
   <action name="actionGoDown">
-   <property name="icon">
-    <iconset theme="go-next">
-     <normaloff>.</normaloff>.</iconset>
-   </property>
    <property name="text">
     <string>&amp;Go Down</string>
    </property>
@@ -158,10 +146,6 @@
    </property>
   </action>
   <action name="actionRename">
-   <property name="icon">
-    <iconset theme="edit-rename">
-     <normaloff>.</normaloff>.</iconset>
-   </property>
    <property name="text">
     <string>&amp;Rename</string>
    </property>
@@ -170,10 +154,6 @@
    </property>
   </action>
   <action name="actionDelete">
-   <property name="icon">
-    <iconset theme="edit-delete">
-     <normaloff>.</normaloff>.</iconset>
-   </property>
    <property name="text">
     <string>D&amp;elete</string>
    </property>
@@ -182,10 +162,6 @@
    </property>
   </action>
   <action name="actionDownload">
-   <property name="icon">
-    <iconset theme="download">
-     <normaloff>.</normaloff>.</iconset>
-   </property>
    <property name="text">
     <string>&amp;Download</string>
    </property>
@@ -202,10 +178,6 @@
    </property>
   </action>
   <action name="actionRefresh">
-   <property name="icon">
-    <iconset theme="view-refresh">
-     <normaloff>.</normaloff>.</iconset>
-   </property>
    <property name="text">
     <string>Re&amp;fresh</string>
    </property>

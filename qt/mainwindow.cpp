@@ -66,6 +66,12 @@ MainWindow::MainWindow(QWidget *parent) :
 	_ui->setupUi(this);
 	setWindowIcon(QIcon(":/android-file-transfer.png"));
 
+	_ui->actionBack->setIcon(style()->standardIcon(QStyle::SP_ArrowBack));
+	_ui->actionGoDown->setIcon(style()->standardIcon(QStyle::SP_ArrowForward));
+	_ui->actionCreateDirectory->setIcon(style()->standardIcon(QStyle::SP_FileDialogNewFolder));
+	_ui->actionRefresh->setIcon(style()->standardIcon(QStyle::SP_BrowserReload));
+	_ui->actionShowThumbnails->setIcon(style()->standardIcon(QStyle::SP_FileDialogDetailedView));
+
 	_ui->listView->setModel(_proxyModel);
 
 	_proxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
