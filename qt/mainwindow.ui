@@ -80,7 +80,7 @@
      <string>&amp;Navigate</string>
     </property>
     <addaction name="actionBack"/>
-    <addaction name="actionGo_Down"/>
+    <addaction name="actionGoDown"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuNavigate"/>
@@ -93,7 +93,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionBack"/>
-   <addaction name="actionGo_Down"/>
+   <addaction name="actionGoDown"/>
    <addaction name="actionRefresh"/>
    <addaction name="actionCreateDirectory"/>
    <addaction name="actionUploadAlbum"/>
@@ -140,7 +140,7 @@
     <string>Backspace</string>
    </property>
   </action>
-  <action name="actionGo_Down">
+  <action name="actionGoDown">
    <property name="icon">
     <iconset theme="go-next">
      <normaloff>.</normaloff>.</iconset>

@@ -78,7 +78,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(_ui->listView, SIGNAL(doubleClicked(QModelIndex)), SLOT(onActivated(QModelIndex)));
 	connect(_ui->listView, SIGNAL(customContextMenuRequested(QPoint)), SLOT(showContextMenu(QPoint)));
 	connect(_ui->actionBack, SIGNAL(triggered()), SLOT(back()));
-	connect(_ui->actionGo_Down, SIGNAL(triggered()), SLOT(down()));
+	connect(_ui->actionGoDown, SIGNAL(triggered()), SLOT(down()));
 	connect(_ui->actionCreateDirectory, SIGNAL(triggered()), SLOT(createDirectory()));
 	connect(_ui->actionUploadDirectory, SIGNAL(triggered()), SLOT(uploadDirectories()));
 	connect(_ui->actionUploadAlbum, SIGNAL(triggered()), SLOT(uploadAlbum()));
@@ -102,7 +102,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	//fixme: find out how to specify alternative in designer
 	_ui->actionBack->setShortcuts(_ui->actionBack->shortcuts() << QKeySequence("Alt+Up") << QKeySequence("Esc"));
-	_ui->actionGo_Down->setShortcuts(_ui->actionGo_Down->shortcuts() << QKeySequence("Alt+Down") << QKeySequence("Enter"));
+	_ui->actionGoDown->setShortcuts(_ui->actionGoDown->shortcuts() << QKeySequence("Alt+Down") << QKeySequence("Enter"));
 	_ui->actionCreateDirectory->setShortcuts(_ui->actionCreateDirectory->shortcuts() << QKeySequence("F7"));
 	_ui->actionRefresh->setShortcuts(_ui->actionRefresh->shortcuts() << QKeySequence("Ctrl+R"));
 	_ui->listView->setFocus();
@@ -466,7 +466,7 @@ void MainWindow::updateActionsState()
 	_ui->actionDelete->setEnabled(!rows.empty());
 	_ui->actionDownload->setEnabled(!rows.empty());
 	_ui->actionRename->setEnabled(rows.size() == 1);
-	_ui->actionGo_Down->setEnabled(rows.size() == 1);
+	_ui->actionGoDown->setEnabled(rows.size() == 1);
 	_ui->actionBack->setEnabled(!_history.empty());
 
 	QStringList statusList;
