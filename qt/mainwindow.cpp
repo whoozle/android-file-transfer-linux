@@ -418,14 +418,23 @@ void MainWindow::showEvent(QShowEvent *)
 			qDebug() << "keys loaded, authenticated";
 			_trustedApp->Authenticate();
 		}
-		if (mtp::Library::Supported(_session)) {
-			qDebug() << "creating media library";
-			_mediaLibrary = std::make_shared<mtp::Library>(_session);
-			_uploader->setLibrary(_mediaLibrary);
-			_ui->actionUploadAlbum->setVisible(false);
+
+		try
+		{
+			if (mtp::Library::Supported(_session)) {
+				qDebug() << "creating media library";
+				_mediaLibrary = std::make_shared<mtp::Library>(_session);
+				_uploader->setLibrary(_mediaLibrary);
+				_ui->actionUploadAlbum->setVisible(false);
+			}
+			else
+				throw std::runtime_error("not supported by device");
 		}
-		else
+		catch (const std::exception & ex)
+		{
+			qWarning() << "import music disabled: " << ex.what();
 			_ui->actionImportMusic->setVisible(false);
+		}
 	}
 }
 
