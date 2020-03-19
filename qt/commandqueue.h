@@ -111,6 +111,7 @@ public:
 	{ return _model; }
 
 	void setLibrary(const mtp::LibraryPtr library);
+	mtp::LibraryPtr library() const;
 
 	void createDirectory(const QString &path);
 	void uploadFile(const QString &file);

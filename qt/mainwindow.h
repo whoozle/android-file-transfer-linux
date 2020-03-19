@@ -71,6 +71,7 @@ private:
 	void saveGeometry(const QString &name, const QWidget &widget);
 	void restoreGeometry(const QString &name, QWidget &widget);
 	static QString getMtpzDataPath();
+	void tryCreateLibrary();
 
 private slots:
 	bool reconnectToDevice();

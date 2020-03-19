@@ -235,6 +235,9 @@ CommandQueue::~CommandQueue()
 void CommandQueue::setLibrary(const mtp::LibraryPtr library)
 { _library = library; }
 
+mtp::LibraryPtr CommandQueue::library() const
+{ return _library; }
+
 void CommandQueue::execute(Command *ptr)
 {
 	std::unique_ptr<Command> cmd(ptr);

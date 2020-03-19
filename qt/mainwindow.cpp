@@ -179,7 +179,25 @@ void MainWindow::replyFinished(QNetworkReply * reply)
 	destination.close();
 	reply->close();
 	reply->deleteLater();
-	QMessageBox::information(this, title, tr("Your MTPZ keys have been successfully installed.\n\nPlease restart the application to use them."));
+	try
+	{
+		_trustedApp = mtp::TrustedApp::Create(_session, toUtf8(mtpzDataPath));
+		if (!_trustedApp->KeysLoaded())
+			throw std::runtime_error("failed to load new keys");
+
+		qDebug() << "new keys loaded, authenticating...";
+
+		_trustedApp->Authenticate();
+
+		QMessageBox::information(this, title, tr("MTPZ keys have been installed to your system."));
+		tryCreateLibrary();
+	}
+	catch (const std::exception & ex)
+	{
+		qWarning() << "failed to recreate session: " << ex.what();
+		QMessageBox::warning(this, title, tr("Your MTPZ keys failed to install or load.\n\nPlease restart the application to try again.\n\nException: %1").arg(ex.what()));
+	}
+
 }
 
 QString MainWindow::getMtpzDataPath()
@@ -419,22 +437,31 @@ void MainWindow::showEvent(QShowEvent *)
 			_trustedApp->Authenticate();
 		}
 
-		try
-		{
-			if (mtp::Library::Supported(_session)) {
-				qDebug() << "creating media library";
-				_mediaLibrary = std::make_shared<mtp::Library>(_session);
-				_uploader->setLibrary(_mediaLibrary);
-				_ui->actionUploadAlbum->setVisible(false);
-			}
-			else
-				throw std::runtime_error("not supported by device");
+		tryCreateLibrary();
+	}
+}
+
+void MainWindow::tryCreateLibrary()
+{
+	if (_uploader->library())
+		return;
+	try
+	{
+		if (mtp::Library::Supported(_session)) {
+			qDebug() << "creating media library";
+			_mediaLibrary = std::make_shared<mtp::Library>(_session);
+			_uploader->setLibrary(_mediaLibrary);
+			_ui->actionUploadAlbum->setVisible(false);
 		}
-		catch (const std::exception & ex)
-		{
-			qWarning() << "import music disabled: " << ex.what();
-			_ui->actionImportMusic->setVisible(false);
-		}
+		else
+			throw std::runtime_error("not supported by device");
+
+		_ui->actionImportMusic->setVisible(true);
+	}
+	catch (const std::exception & ex)
+	{
+		qWarning() << "importing music disabled: " << ex.what();
+		_ui->actionImportMusic->setVisible(false);
 	}
 }
 

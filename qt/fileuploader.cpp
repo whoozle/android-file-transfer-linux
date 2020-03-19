@@ -51,6 +51,10 @@ FileUploader::~FileUploader()
 void FileUploader::setLibrary(const mtp::LibraryPtr & library)
 { _worker->setLibrary(library); }
 
+mtp::LibraryPtr FileUploader::library() const
+{ return _worker? _worker->library(): nullptr; }
+
+
 void FileUploader::onProgress(qint64 current)
 {
 	//qDebug() << "progress " << current << " of " << _total;

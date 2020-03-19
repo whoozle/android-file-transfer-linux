@@ -58,6 +58,7 @@ public:
 	explicit FileUploader(MtpObjectsModel * model, QObject *parent = 0);
 	~FileUploader();
 	void setLibrary(const mtp::LibraryPtr & library);
+	mtp::LibraryPtr library() const;
 
 	void upload(QStringList files);
 	void importMusic(const QString & path);
