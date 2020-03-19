@@ -94,6 +94,7 @@ private slots:
 	void deleteFiles();
 	void downloadFiles(const QVector<mtp::ObjectId> &objects);
 	void uploadFiles(const QStringList &files);
+	void onFilesDropped(const QStringList &files);
 	void onStorageChanged(int idx);
 	void validateClipboard();
 	void pasteFromClipboard();

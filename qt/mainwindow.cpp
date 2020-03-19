@@ -99,7 +99,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(_ui->actionRemoveCover, SIGNAL(triggered(bool)), SLOT(removeCover()));
 	connect(_ui->actionAttachCover, SIGNAL(triggered(bool)), SLOT(attachCover()));
 
-	connect(_objectModel, SIGNAL(onFilesDropped(QStringList)), SLOT(uploadFiles(QStringList)));
+	connect(_objectModel, SIGNAL(onFilesDropped(QStringList)), SLOT(onFilesDropped(QStringList)));
 	connect(_objectModel, SIGNAL(existingFileOverwrite(QString)), SLOT(confirmOverwrite(QString)), Qt::BlockingQueuedConnection);
 
 	connect(_clipboard, SIGNAL(dataChanged()), SLOT(validateClipboard()));
@@ -838,6 +838,19 @@ void MainWindow::importMusic()
 	{
 		importMusic(path);
 	}
+}
+
+void MainWindow::onFilesDropped(const QStringList &files)
+{
+	if (_uploader->library())
+	{
+		for(auto & file : files)
+		{
+			importMusic(file);
+		}
+	}
+	else
+		uploadFiles(files);
 }
 
 namespace
