@@ -84,17 +84,22 @@ namespace mtp
 		auto musicFolders = ListAssociations(_musicFolder);
 
 		using namespace mtp;
+
+		msg::ObjectHandles artists;
 		if (_artistSupported)
 		{
 			debug("getting artists...");
 			if (reporter)
-				reporter(State::QueryingArtists, 0, 0);
-			auto artists = _session->GetObjectHandles(Session::AllStorages, ObjectFormat::Artist, Session::Device);
+				reporter(State::QueryingArtists, progress, total);
+			artists = _session->GetObjectHandles(Session::AllStorages, ObjectFormat::Artist, Session::Device);
 
 			total += artists.ObjectHandles.size();
 			if (reporter)
 				reporter(State::LoadingArtists, progress, total);
+		}
 
+		if (_artistSupported)
+		{
 			for (auto id : artists.ObjectHandles)
 			{
 				auto name = _session->GetObjectStringProperty(id, ObjectProperty::Name);
@@ -118,7 +123,7 @@ namespace mtp
 		{
 			debug("getting albums...");
 			if (reporter)
-				reporter(State::QueryingAlbums, 0, 0);
+				reporter(State::QueryingAlbums, progress, total);
 
 			auto albums = _session->GetObjectHandles(Session::AllStorages, ObjectFormat::AbstractAudioAlbum, Session::Device);
 			total += albums.ObjectHandles.size();
@@ -171,9 +176,9 @@ namespace mtp
 					album->MusicFolderId = _session->CreateDirectory(name, artist->MusicFolderId, _storage).ObjectId;
 
 				_albums.insert(std::make_pair(std::make_pair(artist, name), album));
+				if (reporter)
+					reporter(State::LoadingAlbums, ++progress, total);
 			}
-			if (reporter)
-				reporter(State::LoadingAlbums, ++progress, total);
 		}
 
 		if (reporter)

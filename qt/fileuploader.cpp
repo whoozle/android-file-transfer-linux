@@ -37,6 +37,7 @@ FileUploader::FileUploader(MtpObjectsModel * model, QObject *parent) :
 	connect(&_workerThread, SIGNAL(finished()), SLOT(deleteLater()));
 	connect(this, SIGNAL(executeCommand(Command*)), _worker, SLOT(execute(Command*)));
 	connect(_worker, SIGNAL(progress(qint64)), SLOT(onProgress(qint64)));
+	connect(_worker, SIGNAL(total(qint64)), SLOT(onTotal(qint64)));
 	connect(_worker, SIGNAL(started(QString)), SLOT(onStarted(QString)));
 	connect(_worker, SIGNAL(finished()), SLOT(onFinished()));
 	_workerThread.start();
@@ -57,6 +58,11 @@ void FileUploader::tryCreateLibrary()
 
 mtp::LibraryPtr FileUploader::library() const
 { return _worker? _worker->library(): nullptr; }
+
+void FileUploader::onTotal(qint64 total)
+{
+	_total = total;
+}
 
 void FileUploader::onProgress(qint64 current)
 {

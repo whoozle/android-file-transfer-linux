@@ -50,6 +50,7 @@ private:
 	bool				_aborted;
 
 private slots:
+	void onTotal(qint64 total);
 	void onProgress(qint64 current);
 	void onStarted(const QString &file);
 	void onFinished();

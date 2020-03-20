@@ -134,6 +134,7 @@ public slots:
 signals:
 	void started(QString);
 	void progress(qint64 bytes);
+	void total(qint64 bytes);
 	void finished();
 };
 

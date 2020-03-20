@@ -51,11 +51,32 @@ void LoadLibrary::execute(CommandQueue &queue)
 
 void CommandQueue::loadLibrary()
 {
+	using namespace mtp;
 	auto session = _model->session();
 	qDebug() << "loading media library...";
 	_library.reset();
+	auto reporter = [&](Library::State state , u64 c , u64 t)
+	{
+		qDebug() << "progress " << static_cast<int>(state) << ", " << c << " of "<< t;
+		switch(state)
+		{
+			case Library::State::Initialising: 		start(tr("Loading media library…")); break;
+			case Library::State::QueryingArtists:	start(tr("Querying artists…")); break;
+			case Library::State::LoadingArtists: 	start(tr("Loading artists…")); break;
+			case Library::State::QueryingAlbums: 	start(tr("Querying albums…")); break;
+			case Library::State::LoadingAlbums: 	start(tr("Loading albums…")); break;
+			case Library::State::Loaded: 			start(tr("Done")); break;
+		}
+
+		if (t)
+			emit total(t);
+
+		if (c)
+			emit progress(c);
+	};
+
 	try
-	{ _library = std::make_shared<mtp::Library>(session); }
+	{ _library = std::make_shared<mtp::Library>(session, reporter); }
 	catch (const std::exception & ex)
 	{ qWarning() << "loading media library failed: " << ex.what(); }
 }
