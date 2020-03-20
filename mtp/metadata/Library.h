@@ -4,6 +4,7 @@
 #include <mtp/ptp/ObjectId.h>
 #include <mtp/ptp/ObjectFormat.h>
 #include <mtp/types.h>
+#include <functional>
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -20,6 +21,16 @@ namespace mtp
 		StorageId		_storage;
 
 	public:
+		enum struct State {
+			Initialising,
+			QueryingArtists,
+			LoadingArtists,
+			QueryingAlbums,
+			LoadingAlbums,
+			Loaded
+		};
+		using ProgressReporter = std::function<void (State, u64, u64)>;
+
 		struct Artist
 		{
 			ObjectId 		Id;
@@ -73,7 +84,7 @@ namespace mtp
 
 	public:
 
-		Library(const mtp::SessionPtr & session);
+		Library(const mtp::SessionPtr & session, ProgressReporter && reporter = ProgressReporter());
 		~Library();
 
 		static bool Supported(const mtp::SessionPtr & session);

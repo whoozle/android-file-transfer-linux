@@ -38,11 +38,14 @@ namespace mtp
 		return _session->CreateDirectory(name, parentId, _storage).ObjectId;
 	}
 
-	Library::Library(const mtp::SessionPtr & session): _session(session)
+	Library::Library(const mtp::SessionPtr & session, ProgressReporter && reporter): _session(session)
 	{
 		auto storages = _session->GetStorageIDs();
 		if (storages.StorageIDs.empty())
 			throw std::runtime_error("no storages found");
+
+		if (reporter)
+			reporter(State::Initialising, 0, 0);
 
 		_artistSupported = _session->GetDeviceInfo().Supports(ObjectFormat::Artist);
 		{
@@ -83,7 +86,15 @@ namespace mtp
 		if (_artistSupported)
 		{
 			debug("getting artists...");
+			if (reporter)
+				reporter(State::QueryingArtists, 0, 0);
 			auto artists = _session->GetObjectHandles(Session::AllStorages, ObjectFormat::Artist, Session::Device);
+
+			auto n = artists.ObjectHandles.size();
+			if (reporter)
+				reporter(State::LoadingArtists, 0, n);
+			u64 i = 0;
+
 			for (auto id : artists.ObjectHandles)
 			{
 				auto name = _session->GetObjectStringProperty(id, ObjectProperty::Name);
@@ -98,13 +109,23 @@ namespace mtp
 					artist->MusicFolderId = _session->CreateDirectory(name, _musicFolder, _storage).ObjectId;
 
 				_artists.insert(std::make_pair(name, artist));
+				if (reporter)
+					reporter(State::LoadingArtists, ++i, n);
 			}
 		}
 
 		std::unordered_map<ArtistPtr, NameToObjectIdMap> albumFolders;
 		{
 			debug("getting albums...");
+			if (reporter)
+				reporter(State::QueryingAlbums, 0, 0);
+
 			auto albums = _session->GetObjectHandles(Session::AllStorages, ObjectFormat::AbstractAudioAlbum, Session::Device);
+			auto n = albums.ObjectHandles.size();
+			if (reporter)
+				reporter(State::LoadingAlbums, 0, n);
+			u64 i = 0;
+
 			for (auto id : albums.ObjectHandles)
 			{
 				auto name = _session->GetObjectStringProperty(id, ObjectProperty::Name);
@@ -152,7 +173,12 @@ namespace mtp
 
 				_albums.insert(std::make_pair(std::make_pair(artist, name), album));
 			}
+			if (reporter)
+				reporter(State::LoadingAlbums, ++i, n);
 		}
+
+		if (reporter)
+			reporter(State::Loaded, 0, 0);
 	}
 
 	Library::~Library()
