@@ -821,7 +821,7 @@ void MainWindow::importMusic()
 	}
 
 	d.setAcceptMode(QFileDialog::AcceptOpen);
-	d.setFileMode(QFileDialog::ExistingFiles);
+	d.setFileMode(QFileDialog::Directory);
 	d.setOption(QFileDialog::ReadOnly, true);
 	restoreGeometry("import-music", d);
 	if (!d.exec())
