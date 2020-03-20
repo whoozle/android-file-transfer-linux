@@ -44,8 +44,9 @@ namespace mtp
 		if (storages.StorageIDs.empty())
 			throw std::runtime_error("no storages found");
 
+		u64 progress = 0, total = 0;
 		if (reporter)
-			reporter(State::Initialising, 0, 0);
+			reporter(State::Initialising, progress, total);
 
 		_artistSupported = _session->GetDeviceInfo().Supports(ObjectFormat::Artist);
 		{
@@ -90,10 +91,9 @@ namespace mtp
 				reporter(State::QueryingArtists, 0, 0);
 			auto artists = _session->GetObjectHandles(Session::AllStorages, ObjectFormat::Artist, Session::Device);
 
-			auto n = artists.ObjectHandles.size();
+			total += artists.ObjectHandles.size();
 			if (reporter)
-				reporter(State::LoadingArtists, 0, n);
-			u64 i = 0;
+				reporter(State::LoadingArtists, progress, total);
 
 			for (auto id : artists.ObjectHandles)
 			{
@@ -110,7 +110,7 @@ namespace mtp
 
 				_artists.insert(std::make_pair(name, artist));
 				if (reporter)
-					reporter(State::LoadingArtists, ++i, n);
+					reporter(State::LoadingArtists, ++progress, total);
 			}
 		}
 
@@ -121,10 +121,9 @@ namespace mtp
 				reporter(State::QueryingAlbums, 0, 0);
 
 			auto albums = _session->GetObjectHandles(Session::AllStorages, ObjectFormat::AbstractAudioAlbum, Session::Device);
-			auto n = albums.ObjectHandles.size();
+			total += albums.ObjectHandles.size();
 			if (reporter)
-				reporter(State::LoadingAlbums, 0, n);
-			u64 i = 0;
+				reporter(State::LoadingAlbums, progress, total);
 
 			for (auto id : albums.ObjectHandles)
 			{
@@ -174,11 +173,11 @@ namespace mtp
 				_albums.insert(std::make_pair(std::make_pair(artist, name), album));
 			}
 			if (reporter)
-				reporter(State::LoadingAlbums, ++i, n);
+				reporter(State::LoadingAlbums, ++progress, total);
 		}
 
 		if (reporter)
-			reporter(State::Loaded, 0, 0);
+			reporter(State::Loaded, progress, total);
 	}
 
 	Library::~Library()
