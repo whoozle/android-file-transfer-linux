@@ -85,7 +85,7 @@ namespace mtp
 
 		using namespace mtp;
 
-		msg::ObjectHandles artists;
+		msg::ObjectHandles artists, albums;
 		if (_artistSupported)
 		{
 			debug("getting artists...");
@@ -96,6 +96,16 @@ namespace mtp
 			total += artists.ObjectHandles.size();
 			if (reporter)
 				reporter(State::LoadingArtists, progress, total);
+		}
+		{
+			debug("getting albums...");
+			if (reporter)
+				reporter(State::QueryingAlbums, progress, total);
+
+			albums = _session->GetObjectHandles(Session::AllStorages, ObjectFormat::AbstractAudioAlbum, Session::Device);
+			total += albums.ObjectHandles.size();
+			if (reporter)
+				reporter(State::LoadingAlbums, progress, total);
 		}
 
 		if (_artistSupported)
@@ -120,65 +130,54 @@ namespace mtp
 		}
 
 		std::unordered_map<ArtistPtr, NameToObjectIdMap> albumFolders;
+		for (auto id : albums.ObjectHandles)
 		{
-			debug("getting albums...");
-			if (reporter)
-				reporter(State::QueryingAlbums, progress, total);
+			auto name = _session->GetObjectStringProperty(id, ObjectProperty::Name);
+			auto artistName = _session->GetObjectStringProperty(id, ObjectProperty::Artist);
+			std::string albumDate;
 
-			auto albums = _session->GetObjectHandles(Session::AllStorages, ObjectFormat::AbstractAudioAlbum, Session::Device);
-			total += albums.ObjectHandles.size();
-			if (reporter)
-				reporter(State::LoadingAlbums, progress, total);
+			if (_albumDateAuthoredSupported)
+				albumDate = _session->GetObjectStringProperty(id, ObjectProperty::DateAuthored);
 
-			for (auto id : albums.ObjectHandles)
-			{
-				auto name = _session->GetObjectStringProperty(id, ObjectProperty::Name);
-				auto artistName = _session->GetObjectStringProperty(id, ObjectProperty::Artist);
-				std::string albumDate;
+			auto artist = GetArtist(artistName);
+			if (!artist)
+				artist = CreateArtist(artistName);
 
-				if (_albumDateAuthoredSupported)
-					albumDate = _session->GetObjectStringProperty(id, ObjectProperty::DateAuthored);
-
-				auto artist = GetArtist(artistName);
-				if (!artist)
-					artist = CreateArtist(artistName);
-
-				debug("album: ", artistName, " -- ", name, "\t", id.Id, "\t", albumDate);
-				auto album = std::make_shared<Album>();
-				album->Name = name;
-				album->Artist = artist;
-				album->Id = id;
-				album->Year = !albumDate.empty()? ConvertDateTime(albumDate): 0;
-				if (albumFolders.find(artist) == albumFolders.end()) {
-					albumFolders[artist] = ListAssociations(artist->MusicFolderId);
-				}
-				auto it = albumFolders.find(artist);
-				if (it == albumFolders.end())
-					throw std::runtime_error("no iterator after insert, internal error");
-
-				{
-					auto refs = _session->GetObjectReferences(id).ObjectHandles;
-					std::copy(refs.begin(), refs.end(), std::inserter(album->Refs, album->Refs.begin()));
-					for(auto trackId : refs)
-					{
-						auto name = _session->GetObjectStringProperty(trackId, ObjectProperty::Name);
-						auto index = _session->GetObjectIntegerProperty(trackId, ObjectProperty::Track);
-						debug("[", index, "]: ", name);
-						album->Tracks.insert(std::make_pair(name, index));
-					}
-				}
-
-				const auto & albums = it->second;
-				auto alit = albums.find(name);
-				if (alit != albums.end())
-					album->MusicFolderId = alit->second;
-				else
-					album->MusicFolderId = _session->CreateDirectory(name, artist->MusicFolderId, _storage).ObjectId;
-
-				_albums.insert(std::make_pair(std::make_pair(artist, name), album));
-				if (reporter)
-					reporter(State::LoadingAlbums, ++progress, total);
+			debug("album: ", artistName, " -- ", name, "\t", id.Id, "\t", albumDate);
+			auto album = std::make_shared<Album>();
+			album->Name = name;
+			album->Artist = artist;
+			album->Id = id;
+			album->Year = !albumDate.empty()? ConvertDateTime(albumDate): 0;
+			if (albumFolders.find(artist) == albumFolders.end()) {
+				albumFolders[artist] = ListAssociations(artist->MusicFolderId);
 			}
+			auto it = albumFolders.find(artist);
+			if (it == albumFolders.end())
+				throw std::runtime_error("no iterator after insert, internal error");
+
+			{
+				auto refs = _session->GetObjectReferences(id).ObjectHandles;
+				std::copy(refs.begin(), refs.end(), std::inserter(album->Refs, album->Refs.begin()));
+				for(auto trackId : refs)
+				{
+					auto name = _session->GetObjectStringProperty(trackId, ObjectProperty::Name);
+					auto index = _session->GetObjectIntegerProperty(trackId, ObjectProperty::Track);
+					debug("[", index, "]: ", name);
+					album->Tracks.insert(std::make_pair(name, index));
+				}
+			}
+
+			const auto & albums = it->second;
+			auto alit = albums.find(name);
+			if (alit != albums.end())
+				album->MusicFolderId = alit->second;
+			else
+				album->MusicFolderId = _session->CreateDirectory(name, artist->MusicFolderId, _storage).ObjectId;
+
+			_albums.insert(std::make_pair(std::make_pair(artist, name), album));
+			if (reporter)
+				reporter(State::LoadingAlbums, ++progress, total);
 		}
 
 		if (reporter)
