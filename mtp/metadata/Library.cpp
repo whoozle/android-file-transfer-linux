@@ -7,8 +7,9 @@ namespace mtp
 {
 	namespace
 	{
-		const std::string UknownArtist	("UknownArtist");
-		const std::string UknownAlbum	("UknownAlbum");
+		const std::string UknownArtist		("UknownArtist");
+		const std::string UknownAlbum		("UknownAlbum");
+		const std::string VariousArtists	("VariousArtists");
 	}
 
 	Library::NameToObjectIdMap Library::ListAssociations(ObjectId parentId)
