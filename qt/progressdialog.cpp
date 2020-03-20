@@ -24,7 +24,7 @@
 #include <QPushButton>
 #include <QDebug>
 
-ProgressDialog::ProgressDialog(QWidget *parent) :
+ProgressDialog::ProgressDialog(QWidget *parent, bool showAbort) :
 	QDialog(parent),
 	ui(new Ui::ProgressDialog), _progress(0), _duration(0)
 {
@@ -37,9 +37,14 @@ ProgressDialog::ProgressDialog(QWidget *parent) :
 	_animation->setEndValue(1);
 	_animation->start();
 
-	QPushButton *b = ui->buttonBox->button(QDialogButtonBox::Abort);
-	Q_ASSERT(b);
-	connect(b, SIGNAL(clicked(bool)), SLOT(onAbortButtonPressed()));
+	if (showAbort)
+	{
+		QPushButton *b = ui->buttonBox->button(QDialogButtonBox::Abort);
+		Q_ASSERT(b);
+		connect(b, SIGNAL(clicked(bool)), SLOT(onAbortButtonPressed()));
+	}
+	else
+		ui->buttonBox->clear();
 }
 
 ProgressDialog::~ProgressDialog()

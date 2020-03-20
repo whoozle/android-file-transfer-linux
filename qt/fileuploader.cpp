@@ -48,12 +48,15 @@ FileUploader::~FileUploader()
 	_workerThread.wait();
 }
 
-void FileUploader::setLibrary(const mtp::LibraryPtr & library)
-{ _worker->setLibrary(library); }
+void FileUploader::tryCreateLibrary()
+{
+	mtp::ObjectId currentParentId = _model->parentObjectId();
+	emit executeCommand(new LoadLibrary());
+	emit executeCommand(new FinishQueue(currentParentId));
+}
 
 mtp::LibraryPtr FileUploader::library() const
 { return _worker? _worker->library(): nullptr; }
-
 
 void FileUploader::onProgress(qint64 current)
 {

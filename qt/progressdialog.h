@@ -34,7 +34,7 @@ class ProgressDialog : public QDialog
 	Q_PROPERTY(float progress READ progress WRITE setProgress);
 
 public:
-	explicit ProgressDialog(QWidget *parent = 0);
+	explicit ProgressDialog(QWidget *parent = 0, bool showAbort = true);
 	~ProgressDialog();
 
 	float progress() const

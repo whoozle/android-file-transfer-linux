@@ -46,6 +46,20 @@ void DownloadFile::execute(CommandQueue &queue)
 void ImportFile::execute(CommandQueue &queue)
 { queue.importFile(Filename); }
 
+void LoadLibrary::execute(CommandQueue &queue)
+{ queue.loadLibrary(); }
+
+void CommandQueue::loadLibrary()
+{
+	auto session = _model->session();
+	qDebug() << "loading media library...";
+	_library.reset();
+	try
+	{ _library = std::make_shared<mtp::Library>(session); }
+	catch (const std::exception & ex)
+	{ qWarning() << "loading media library failed: " << ex.what(); }
+}
+
 void CommandQueue::downloadFile(const QString &filename, mtp::ObjectId objectId)
 {
 	if (_aborted)
@@ -231,9 +245,6 @@ CommandQueue::~CommandQueue()
 {
 	qDebug() << "upload worker stopped";
 }
-
-void CommandQueue::setLibrary(const mtp::LibraryPtr library)
-{ _library = library; }
 
 mtp::LibraryPtr CommandQueue::library() const
 { return _library; }

@@ -445,23 +445,34 @@ void MainWindow::tryCreateLibrary()
 {
 	if (_uploader->library())
 		return;
-	try
-	{
-		if (mtp::Library::Supported(_session)) {
-			qDebug() << "creating media library";
-			_mediaLibrary = std::make_shared<mtp::Library>(_session);
-			_uploader->setLibrary(_mediaLibrary);
-			_ui->actionUploadAlbum->setVisible(false);
-		}
-		else
-			throw std::runtime_error("not supported by device");
 
-		_ui->actionImportMusic->setVisible(true);
-	}
-	catch (const std::exception & ex)
-	{
-		qWarning() << "importing music disabled: " << ex.what();
-		_ui->actionImportMusic->setVisible(false);
+	if (mtp::Library::Supported(_session)) {
+		ProgressDialog progressDialog(this, false);
+		progressDialog.setWindowTitle(tr("Loading Media Library"));
+		progressDialog.setModal(true);
+		progressDialog.setValue(0);
+
+		connect(_uploader, SIGNAL(uploadProgress(float)), &progressDialog, SLOT(setValue(float)));
+		connect(_uploader, SIGNAL(uploadSpeed(qint64)), &progressDialog, SLOT(setSpeed(qint64)));
+		connect(_uploader, SIGNAL(uploadStarted(QString)), &progressDialog, SLOT(setFilename(QString)));
+		connect(_uploader, SIGNAL(finished()), &progressDialog, SLOT(accept()));
+		connect(&progressDialog, SIGNAL(abort()), &progressDialog, SLOT(reject()));
+
+		try
+		{
+			_uploader->tryCreateLibrary();
+
+			_ui->actionUploadAlbum->setVisible(false);
+			_ui->actionImportMusic->setVisible(true);
+		}
+		catch (const std::exception & ex)
+		{
+			qWarning() << "importing music disabled: " << ex.what();
+			_ui->actionUploadAlbum->setVisible(true);
+			_ui->actionImportMusic->setVisible(false);
+		}
+
+		progressDialog.exec();
 	}
 }
 

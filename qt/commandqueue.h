@@ -83,6 +83,11 @@ struct DownloadFile : public FileCommand
 	void execute(CommandQueue &queue);
 };
 
+struct LoadLibrary : public Command
+{
+	void execute(CommandQueue &queue);
+};
+
 class CommandQueue: public QObject
 {
 	Q_OBJECT
@@ -110,9 +115,9 @@ public:
 	MtpObjectsModel *model() const
 	{ return _model; }
 
-	void setLibrary(const mtp::LibraryPtr library);
 	mtp::LibraryPtr library() const;
 
+	void loadLibrary();
 	void createDirectory(const QString &path);
 	void uploadFile(const QString &file);
 	void downloadFile(const QString &filename, mtp::ObjectId objectId);
