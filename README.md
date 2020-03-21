@@ -160,7 +160,7 @@ Please do not hesitate to contact me if you have any further questions, my email
 ## Special thanks
 * All who filed bugs on github and wrote emails, many features appeared only because of your feedback. Thanks!
 * Alexey [gazay](https://github.com/gazay) Gaziev for useful suggestions, support and invaluable help with MacBook and MacOSX port.
-* @ssnjrthegr8 for new logo!
+* @ssnjrthegr8 for the new logo!
 
 ## License
 
