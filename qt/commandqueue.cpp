@@ -314,6 +314,7 @@ void CommandQueue::finish(mtp::ObjectId directoryId)
 			continue;
 
 		QFile file(bestPath);
+		qDebug() << "setting cover from " << bestPath;
 		if (!file.open(QIODevice::ReadOnly))
 			continue;
 
