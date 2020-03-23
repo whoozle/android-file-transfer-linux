@@ -56,11 +56,9 @@ namespace mtp
 
 		_storage = storages.StorageIDs[0]; //picking up first storage.
 		//zune fails to create artist/album without storage id
-
 		{
 			ByteArray data = _session->GetObjectPropertyList(Session::Root, ObjectFormat::Association, ObjectProperty::ObjectFilename, 0, 1);
-			ObjectPropertyListParser<std::string> parser;
-			parser.Parse(data, [&](ObjectId id, ObjectProperty property, const std::string &name)
+			ObjectStringPropertyListParser::Parse(data, [&](ObjectId id, ObjectProperty property, const std::string &name)
 			{
 				if (name == "Artists")
 					_artistsFolder = id;
@@ -85,32 +83,36 @@ namespace mtp
 
 		using namespace mtp;
 
-		msg::ObjectHandles artists, albums;
+		ByteArray artists, albums;
 		if (_artistSupported)
 		{
 			debug("getting artists...");
 			if (reporter)
 				reporter(State::QueryingArtists, progress, total);
-			artists = _session->GetObjectHandles(Session::AllStorages, ObjectFormat::Artist, Session::Device);
 
-			total += artists.ObjectHandles.size();
+			artists = _session->GetObjectPropertyList(Session::Root, mtp::ObjectFormat::Artist, mtp::ObjectProperty::Name, 0, 1);
+			HexDump("artists", artists);
+
+			total += ObjectStringPropertyListParser::GetSize(artists);
 		}
 		{
 			debug("getting albums...");
 			if (reporter)
 				reporter(State::QueryingAlbums, progress, total);
 
-			albums = _session->GetObjectHandles(Session::AllStorages, ObjectFormat::AbstractAudioAlbum, Session::Device);
-			total += albums.ObjectHandles.size();
+			albums = _session->GetObjectPropertyList(Session::Root, mtp::ObjectFormat::AbstractAudioAlbum,  mtp::ObjectProperty::Name, 0, 1);
+			HexDump("albums", artists);
+
+			total += ObjectStringPropertyListParser::GetSize(albums);
 		}
 
 		if (_artistSupported)
 		{
 			if (reporter)
 				reporter(State::LoadingArtists, progress, total);
-			for (auto id : artists.ObjectHandles)
+
+			ObjectStringPropertyListParser::Parse(artists, [&](ObjectId id, ObjectProperty property, const std::string &name)
 			{
-				auto name = _session->GetObjectStringProperty(id, ObjectProperty::Name);
 				debug("artist: ", name, "\t", id.Id);
 				auto artist = std::make_shared<Artist>();
 				artist->Id = id;
@@ -124,18 +126,18 @@ namespace mtp
 				_artists.insert(std::make_pair(name, artist));
 				if (reporter)
 					reporter(State::LoadingArtists, ++progress, total);
-			}
+			});
 		}
 
 		if (reporter)
 			reporter(State::LoadingAlbums, progress, total);
-		std::unordered_map<ArtistPtr, NameToObjectIdMap> albumFolders;
-		for (auto id : albums.ObjectHandles)
-		{
-			auto name = _session->GetObjectStringProperty(id, ObjectProperty::Name);
-			auto artistName = _session->GetObjectStringProperty(id, ObjectProperty::Artist);
-			std::string albumDate;
 
+		std::unordered_map<ArtistPtr, NameToObjectIdMap> albumFolders;
+		ObjectStringPropertyListParser::Parse(albums, [&](ObjectId id, ObjectProperty property, const std::string &name)
+		{
+			auto artistName = _session->GetObjectStringProperty(id, ObjectProperty::Artist);
+
+			std::string albumDate;
 			if (_albumDateAuthoredSupported)
 				albumDate = _session->GetObjectStringProperty(id, ObjectProperty::DateAuthored);
 
@@ -166,7 +168,7 @@ namespace mtp
 			_albums.insert(std::make_pair(std::make_pair(artist, name), album));
 			if (reporter)
 				reporter(State::LoadingAlbums, ++progress, total);
-		}
+		});
 
 		if (reporter)
 			reporter(State::Loaded, progress, total);
