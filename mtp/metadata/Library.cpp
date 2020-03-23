@@ -156,18 +156,6 @@ namespace mtp
 			if (it == albumFolders.end())
 				throw std::runtime_error("no iterator after insert, internal error");
 
-			{
-				auto refs = _session->GetObjectReferences(id).ObjectHandles;
-				std::copy(refs.begin(), refs.end(), std::inserter(album->Refs, album->Refs.begin()));
-				for(auto trackId : refs)
-				{
-					auto name = _session->GetObjectStringProperty(trackId, ObjectProperty::Name);
-					auto index = _session->GetObjectIntegerProperty(trackId, ObjectProperty::Track);
-					debug("[", index, "]: ", name);
-					album->Tracks.insert(std::make_pair(name, index));
-				}
-			}
-
 			const auto & albums = it->second;
 			auto alit = albums.find(name);
 			if (alit != albums.end())
@@ -305,6 +293,8 @@ namespace mtp
 		if (!album)
 			return false;
 
+		LoadRefs(album);
+
 		auto & tracks = album->Tracks;
 		auto range = tracks.equal_range(name);
 		for(auto i = range.first; i != range.second; ++i)
@@ -377,10 +367,29 @@ namespace mtp
 		return ti;
 	}
 
+	void Library::LoadRefs(AlbumPtr album)
+	{
+		if (!album || album->RefsLoaded)
+			return;
+
+		auto refs = _session->GetObjectReferences(album->Id).ObjectHandles;
+		std::copy(refs.begin(), refs.end(), std::inserter(album->Refs, album->Refs.begin()));
+		for(auto trackId : refs)
+		{
+			auto name = _session->GetObjectStringProperty(trackId, ObjectProperty::Name);
+			auto index = _session->GetObjectIntegerProperty(trackId, ObjectProperty::Track);
+			debug("[", index, "]: ", name);
+			album->Tracks.insert(std::make_pair(name, index));
+		}
+		album->RefsLoaded = true;
+	}
+
 	void Library::AddTrack(AlbumPtr album, const NewTrackInfo & ti)
 	{
 		if (!album)
 			return;
+
+		LoadRefs(album);
 
 		auto & refs = album->Refs;
 		auto & tracks = album->Tracks;

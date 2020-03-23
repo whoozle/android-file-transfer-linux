@@ -45,7 +45,11 @@ namespace mtp
 			ObjectId		MusicFolderId;
 			ArtistPtr		Artist;
 			std::string 	Name;
-			time_t	 		Year;
+			time_t	 		Year = 0;
+			bool			RefsLoaded = false;
+
+			void LoadRefs();
+
 			std::unordered_set<ObjectId> Refs;
 			std::unordered_multimap<std::string, int> Tracks;
 		};
@@ -81,9 +85,9 @@ namespace mtp
 		NameToObjectIdMap ListAssociations(ObjectId parentId);
 
 		ObjectId GetOrCreate(ObjectId parentId, const std::string &name);
+		void LoadRefs(AlbumPtr album);
 
 	public:
-
 		Library(const mtp::SessionPtr & session, ProgressReporter && reporter = ProgressReporter());
 		~Library();
 
