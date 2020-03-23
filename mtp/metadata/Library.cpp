@@ -1,5 +1,6 @@
 #include <mtp/metadata/Library.h>
 #include <mtp/ptp/Session.h>
+#include <mtp/ptp/ObjectPropertyListParser.h>
 #include <mtp/log.h>
 #include <unordered_map>
 
@@ -15,14 +16,12 @@ namespace mtp
 	Library::NameToObjectIdMap Library::ListAssociations(ObjectId parentId)
 	{
 		NameToObjectIdMap list;
-		auto folders = _session->GetObjectHandles(_storage, mtp::ObjectFormat::Association, parentId);
-		list.reserve(folders.ObjectHandles.size());
 
-		for(auto id : folders.ObjectHandles)
-		{
-			auto name = _session->GetObjectStringProperty(id, ObjectProperty::ObjectFilename);
+		ByteArray data = _session->GetObjectPropertyList(parentId, ObjectFormat::Association, ObjectProperty::ObjectFilename, 0, 1);
+		ObjectPropertyListParser<std::string> parser;
+		parser.Parse(data, [&](ObjectId id, ObjectProperty property, const std::string &name) {
 			list.insert(std::make_pair(name, id));
-		}
+		});
 		return list;
 	}
 
@@ -58,17 +57,17 @@ namespace mtp
 		//zune fails to create artist/album without storage id
 
 		{
-			msg::ObjectHandles rootFolders = _session->GetObjectHandles(Session::AllStorages, mtp::ObjectFormat::Association, Session::Root);
-			for (auto id : rootFolders.ObjectHandles)
+			ByteArray data = _session->GetObjectPropertyList(Session::Root, ObjectFormat::Association, ObjectProperty::ObjectFilename, 0, 1);
+			ObjectPropertyListParser<std::string> parser;
+			parser.Parse(data, [&](ObjectId id, ObjectProperty property, const std::string &name)
 			{
-				auto name = _session->GetObjectStringProperty(id, ObjectProperty::ObjectFilename);
 				if (name == "Artists")
 					_artistsFolder = id;
 				else if (name == "Albums")
 					_albumsFolder = id;
 				else if (name == "Music")
 					_musicFolder = id;
-			}
+			});
 		}
 		if (_artistSupported && _artistsFolder == ObjectId())
 			_artistsFolder = _session->CreateDirectory("Artists", Session::Root, _storage).ObjectId;
@@ -407,6 +406,7 @@ namespace mtp
 	{
 		auto & gdi = session->GetDeviceInfo();
 		return
+			gdi.Supports(OperationCode::GetObjectPropList) &&
 			gdi.Supports(OperationCode::SendObjectPropList) &&
 			gdi.Supports(OperationCode::SetObjectReferences) &&
 			gdi.Supports(ObjectFormat::AbstractAudioAlbum);
