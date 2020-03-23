@@ -72,6 +72,7 @@ private:
 	void restoreGeometry(const QString &name, QWidget &widget);
 	static QString getMtpzDataPath();
 	void tryCreateLibrary();
+	void importMusic(bool directoryMode);
 
 private slots:
 	bool reconnectToDevice();
@@ -88,6 +89,7 @@ private slots:
 	void uploadAlbum();
 	void uploadAlbum(QString path);
 	void importMusic();
+	void importMusicFiles();
 	void importMusic(QString path);
 	void downloadFiles();
 	void renameFile();

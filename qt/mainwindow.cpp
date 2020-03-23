@@ -41,6 +41,7 @@
 #include <QKeyEvent>
 #include <QFileDialog>
 #include <QSettings>
+#include <QToolButton>
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QNetworkReply>
@@ -88,6 +89,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(_ui->actionUploadDirectory, SIGNAL(triggered()), SLOT(uploadDirectories()));
 	connect(_ui->actionUploadAlbum, SIGNAL(triggered()), SLOT(uploadAlbum()));
 	connect(_ui->actionImportMusic, SIGNAL(triggered()), SLOT(importMusic()));
+	connect(_ui->actionImportMusicFiles, SIGNAL(triggered()), SLOT(importMusicFiles()));
 	connect(_ui->actionUpload, SIGNAL(triggered()), SLOT(uploadFiles()));
 	connect(_ui->actionRename, SIGNAL(triggered()), SLOT(renameFile()));
 	connect(_ui->actionDownload, SIGNAL(triggered()), SLOT(downloadFiles()));
@@ -104,6 +106,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	connect(_clipboard, SIGNAL(dataChanged()), SLOT(validateClipboard()));
 	validateClipboard();
+	QToolButton * importMusic = dynamic_cast<QToolButton *>(_ui->mainToolBar->widgetForAction(_ui->actionImportMusic));
+	importMusic->setMenu(new QMenu(tr("Import Music")));
+	importMusic->menu()->addAction(_ui->actionImportMusicFiles);
 
 	//fixme: find out how to specify alternative in designer
 	_ui->actionBack->setShortcuts(_ui->actionBack->shortcuts() << QKeySequence("Alt+Up") << QKeySequence("Esc"));
@@ -822,7 +827,15 @@ void MainWindow::uploadAlbum()
 }
 
 void MainWindow::importMusic()
+{ importMusic(true); }
+
+void MainWindow::importMusicFiles()
+{ importMusic(false); }
+
+void MainWindow::importMusic(bool directoryMode)
 {
+	qDebug() << "import music, directory mode: " << directoryMode;
+
 	QFileDialog d(this);
 	QSettings settings;
 	{
@@ -832,8 +845,13 @@ void MainWindow::importMusic()
 	}
 
 	d.setAcceptMode(QFileDialog::AcceptOpen);
-	d.setFileMode(QFileDialog::Directory);
 	d.setOption(QFileDialog::ReadOnly, true);
+	if (directoryMode) {
+		d.setFileMode(QFileDialog::Directory);
+		d.setOption(QFileDialog::ShowDirsOnly, true);
+	} else {
+		d.setFileMode(QFileDialog::ExistingFiles);
+	}
 	restoreGeometry("import-music", d);
 	if (!d.exec())
 		return;

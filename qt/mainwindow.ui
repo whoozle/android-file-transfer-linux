@@ -219,6 +219,14 @@
     <string>Attach Cover</string>
    </property>
   </action>
+  <action name="actionImportMusicFiles">
+   <property name="text">
+    <string>Import Music Files</string>
+   </property>
+   <property name="toolTip">
+    <string>Import individual music files</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>
