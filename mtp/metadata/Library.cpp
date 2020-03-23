@@ -94,8 +94,6 @@ namespace mtp
 			artists = _session->GetObjectHandles(Session::AllStorages, ObjectFormat::Artist, Session::Device);
 
 			total += artists.ObjectHandles.size();
-			if (reporter)
-				reporter(State::LoadingArtists, progress, total);
 		}
 		{
 			debug("getting albums...");
@@ -104,12 +102,12 @@ namespace mtp
 
 			albums = _session->GetObjectHandles(Session::AllStorages, ObjectFormat::AbstractAudioAlbum, Session::Device);
 			total += albums.ObjectHandles.size();
-			if (reporter)
-				reporter(State::LoadingAlbums, progress, total);
 		}
 
 		if (_artistSupported)
 		{
+			if (reporter)
+				reporter(State::LoadingArtists, progress, total);
 			for (auto id : artists.ObjectHandles)
 			{
 				auto name = _session->GetObjectStringProperty(id, ObjectProperty::Name);
@@ -129,6 +127,8 @@ namespace mtp
 			}
 		}
 
+		if (reporter)
+			reporter(State::LoadingAlbums, progress, total);
 		std::unordered_map<ArtistPtr, NameToObjectIdMap> albumFolders;
 		for (auto id : albums.ObjectHandles)
 		{
