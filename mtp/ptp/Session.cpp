@@ -419,11 +419,7 @@ namespace mtp
 
 
 	ByteArray Session::GetObjectPropertyList(ObjectId objectId, ObjectFormat format, ObjectProperty property, u32 groupCode, u32 depth, int timeout)
-	{
-		if (objectId == Root) //ffffffff -> 0
-			objectId = Device;
-		return RunTransaction(timeout, OperationCode::GetObjectPropList, objectId.Id, (u32)format, property != ObjectProperty::All? (u32)property: 0xffffffffu, groupCode, depth);
-	}
+	{ return RunTransaction(timeout, OperationCode::GetObjectPropList, objectId.Id, (u32)format, property != ObjectProperty::All? (u32)property: 0xffffffffu, groupCode, depth); }
 
 	void Session::DeleteObject(ObjectId objectId, int timeout)
 	{ RunTransaction(timeout, OperationCode::DeleteObject, objectId.Id, 0); }
