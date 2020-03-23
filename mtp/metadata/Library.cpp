@@ -48,6 +48,7 @@ namespace mtp
 			reporter(State::Initialising, progress, total);
 
 		_artistSupported = _session->GetDeviceInfo().Supports(ObjectFormat::Artist);
+		debug("device supports ObjectFormat::Artist: ", _artistSupported? "yes": "no");
 		{
 			auto propsSupported = _session->GetObjectPropertiesSupported(ObjectFormat::AbstractAudioAlbum);
 			_albumDateAuthoredSupported = std::find(propsSupported.ObjectPropertyCodes.begin(), propsSupported.ObjectPropertyCodes.end(), ObjectProperty::DateAuthored) != propsSupported.ObjectPropertyCodes.end();
