@@ -298,7 +298,11 @@ void CommandQueue::finish(mtp::ObjectId directoryId)
 		auto & albumPath = akv.first;
 		auto & album = akv.second;
 
-		qDebug() << "looking for a cover for album " << fromUtf8(akv.second->Name);
+		if (_aborted)
+			break;
+
+		QString albumName = fromUtf8(akv.second->Name);
+		qDebug() << "looking for a cover for album " << albumName;
 
 		QString bestPath;
 		for(auto & ckv : _covers)
@@ -312,6 +316,8 @@ void CommandQueue::finish(mtp::ObjectId directoryId)
 
 		if (bestPath.isEmpty())
 			continue;
+
+		emit started(tr("Setting cover for album %1").arg(albumName));
 
 		QFile file(bestPath);
 		qDebug() << "setting cover from " << bestPath;
