@@ -25,7 +25,7 @@
         - libqt5gui5
         - libqt5widgets5
         - libqt5network5
-        - libfuse
-        - libmagic
-        - libtag1
-        - libssl1.1
+        - libfuse-dev
+        - libmagic-dev
+        - libtag1-dev
+        - libssl-dev
