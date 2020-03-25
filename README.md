@@ -60,7 +60,7 @@ https://www.paypal.me/whoozle
 * For ubuntu and other debian-based distros use the following command:
 
   ```shell
-  sudo apt-get install build-essential cmake libqt4-dev ninja-build libfuse-dev libreadline-dev
+  sudo apt-get install build-essential cmake qt5-default ninja-build libfuse-dev libreadline-dev
   ```
 
   For Fedora:
