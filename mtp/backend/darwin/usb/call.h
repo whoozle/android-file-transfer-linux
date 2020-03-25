@@ -23,12 +23,14 @@
 #include <usb/Exception.h>
 #include <usb/usb.h>
 #include <mtp/usb/DeviceNotFoundException.h>
+#include <mtp/usb/DeviceBusyException.h>
 
 #define USB_CALL(...) \
 	do { int _r_ = (__VA_ARGS__); \
 		switch(_r_) { \
 			case kIOReturnSuccess  : break; \
 			case kIOReturnNoDevice : throw mtp::usb::DeviceNotFoundException(); \
+			case kIOReturnExclusiveAccess: throw mtp::usb::DeviceBusyException(); \
 			default: throw mtp::usb::Exception(#__VA_ARGS__, _r_) ; \
 		} \
 	} while(false)
