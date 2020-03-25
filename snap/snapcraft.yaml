@@ -12,10 +12,7 @@
 
   apps:
     android-file-transfer:
-      adapter: full
-      command: bin/android-file-transfer
-      command-chain:
-        - bin/desktop-launch
+      command: bin/desktop-launch bin/android-file-transfer
       desktop: share/applications/android-file-transfer.desktop
       plugs: [x11, network, network-bind]
     aft-mtp-cli:
