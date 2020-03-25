@@ -20,6 +20,8 @@
         - libmagic-dev
         - libtag1-dev
         - libssl-dev
+        - libreadline-dev
+        - pkg-config
 
       stage-packages:
         - libqt5gui5
@@ -29,3 +31,4 @@
         - libmagic-dev
         - libtag1-dev
         - libssl-dev
+        - libreadline-dev
