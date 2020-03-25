@@ -12,16 +12,45 @@
 
   apps:
     android-file-transfer:
+      adapter: full
       command: bin/android-file-transfer
+      command-chain:
+        - bin/desktop-launch
       desktop: share/applications/android-file-transfer.desktop
+      plugs: [x11, network, network-bind]
     aft-mtp-cli:
       command: bin/aft-mtp-cli
     aft-mtp-mount:
       command: bin/aft-mtp-mount
 
   parts:
+    desktop-qt5:
+        source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
+        source-subdir: qt
+        plugin: make
+        make-parameters: ["FLAVOR=qt5"]
+        build-packages:
+          - build-essential
+          - qtbase5-dev
+          - dpkg-dev
+        stage-packages:
+          - libxkbcommon0
+          - ttf-ubuntu-font-family
+          - dmz-cursor-theme
+          - light-themes
+          - adwaita-icon-theme
+          - gnome-themes-standard
+          - shared-mime-info
+          - libqt5gui5
+          - libgdk-pixbuf2.0-0
+          - libqt5svg5 # for loading icon themes which are svg
+          - try: [appmenu-qt5] # not available on core18
+          - locales-all
+          - xdg-user-dirs
+          - fcitx-frontend-qt5
     aftl:
       # See 'snapcraft plugins'
+      after: [desktop-qt5]
       plugin: cmake
       build-packages:
         - qt5-default
