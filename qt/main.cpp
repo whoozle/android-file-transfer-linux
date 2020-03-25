@@ -25,6 +25,9 @@
 #include <QMessageBox>
 #include <QTranslator>
 #include <mtp/log.h>
+#if QT_VERSION >= 0x050000
+#	include <QGuiApplication>
+#endif
 
 namespace
 {
@@ -56,7 +59,9 @@ int main(int argc, char *argv[])
 	QCoreApplication::setOrganizationDomain("whoozle.github.io");
 	QCoreApplication::setOrganizationName("whoozle.github.io");
 
+#if QT_VERSION >= 0x050000
 	QGuiApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+#endif
 
 	QTranslator qtTranslator;
 
