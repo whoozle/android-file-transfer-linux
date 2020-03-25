@@ -7,7 +7,6 @@ matrix:
     include:
         - os: linux
           compiler: gcc
-          dist: bionic
         - os: osx
           osx_image: xcode10.1
           compiler: clang
