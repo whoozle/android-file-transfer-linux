@@ -2,6 +2,7 @@
   # After registering a name on build.snapcraft.io, commit an uncommented line:
   name: android-file-transfer-linux
   version: '4.0+git' # just for humans, typically '1.2+git' or '1.3.2'
+  license: 'LGPL-2.1'
   summary: Simple and reliable MTP client
   description: |
     Simple UI + Fuse wrapper + cli tool for exploring, downloading, uploading
@@ -9,6 +10,15 @@
 
   grade: devel # must be 'stable' to release into candidate/stable channels
   confinement: devmode # use 'strict' once you have the right plugs and slots
+
+  apps:
+    android-file-transfer:
+      command: bin/android-file-transfer
+      desktop: share/applications/android-file-transfer.desktop
+    aft-mtp-cli:
+      command: bin/aft-mtp-cli
+    aft-mtp-mount:
+      command: bin/aft-mtp-mount
 
   parts:
     aftl:
