@@ -28,4 +28,4 @@
         - libfuse
         - libmagic
         - libtag1
-        - libssl
+        - libssl1.1
