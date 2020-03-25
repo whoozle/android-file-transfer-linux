@@ -13,5 +13,5 @@
   parts:
     my-part:
       # See 'snapcraft plugins'
-      plugin: nil
+      plugin: cmake
   
