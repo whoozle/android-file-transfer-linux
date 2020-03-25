@@ -15,6 +15,21 @@ If you're happy with `gmtp`/`gvfs`/`mtpfs` or any other mtp software, you might 
 
 If you're suffering from crashes, missing tags, album covers, usb freezes and corrupted files, this software is right for you.
 
+## Pre-built Packages
+
+If your distribution does not provide `android-file-transfer-linux` package, you can still install it in your system. 
+There's quite a few packages available:
+- Snapcraft: https://snapcraft.io/android-file-transfer-linux
+- AppImage: https://github.com/whoozle/android-file-transfer-linux/releases
+- MacOSX DMG image: https://github.com/whoozle/android-file-transfer-linux/releases
+- MacOSX Homebrew: `brew cask install whoozle-android-file-transfer` or `brew cask install whoozle-android-file-transfer-nightly`
+
+## Support me
+If you want to help me with development, click on the link below and follow the instructions. I'm developing AFTL in my spare time and try to fix everything as fast as possible, sometimes adding features in realtime (more than 100 tickes closed by now).
+Any amount would help relieving pain of using MTP. :D
+
+https://www.paypal.me/whoozle
+
 ## Features
 
 * Simple Qt UI with progress dialogs.
@@ -29,12 +44,6 @@ If you're suffering from crashes, missing tags, album covers, usb freezes and co
 
 ## FAQ
 [Please take a look at FAQ if you have issues with your operating system](FAQ.md). It's not that big, but those are the questions asked very often. 
-
-## Support me
-If you want to help me with development, click on the link below and follow the instructions. I'm developing AFTL in my spare time and try to fix everything as fast as possible, sometimes adding features in realtime (more than 100 tickes closed by now).
-Any amount would help relieving pain of using MTP. :D
-
-https://www.paypal.me/whoozle
 
 ## Building instructions
 
