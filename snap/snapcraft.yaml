@@ -9,12 +9,17 @@
 
   grade: devel # must be 'stable' to release into candidate/stable channels
   confinement: devmode # use 'strict' once you have the right plugs and slots
+  base: core18
 
   apps:
     android-file-transfer:
       command: bin/desktop-launch android-file-transfer
       desktop: share/applications/android-file-transfer.desktop
-      plugs: [x11, network, network-bind]
+      plugs: [x11, network, network-bind, desktop, gsettings, wayland]
+      environment:
+        # Use GTK3 cursor theme, icon theme and open/save file dialogs.
+        QT_QPA_PLATFORMTHEME: gtk3
+
     aft-mtp-cli:
       command: bin/aft-mtp-cli
     aft-mtp-mount:
@@ -45,10 +50,16 @@
           - locales-all
           - xdg-user-dirs
           - fcitx-frontend-qt5
+
     aftl:
       # See 'snapcraft plugins'
+      source: .
       after: [desktop-qt5]
       plugin: cmake
+
+      configflags:
+        - -DCMAKE_BUILD_TYPE=Release
+
       build-packages:
         - qt5-default
         - libfuse-dev
@@ -67,3 +78,19 @@
         - libtag1-dev
         - libssl-dev
         - libreadline-dev
+
+  plugs:
+    # Support for common GTK themes
+    # https://forum.snapcraft.io/t/how-to-use-the-system-gtk-theme-via-the-gtk-common-themes-snap/6235
+    gtk-3-themes:
+      interface: content
+      target: $SNAP/data-dir/themes
+      default-provider: gtk-common-themes
+    icon-themes:
+      interface: content
+      target: $SNAP/data-dir/icons
+      default-provider: gtk-common-themes
+    sound-themes:
+      interface: content
+      target: $SNAP/data-dir/sounds
+      default-provider: gtk-common-themes
