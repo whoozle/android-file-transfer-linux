@@ -67,10 +67,17 @@ MainWindow::MainWindow(QWidget *parent) :
 	_ui->setupUi(this);
 	setWindowIcon(QIcon(":/android-file-transfer.png"));
 
-	_ui->actionBack->setIcon(style()->standardIcon(QStyle::SP_ArrowBack));
-	_ui->actionGoDown->setIcon(style()->standardIcon(QStyle::SP_ArrowForward));
-	_ui->actionCreateDirectory->setIcon(style()->standardIcon(QStyle::SP_FileDialogNewFolder));
-	_ui->actionRefresh->setIcon(style()->standardIcon(QStyle::SP_BrowserReload));
+	QString theme;
+	{
+		auto value = palette().text().color().value();
+		//trying to guess if it's dark or light theme
+		theme = value > 128? "dark": "light";
+		qDebug() << "current text color value: " << value << ", guessed theme: " << theme;
+	}
+	_ui->actionBack->setIcon(QIcon(":/icons/" + theme + "/go-previous.svg"));
+	_ui->actionGoDown->setIcon(QIcon(":/icons/" + theme + "/go-next.svg"));
+	_ui->actionCreateDirectory->setIcon(QIcon(":/icons/" + theme + "/folder-new.svg"));
+	_ui->actionRefresh->setIcon(QIcon(":/icons/" + theme + "/view-refresh.svg"));
 
 	_ui->listView->setModel(_proxyModel);
 

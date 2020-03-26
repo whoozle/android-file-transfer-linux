@@ -2,5 +2,13 @@
     <qresource prefix="/">
         <file>android-file-transfer.png</file>
         <file>translations/android-file-transfer-linux_ru.qm</file>
+        <file>icons/dark/folder-new.svg</file>
+        <file>icons/dark/go-next.svg</file>
+        <file>icons/dark/go-previous.svg</file>
+        <file>icons/dark/view-refresh.svg</file>
+        <file>icons/light/folder-new.svg</file>
+        <file>icons/light/go-next.svg</file>
+        <file>icons/light/go-previous.svg</file>
+        <file>icons/light/view-refresh.svg</file>
     </qresource>
 </RCC>
