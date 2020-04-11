@@ -3,7 +3,7 @@
 ## Is it possible to use cli tool for automated file management?
 
 Yes. There's two options of achieving this. 
-1. Pass every command as **single** command line argument, e.g. ```aft-mtp-cli "get Pictures" "cd Pictures" "ls"```. If you need quoted argument for commands, you have to escape them, e.g. ```aft-mtp-cli "get \"Pictures\"". 
+1. Pass every command as **single** command line argument, e.g. ```aft-mtp-cli "get Pictures" "cd Pictures" "ls"```. If you need quoted argument for commands, you have to escape them, e.g. ```aft-mtp-cli "get \"Pictures\""```. 
 2. Pass -b command line option and feed your script to stdin. 
 
 ## How to unmount my device?
