@@ -458,6 +458,9 @@ void MainWindow::tryCreateLibrary()
 	if (_uploader->library())
 		return;
 
+	_ui->actionUploadAlbum->setVisible(true);
+	_ui->actionImportMusic->setVisible(false);
+
 	if (mtp::Library::Supported(_session)) {
 		ProgressDialog progressDialog(this, false);
 		progressDialog.setWindowTitle(tr("Loading Media Library"));
@@ -473,15 +476,12 @@ void MainWindow::tryCreateLibrary()
 		try
 		{
 			_uploader->tryCreateLibrary();
-
 			_ui->actionUploadAlbum->setVisible(false);
 			_ui->actionImportMusic->setVisible(true);
 		}
 		catch (const std::exception & ex)
 		{
 			qWarning() << "importing music disabled: " << ex.what();
-			_ui->actionUploadAlbum->setVisible(true);
-			_ui->actionImportMusic->setVisible(false);
 		}
 
 		progressDialog.exec();
