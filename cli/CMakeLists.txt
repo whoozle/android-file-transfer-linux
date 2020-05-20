@@ -9,6 +9,7 @@ set(CLI_SOURCES
 	cli.cpp)
 
 if (READLINE_FOUND)
+	set(CMAKE_REQUIRED_INCLUDES ${Readline_INCLUDE_DIR})
 	set(CMAKE_REQUIRED_LIBRARIES ${Readline_LIBRARY})
 	set(READLINE_TEST_SRC "
 #include <stdio.h>
@@ -35,6 +36,7 @@ int main(int argc, char **argv) {
 		endif()
 	endif()
 
+	set(CMAKE_REQUIRED_INCLUDES)
 	set(CMAKE_REQUIRED_LIBRARIES)
 endif()
 
@@ -47,6 +49,7 @@ else()
 endif()
 
 add_executable(aft-mtp-cli ${CLI_SOURCES})
+target_include_directories(aft-mtp-cli SYSTEM PRIVATE ${Readline_INCLUDE_DIR})
 target_link_libraries(aft-mtp-cli ${MTP_LIBRARIES} ${CLI_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 install(TARGETS aft-mtp-cli RUNTIME DESTINATION bin)
 
