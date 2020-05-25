@@ -1,6 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="ru_RU">
+<TS version="2.1" language="ru_RU">
+<context>
+    <name>CommandQueue</name>
+    <message>
+        <location filename="../commandqueue.cpp" line="63"/>
+        <source>Loading media library…</source>
+        <translation>Загрузка библиотеки…</translation>
+    </message>
+    <message>
+        <location filename="../commandqueue.cpp" line="64"/>
+        <source>Querying artists…</source>
+        <translation>Поиск исполнителей…</translation>
+    </message>
+    <message>
+        <location filename="../commandqueue.cpp" line="65"/>
+        <source>Loading artists…</source>
+        <translation>Загрузка исполнителей…</translation>
+    </message>
+    <message>
+        <location filename="../commandqueue.cpp" line="66"/>
+        <source>Querying albums…</source>
+        <translation>Поиск альбомов…</translation>
+    </message>
+    <message>
+        <location filename="../commandqueue.cpp" line="67"/>
+        <source>Loading albums…</source>
+        <translation>Загрузка альбомов…</translation>
+    </message>
+    <message>
+        <location filename="../commandqueue.cpp" line="68"/>
+        <source>Done</source>
+        <translation>Загрузка завершена</translation>
+    </message>
+    <message>
+        <location filename="../commandqueue.cpp" line="320"/>
+        <source>Setting cover for album %1</source>
+        <translation>Устанавливаем обложку для альбома %1</translation>
+    </message>
+</context>
 <context>
     <name>CreateDirectoryDialog</name>
     <message>
@@ -32,188 +70,391 @@
         <translation>&amp;Навигация</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="109"/>
+        <location filename="../mainwindow.ui" line="114"/>
         <source>Upload</source>
         <translation>Закачать</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="112"/>
+        <location filename="../mainwindow.ui" line="117"/>
         <source>Ctrl+U</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="121"/>
+        <location filename="../mainwindow.ui" line="122"/>
         <source>&amp;CreateDirectory</source>
         <translation>Создать &amp;каталог</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="124"/>
+        <location filename="../mainwindow.ui" line="125"/>
         <source>Ctrl+N</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="129"/>
+        <location filename="../mainwindow.ui" line="130"/>
         <source>UploadDirectory</source>
         <translation>Закачать каталог</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="138"/>
+        <location filename="../mainwindow.ui" line="135"/>
         <source>&amp;Back</source>
         <translation>&amp;Назад</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="141"/>
+        <location filename="../mainwindow.ui" line="138"/>
         <source>Backspace</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="150"/>
+        <location filename="../mainwindow.ui" line="143"/>
         <source>&amp;Go Down</source>
         <translation>&amp;Зайти</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="153"/>
+        <location filename="../mainwindow.ui" line="146"/>
         <source>Return</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="158"/>
+        <location filename="../mainwindow.ui" line="151"/>
         <source>Upload Album</source>
         <translation>Закачать альбом</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="167"/>
+        <location filename="../mainwindow.ui" line="156"/>
         <source>&amp;Rename</source>
         <translation>&amp;Переименовать</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="170"/>
+        <location filename="../mainwindow.ui" line="159"/>
         <source>F2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="179"/>
+        <location filename="../mainwindow.ui" line="164"/>
         <source>D&amp;elete</source>
         <translation>&amp;Удалить</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="182"/>
+        <location filename="../mainwindow.ui" line="167"/>
         <source>Del</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="191"/>
+        <location filename="../mainwindow.ui" line="172"/>
         <source>&amp;Download</source>
         <translation>&amp;Скачать</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="194"/>
+        <location filename="../mainwindow.ui" line="175"/>
         <source>Ctrl+D</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="199"/>
+        <location filename="../mainwindow.ui" line="180"/>
         <source>E&amp;xit</source>
         <translation>В&amp;ыход</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="202"/>
+        <location filename="../mainwindow.ui" line="183"/>
         <source>Ctrl+Q</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="211"/>
+        <location filename="../mainwindow.ui" line="188"/>
         <source>Re&amp;fresh</source>
         <translation>&amp;Обновить</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="214"/>
+        <location filename="../mainwindow.ui" line="191"/>
         <source>F5</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="219"/>
+        <location filename="../mainwindow.ui" line="196"/>
         <source>&amp;Paste</source>
         <translation>&amp;Вставить</translation>
     </message>
     <message>
-        <source>Paste</source>
-        <translation>Вставить</translation>
+        <location filename="../mainwindow.ui" line="207"/>
+        <source>Show Thumbnails</source>
+        <translation>Показывать эскизы</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="222"/>
+        <location filename="../mainwindow.ui" line="210"/>
+        <source>Show Thumbnails of images where available</source>
+        <translation>Показывай эскизы где можно</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.ui" line="215"/>
+        <location filename="../mainwindow.cpp" line="122"/>
+        <source>Import Music</source>
+        <translation>Импортировать музыку</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.ui" line="220"/>
+        <source>Remove Cover</source>
+        <translation>Убрать обложку</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.ui" line="225"/>
+        <location filename="../mainwindow.cpp" line="1039"/>
+        <location filename="../mainwindow.cpp" line="1050"/>
+        <source>Attach Cover</source>
+        <translation>Установить обложку</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.ui" line="230"/>
+        <source>Import Music Files</source>
+        <translation>Импортировать файлы с музыкой</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.ui" line="233"/>
+        <source>Import individual music files</source>
+        <translation>Импортировать отдельные файлы с музыкой</translation>
+    </message>
+    <message>
+        <source>Paste</source>
+        <translation type="vanished">Вставить</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.ui" line="199"/>
         <source>Ctrl+V</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="129"/>
+        <location filename="../mainwindow.cpp" line="262"/>
         <source>Device is busy</source>
         <translation>Устройство занято</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="129"/>
         <source>Device is busy, maybe another process is using it. Close other MTP applications and restart Android File Transfer.</source>
-        <translation>Устройство занято, вероятно, какой-то другой процесс в данный момент его использует.
+        <translation type="vanished">Устройство занято, вероятно, какой-то другой процесс в данный момент его использует.
 Закройте другие MTP приложения и перезапустите Android File Transfer for Linux.</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="135"/>
+        <location filename="../mainwindow.cpp" line="178"/>
+        <source>MTPZ Keys Download</source>
+        <translation>Загрузить ключи MTPZ</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="181"/>
+        <source>Could not download keys, please find the error below:
+
+%1
+
+Please look for .mtpz-data file on the internet and manually install it to your home directory.</source>
+        <translation>Не получилось загрузить ключи, ошибка:
+
+%1
+
+Вы можете самостоятельно найти файл .mtpz-data в интернете и положить его в вашу домашную директорию.</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="189"/>
+        <source>Could not write keys to %1</source>
+        <translation>Не получилось записать ключи в %1</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="194"/>
+        <source>Could not write keys, please find the error below:
+
+%1
+
+Please look for .mtpz-data file on the internet and manually install it to your home directory.</source>
+        <translation>Не получилось загрузить ключи, ошибка:
+
+%1
+
+Вы можете самостоятельно найти файл .mtpz-data в интернете и положить его в вашу домашную директорию.</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="209"/>
+        <source>MTPZ keys have been installed to your system.</source>
+        <translation>MTPZ ключи были успешно установлены.</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="215"/>
+        <source>Your MTPZ keys failed to install or load.
+
+Please restart the application to try again.
+
+Exception: %1</source>
+        <translation>Не удалось установить ваши MTPZ ключи.
+
+ Перезапустите приложение чтобы попробовать ещё раз.
+
+Ошибка: %1</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="258"/>
+        <source>The following processes are keeping file descriptors for your device:
+</source>
+        <translation>Следующие процессы удерживают файловые дескрипторы вашего устройства:
+</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="263"/>
+        <source>Device is busy, maybe another process is using it.
+
+</source>
+        <translation>Устройство занято, может быть какой-нибудь другой процесс его использует.
+
+</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="265"/>
+        <source>Close other MTP applications and restart Android File Transfer.
+
+Press Abort to kill them or Ignore to try next device.</source>
+        <translation>Закройте другие MTP приложения и перезапустите Android File Transfer
+
+Нажмите &quot;Прервать&quot; чтобы убить сторонний процесс, или &quot;Игнорировать&quot; чтобы попробовать следующее устройство.</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="289"/>
+        <source>Device::Find failed</source>
+        <translation>Device::Find взорвалось</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="290"/>
+        <source>MTP device could not be opened at the moment
+
+Failure: %1
+Press Reset to reset them or Ignore to try next device.</source>
+        <translation>MTP устройство не может быть открыто в данный момент
+
+Ошибка: %1
+Нажмите &quot;Сброс&quot; чтобы попытаться сбросить устройство или &quot;Игнорировать&quot; чтобы попробовать другие устройства. </translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="315"/>
         <source>No MTP device found</source>
         <translation>Не найдено ни одного устройства MTP</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="159"/>
+        <location filename="../mainwindow.cpp" line="333"/>
+        <source>MTPZ Keys are Missing</source>
+        <translation>MTPZ ключи не найдены</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="334"/>
+        <source>It seems your computer is missing an important bit for talking with MTPZ device: private keys and certificate material from Microsoft.
+This means that you can&apos;t download and upload files from/to such devices.
+
+Microsoft could have released that key material and documentation for MTPZ devices as they are not interested in those anymore.
+
+Because of the legal risks we can&apos;t bundle those keys, even though in some countries it&apos;s lawful to modify things to make them working again, just because you own it.
+
+</source>
+        <translation>Похоже, что ваш компьютер не содержит важного файла для общения с MTPZ устройствами: ключи и сертификаты от Microsoft.
+Это означает, вы не может скачивать и закачивать файлы на MTPZ устройства. 
+
+Майкрософт мог бы выложить ключи и документацию о MTPZ, так как они не очень заинтересованы в развитии MTPZ или производстве MTPZ устройств. 
+
+Так как поставлять чужие ключи может оказаться юридически рискованным делом, мы напоминаем, что в некоторых странах (включая Россию) — вы можете легально модифицировать ваше неработающее устройство, чтобы оно начало выполнять свои функции.
+
+</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="346"/>
+        <source>Alternatively I (as an app) can offer you to download keys from the Internet.
+Can I download keys for you?
+
+(Please press Yes only if all of the above is legal in your country or you just don&apos;t care).</source>
+        <translation>В качестве альтернативы, я (как приложение) могу предложить вам скачать ключи из сети интернет.
+Скачать ключи?
+
+Пожалуйста нажмите &quot;Да&quot; только если всё вышеуказанное легально в вашей стране. (Или вам всё равно)</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="367"/>
+        <source>You can look for .mtpz-data file on the internet, download it and place it in your home directory.</source>
+        <translation>Вы можете найти файл &quot;.mtpz-data&quot; в интернете и просто положить его в домашнюю директорию.</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="380"/>
+        <location filename="../mainwindow.cpp" line="399"/>
         <source>MTP</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="159"/>
+        <location filename="../mainwindow.cpp" line="380"/>
         <source>MTP device does not respond</source>
         <translation>MTP устройство не отвечает</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="169"/>
+        <location filename="../mainwindow.cpp" line="399"/>
+        <source>Could not open MTP session: %1</source>
+        <translation>Не получается открыть MTP сессию: %1</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="433"/>
         <source>No MTP Storages</source>
         <translation>Нет хранилищ MTP</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="170"/>
+        <location filename="../mainwindow.cpp" line="434"/>
         <source>No MTP storage found, your device might be locked.
 Please unlock and press Retry to continue or Abort to exit.</source>
         <translation>Нет ни одного хранилища, возможно ваше устройство заблокировано
 Разблокируйте устройство и нажмите Повторить чтобы попробовать ещё раз или Прервать, чтобы выйти.</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="267"/>
+        <location filename="../mainwindow.cpp" line="471"/>
+        <source>Loading Media Library</source>
+        <translation>Загружаем библиотеку</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="587"/>
         <source>Deleting file(s)</source>
         <translation>Удаление файла(ов)</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="268"/>
+        <location filename="../mainwindow.cpp" line="588"/>
         <source>Are you sure?</source>
         <translation>Вы уверены?</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="331"/>
+        <location filename="../mainwindow.cpp" line="675"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="332"/>
+        <location filename="../mainwindow.cpp" line="676"/>
         <source>Failed to create new directory:
 </source>
         <translation>Не удалось создать новый каталог:
 </translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="574"/>
+        <location filename="../mainwindow.cpp" line="744"/>
+        <source>Download Progress</source>
+        <translation>Загрузка</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="947"/>
+        <source>Importing Progress</source>
+        <translation>Импорт</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="974"/>
         <source>Overwrite confirmation</source>
         <translation>Подтверждение перезаписи</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="574"/>
+        <location filename="../mainwindow.cpp" line="974"/>
         <source>You are about to overwrite file </source>
         <translation>Вы собираетесь перезаписать файл </translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="1039"/>
+        <source>Could not open selected file</source>
+        <translation>Не получилось открыть выбранный файл</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="1050"/>
+        <source>Could not attach cover: %1</source>
+        <translation>Не удалось установить обложку: %1</translation>
     </message>
 </context>
 <context>
@@ -232,26 +473,35 @@ Please unlock and press Retry to continue or Abort to exit.</source>
         <translation>Прогресс</translation>
     </message>
     <message>
-        <location filename="../progressdialog.cpp" line="95"/>
-        <location filename="../progressdialog.cpp" line="97"/>
-        <location filename="../progressdialog.cpp" line="99"/>
         <source>Speed: </source>
-        <translation>Скорость:</translation>
+        <translation type="vanished">Скорость:</translation>
     </message>
     <message>
-        <location filename="../progressdialog.cpp" line="95"/>
         <source> Kb/s</source>
-        <translation>Кб/с</translation>
+        <translation type="vanished">Кб/с</translation>
     </message>
     <message>
-        <location filename="../progressdialog.cpp" line="97"/>
         <source> Mb/s</source>
-        <translation>Мб/с</translation>
+        <translation type="vanished">Мб/с</translation>
     </message>
     <message>
-        <location filename="../progressdialog.cpp" line="99"/>
         <source> Gb/s</source>
-        <translation>Гб/с</translation>
+        <translation type="vanished">Гб/с</translation>
+    </message>
+    <message>
+        <location filename="../progressdialog.cpp" line="104"/>
+        <source>Speed: %1 Kb/s</source>
+        <translation>Скорость: %1 Кб/c</translation>
+    </message>
+    <message>
+        <location filename="../progressdialog.cpp" line="106"/>
+        <source>Speed: %1 Mb/s</source>
+        <translation>Скорость: %1 Мб/c</translation>
+    </message>
+    <message>
+        <location filename="../progressdialog.cpp" line="108"/>
+        <source>Speed: %1 Gb/s</source>
+        <translation>Скорость: %1 Гб/c</translation>
     </message>
 </context>
 <context>
