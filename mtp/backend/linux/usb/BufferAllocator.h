@@ -24,6 +24,8 @@
 #include <mtp/types.h>
 #include <mtp/log.h>
 #include <Exception.h>
+#include <array>
+
 #include <sys/mman.h>
 #include <unistd.h>
 
