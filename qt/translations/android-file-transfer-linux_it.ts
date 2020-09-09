@@ -240,18 +240,18 @@ Si prega di sbloccare e premere Ritenta per continuare o Interrompere per uscire
     </message>
     <message>
         <location filename="../progressdialog.cpp" line="95"/>
-        <source> Kb/s</source>
-        <translation> Kb/s</translation>
+        <source> kB/s</source>
+        <translation> kB/s</translation>
     </message>
     <message>
         <location filename="../progressdialog.cpp" line="97"/>
-        <source> Mb/s</source>
-        <translation> Mb/s</translation>
+        <source> MB/s</source>
+        <translation> MB/s</translation>
     </message>
     <message>
         <location filename="../progressdialog.cpp" line="99"/>
-        <source> Gb/s</source>
-        <translation> Gb/s</translation>
+        <source> GB/s</source>
+        <translation> GB/s</translation>
     </message>
 </context>
 <context>

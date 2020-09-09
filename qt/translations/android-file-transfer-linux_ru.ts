@@ -477,16 +477,16 @@ Please unlock and press Retry to continue or Abort to exit.</source>
         <translation type="vanished">Скорость:</translation>
     </message>
     <message>
-        <source> Kb/s</source>
-        <translation type="vanished">Кб/с</translation>
+        <source> kB/s</source>
+        <translation type="vanished">кБ/с</translation>
     </message>
     <message>
-        <source> Mb/s</source>
-        <translation type="vanished">Мб/с</translation>
+        <source> MB/s</source>
+        <translation type="vanished">МБ/с</translation>
     </message>
     <message>
-        <source> Gb/s</source>
-        <translation type="vanished">Гб/с</translation>
+        <source> GB/s</source>
+        <translation type="vanished">ГБ/с</translation>
     </message>
     <message>
         <location filename="../progressdialog.cpp" line="104"/>
