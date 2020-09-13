@@ -97,15 +97,15 @@ void ProgressDialog::setValue(float current)
 
 void ProgressDialog::setSpeed(qint64 speed)
 {
-	static constexpr double Kb = 1000;
-	static constexpr double Mb = 1000 * Kb; //haha
-	static constexpr double Gb = 1000 * Mb;
-	if (speed < 2 * Mb)
-		ui->speedLabel->setText(tr("Speed: %1 Kb/s").arg(speed / Kb, 0, 'f', 1));
-	else if (speed < 2 * Gb)
-		ui->speedLabel->setText(tr("Speed: %1 Mb/s").arg(speed / Mb, 0, 'f', 1));
+	static constexpr double kB = 1000;
+	static constexpr double MB = 1000 * kB; // k, M, G are metric prefixes
+	static constexpr double GB = 1000 * MB; // 1024 is for binary prefixes
+	if (speed < 2 * MB)
+		ui->speedLabel->setText(tr("Speed: %1 kB/s").arg(speed / kB, 0, 'f', 1));
+	else if (speed < 2 * GB)
+		ui->speedLabel->setText(tr("Speed: %1 MB/s").arg(speed / MB, 0, 'f', 1));
 	else
-		ui->speedLabel->setText(tr("Speed: %1 Gb/s").arg(speed / Gb, 0, 'f', 1));
+		ui->speedLabel->setText(tr("Speed: %1 GB/s").arg(speed / GB, 0, 'f', 1));
 }
 
 void ProgressDialog::setFilename(const QString &filename)

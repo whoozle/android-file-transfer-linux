@@ -465,18 +465,18 @@ Prosím odemčete jej a zmáčknětě Zkust znovu pro pokračování nebo Zruši
     </message>
     <message>
         <location filename="../progressdialog.cpp" line="104"/>
-        <source>Speed: %1 Kb/s</source>
-        <translation>Rychlost: %1 Kb/s</translation>
+        <source>Speed: %1 kB/s</source>
+        <translation>Rychlost: %1 kB/s</translation>
     </message>
     <message>
         <location filename="../progressdialog.cpp" line="106"/>
-        <source>Speed: %1 Mb/s</source>
-        <translation>Rychlost: %1 Mb/s</translation>
+        <source>Speed: %1 MB/s</source>
+        <translation>Rychlost: %1 MB/s</translation>
     </message>
     <message>
         <location filename="../progressdialog.cpp" line="108"/>
-        <source>Speed: %1 Gb/s</source>
-        <translation>Rychlost: %1 Gb/s</translation>
+        <source>Speed: %1 GB/s</source>
+        <translation>Rychlost: %1 GB/s</translation>
     </message>
 </context>
 <context>
