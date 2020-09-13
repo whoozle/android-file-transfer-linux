@@ -37,7 +37,7 @@ script:
       ./linuxdeployqt-continuous-x86_64.AppImage appdir/usr/share/applications/*.desktop -bundle-non-qt-libs &&
       ./linuxdeployqt-continuous-x86_64.AppImage appdir/usr/share/applications/*.desktop -appimage
     elif [ "${TRAVIS_OS_NAME}" = "freebsd" ]; then
-      cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DUSB_BACKEND_LIBUSB=YES
+      cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DUSB_BACKEND_LIBUSB=YES -DBUILD_PYTHON=OFF
       cmake --build build
     elif [ "${TRAVIS_OS_NAME}" = "osx" ]; then
       mkdir build &&
