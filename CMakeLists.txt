@@ -25,12 +25,15 @@ include(CheckFunctionExists)
 include(CheckIncludeFiles)
 
 find_package ( Threads )
-find_package (Python COMPONENTS Development QUIET)
 
 option(BUILD_FUSE "Build fuse mount helper" ON)
 option(BUILD_MTPZ "Build with MTPZ support" ON)
 option(BUILD_PYTHON "Build python module" ON)
 option(BUILD_TAGLIB "Build with taglib support" ON)
+
+if (BUILD_PYTHON)
+	find_package (Python COMPONENTS Development QUIET)
+endif()
 
 if (BUILD_SHARED_LIB)
 	set(LIB_NAME mtp-ng)
