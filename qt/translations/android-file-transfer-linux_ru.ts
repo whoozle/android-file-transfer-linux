@@ -186,7 +186,7 @@
     </message>
     <message>
         <location filename="../mainwindow.ui" line="215"/>
-        <location filename="../mainwindow.cpp" line="122"/>
+        <location filename="../mainwindow.cpp" line="117"/>
         <source>Import Music</source>
         <translation>Импортировать музыку</translation>
     </message>
@@ -197,8 +197,8 @@
     </message>
     <message>
         <location filename="../mainwindow.ui" line="225"/>
-        <location filename="../mainwindow.cpp" line="1039"/>
-        <location filename="../mainwindow.cpp" line="1050"/>
+        <location filename="../mainwindow.cpp" line="1034"/>
+        <location filename="../mainwindow.cpp" line="1045"/>
         <source>Attach Cover</source>
         <translation>Установить обложку</translation>
     </message>
@@ -222,7 +222,7 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="262"/>
+        <location filename="../mainwindow.cpp" line="257"/>
         <source>Device is busy</source>
         <translation>Устройство занято</translation>
     </message>
@@ -232,12 +232,12 @@
 Закройте другие MTP приложения и перезапустите Android File Transfer for Linux.</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="178"/>
+        <location filename="../mainwindow.cpp" line="173"/>
         <source>MTPZ Keys Download</source>
         <translation>Загрузить ключи MTPZ</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="181"/>
+        <location filename="../mainwindow.cpp" line="176"/>
         <source>Could not download keys, please find the error below:
 
 %1
@@ -250,12 +250,12 @@ Please look for .mtpz-data file on the internet and manually install it to your 
 Вы можете самостоятельно найти файл .mtpz-data в интернете и положить его в вашу домашную директорию.</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="189"/>
+        <location filename="../mainwindow.cpp" line="184"/>
         <source>Could not write keys to %1</source>
         <translation>Не получилось записать ключи в %1</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="194"/>
+        <location filename="../mainwindow.cpp" line="189"/>
         <source>Could not write keys, please find the error below:
 
 %1
@@ -268,12 +268,12 @@ Please look for .mtpz-data file on the internet and manually install it to your 
 Вы можете самостоятельно найти файл .mtpz-data в интернете и положить его в вашу домашную директорию.</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="209"/>
+        <location filename="../mainwindow.cpp" line="204"/>
         <source>MTPZ keys have been installed to your system.</source>
         <translation>MTPZ ключи были успешно установлены.</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="215"/>
+        <location filename="../mainwindow.cpp" line="210"/>
         <source>Your MTPZ keys failed to install or load.
 
 Please restart the application to try again.
@@ -286,14 +286,14 @@ Exception: %1</source>
 Ошибка: %1</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="258"/>
+        <location filename="../mainwindow.cpp" line="253"/>
         <source>The following processes are keeping file descriptors for your device:
 </source>
         <translation>Следующие процессы удерживают файловые дескрипторы вашего устройства:
 </translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="263"/>
+        <location filename="../mainwindow.cpp" line="258"/>
         <source>Device is busy, maybe another process is using it.
 
 </source>
@@ -302,7 +302,7 @@ Exception: %1</source>
 </translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="265"/>
+        <location filename="../mainwindow.cpp" line="260"/>
         <source>Close other MTP applications and restart Android File Transfer.
 
 Press Abort to kill them or Ignore to try next device.</source>
@@ -311,12 +311,12 @@ Press Abort to kill them or Ignore to try next device.</source>
 Нажмите &quot;Прервать&quot; чтобы убить сторонний процесс, или &quot;Игнорировать&quot; чтобы попробовать следующее устройство.</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="289"/>
+        <location filename="../mainwindow.cpp" line="284"/>
         <source>Device::Find failed</source>
         <translation>Device::Find взорвалось</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="290"/>
+        <location filename="../mainwindow.cpp" line="285"/>
         <source>MTP device could not be opened at the moment
 
 Failure: %1
@@ -327,17 +327,17 @@ Press Reset to reset them or Ignore to try next device.</source>
 Нажмите &quot;Сброс&quot; чтобы попытаться сбросить устройство или &quot;Игнорировать&quot; чтобы попробовать другие устройства. </translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="315"/>
+        <location filename="../mainwindow.cpp" line="310"/>
         <source>No MTP device found</source>
         <translation>Не найдено ни одного устройства MTP</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="333"/>
+        <location filename="../mainwindow.cpp" line="328"/>
         <source>MTPZ Keys are Missing</source>
         <translation>MTPZ ключи не найдены</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="334"/>
+        <location filename="../mainwindow.cpp" line="329"/>
         <source>It seems your computer is missing an important bit for talking with MTPZ device: private keys and certificate material from Microsoft.
 This means that you can&apos;t download and upload files from/to such devices.
 
@@ -356,7 +356,7 @@ Because of the legal risks we can&apos;t bundle those keys, even though in some 
 </translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="346"/>
+        <location filename="../mainwindow.cpp" line="341"/>
         <source>Alternatively I (as an app) can offer you to download keys from the Internet.
 Can I download keys for you?
 
@@ -367,92 +367,92 @@ Can I download keys for you?
 Пожалуйста нажмите &quot;Да&quot; только если всё вышеуказанное легально в вашей стране. (Или вам всё равно)</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="367"/>
+        <location filename="../mainwindow.cpp" line="362"/>
         <source>You can look for .mtpz-data file on the internet, download it and place it in your home directory.</source>
         <translation>Вы можете найти файл &quot;.mtpz-data&quot; в интернете и просто положить его в домашнюю директорию.</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="380"/>
-        <location filename="../mainwindow.cpp" line="399"/>
+        <location filename="../mainwindow.cpp" line="375"/>
+        <location filename="../mainwindow.cpp" line="394"/>
         <source>MTP</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="380"/>
+        <location filename="../mainwindow.cpp" line="375"/>
         <source>MTP device does not respond</source>
         <translation>MTP устройство не отвечает</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="399"/>
+        <location filename="../mainwindow.cpp" line="394"/>
         <source>Could not open MTP session: %1</source>
         <translation>Не получается открыть MTP сессию: %1</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="433"/>
+        <location filename="../mainwindow.cpp" line="428"/>
         <source>No MTP Storages</source>
         <translation>Нет хранилищ MTP</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="434"/>
+        <location filename="../mainwindow.cpp" line="429"/>
         <source>No MTP storage found, your device might be locked.
 Please unlock and press Retry to continue or Abort to exit.</source>
         <translation>Нет ни одного хранилища, возможно ваше устройство заблокировано
 Разблокируйте устройство и нажмите Повторить чтобы попробовать ещё раз или Прервать, чтобы выйти.</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="471"/>
+        <location filename="../mainwindow.cpp" line="466"/>
         <source>Loading Media Library</source>
         <translation>Загружаем библиотеку</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="587"/>
+        <location filename="../mainwindow.cpp" line="582"/>
         <source>Deleting file(s)</source>
         <translation>Удаление файла(ов)</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="588"/>
+        <location filename="../mainwindow.cpp" line="583"/>
         <source>Are you sure?</source>
         <translation>Вы уверены?</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="675"/>
+        <location filename="../mainwindow.cpp" line="670"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="676"/>
+        <location filename="../mainwindow.cpp" line="671"/>
         <source>Failed to create new directory:
 </source>
         <translation>Не удалось создать новый каталог:
 </translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="744"/>
+        <location filename="../mainwindow.cpp" line="739"/>
         <source>Download Progress</source>
         <translation>Загрузка</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="947"/>
+        <location filename="../mainwindow.cpp" line="942"/>
         <source>Importing Progress</source>
         <translation>Импорт</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="974"/>
+        <location filename="../mainwindow.cpp" line="969"/>
         <source>Overwrite confirmation</source>
         <translation>Подтверждение перезаписи</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="974"/>
+        <location filename="../mainwindow.cpp" line="969"/>
         <source>You are about to overwrite file </source>
         <translation>Вы собираетесь перезаписать файл </translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1039"/>
+        <location filename="../mainwindow.cpp" line="1034"/>
         <source>Could not open selected file</source>
         <translation>Не получилось открыть выбранный файл</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1050"/>
+        <location filename="../mainwindow.cpp" line="1045"/>
         <source>Could not attach cover: %1</source>
         <translation>Не удалось установить обложку: %1</translation>
     </message>
@@ -489,19 +489,31 @@ Please unlock and press Retry to continue or Abort to exit.</source>
         <translation type="vanished">ГБ/с</translation>
     </message>
     <message>
-        <location filename="../progressdialog.cpp" line="104"/>
         <source>Speed: %1 Kb/s</source>
-        <translation>Скорость: %1 Кб/c</translation>
+        <translation type="vanished">Скорость: %1 Кб/c</translation>
+    </message>
+    <message>
+        <source>Speed: %1 Mb/s</source>
+        <translation type="vanished">Скорость: %1 Мб/c</translation>
+    </message>
+    <message>
+        <source>Speed: %1 Gb/s</source>
+        <translation type="vanished">Скорость: %1 Гб/c</translation>
+    </message>
+    <message>
+        <location filename="../progressdialog.cpp" line="104"/>
+        <source>Speed: %1 kB/s</source>
+        <translation>Скорость: %1 КБайт/c</translation>
     </message>
     <message>
         <location filename="../progressdialog.cpp" line="106"/>
-        <source>Speed: %1 Mb/s</source>
-        <translation>Скорость: %1 Мб/c</translation>
+        <source>Speed: %1 MB/s</source>
+        <translation>Скорость: %1 Мбайт/c</translation>
     </message>
     <message>
         <location filename="../progressdialog.cpp" line="108"/>
-        <source>Speed: %1 Gb/s</source>
-        <translation>Скорость: %1 Гб/c</translation>
+        <source>Speed: %1 GB/s</source>
+        <translation>Скорость: %1 Гбайт/c</translation>
     </message>
 </context>
 <context>
