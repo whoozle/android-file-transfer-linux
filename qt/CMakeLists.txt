@@ -4,10 +4,12 @@ if(DESIRED_QT_VERSION)
 	else()
 		find_package(Qt5Widgets QUIET)
 		find_package(Qt5Network QUIET)
+		find_package(Qt5LinguistTools QUIET)
 	endif()
 else()
 	find_package(Qt5Widgets QUIET)
 	find_package(Qt5Network QUIET)
+	find_package(Qt5LinguistTools QUIET)
 	find_package(Qt4 QUIET)
 endif()
 
@@ -40,18 +42,43 @@ set(FORMS mainwindow.ui
 	renamedialog.ui
 )
 
+set(TS_FILES
+	translations/android-file-transfer-linux_cs.ts
+	translations/android-file-transfer-linux_cz.ts
+	translations/android-file-transfer-linux_it.ts
+	translations/android-file-transfer-linux_ru.ts
+)
+
 if (Qt5Widgets_FOUND)
 	message(STATUS "Using Qt5")
 	qt5_wrap_cpp(HEADERS_MOC ${HEADERS})
 	qt5_wrap_ui(FORMS_HEADERS ${FORMS})
-	qt5_add_resources(RESOURCES android-file-transfer.qrc)
+
+	qt5_add_translation(QM_FILES ${TS_FILES})
+	set(QM_FILES_XML "")
+	foreach(_QM ${QM_FILES})
+		get_filename_component(_QM ${_QM} NAME)
+		set(QM_FILES_XML "${QM_FILES_XML}<file>${_QM}</file>")
+	endforeach()
+	configure_file(translations/translations.qrc.in translations.qrc)
+
+	qt5_add_resources(RESOURCES android-file-transfer.qrc ${CMAKE_CURRENT_BINARY_DIR}/translations.qrc)
 	include_directories(${Qt5Widgets_INCLUDE_DIRS} ${Qt5Network_INCLUDE_DIRS})
 	set(EXTRA_QT_LINK ${Qt5Widgets_LIBRARIES} ${Qt5Network_LIBRARIES})
 elseif(Qt4_FOUND OR QT_FOUND OR QT4_FOUND)
 	message(STATUS "Using Qt4")
 	qt4_wrap_cpp(HEADERS_MOC ${HEADERS})
 	qt4_wrap_ui(FORMS_HEADERS ${FORMS})
-	qt4_add_resources(RESOURCES android-file-transfer.qrc)
+
+	qt4_add_translation(QM_FILES ${TS_FILES})
+	set(QM_FILES_XML "")
+	foreach(_QM ${QM_FILES})
+		get_filename_component(_QM ${_QM} NAME)
+		set(QM_FILES_XML "${QM_FILES_XML}<file>${_QM}</file>")
+	endforeach()
+	configure_file(translations/translations.qrc.in translations.qrc)
+
+	qt4_add_resources(RESOURCES android-file-transfer.qrc ${CMAKE_CURRENT_BINARY_DIR}/translations.qrc)
 	include(${QT_USE_FILE})
 	set(EXTRA_QT_LINK Qt4::QtNetwork ${QT_LIBRARIES})
 else()
