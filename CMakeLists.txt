@@ -32,7 +32,7 @@ option(BUILD_PYTHON "Build python module" ON)
 option(BUILD_TAGLIB "Build with taglib support" ON)
 
 if (BUILD_PYTHON)
-	find_package (Python COMPONENTS Development QUIET)
+	find_package (Python COMPONENTS Interpreter Development QUIET)
 endif()
 
 if (BUILD_SHARED_LIB)
