@@ -49,6 +49,9 @@ namespace mtp { namespace usb
 	DevicePtr BulkPipe::GetDevice() const
 	{ return _device; }
 
+	InterfacePtr BulkPipe::GetInterface() const
+	{ return _interface; }
+
 	ByteArray BulkPipe::ReadInterrupt(int timeout)
 	{
 		ByteArrayObjectOutputStreamPtr s(new ByteArrayObjectOutputStream());

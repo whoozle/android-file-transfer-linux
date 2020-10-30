@@ -58,6 +58,7 @@ namespace mtp { namespace usb
 		~BulkPipe();
 
 		DevicePtr GetDevice() const;
+		InterfacePtr GetInterface() const;
 
 		ByteArray ReadInterrupt(int timeout);
 

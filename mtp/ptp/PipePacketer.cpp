@@ -249,7 +249,7 @@ namespace mtp
 		_pipe->GetDevice()->WriteControl(
 			(u8)(usb::RequestType::HostToDevice | usb::RequestType::Class | usb::RequestType::Interface),
 			0x64,
-			0, 0, req.Data, timeout);
+			0, _pipe->GetInterface()->GetIndex(), req.Data, timeout);
 	}
 
 
