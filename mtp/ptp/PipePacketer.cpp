@@ -27,6 +27,7 @@
 #include <mtp/ptp/OperationRequest.h>
 #include <mtp/usb/Request.h>
 #include <usb/Device.h>
+#include <usb/Interface.h>
 #include <mtp/log.h>
 
 
