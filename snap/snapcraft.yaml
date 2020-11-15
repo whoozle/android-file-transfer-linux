@@ -63,6 +63,8 @@
 
       build-packages:
         - qt5-default
+        - qttools5-dev
+        - qttools5-dev-tools
         - libfuse-dev
         - libmagic-dev
         - libtag1-dev

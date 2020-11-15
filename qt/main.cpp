@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
 	app.installTranslator(&qtTranslator);
 
 	QTranslator aTranslator;
-	aTranslator.load(":/translations/android-file-transfer-linux_" + QLocale::system().name());
+	aTranslator.load(":/android-file-transfer-linux_" + QLocale::system().name());
 	app.installTranslator(&aTranslator);
 
 	MainWindow w;

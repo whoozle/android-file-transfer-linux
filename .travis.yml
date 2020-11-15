@@ -16,9 +16,9 @@ matrix:
 install:
   - |
     if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
-      sudo apt-get -y install qt5-default libfuse-dev libmagic-dev libtag1-dev libssl-dev
+      sudo apt-get -y install qt5-default qttools5-dev qttools5-dev-tools libfuse-dev libmagic-dev libtag1-dev libssl-dev
     elif [ "${TRAVIS_OS_NAME}" = "freebsd" ]; then
-      sudo pkg install -y ninja qt5-qmake qt5-buildtools qt5-widgets fusefs-libs pybind11 taglib
+      sudo pkg install -y ninja qt5-qmake qt5-buildtools qt5-widgets qt5-linguist fusefs-libs pybind11 taglib
     elif [ "${TRAVIS_OS_NAME}" = "osx" ]; then
       brew tap homebrew/cask && brew install qt5 homebrew/cask/osxfuse pybind11 taglib openssl@1.1
     fi

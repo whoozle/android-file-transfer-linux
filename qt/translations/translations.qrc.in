@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        ${QM_FILES_XML}
+    </qresource>
+</RCC>
