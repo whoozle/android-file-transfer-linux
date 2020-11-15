@@ -135,7 +135,7 @@ namespace mtp
 				catch (const std::exception & ex)
 				{ debug("winusb handshake failed: ", ex.what()); }
 
-				if (name != "MTP") {
+				if (name.find("MTP") == name.npos)  {
 					auto interfaceStringIndex = GetInterfaceStringIndex(desc, j);
 					data = usb::DeviceRequest(device).GetDescriptor(usb::DescriptorType::String, interfaceStringIndex, langId);
 					HexDump("interface name", data);
@@ -147,7 +147,7 @@ namespace mtp
 					name = stream.ReadString((len - 2) / 2);
 				}
 #endif
-				if (name == "MTP")
+				if (name.find("MTP") != name.npos)
 				{
 					//device->SetConfiguration(configuration->GetIndex());
 					if (resetDevice)
