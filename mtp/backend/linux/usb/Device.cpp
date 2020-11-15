@@ -106,6 +106,7 @@ namespace mtp { namespace usb
 
 	void Device::Reset()
 	{
+		debug("resetting device...");
 		try
 		{ IOCTL(_fd.Get(), USBDEVFS_RESET); }
 		catch(const std::exception &ex)
