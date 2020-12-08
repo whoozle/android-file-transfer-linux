@@ -46,6 +46,9 @@ namespace mtp { namespace usb
 	public:
 		Interface(int index, const std::string &path);
 
+		std::string GetPath() const
+		{ return _path; }
+
 		u8 GetClass() const
 		{ return _class; }
 

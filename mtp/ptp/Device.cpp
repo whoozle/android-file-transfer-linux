@@ -49,6 +49,11 @@ namespace mtp
 		return std::make_shared<Session>(_packeter.GetPipe(), sessionId);
 	}
 
+    PipePacketer Device::GetPacketer()
+	{
+		return _packeter;
+	}
+	
 	u8 Device::GetInterfaceStringIndex(usb::DeviceDescriptorPtr desc, u8 number)
 	{
 		static const u16 DT_INTERFACE = 4;
@@ -184,5 +189,4 @@ namespace mtp
 
 		return nullptr;
 	}
-
 }

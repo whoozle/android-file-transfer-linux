@@ -38,6 +38,24 @@
 
 #include <fuse_lowlevel.h>
 
+#include <unistd.h>
+
+struct deviceInfo
+{
+	std::string _Manufacturer;
+	std::string _Model;
+	std::string _DeviceVersion;
+	std::string _SerialNumber;
+	std::string _devicePath;
+};
+
+std::string get_atf_path()
+{
+	int uid = getuid();
+	std::string uidstr = std::to_string(uid);
+	return "/run/user/" + uidstr + "/aft-mtp/";
+}
+
 namespace
 {
 	using namespace mtp::fuse;
@@ -72,6 +90,21 @@ namespace
 		std::vector<mtp::StorageId>					_storageIdList;
 		std::map<mtp::StorageId, std::string>		_storageToName;
 		std::map<std::string, mtp::StorageId>		_storageFromName;
+
+	public:
+		deviceInfo getDeviceInfo()
+		{
+			deviceInfo info;
+			if (_session)
+			{
+				info._Manufacturer = _session->GetDeviceInfo().Manufacturer;
+				info._Model = _session->GetDeviceInfo().Model;
+				info._DeviceVersion = _session->GetDeviceInfo().DeviceVersion;
+				info._SerialNumber = _session->GetDeviceInfo().SerialNumber;
+				info._devicePath = _device->GetPacketer().GetPipe()->GetInterface()->GetPath();
+			}
+			return info;
+		}
 
 	private:
 		static FuseId ToFuse(mtp::ObjectId id)
@@ -800,6 +833,13 @@ int main(int argc, char **argv)
 	ops.unlink		= &Unlink;
 	ops.statfs		= &StatFS;
 
+	//create mount point
+	deviceInfo info = g_wrapper->getDeviceInfo();
+	std::string dirPath = get_atf_path() + info._Manufacturer + info._SerialNumber;
+	std::string cmd = "mkdir -p " + dirPath;
+	system(cmd.c_str());
+	const char *real_mount_point = dirPath.c_str();
+
 	struct fuse_args args = FUSE_ARGS_INIT(argc, argv);
 	struct fuse_chan *ch;
 	char *mountpoint;
@@ -807,8 +847,8 @@ int main(int argc, char **argv)
 	int multithreaded = 0, foreground = 0;
 
 	if (fuse_parse_cmdline(&args, &mountpoint, &multithreaded, &foreground) != -1 &&
-	    mountpoint != NULL &&
-	    (ch = fuse_mount(mountpoint, &args)) != NULL) {
+        real_mount_point != NULL &&
+        (ch = fuse_mount(real_mount_point, &args)) != NULL) {
 		struct fuse_session *se;
 
 		se = fuse_lowlevel_new(&args, &ops,
