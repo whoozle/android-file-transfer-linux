@@ -51,9 +51,13 @@ struct deviceInfo
 
 std::string get_atf_path()
 {
-	int uid = getuid();
-	std::string uidstr = std::to_string(uid);
-	return "/run/user/" + uidstr + "/aft-mtp/";
+//	int uid = getuid();
+//	std::string uidstr = std::to_string(uid);
+//	return "/run/user/" + uidstr + "/aft-mtp/";
+
+    std::string home = getenv("HOME");
+	home += "/aft-mtp/";
+	return home;
 }
 
 namespace
@@ -799,6 +803,8 @@ namespace
 int main(int argc, char **argv)
 {
 	bool claimInterface = true;
+    bool fsname_defined = false;
+
 	for(int i = 1; i < argc; ++i)
 	{
 		if (strcmp(argv[i], "-C") == 0)
@@ -807,6 +813,11 @@ int main(int argc, char **argv)
 			mtp::g_debug = true;
 		if (i + 1 < argc && strcmp(argv[i], "-o") == 0 && strcmp(argv[i + 1], "debug") == 0)
 			mtp::g_debug = true;
+
+        if(i + 1 < argc && strcmp(argv[i], "-o") == 0 && (strlen(argv[i + 1]) > strlen("fsname=")) && strncmp(argv[i + 1], "fsname=", strlen("fsname=")) == 0)
+        {
+            fsname_defined = true;
+        }
 	}
 
 	try
@@ -835,12 +846,36 @@ int main(int argc, char **argv)
 
 	//create mount point
 	deviceInfo info = g_wrapper->getDeviceInfo();
+
+	info._Manufacturer.erase(
+		std::remove_if(info._Manufacturer.begin(), info._Manufacturer.end(),
+					   [](char c) { return !std::isalnum(c); }),
+		info._Manufacturer.end());
+
+	info._SerialNumber.erase(
+		std::remove_if(info._SerialNumber.begin(), info._SerialNumber.end(),
+					   [](char c) { return !std::isalnum(c); }),
+		info._SerialNumber.end());
+
 	std::string dirPath = get_atf_path() + info._Manufacturer + info._SerialNumber;
 	std::string cmd = "mkdir -p " + dirPath;
 	system(cmd.c_str());
 	const char *real_mount_point = dirPath.c_str();
 
-	struct fuse_args args = FUSE_ARGS_INIT(argc, argv);
+    //-o fsname=xx
+    char *rargv[100];
+    int rargc = argc;
+    std::string rfsnamecmd = "fsname=" + info._Manufacturer + info._SerialNumber;
+    if(rfsnamecmd.empty()) { rfsnamecmd = "fsname=aft-mtp"; }
+    for(int i = 0; i < argc; ++i) { rargv[i] = argv[i]; }
+    if(!fsname_defined)
+    {
+        rargc += 2;
+        rargv[rargc - 2] = "-o";
+        rargv[rargc - 1] = (char*)rfsnamecmd.c_str();
+    }
+
+    struct fuse_args args = FUSE_ARGS_INIT(rargc, rargv);
 	struct fuse_chan *ch;
 	char *mountpoint;
 	int err = -1;
