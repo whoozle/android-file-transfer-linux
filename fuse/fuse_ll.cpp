@@ -598,11 +598,6 @@ namespace
 			FUSE_CALL(fuse_reply_err(req, 0));
 		}
 
-		void Rename(fuse_req_t req, FuseId parent, const char *name, FuseId newparent, const char *newname)
-		{
-			fuse_reply_err(req, EXDEV); //return cross-device link, so user space should re-create file and copy it
-		}
-
 		void SetAttr(fuse_req_t req, FuseId inode, struct stat *attr, int to_set, struct fuse_file_info *fi)
 		{
 			mtp::scoped_mutex_lock l(_mutex);
@@ -623,8 +618,14 @@ namespace
 				entry.ReplyError(ENOENT);
 		}
 
-		void RemoveDir (fuse_req_t req, FuseId parent, const char *name)
-		{ Unlink(req, parent, name); }
+		void UnlinkImpl(FuseId inode)
+		{
+			mtp::debug("   unlinking inode ", inode.Inode);
+			mtp::ObjectId id = FromFuse(inode);
+			_session->DeleteObject(id);
+			_openedFiles.erase(inode);
+			_objectAttrs.erase(id);
+		}
 
 		void Unlink(fuse_req_t req, FuseId parent, const char *name)
 		{
@@ -638,14 +639,52 @@ namespace
 			}
 
 			FuseId inode = i->second;
-			mtp::debug("   unlinking inode ", inode.Inode);
-			mtp::ObjectId id = FromFuse(inode);
+			UnlinkImpl(inode);
 			_directoryCache.erase(parent);
-			_openedFiles.erase(inode);
-			_objectAttrs.erase(id);
 			children.erase(i);
 
-			_session->DeleteObject(id);
+			FUSE_CALL(fuse_reply_err(req, 0));
+		}
+
+		void RemoveDir (fuse_req_t req, FuseId parent, const char *name)
+		{ Unlink(req, parent, name); }
+
+		void Rename(fuse_req_t req, FuseId parent, const char *name, FuseId newparent, const char *newName)
+		{
+			if (parent != newparent) {
+				//no renames across directory boundary, sorry
+				//return cross-device link, so user space should re-create file and copy it
+				FUSE_CALL(fuse_reply_err(req, EXDEV));
+				return;
+			}
+
+			mtp::scoped_mutex_lock l(_mutex);
+			ChildrenObjects &children = GetChildren(parent);
+			auto i = children.find(name);
+			if (i == children.end())
+			{
+				FUSE_CALL(fuse_reply_err(req, ENOENT));
+				return;
+			}
+
+			FuseId inode = i->second;
+			mtp::debug("   renaming inode ", inode.Inode, " to ", newName);
+
+			auto old = children.find(newName);
+			if (old != children.end())
+			{
+				mtp::debug("   unlinking target inode ", old->second.Inode);
+				UnlinkImpl(old->second);
+				children.erase(old);
+			}
+
+			mtp::ObjectId id = FromFuse(inode);
+			_session->SetObjectProperty(id, mtp::ObjectProperty::ObjectFilename, std::string(newName));
+
+			children.erase(i);
+			children.emplace(newName, inode);
+			_directoryCache.erase(parent);
+
 			FUSE_CALL(fuse_reply_err(req, 0));
 		}
 
