@@ -51,6 +51,7 @@ namespace mtp
 		bool			_editObjectSupported;
 		bool			_getObjectPropertyListSupported;
 		bool			_getObjectModificationTimeBuggy;
+		bool			_separateBulkWrites;
 		int				_defaultTimeout;
 
 	public:

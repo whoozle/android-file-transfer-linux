@@ -44,10 +44,13 @@ namespace mtp
 
 	Session::Session(usb::BulkPipePtr pipe, u32 sessionId):
 		_packeter(pipe), _sessionId(sessionId), _nextTransactionId(1), _transaction(),
-		_getObjectModificationTimeBuggy(false),
+		_getObjectModificationTimeBuggy(false), _separateBulkWrites(false),
 		_defaultTimeout(DefaultTimeout)
 	{
 		_deviceInfo = GetDeviceInfoImpl();
+		if (_deviceInfo.Manufacturer == "Microsoft")
+			_separateBulkWrites = true;
+
 		_getPartialObject64Supported = _deviceInfo.Supports(OperationCode::GetPartialObject64);
 		_getObjectPropertyListSupported = _deviceInfo.Supports(OperationCode::GetObjectPropList);
 		_editObjectSupported = _deviceInfo.Supports(OperationCode::BeginEditObject) &&
@@ -126,8 +129,12 @@ namespace mtp
 		{
 			DataRequest req(code, transaction.Id);
 			Container container(req, inputStream);
-			_packeter.Write(std::make_shared<ByteArrayObjectInputStream>(container.Data), timeout);
-			_packeter.Write(inputStream, timeout);
+			if (_separateBulkWrites)
+			{
+				_packeter.Write(std::make_shared<ByteArrayObjectInputStream>(container.Data), timeout);
+				_packeter.Write(inputStream, timeout);
+			} else
+				_packeter.Write(std::make_shared<JoinedObjectInputStream>(std::make_shared<ByteArrayObjectInputStream>(container.Data), inputStream), timeout);
 		}
 		return Get(transaction.Id, response);
 	}
