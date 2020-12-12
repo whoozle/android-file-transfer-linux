@@ -1,3 +1,4 @@
+cmake_minimum_required(VERSION 2.8.12)
 project(android-file-transfer)
 
 set (CMAKE_CXX_STANDARD 11)
@@ -16,8 +17,6 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 	find_program(OTOOL_BIN otool)
 endif()
 
-cmake_minimum_required(VERSION 2.8)
-set(CMAKE_USE_RELATIVE_PATHS TRUE)
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 
 include(FindPkgConfig)
