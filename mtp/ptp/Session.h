@@ -160,8 +160,10 @@ namespace mtp
 		void EndEditObject(ObjectId objectId);
 
 		ByteArray Get(u32 transaction, ByteArray & response, int timeout = 0);
+		ByteArray Get(PipePacketer &packeter, u32 transaction, ByteArray & response, int timeout = 0);
 
 		void Send(const OperationRequest &req, int timeout = 0);
+		void Send(PipePacketer &packeter, const OperationRequest &req, int timeout = 0);
 		void Close();
 	};
 
