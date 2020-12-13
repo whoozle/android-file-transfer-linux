@@ -82,13 +82,20 @@ namespace mtp
 			_transaction->Id = _nextTransactionId++;
 	}
 
+	void Session::Send(PipePacketer &packeter, const OperationRequest &req, int timeout)
+	{
+		if (timeout <= 0)
+			timeout = DefaultTimeout;
+		Container container(req);
+		packeter.Write(container.Data, timeout);
+	}
+
 
 	void Session::Send(const OperationRequest &req, int timeout)
 	{
 		if (timeout <= 0)
 			timeout = _defaultTimeout;
-		Container container(req);
-		_packeter.Write(container.Data, timeout);
+		Send(_packeter, req, timeout);
 	}
 
 	void Session::Close()
@@ -101,15 +108,23 @@ namespace mtp
 		//HexDump("payload", data);
 	}
 
+	ByteArray Session::Get(PipePacketer &packeter, u32 transaction, ByteArray & response, int timeout)
+	{
+		if (timeout <= 0)
+			timeout = DefaultTimeout;
+
+		ByteArray data;
+		ResponseType responseCode;
+		packeter.Read(transaction, data, responseCode, response, timeout);
+		CHECK_RESPONSE(responseCode);
+		return data;
+	}
+
 	ByteArray Session::Get(u32 transaction, ByteArray &response, int timeout)
 	{
 		if (timeout <= 0)
 			timeout = _defaultTimeout;
-		ByteArray data;
-		ResponseType responseCode;
-		_packeter.Read(transaction, data, responseCode, response, timeout);
-		CHECK_RESPONSE(responseCode);
-		return data;
+		return Get(_packeter, transaction, response, timeout);
 	}
 
 	template<typename ... Args>
