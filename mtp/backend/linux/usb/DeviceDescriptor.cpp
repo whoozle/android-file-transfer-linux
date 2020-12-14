@@ -30,11 +30,13 @@ namespace mtp { namespace usb
 {
 	DeviceDescriptor::DeviceDescriptor(int busId, const std::string &path): _busId(busId), _path(path)
 	{
+		debug("creating device descriptor at ", path);
 		_vendor			= Directory::ReadInt(path + "/idVendor");
 		_product		= Directory::ReadInt(path + "/idProduct");
 		_deviceNumber	= Directory::ReadInt(path + "/devnum", 10);
 		_controlEp		= std::make_shared<Endpoint>(path + "/ep_00");
 		_descriptor		= Directory::ReadAll(path + "/descriptors");
+		_configurationValue = Directory::ReadInt(path + "/bConfigurationValue", 10);
 	}
 
 	DevicePtr DeviceDescriptor::Open(ContextPtr context)
@@ -51,7 +53,7 @@ namespace mtp { namespace usb
 		snprintf(fname, sizeof(fname), "/dev/bus/usb/%03d/%03u", _busId, _deviceNumber);
 		int fd = open(fname, O_RDWR);
 		if (fd != -1)
-			return std::make_shared<Device>(fd, _controlEp);
+			return std::make_shared<Device>(fd, _controlEp, _configurationValue);
 		debug("error: ", posix::Exception::GetErrorMessage(errno));
 		return nullptr;
 	}
