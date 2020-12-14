@@ -105,6 +105,7 @@ set(SOURCES
 	mtp/ptp/DataTypeCode.cpp
 	mtp/ptp/Device.cpp
 	mtp/ptp/DeviceProperty.cpp
+	mtp/ptp/Messages.cpp
 	mtp/ptp/ObjectFormat.cpp
 	mtp/ptp/ObjectProperty.cpp
 	mtp/ptp/OperationCode.cpp

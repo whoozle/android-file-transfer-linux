@@ -2,6 +2,7 @@
 #include <mtp/ptp/Session.h>
 #include <mtp/ptp/ObjectPropertyListParser.h>
 #include <mtp/log.h>
+#include <algorithm>
 #include <unordered_map>
 
 namespace mtp

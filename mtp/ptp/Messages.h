@@ -28,7 +28,8 @@
 #include <mtp/ptp/ObjectProperty.h>
 #include <mtp/ptp/OperationCode.h>
 #include <mtp/ptp/EventCode.h>
-#include <algorithm>
+#include <string>
+#include <vector>
 
 namespace mtp { namespace msg
 {
@@ -67,28 +68,25 @@ namespace mtp { namespace msg
 			stream >> SerialNumber;
 		}
 
-		bool Supports(OperationCode opcode) const
-		{
-			auto i = std::find(OperationsSupported.begin(), OperationsSupported.end(), opcode);
-			return i != OperationsSupported.end();
-		}
+		bool Supports(OperationCode opcode) const;
 
-		bool Supports(DeviceProperty property) const
-		{
-			auto i = std::find(DevicePropertiesSupported.begin(), DevicePropertiesSupported.end(), property);
-			return i != DevicePropertiesSupported.end();
-		}
+		bool Supports(DeviceProperty property) const;
 
-		bool Supports(EventCode event) const
-		{
-			auto i = std::find(EventsSupported.begin(), EventsSupported.end(), event);
-			return i != EventsSupported.end();
-		}
+		bool Supports(EventCode event) const;
 
-		bool Supports(ObjectFormat format) const
+		bool Supports(ObjectFormat format) const;
+
+		std::string GetFilesystemFriendlyName() const;
+
+		static bool Matches(const std::string & haystack, const std::string & needle)
+		{ return strcasestr(haystack.c_str(), needle.c_str()); }
+
+		bool Matches(const std::string & filter) const
 		{
-			auto i = std::find(ImageFormats.begin(), ImageFormats.end(), format);
-			return i != ImageFormats.end();
+			if (filter.empty())
+				return true;
+			auto fsname = GetFilesystemFriendlyName();
+			return Matches(fsname, filter);
 		}
 	};
 
