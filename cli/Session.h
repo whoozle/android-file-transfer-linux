@@ -79,7 +79,7 @@ namespace cli
 		static std::string GetMtpzDataPath();
 
 	public:
-		Session(const mtp::DevicePtr &device, bool showPrompt);
+		Session(const mtp::SessionPtr &session, bool showPrompt);
 		~Session();
 
 		bool SetFirstStorage();

@@ -64,9 +64,8 @@ namespace
 namespace cli
 {
 
-	Session::Session(const mtp::DevicePtr &device, bool showPrompt):
-		_device(device),
-		_session(_device->OpenSession(1)),
+	Session::Session(const mtp::SessionPtr &session, bool showPrompt):
+		_session(session),
 		_trustedApp(mtp::TrustedApp::Create(_session, GetMtpzDataPath())),
 		_gdi(_session->GetDeviceInfo()),
 		_cs(mtp::Session::AllStorages),

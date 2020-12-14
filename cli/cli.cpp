@@ -72,6 +72,8 @@ int main(int argc, char **argv)
 	bool claimInterface = true;
 	bool showEvents = false;
 	bool resetDevice = false;
+	bool listDevices = false;
+	std::string deviceFilter;
 	const char *fileInput = nullptr;
 
 	if (!isatty(STDIN_FILENO))
@@ -88,6 +90,8 @@ int main(int argc, char **argv)
 		{"no-claim",		no_argument,		0,	'C' },
 		{"input-file",		required_argument,	0,	'f' },
 		{"reset-device",	no_argument	,		0,	'R' },
+		{"device-name",		required_argument,	0,	'd' },
+		{"device-list",		required_argument,	0,	'l' },
 		{0,					0,					0,	 0	}
 	};
 
@@ -100,7 +104,7 @@ int main(int argc, char **argv)
 	while(true)
 	{
 		int optionIndex = 0; //index of matching option
-		int c = getopt_long(argc, argv, "ibehvVCRf:", long_options, &optionIndex);
+		int c = getopt_long(argc, argv, "ibehvVCRf:ld:", long_options, &optionIndex);
 		if (c == -1)
 			break;
 		switch(c)
@@ -126,6 +130,12 @@ int main(int argc, char **argv)
 			break;
 		case 'R':
 			resetDevice = true;
+			break;
+		case 'l':
+			listDevices = true;
+			break;
+		case 'd':
+			deviceFilter = optarg;
 			break;
 		case '?':
 		case 'h':
@@ -161,6 +171,8 @@ int main(int argc, char **argv)
 			"-f\t--input-file\tuse file to read input commands\n"
 			"-C\t--no-claim\tno usb interface claim\n"
 			"-R\t--reset-device\treset usb device before connecting\n"
+			"-d\t--device-name\tuse device name (could be partial name, e.g. model or manufacturer)\n"
+			"-l\t--device-list\tlist devices\n"
 			"-V\t--version\tshow version information"
 			);
 		exit(0);
@@ -173,6 +185,20 @@ int main(int argc, char **argv)
 	}
 
 	usb::ContextPtr ctx(new usb::Context);
+	if (listDevices) {
+		for (usb::DeviceDescriptorPtr desc : ctx->GetDevices())
+		{
+			try
+			{
+				auto device = Device::Open(ctx, desc, claimInterface, resetDevice);
+				if (device && device->DeviceDescriptionMatches(deviceFilter))
+					print(device->GetDeviceDescription());
+			}
+			catch (const std::exception & ex)
+			{ error("Device::Find failed:", ex.what()); }
+		}
+		return 0;
+	}
 	cli::SessionPtr session;
 
 	for (usb::DeviceDescriptorPtr desc : ctx->GetDevices())
@@ -182,9 +208,11 @@ int main(int argc, char **argv)
 			auto device = Device::Open(ctx, desc, claimInterface, resetDevice);
 			if (!device)
 				continue;
-			session = std::make_shared<cli::Session>(device, showPrompt);
+
+			session = std::make_shared<cli::Session>(device->OpenSession(1), showPrompt);
 			if (session->SetFirstStorage())
 				break;
+
 			else
 			{
 				error("your device may be locked or does not have any storage available");

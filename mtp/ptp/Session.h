@@ -78,7 +78,7 @@ namespace mtp
 		};
 		DECLARE_PTR(ObjectEditSession);
 
-		Session(usb::BulkPipePtr pipe, u32 sessionId);
+		Session(const PipePacketer & packeter, u32 sessionId);
 		~Session();
 
 		const msg::DeviceInfo & GetDeviceInfo() const
@@ -143,6 +143,8 @@ namespace mtp
 		//windows specific
 		void EnableSecureFileOperations(u32 cmac1[4]);
 
+		static msg::DeviceInfo GetDeviceInfo(PipePacketer& packeter, int timeout = 0);
+
 	private:
 		template<typename ... Args>
 		ByteArray RunTransaction(int timeout, OperationCode code, Args && ... args)
@@ -152,7 +154,6 @@ namespace mtp
 
 		void SetCurrentTransaction(Transaction *);
 
-		msg::DeviceInfo GetDeviceInfoImpl();
 
 		void BeginEditObject(ObjectId objectId);
 		void SendPartialObject(ObjectId objectId, u64 offset, const ByteArray &data);
@@ -160,10 +161,10 @@ namespace mtp
 		void EndEditObject(ObjectId objectId);
 
 		ByteArray Get(u32 transaction, ByteArray & response, int timeout = 0);
-		ByteArray Get(PipePacketer &packeter, u32 transaction, ByteArray & response, int timeout = 0);
+		static ByteArray Get(PipePacketer &packeter, u32 transaction, ByteArray & response, int timeout = 0);
 
 		void Send(const OperationRequest &req, int timeout = 0);
-		void Send(PipePacketer &packeter, const OperationRequest &req, int timeout = 0);
+		static void Send(PipePacketer &packeter, const OperationRequest &req, int timeout = 0);
 		void Close();
 	};
 

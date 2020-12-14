@@ -154,7 +154,7 @@ PYBIND11_MODULE(aftl, m) {
 
 	py::class_<Device, DevicePtr>(m, "Device").
 		def_static("find_first", &Device::FindFirst,
-			py::arg("claim_interface") = true, py::arg("reset") = false).
+			py::arg("filter_device") = std::string(), py::arg("claim_interface") = true, py::arg("reset_device") = false).
 		def("open_session", &Device::OpenSession,
 			py::arg("session_id") = 1, py::arg("timeout") = static_cast<int>(Session::DefaultTimeout))
 	;
@@ -307,7 +307,7 @@ PYBIND11_MODULE(aftl, m) {
 		def("create_directory", &Session::CreateDirectory, py::arg("name"), py::arg("parent"), py::arg("storage") = Session::AnyStorage, py::arg("association_type") = AssociationType::GenericFolder).
 		def("send_object_info", &Session::SendObjectInfo, py::arg("object_info"), py::arg("storage"), py::arg("parent")).
 
-		def("get_device_info", &Session::GetDeviceInfo).
+		def("get_device_info", static_cast<const msg::DeviceInfo & (Session::*)() const>(&Session::GetDeviceInfo)).
 		def("get_device_property", &Session::GetDeviceProperty).
 		def("get_device_integer_property", &Session::GetDeviceIntegerProperty).
 		def("get_device_string_property", &Session::GetDeviceStringProperty).
