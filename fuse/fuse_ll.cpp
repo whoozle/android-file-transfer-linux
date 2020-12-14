@@ -45,7 +45,9 @@ namespace
 	class FuseWrapper
 	{
 		std::mutex		_mutex;
+		std::string		_deviceFilter;
 		bool			_claimInterface;
+		bool			_resetDevice;
 		mtp::DevicePtr	_device;
 		mtp::SessionPtr	_session;
 		bool			_editObjectSupported;
@@ -377,7 +379,8 @@ namespace
 		}
 
 	public:
-		FuseWrapper(bool claimInterface): _claimInterface(claimInterface)
+		FuseWrapper(const std::string & deviceFilter, bool claimInterface, bool resetDevice):
+			_deviceFilter(deviceFilter), _claimInterface(claimInterface), _resetDevice(resetDevice)
 		{ Connect(); }
 
 		void Connect()
@@ -390,7 +393,7 @@ namespace
 			_directoryCache.clear();
 			_session.reset();
 			_device.reset();
-			_device = mtp::Device::FindFirst(_claimInterface);
+			_device = mtp::Device::FindFirst(_deviceFilter, _claimInterface, _resetDevice);
 			if (!_device)
 				throw std::runtime_error("no MTP device found");
 
@@ -804,19 +807,25 @@ namespace
 
 int main(int argc, char **argv)
 {
+	std::string deviceFilter;
 	bool claimInterface = true;
+	bool resetDevice = false;
 	for(int i = 1; i < argc; ++i)
 	{
-		if (strcmp(argv[i], "-C") == 0)
+		if (strcmp(argv[i], "-R") == 0)
+			resetDevice = false;
+		else if (strcmp(argv[i], "-C") == 0)
 			claimInterface = false;
-		if (strcmp(argv[i], "-d") == 0 || strcmp(argv[i], "-odebug") == 0)
+		else if (strcmp(argv[i], "-v") == 0 || strcmp(argv[i], "-odebug") == 0)
 			mtp::g_debug = true;
-		if (i + 1 < argc && strcmp(argv[i], "-o") == 0 && strcmp(argv[i + 1], "debug") == 0)
+		else if (i + 1 < argc && strcmp(argv[i], "-o") == 0 && strcmp(argv[i + 1], "debug") == 0)
 			mtp::g_debug = true;
+		else if (i + 1 < argc && strcmp(argv[i], "-d") == 0)
+			deviceFilter = argv[i + 1];
 	}
 
 	try
-	{ g_wrapper.reset(new FuseWrapper(claimInterface)); }
+	{ g_wrapper.reset(new FuseWrapper(deviceFilter, claimInterface, resetDevice)); }
 	catch(const std::exception &ex)
 	{ mtp::error("connect failed: ", ex.what()); return 1; }
 

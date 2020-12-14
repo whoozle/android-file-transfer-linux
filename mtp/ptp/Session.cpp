@@ -42,12 +42,12 @@ namespace mtp
 		throw InvalidResponseException(__func__, (RCODE)); \
 } while(false)
 
-	Session::Session(usb::BulkPipePtr pipe, u32 sessionId):
-		_packeter(pipe), _sessionId(sessionId), _nextTransactionId(1), _transaction(),
+	Session::Session(const PipePacketer & packeter, u32 sessionId):
+		_packeter(packeter), _sessionId(sessionId), _nextTransactionId(1), _transaction(),
 		_getObjectModificationTimeBuggy(false), _separateBulkWrites(false),
 		_defaultTimeout(DefaultTimeout)
 	{
-		_deviceInfo = GetDeviceInfoImpl();
+		_deviceInfo = GetDeviceInfo(_packeter, _defaultTimeout);
 		if (_deviceInfo.Manufacturer == "Microsoft")
 			_separateBulkWrites = true;
 
@@ -154,8 +154,13 @@ namespace mtp
 		return Get(transaction.Id, response);
 	}
 
-	msg::DeviceInfo Session::GetDeviceInfoImpl()
-	{ return ParseResponse<msg::DeviceInfo>(RunTransaction(_defaultTimeout, OperationCode::GetDeviceInfo)); }
+	msg::DeviceInfo Session::GetDeviceInfo(PipePacketer& packeter, int timeout)
+	{
+		ByteArray response;
+		Send(packeter, OperationRequest(OperationCode::GetDeviceInfo, 0), timeout);
+		auto info = Get(packeter, 0, response, timeout);
+		return ParseResponse<msg::DeviceInfo>(info);
+	}
 
 
 	msg::ObjectHandles Session::GetObjectHandles(StorageId storageId, ObjectFormat objectFormat, ObjectId parent, int timeout)

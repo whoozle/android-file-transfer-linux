@@ -168,7 +168,7 @@ namespace mtp
 		return nullptr;
 	}
 
-	DevicePtr Device::FindFirst(bool claimInterface, bool resetDevice)
+	DevicePtr Device::FindFirst(const std::string & filter, bool claimInterface, bool resetDevice)
 	{
 		usb::ContextPtr ctx(new usb::Context);
 
@@ -184,5 +184,21 @@ namespace mtp
 
 		return nullptr;
 	}
+
+	std::string Device::GetDeviceDescription()
+	{
+		auto di = Session::GetDeviceInfo(_packeter);
+		return di.Manufacturer + ":" + di.Model + ":" + di.SerialNumber;
+	}
+
+	bool Device::DeviceDescriptionMatches(const std::string & filter_)
+	{
+		std::string desc = GetDeviceDescription();
+		std::transform(desc.begin(), desc.end(), desc.begin(), ::tolower);
+		std::string filter = filter_;
+		std::transform(filter.begin(), filter.end(), filter.begin(), ::tolower);
+		return desc.find(filter) != desc.npos;
+	}
+
 
 }
