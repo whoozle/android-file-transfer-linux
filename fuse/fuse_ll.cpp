@@ -30,6 +30,7 @@
 
 #include <mtp/log.h>
 
+#include <algorithm>
 #include <map>
 #include <set>
 #include <vector>

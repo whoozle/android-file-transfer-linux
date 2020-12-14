@@ -33,8 +33,9 @@
 #include <mtp/metadata/Metadata.h>
 #include <mtp/metadata/Library.h>
 
-#include <sstream>
+#include <algorithm>
 #include <set>
+#include <sstream>
 
 #include <string.h>
 #include <stdlib.h>

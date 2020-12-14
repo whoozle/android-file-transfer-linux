@@ -185,20 +185,8 @@ namespace mtp
 		return nullptr;
 	}
 
-	std::string Device::GetDeviceDescription()
-	{
-		auto di = Session::GetDeviceInfo(_packeter);
-		return di.Manufacturer + ":" + di.Model + ":" + di.SerialNumber;
-	}
-
-	bool Device::DeviceDescriptionMatches(const std::string & filter_)
-	{
-		std::string desc = GetDeviceDescription();
-		std::transform(desc.begin(), desc.end(), desc.begin(), ::tolower);
-		std::string filter = filter_;
-		std::transform(filter.begin(), filter.end(), filter.begin(), ::tolower);
-		return desc.find(filter) != desc.npos;
-	}
+	msg::DeviceInfo Device::GetInfo()
+	{ return Session::GetDeviceInfo(_packeter); }
 
 
 }

@@ -191,8 +191,12 @@ int main(int argc, char **argv)
 			try
 			{
 				auto device = Device::Open(ctx, desc, claimInterface, resetDevice);
-				if (device && device->DeviceDescriptionMatches(deviceFilter))
-					print(device->GetDeviceDescription());
+				if (device) {
+					auto di = device->GetInfo();
+					if (di.Matches(deviceFilter)) {
+						print(di.GetFilesystemFriendlyName());
+					}
+				}
 			}
 			catch (const std::exception & ex)
 			{ error("Device::Find failed:", ex.what()); }
@@ -208,6 +212,14 @@ int main(int argc, char **argv)
 			auto device = Device::Open(ctx, desc, claimInterface, resetDevice);
 			if (!device)
 				continue;
+
+			if (!deviceFilter.empty()) {
+				auto di = device->GetInfo();
+				if (!di.Matches(deviceFilter)) {
+					debug("got device info, filter does not match");
+					continue;
+				}
+			}
 
 			session = std::make_shared<cli::Session>(device->OpenSession(1), showPrompt);
 			if (session->SetFirstStorage())
