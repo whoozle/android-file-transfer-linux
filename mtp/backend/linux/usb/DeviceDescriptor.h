@@ -57,6 +57,7 @@ namespace mtp { namespace usb
 		std::string						_path;
 		u16								_vendor, _product;
 		int								_deviceNumber;
+		int								_configurationValue;
 		std::map<int, ConfigurationPtr>	_configurationMap;
 		std::vector<ConfigurationPtr>	_configuration;
 		EndpointPtr						_controlEp;

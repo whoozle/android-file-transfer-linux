@@ -28,10 +28,6 @@ namespace mtp { namespace usb
 	BulkPipe::BulkPipe(DevicePtr device, ConfigurationPtr conf, InterfacePtr interface, EndpointPtr in, EndpointPtr out, EndpointPtr interrupt, ITokenPtr claimToken):
 		_device(device), _conf(conf), _interface(interface), _in(in), _out(out), _interrupt(interrupt), _claimToken(claimToken)
 	{
-		int currentConfigurationIndex = _device->GetConfiguration();
-		if (conf->GetIndex() != currentConfigurationIndex)
-			_device->SetConfiguration(conf->GetIndex());
-
 		try
 		{ device->ClearHalt(in); }
 		catch(const std::exception & ex)

@@ -68,7 +68,8 @@ namespace mtp { namespace usb
 	}
 
 
-	Device::Device(int fd, const EndpointPtr &controlEp): _fd(fd), _capabilities(0), _controlEp(controlEp)
+	Device::Device(int fd, const EndpointPtr &controlEp, u8 configuration):
+		_fd(fd), _capabilities(0), _controlEp(controlEp), _configuration(configuration)
 	{
 		try { IOCTL(_fd.Get(), USBDEVFS_GET_CAPABILITIES, &_capabilities); }
 		catch(const std::exception &ex)
@@ -108,20 +109,24 @@ namespace mtp { namespace usb
 	{
 		debug("resetting device...");
 		try
-		{ IOCTL(_fd.Get(), USBDEVFS_RESET); }
+		{
+			IOCTL(_fd.Get(), USBDEVFS_RESET);
+			SetConfiguration(_configuration);
+		}
 		catch(const std::exception &ex)
 		{ error("resetting device failed: ", ex.what()); }
 	}
 
 	int Device::GetConfiguration() const
 	{
-		return 0;
+		return _configuration;
 	}
 
 	void Device::SetConfiguration(int idx)
 	{
-		error("SetConfiguration(", idx, "): not implemented");
-		//IOCTL(_fd.Get(), USBDEVFS_SETCONFIGURATION, &idx); //this will crash your device forever
+		debug("SetConfiguration(", idx, ")");
+		IOCTL(_fd.Get(), USBDEVFS_SETCONFIGURATION, &idx);
+		_configuration = idx;
 	}
 
 	struct Device::Urb : usbdevfs_urb, Noncopyable

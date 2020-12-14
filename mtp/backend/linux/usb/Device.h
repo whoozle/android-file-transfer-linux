@@ -53,6 +53,7 @@ namespace mtp { namespace usb
 		posix::FileHandler			_fd;
 		u32							_capabilities;
 		EndpointPtr					_controlEp;
+		u8							_configuration;
 		BufferAllocatorPtr			_bufferAllocator;
 
 		struct Urb;
@@ -60,7 +61,7 @@ namespace mtp { namespace usb
 		std::queue<std::function<void ()>>	_controls;
 
 	public:
-		Device(int fd, const EndpointPtr &controlEp);
+		Device(int fd, const EndpointPtr &controlEp, u8 configuration);
 		~Device();
 
 		InterfaceTokenPtr ClaimInterface(const InterfacePtr & interface)

@@ -75,6 +75,13 @@ namespace mtp
 	{
 		debug("probing device ", hex(desc->GetVendorId(), 4), ":", hex(desc->GetProductId(), 4));
 		usb::DevicePtr device = desc->TryOpen(ctx);
+
+		if (resetDevice && device) {
+			device->Reset();
+			device.reset();
+			device = desc->TryOpen(ctx);
+		}
+
 		if (!device) {
 			debug("descriptor->TryOpen() failed");
 			return nullptr;
@@ -101,7 +108,7 @@ namespace mtp
 			{
 				usb::InterfacePtr iface = conf->GetInterface(device, conf, j, 0);
 				usb::InterfaceTokenPtr token = claimInterface? device->ClaimInterface(iface): nullptr;
-				debug("Device usb interface: ", i, ':', j, ", index: ", iface->GetIndex(), ", enpoints: ", iface->GetEndpointsCount());
+				debug("Device usb interface: ", i, ':', j, ", index: ", iface->GetIndex(), ", endpoints: ", iface->GetEndpointsCount());
 
 #ifdef USB_BACKEND_LIBUSB
 				std::string name = iface->GetName();
@@ -135,7 +142,8 @@ namespace mtp
 				catch (const std::exception & ex)
 				{ debug("winusb handshake failed: ", ex.what()); }
 
-				if (name.find("MTP") == name.npos)  {
+				if (name.find("MTP") == name.npos)
+				{
 					auto interfaceStringIndex = GetInterfaceStringIndex(desc, j);
 					data = usb::DeviceRequest(device).GetDescriptor(usb::DescriptorType::String, interfaceStringIndex, langId);
 					HexDump("interface name", data);
@@ -149,10 +157,6 @@ namespace mtp
 #endif
 				if (name.find("MTP") != name.npos)
 				{
-					//device->SetConfiguration(configuration->GetIndex());
-					if (resetDevice)
-						device->Reset();
-
 					usb::BulkPipePtr pipe = usb::BulkPipe::Create(device, conf, iface, token);
 					return std::make_shared<Device>(pipe);
 				} else
