@@ -47,7 +47,7 @@ namespace mtp { namespace usb
 	void Device::ClearHalt(const EndpointPtr & ep)
 	{
 		IOUSBInterfaceInterface	** interface = ep->GetInterfaceHandle();
-		USB_CALL((*interface)->ClearPipeStallBothEnds(interface, ep->GetRefIndex()));
+		USB_CALL((*interface)->ClearPipeStall(interface, ep->GetRefIndex()));
 	}
 
 	void Device::WriteBulk(const EndpointPtr & ep, const IObjectInputStreamPtr &inputStream, int timeout)
