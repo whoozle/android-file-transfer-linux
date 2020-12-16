@@ -78,16 +78,9 @@ namespace mtp { namespace msg
 
 		std::string GetFilesystemFriendlyName() const;
 
-		static bool Matches(const std::string & haystack, const std::string & needle)
-		{ return strcasestr(haystack.c_str(), needle.c_str()); }
+		static bool Matches(const std::string & haystack, const std::string & needle);
 
-		bool Matches(const std::string & filter) const
-		{
-			if (filter.empty())
-				return true;
-			auto fsname = GetFilesystemFriendlyName();
-			return Matches(fsname, filter);
-		}
+		bool Matches(const std::string & filter) const;
 	};
 
 	struct ObjectHandles //! MTP ObjectHandles message

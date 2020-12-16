@@ -29,6 +29,18 @@ namespace mtp { namespace msg
 		return i != ImageFormats.end();
 	}
 
+	bool DeviceInfo::Matches(const std::string & haystack, const std::string & needle)
+	{ return strcasestr(haystack.c_str(), needle.c_str()); }
+
+	bool DeviceInfo::Matches(const std::string & filter) const
+	{
+		if (filter.empty())
+			return true;
+		auto fsname = GetFilesystemFriendlyName();
+		return Matches(fsname, filter);
+	}
+
+
 	namespace
 	{
 		std::string Strip(std::string str)
