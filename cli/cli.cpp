@@ -213,12 +213,9 @@ int main(int argc, char **argv)
 			if (!device)
 				continue;
 
-			if (!deviceFilter.empty()) {
-				auto di = device->GetInfo();
-				if (!di.Matches(deviceFilter)) {
-					debug("got device info, filter does not match");
-					continue;
-				}
+			if (!device->Matches(deviceFilter)) {
+				debug("got device info, filter does not match");
+				continue;
 			}
 
 			session = std::make_shared<cli::Session>(device->OpenSession(1), showPrompt);

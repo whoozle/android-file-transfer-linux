@@ -192,5 +192,13 @@ namespace mtp
 	msg::DeviceInfo Device::GetInfo()
 	{ return Session::GetDeviceInfo(_packeter); }
 
+	bool Device::Matches(const std::string & filter)
+	{
+		if (filter.empty())
+			return true;
+
+		auto di = GetInfo();
+		return di.Matches(filter);
+	}
 
 }

@@ -36,7 +36,11 @@ namespace mtp
 
 	public:
 		Device(usb::BulkPipePtr pipe);
+
 		msg::DeviceInfo GetInfo();
+
+		///This could be very expensive, it calls GetDeviceInfo
+		bool Matches(const std::string & filter);
 
 		SessionPtr OpenSession(u32 sessionId, int timeout = Session::DefaultTimeout);
 
