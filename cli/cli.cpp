@@ -205,33 +205,26 @@ int main(int argc, char **argv)
 	}
 	cli::SessionPtr session;
 
-	for (usb::DeviceDescriptorPtr desc : ctx->GetDevices())
+	try
 	{
-		try
+		auto device = Device::FindFirst(ctx, deviceFilter, claimInterface, resetDevice);
+		if (!device)
 		{
-			auto device = Device::Open(ctx, desc, claimInterface, resetDevice);
-			if (!device)
-				continue;
-
-			if (!device->Matches(deviceFilter)) {
-				debug("got device info, filter does not match");
-				continue;
-			}
-
-			session = std::make_shared<cli::Session>(device->OpenSession(1), showPrompt);
-			if (session->SetFirstStorage())
-				break;
-
-			else
-			{
-				error("your device may be locked or does not have any storage available");
-				session.reset();
-				device.reset();
-			}
+			error("device not found (filter = '", deviceFilter, "'");
+			exit(1);
 		}
-		catch(const std::exception &ex)
-		{ error("Device::Find failed:", ex.what()); }
+
+		session = std::make_shared<cli::Session>(device->OpenSession(1), showPrompt);
+		if (!session->SetFirstStorage())
+		{
+			error("your device may be locked or does not have any storage available");
+			session.reset();
+			device.reset();
+		}
 	}
+	catch(const std::exception &ex)
+	{ error("Device::Find failed:", ex.what()); }
+
 	ctx.reset();
 	if (!session)
 		exit(1);

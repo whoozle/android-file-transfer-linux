@@ -45,6 +45,7 @@ namespace mtp
 		SessionPtr OpenSession(u32 sessionId, int timeout = Session::DefaultTimeout);
 
 		static DevicePtr Open(usb::ContextPtr context, usb::DeviceDescriptorPtr desc, bool claimInterface = true, bool resetDevice = false); //fixme: add flags here
+		static DevicePtr FindFirst(usb::ContextPtr context, const std::string & filter = std::string(), bool claimInterface = true, bool resetDevice = false);
 		static DevicePtr FindFirst(const std::string & filter = std::string(), bool claimInterface = true, bool resetDevice = false);
 	};
 }

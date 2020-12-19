@@ -153,7 +153,7 @@ PYBIND11_MODULE(aftl, m) {
 	;
 
 	py::class_<Device, DevicePtr>(m, "Device").
-		def_static("find_first", &Device::FindFirst,
+		def_static("find_first", static_cast<DevicePtr (*)(const std::string &, bool claimInterface, bool)>(&Device::FindFirst),
 			py::arg("filter_device") = std::string(), py::arg("claim_interface") = true, py::arg("reset_device") = false).
 		def("open_session", &Device::OpenSession,
 			py::arg("session_id") = 1, py::arg("timeout") = static_cast<int>(Session::DefaultTimeout))
