@@ -434,6 +434,8 @@ namespace
 				_storageToName[id] = path;
 			}
 		}
+		std::string GetMountpoint()
+		{ return _session->GetDeviceInfo().GetFilesystemFriendlyName(); }
 
 		void Init(void *, fuse_conn_info *conn)
 		{
@@ -811,19 +813,41 @@ int main(int argc, char **argv)
 	std::string deviceFilter;
 	bool claimInterface = true;
 	bool resetDevice = false;
+	bool showHelp = false;
+
+	std::vector<char *> args;
+	args.push_back(argv[0]);
+
 	for(int i = 1; i < argc; ++i)
 	{
 		if (strcmp(argv[i], "-R") == 0)
 			resetDevice = false;
 		else if (strcmp(argv[i], "-C") == 0)
 			claimInterface = false;
-		else if (strcmp(argv[i], "-v") == 0 || strcmp(argv[i], "-odebug") == 0)
+		else if (strcmp(argv[i], "-d") == 0 || strcmp(argv[i], "-odebug") == 0)
+		{
+			args.push_back(argv[i]);
 			mtp::g_debug = true;
+		}
 		else if (i + 1 < argc && strcmp(argv[i], "-o") == 0 && strcmp(argv[i + 1], "debug") == 0)
+		{
 			mtp::g_debug = true;
-		else if (i + 1 < argc && strcmp(argv[i], "-d") == 0)
+			args.push_back(argv[i]);
+		}
+		else if (i + 1 < argc && strcmp(argv[i], "-D") == 0)
+		{
 			deviceFilter = argv[i + 1];
+			++i;
+		}
+		else if (strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-h") == 0)
+		{
+			args.push_back(argv[i]);
+			showHelp = true;
+		} else
+			args.push_back(argv[i]);
 	}
+
+	args.push_back(nullptr);
 
 	try
 	{ g_wrapper.reset(new FuseWrapper(deviceFilter, claimInterface, resetDevice)); }
@@ -849,34 +873,49 @@ int main(int argc, char **argv)
 	ops.unlink		= &Unlink;
 	ops.statfs		= &StatFS;
 
-	struct fuse_args args = FUSE_ARGS_INIT(argc, argv);
+	struct fuse_args fuse_args = FUSE_ARGS_INIT(static_cast<int>(args.size() - 1), args.data());
 	struct fuse_chan *ch;
 	char *mountpoint;
 	int err = -1;
 	int multithreaded = 0, foreground = 0;
 
-	if (fuse_parse_cmdline(&args, &mountpoint, &multithreaded, &foreground) != -1 &&
-	    mountpoint != NULL &&
-	    (ch = fuse_mount(mountpoint, &args)) != NULL) {
-		struct fuse_session *se;
-
-		se = fuse_lowlevel_new(&args, &ops,
-				       sizeof(ops), NULL);
-		if (se != NULL) {
-			if (fuse_set_signal_handlers(se) != -1)
-			{
-				fuse_session_add_chan(se, ch);
-				if (fuse_daemonize(foreground) == -1)
-					perror("fuse_daemonize");
-				err = (multithreaded? fuse_session_loop_mt: fuse_session_loop)(se);
-				fuse_remove_signal_handlers(se);
-				fuse_session_remove_chan(ch);
-			}
-			fuse_session_destroy(se);
+	if (fuse_parse_cmdline(&fuse_args, &mountpoint, &multithreaded, &foreground) != -1)
+	{
+		if (!mountpoint)
+		{
+			auto mp = g_wrapper->GetMountpoint();
+			mountpoint = strdup(mp.c_str());
+			mkdir(mountpoint, 0700);
 		}
-		fuse_unmount(mountpoint, ch);
+
+	    if (mountpoint != NULL && (ch = fuse_mount(mountpoint, &fuse_args)) != NULL)
+		{
+			struct fuse_session *se = fuse_lowlevel_new(&fuse_args, &ops, sizeof(ops), NULL);
+			if (se != NULL)
+			{
+				if (fuse_set_signal_handlers(se) != -1)
+				{
+					fuse_session_add_chan(se, ch);
+					if (fuse_daemonize(foreground) == -1)
+						perror("fuse_daemonize");
+					err = (multithreaded? fuse_session_loop_mt: fuse_session_loop)(se);
+					fuse_remove_signal_handlers(se);
+					fuse_session_remove_chan(ch);
+				}
+				fuse_session_destroy(se);
+			}
+			fuse_unmount(mountpoint, ch);
+		}
+	} else {
+		if (showHelp) {
+			mtp::print("Additional AFT options: ");
+			mtp::print("    -R                     reset device");
+			mtp::print("    -C                     do not claim USB interface");
+			mtp::print("    -v                     AFT verbose output");
+		} else
+			mtp::error("fuse_parse_cmdline failed");
 	}
-	fuse_opt_free_args(&args);
+	fuse_opt_free_args(&fuse_args);
 
 	return err ? 1 : 0;
 }
