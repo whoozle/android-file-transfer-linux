@@ -30,7 +30,7 @@
 #include <QMimeData>
 #include <QUrl>
 
-#include <mtp/ptp/MemoryObjectStream.h>
+#include <mtp/ptp/ByteArrayObjectStream.h>
 #include <cli/PosixStreams.h> //for mtime
 
 MtpObjectsModel::MtpObjectsModel(QObject *parent):
@@ -130,21 +130,21 @@ MtpObjectsModel::ThumbnailPtr MtpObjectsModel::Row::GetThumbnail(mtp::SessionPtr
 {
 	if (!_thumbnail)
 	{
-		auto stream = std::make_shared<mtp::MemoryObjectOutputStream>();
+		auto stream = std::make_shared<mtp::ByteArrayObjectOutputStream>();
 		_thumbnail = std::make_shared<QPixmap>();
 		try
 		{
 			qDebug() << "requesting thumbnail for " << ObjectId.Id;
 			session->GetThumb(ObjectId, stream);
 
-			auto data = stream->GetData();
+			auto & data = stream->GetData();
 			QPixmap pixmap;
-			if (!pixmap.loadFromData(data->data(), data->size()))
+			if (!pixmap.loadFromData(data.data(), data.size()))
 				throw std::runtime_error("couldn't load pixmap");
 
 			*_thumbnail = pixmap.scaled(maxSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
-			qDebug() << "loaded " << data->size() << " bytes of thumbnail data";
+			qDebug() << "loaded " << data.size() << " bytes of thumbnail data";
 		}
 		catch(const std::exception &ex)
 		{
