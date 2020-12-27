@@ -138,6 +138,8 @@ namespace mtp
 #endif
 
 		scoped_mutex_lock l(_mutex);
+		if (!_deviceInfo.Supports(code))
+			throw std::runtime_error("Operation code " + ToString(code) + " not supported.");
 		Transaction transaction(this);
 		Send(OperationRequest(code, transaction.Id, std::forward<Args>(args) ... ), timeout);
 		if (inputStream)
