@@ -50,6 +50,7 @@ namespace mtp
 		bool			_getPartialObject64Supported;
 		bool			_editObjectSupported;
 		bool			_getObjectPropertyListSupported;
+		bool			_getObjectPropValueSupported;
 		bool			_getObjectModificationTimeBuggy;
 		bool			_separateBulkWrites;
 		int				_defaultTimeout;

@@ -53,6 +53,7 @@ namespace mtp
 
 		_getPartialObject64Supported = _deviceInfo.Supports(OperationCode::GetPartialObject64);
 		_getObjectPropertyListSupported = _deviceInfo.Supports(OperationCode::GetObjectPropList);
+		_getObjectPropValueSupported = _deviceInfo.Supports(OperationCode::GetObjectPropValue);
 		_editObjectSupported = _deviceInfo.Supports(OperationCode::BeginEditObject) &&
 			_deviceInfo.Supports(OperationCode::EndEditObject) &&
 			_deviceInfo.Supports(OperationCode::TruncateObject) &&
@@ -367,7 +368,45 @@ namespace mtp
 	{ return RunTransaction(_defaultTimeout, OperationCode::GetObjectPropValue, objectId.Id, (u16)property); }
 
 	u64 Session::GetObjectIntegerProperty(ObjectId objectId, ObjectProperty property)
-	{ return ReadSingleInteger(GetObjectProperty(objectId, property)); }
+	{
+		if (!_getObjectPropValueSupported) {
+			auto info = GetObjectInfo(objectId);
+			switch(property)
+			{
+				case ObjectProperty::StorageId:
+					return info.StorageId.Id;
+				case ObjectProperty::ObjectFormat:
+					return static_cast<u32>(info.ObjectFormat);
+				case ObjectProperty::ProtectionStatus:
+					return info.ProtectionStatus;
+				case ObjectProperty::ObjectSize:
+					return info.ObjectCompressedSize;
+				case ObjectProperty::RepresentativeSampleFormat:
+					return info.ThumbFormat;
+				case ObjectProperty::RepresentativeSampleSize:
+					return info.ThumbCompressedSize;
+				case ObjectProperty::RepresentativeSampleWidth:
+					return info.ThumbPixWidth;
+				case ObjectProperty::RepresentativeSampleHeight:
+					return info.ThumbPixHeight;
+				case ObjectProperty::Width:
+					return info.ImagePixWidth;
+				case ObjectProperty::Height:
+					return info.ImagePixHeight;
+				case ObjectProperty::ImageBitDepth:
+					return info.ImageBitDepth;
+				case ObjectProperty::ParentObject:
+					return info.ParentObject.Id;
+				case ObjectProperty::AssociationType:
+					return static_cast<u32>(info.AssociationType);
+				case ObjectProperty::AssociationDesc:
+					return info.AssociationDesc;
+				default:
+					throw std::runtime_error("Device does not support object properties and no ObjectInfo fallback for " + ToString(property) + ".");
+			}
+		}
+		return ReadSingleInteger(GetObjectProperty(objectId, property));
+	}
 
 	void Session::SetObjectProperty(ObjectId objectId, ObjectProperty property, u64 value)
 	{
@@ -400,6 +439,22 @@ namespace mtp
 
 	std::string Session::GetObjectStringProperty(ObjectId objectId, ObjectProperty property)
 	{
+		if (!_getObjectPropValueSupported) {
+			auto info = GetObjectInfo(objectId);
+			switch(property)
+			{
+				case ObjectProperty::ObjectFilename:
+					return info.Filename;
+				case ObjectProperty::DateCreated:
+				case ObjectProperty::DateAuthored:
+				case ObjectProperty::DateAdded:
+					return info.CaptureDate;
+				case ObjectProperty::DateModified:
+					return info.ModificationDate;
+				default:
+					throw std::runtime_error("Device does not support object properties and no ObjectInfo fallback for " + ToString(property) + ".");
+			}
+		}
 		return ReadSingleString(GetObjectProperty(objectId, property));
 	}
 
