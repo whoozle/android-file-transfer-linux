@@ -62,6 +62,9 @@ namespace mtp
 		const ByteArray &GetData() const
 		{ return _data; }
 
+		ByteArray &GetData()
+		{ return _data; }
+
 		size_t Write(const u8 *data, size_t size) override
 		{
 			CheckCancelled();

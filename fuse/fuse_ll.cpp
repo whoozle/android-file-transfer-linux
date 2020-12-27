@@ -35,6 +35,7 @@
 #include <set>
 #include <vector>
 #include <functional>
+#include <list>
 #include <stdio.h>
 
 #include <fuse_lowlevel.h>
@@ -53,10 +54,14 @@ namespace
 		mtp::SessionPtr	_session;
 		bool			_editObjectSupported;
 		bool			_getObjectPropertyListSupported;
+		bool			_getPartialObjectSupported;
 		time_t			_connectTime;
+		size_t			_partialObjectCacheSize;
 
-		typedef std::map<std::string, FuseId> ChildrenObjects;
-		typedef std::map<FuseId, ChildrenObjects> Files;
+		static constexpr size_t DefaultPartialObjectCacheSize = 3; //just 3 object entries.
+
+		using ChildrenObjects = std::map<std::string, FuseId>;
+		using Files = std::map<FuseId, ChildrenObjects>;
 		Files			_files;
 
 		typedef std::map<mtp::ObjectId, struct stat> ObjectAttrs;
@@ -75,6 +80,21 @@ namespace
 		std::vector<mtp::StorageId>					_storageIdList;
 		std::map<mtp::StorageId, std::string>		_storageToName;
 		std::map<std::string, mtp::StorageId>		_storageFromName;
+
+		struct ObjectCacheEntry
+		{
+			mtp::ObjectId 	Id;
+			mtp::ByteArray 	Data;
+
+			ObjectCacheEntry()
+			{ }
+
+			ObjectCacheEntry(mtp::ObjectId id, mtp::ByteArray && data): Id(id), Data(std::move(data))
+			{ }
+		};
+
+		using ObjectCache = std::list<ObjectCacheEntry>;
+		ObjectCache 								_objectCache;
 
 	private:
 		static FuseId ToFuse(mtp::ObjectId id)
@@ -283,8 +303,6 @@ namespace
 					catch(const std::exception &ex)
 					{ }
 
-
-
 					return cache;
 				}
 			}
@@ -381,7 +399,7 @@ namespace
 
 	public:
 		FuseWrapper(const std::string & deviceFilter, bool claimInterface, bool resetDevice):
-			_deviceFilter(deviceFilter), _claimInterface(claimInterface), _resetDevice(resetDevice)
+			_deviceFilter(deviceFilter), _claimInterface(claimInterface), _resetDevice(resetDevice), _partialObjectCacheSize(DefaultPartialObjectCacheSize)
 		{ Connect(); }
 
 		void Connect()
@@ -401,10 +419,13 @@ namespace
 			_session = _device->OpenSession(1);
 			_editObjectSupported = _session->EditObjectSupported();
 			if (!_editObjectSupported)
-				mtp::error("your device does not have android EditObject extension, mounting read-only\n");
+				mtp::error("your device does not have android EditObject extension, mounting read-only");
 			_getObjectPropertyListSupported = _session->GetObjectPropertyListSupported();
 			if (!_getObjectPropertyListSupported)
-				mtp::error("your device does not have GetObjectPropertyList extension, expect slow enumeration of big directories\n");
+				mtp::error("your device does not have GetObjectPropertyList extension, expect slow enumeration of big directories");
+			_getPartialObjectSupported = _session->GetDeviceInfo().Supports(mtp::OperationCode::GetPartialObject);
+			if (!_getPartialObjectSupported)
+				mtp::error("your device does not have GetPartialObject extension (beware, this will download the latest N objects you accessed and keep them in a small in-memory cache)");
 
 			_connectTime = time(NULL);
 			PopulateStorages();
@@ -534,9 +555,48 @@ namespace
 			off_t rsize = std::min<off_t>(attr.st_size - begin, size);
 			mtp::debug("reading ", rsize, " bytes");
 			mtp::ByteArray data;
+			auto objectId = FromFuse(ino);
 			if (rsize > 0)
-				data = _session->GetPartialObject(FromFuse(ino), begin, rsize);
-			mtp::debug("read", data.size(), "bytes of data");
+			{
+				if (!_getPartialObjectSupported)
+				{
+					std::size_t size = 0;
+
+					ObjectCache::iterator it;
+					for(it = _objectCache.begin(); it != _objectCache.end(); ++it, ++size)
+					{
+						auto & entry = *it;
+						if (entry.Id == objectId)
+						{
+							mtp::debug("in-memory cache hit");
+							auto src = entry.Data.data() + begin;
+							std::copy(src, src + rsize, std::back_inserter(data));
+							if (it != _objectCache.begin())
+								std::swap(*_objectCache.begin(), *it);
+							break;
+						}
+					}
+					if (it == _objectCache.end())
+					{
+						mtp::debug("in-memory cache miss");
+						auto stream = std::make_shared<mtp::ByteArrayObjectOutputStream>();
+						_session->GetObject(objectId, stream);
+						auto src = stream->GetData().data() + begin;
+						std::copy(src, src + rsize, std::back_inserter(data));
+						_objectCache.emplace_front(objectId, std::move(stream->GetData()));
+						++size;
+					}
+
+					while (size > _partialObjectCacheSize)
+					{
+						mtp::debug("purging last entry from cache...");
+						_objectCache.pop_back();
+						--size;
+					}
+				} else
+					data = _session->GetPartialObject(objectId, begin, rsize);
+			}
+			mtp::debug("read ", data.size(), " bytes of data");
 			FUSE_CALL(fuse_reply_buf(req, static_cast<char *>(static_cast<void *>(data.data())), data.size()));
 		}
 
