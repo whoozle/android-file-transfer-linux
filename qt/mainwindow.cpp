@@ -450,6 +450,12 @@ void MainWindow::showEvent(QShowEvent *)
 		}
 
 		tryCreateLibrary();
+
+		bool canUpload = _session->GetDeviceInfo().Supports(mtp::OperationCode::SendObjectInfo);
+		_ui->actionCreateDirectory->setVisible(canUpload);
+		_ui->actionUploadAlbum->setVisible(canUpload);
+		_ui->actionUploadDirectory->setVisible(canUpload);
+		_ui->actionUpload->setVisible(canUpload);
 	}
 }
 
