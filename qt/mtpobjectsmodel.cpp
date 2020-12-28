@@ -134,7 +134,11 @@ MtpObjectsModel::ThumbnailPtr MtpObjectsModel::Row::GetThumbnail(mtp::SessionPtr
 		_thumbnail = std::make_shared<QPixmap>();
 		try
 		{
-			qDebug() << "requesting thumbnail for " << ObjectId.Id;
+			auto format = GetInfo(session)->ThumbFormat;
+			if (format == 0)
+				throw std::runtime_error("invalid thumbnail format");
+
+			qDebug() << "requesting thumbnail for " << ObjectId.Id << ", format: " << format;
 			session->GetThumb(ObjectId, stream);
 
 			auto & data = stream->GetData();
