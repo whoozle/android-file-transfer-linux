@@ -41,6 +41,7 @@ https://www.paypal.me/whoozle
 * No extra dependencies (e.g. `libptp`/`libmtp`).
 * Available as static/shared library.
 * Command line tool (aft-mtp-cli)
+* Python bindings
 
 ## FAQ
 [Please take a look at FAQ if you have issues with your operating system](FAQ.md). It's not that big, but those are the questions asked very often. 
