@@ -41,6 +41,7 @@ namespace mtp { namespace usb
 
 		void Kill() const;
 		static void Kill(const ProcessDescriptor & desc);
+		static void Kill(const std::vector<ProcessDescriptor> & processes);
 	};
 
 }}

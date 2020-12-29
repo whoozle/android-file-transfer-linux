@@ -126,8 +126,10 @@ namespace mtp { namespace usb
 	}
 
 	void DeviceBusyException::Kill() const
+	{ Kill(Processes); }
+	void DeviceBusyException::Kill(const std::vector<ProcessDescriptor> & processes)
 	{
-		for(auto desc : Processes)
+		for(auto & desc : processes)
 		{
 			try
 			{ Kill(desc); }
