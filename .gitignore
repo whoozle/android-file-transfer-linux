@@ -5,6 +5,5 @@ CMakeCache*
 nbproject
 build
 *.user
-aft-*
 doc
 .vscode
