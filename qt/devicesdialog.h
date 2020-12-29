@@ -38,6 +38,7 @@ private slots:
 	void scan();
 	void kill();
 	void itemClicked(QListWidgetItem *);
+	void itemDoubleClicked(QListWidgetItem *);
 	void updateButtons();
 
 private:

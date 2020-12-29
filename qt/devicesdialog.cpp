@@ -18,6 +18,7 @@ DevicesDialog::DevicesDialog(bool resetDevice, QWidget *parent) :
 	_buttonScan = ui->buttonBox->addButton(tr("Rescan Devices"), QDialogButtonBox::ActionRole);
 	_buttonKill = ui->buttonBox->addButton(tr("Kill Users"), QDialogButtonBox::ActionRole);
 	connect(ui->listWidget, SIGNAL(itemClicked(QListWidgetItem *)), SLOT(itemClicked(QListWidgetItem *)));
+	connect(ui->listWidget, SIGNAL(itemDoubleClicked(QListWidgetItem *)), SLOT(itemDoubleClicked(QListWidgetItem *)));
 	connect(_buttonScan, SIGNAL(clicked()), SLOT(scan()));
 	connect(_buttonKill, SIGNAL(clicked()), SLOT(kill()));
 }
@@ -161,6 +162,9 @@ void DevicesDialog::updateButtons()
 
 void DevicesDialog::itemClicked(QListWidgetItem *)
 { updateButtons(); }
+
+void DevicesDialog::itemDoubleClicked(QListWidgetItem *)
+{ updateButtons(); accept(); }
 
 DevicesDialog::~DevicesDialog()
 {
