@@ -25,6 +25,7 @@
 #include "mtpobjectsmodel.h"
 #include "mtpstoragesmodel.h"
 #include "fileuploader.h"
+#include "devicesdialog.h"
 #include "utils.h"
 #include <mtp/metadata/Library.h>
 #include <mtp/mtpz/TrustedApp.h>
@@ -33,7 +34,6 @@
 #include <mtp/usb/TimeoutException.h>
 #include <mtp/usb/DeviceBusyException.h>
 #include <mtp/usb/DeviceNotFoundException.h>
-#include <usb/Context.h>
 #include <QClipboard>
 #include <QDebug>
 #include <QSortFilterProxyModel>
@@ -227,82 +227,13 @@ bool MainWindow::reconnectToDevice()
 {
 	_session.reset();
 	_device.reset();
-	bool claimInterface = true;
-	bool resetDevice = _resetDevice;
 
-	mtp::usb::ContextPtr ctx(new mtp::usb::Context);
-
-	auto devices = ctx->GetDevices();
-	for (auto desc = devices.begin(); desc != devices.end();)
 	{
-		qDebug("probing device...");
-		try
-		{
-			_device = mtp::Device::Open(ctx, *desc, claimInterface, resetDevice);
-			++desc;
-		}
-		catch(const mtp::usb::DeviceBusyException &ex)
-		{
-			bool canKill = !ex.Processes.empty();
-			QString processList;
-			for (auto & desc : ex.Processes)
-			{
-				processList += QString("%1 (pid: %2)\n").arg(fromUtf8(desc.Name)).arg(desc.Id);
-			}
-			if (canKill)
-				processList = tr("The following processes are keeping file descriptors for your device:\n") + processList;
-
-			QMessageBox dialog(
-				QMessageBox::Warning,
-				tr("Device is busy"),
-				tr("Device is busy, maybe another process is using it.\n\n") +
-				processList +
-				tr("Close other MTP applications and restart Android File Transfer.\n"
-				"\nPress Abort to kill them or Ignore to try next device."),
-				(canKill? QMessageBox::Abort: QMessageBox::StandardButton(0)) | QMessageBox::Ignore,
-				this
-			);
-
-			dialog.setDefaultButton(QMessageBox::Ignore);
-			dialog.setEscapeButton(QMessageBox::Ignore);
-			auto r = dialog.exec();
-
-			if ((r & QMessageBox::Abort) == QMessageBox::Abort)
-			{
-				qDebug("kill'em all");
-				ex.Kill();
-				qDebug("retrying..."); //do not increment desc, retry device
-			}
-			if ((r & QMessageBox::Ignore) == QMessageBox::Ignore)
-				++desc;
-		}
-		catch(const std::exception &ex)
-		{
-			qWarning("Device::Find failed: %s", ex.what());
-			QMessageBox dialog(
-				QMessageBox::Warning,
-				tr("Device::Find failed"),
-				tr(
-					"MTP device could not be opened at the moment\n\nFailure: %1\n"
-					"Press Reset to reset them or Ignore to try next device.").arg(fromUtf8(ex.what())),
-				QMessageBox::Reset | QMessageBox::Ignore,
-				this
-			);
-			dialog.setDefaultButton(QMessageBox::Ignore);
-			dialog.setEscapeButton(QMessageBox::Ignore);
-			auto r = dialog.exec();
-
-			if ((r & QMessageBox::Reset) == QMessageBox::Reset)
-			{
-				qDebug("retry with reset...");
-				resetDevice = true;
-			}
-			if ((r & QMessageBox::Ignore) == QMessageBox::Ignore)
-				++desc;
-		}
-
-		if (_device)
-			break;
+		DevicesDialog dialog(_resetDevice, this);
+		int r = dialog.exec();
+		if (r == QDialog::Rejected)
+			return false;
+		_device = dialog.getDevice();
 	}
 
 	if (!_device)
