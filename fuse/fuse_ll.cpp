@@ -967,13 +967,14 @@ int main(int argc, char **argv)
 			fuse_unmount(mountpoint, ch);
 		}
 	} else {
-		if (showHelp) {
-			mtp::print("Additional AFT options: ");
-			mtp::print("    -R                     reset device");
-			mtp::print("    -C                     do not claim USB interface");
-			mtp::print("    -v                     AFT verbose output");
-		} else
-			mtp::error("fuse_parse_cmdline failed");
+		mtp::error("fuse_parse_cmdline failed");
+	}
+	if (showHelp) {
+		mtp::print();
+		mtp::print("Additional AFT options: ");
+		mtp::print("    -R                     reset device");
+		mtp::print("    -C                     do not claim USB interface");
+		mtp::print("    -v                     AFT verbose output");
 	}
 	fuse_opt_free_args(&fuse_args);
 
