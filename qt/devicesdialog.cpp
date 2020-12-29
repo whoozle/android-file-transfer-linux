@@ -147,6 +147,11 @@ int DevicesDialog::exec()
 	if (_devices.empty())
 		return QDialog::Rejected;
 
+	if (_devices.size() == 1 && _devices.front().Device)
+	{
+		return QDialog::Accepted;
+	}
+
 	return QDialog::exec();
 }
 
