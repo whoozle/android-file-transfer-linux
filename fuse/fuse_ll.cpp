@@ -419,7 +419,7 @@ namespace
 			_session = _device->OpenSession(1);
 			_editObjectSupported = _session->EditObjectSupported();
 			if (!_editObjectSupported)
-				mtp::error("your device does not have android EditObject extension, mounting read-only");
+				mtp::error("your device does not have android EditObject extension, you will not be able to write into individual files");
 			_getObjectPropertyListSupported = _session->GetObjectPropertyListSupported();
 			if (!_getObjectPropertyListSupported)
 				mtp::error("your device does not have GetObjectPropertyList extension, expect slow enumeration of big directories");
