@@ -8,14 +8,14 @@
     data from/to your MTP device. Git version has experimental Zune support.
 
   grade: stable # must be 'stable' to release into candidate/stable channels
-  confinement: classic # use 'strict' once you have the right plugs and slots
+  confinement: strict # use 'strict' once you have the right plugs and slots
   base: core18
 
   apps:
     android-file-transfer:
       command: bin/desktop-launch android-file-transfer
       desktop: share/applications/android-file-transfer.desktop
-      plugs: [x11, network, network-bind, desktop, gsettings, wayland]
+      plugs: [x11, network, network-bind, desktop, gsettings, wayland, raw-usb]
       environment:
         # Use GTK3 cursor theme, icon theme and open/save file dialogs.
         QT_QPA_PLATFORMTHEME: gtk3
