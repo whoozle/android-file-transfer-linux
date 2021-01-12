@@ -1,7 +1,7 @@
 
   # After registering a name on build.snapcraft.io, commit an uncommented line:
   name: android-file-transfer-linux
-  version: git
+  version: 4.2+git
   summary: Simple and reliable MTP client
   description: |
     Simple UI + Fuse wrapper + cli tool for exploring, downloading, uploading
