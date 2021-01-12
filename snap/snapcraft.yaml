@@ -73,6 +73,7 @@
         - pkg-config
 
       stage-packages:
+        - libgtk2.0-0
         - libqt5gui5
         - libqt5widgets5
         - libqt5network5
