@@ -32,7 +32,7 @@ public:
 
 	mtp::DevicePtr getDevice();
 
-	int exec() override;
+	int exec();
 
 private slots:
 	void scan();
