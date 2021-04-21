@@ -50,6 +50,7 @@ set(TS_FILES
 	translations/android-file-transfer-linux_it.ts
 	translations/android-file-transfer-linux_nl.ts
 	translations/android-file-transfer-linux_ru.ts
+	translations/android-file-transfer-linux_zh-CN.ts
 )
 
 if (Qt5Widgets_FOUND)
