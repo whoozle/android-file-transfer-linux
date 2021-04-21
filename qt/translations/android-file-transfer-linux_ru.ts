@@ -57,36 +57,36 @@
     <message>
         <location filename="../devicesdialog.ui" line="14"/>
         <source>Dialog</source>
-        <translation type="unfinished"></translation>
+        <translation>Диалог</translation>
     </message>
     <message>
         <location filename="../devicesdialog.cpp" line="18"/>
         <source>Rescan Devices</source>
-        <translation type="unfinished"></translation>
+        <translation>Сканировать Устройства</translation>
     </message>
     <message>
         <location filename="../devicesdialog.cpp" line="19"/>
         <source>Kill Users</source>
-        <translation type="unfinished"></translation>
+        <translation>Убить использующие процессы</translation>
     </message>
     <message>
         <location filename="../devicesdialog.cpp" line="52"/>
         <source>The following processes are keeping file descriptors for your device:
 </source>
-        <translation type="unfinished">Следующие процессы удерживают файловые дескрипторы вашего устройства:
+        <translation>Следующие процессы удерживают файловые дескрипторы вашего устройства:
 </translation>
     </message>
     <message>
         <location filename="../devicesdialog.cpp" line="56"/>
         <source>Device is busy</source>
-        <translation type="unfinished">Устройство занято</translation>
+        <translation>Устройство занято</translation>
     </message>
     <message>
         <location filename="../devicesdialog.cpp" line="57"/>
         <source>Device is busy, maybe another process is using it.
 
 </source>
-        <translation type="unfinished">Устройство занято, может быть какой-нибудь другой процесс его использует.
+        <translation>Устройство занято, может быть какой-нибудь другой процесс его использует.
 
 </translation>
     </message>
@@ -95,14 +95,14 @@
         <source>Close other MTP applications and restart Android File Transfer.
 
 Press Abort to kill them or Ignore to try next device.</source>
-        <translation type="unfinished">Закройте другие MTP приложения и перезапустите Android File Transfer
+        <translation>Закройте другие MTP приложения и перезапустите Android File Transfer
 
 Нажмите &quot;Прервать&quot; чтобы убить сторонний процесс, или &quot;Игнорировать&quot; чтобы попробовать следующее устройство.</translation>
     </message>
     <message>
         <location filename="../devicesdialog.cpp" line="129"/>
         <source>USB Device %1:%2</source>
-        <translation type="unfinished"></translation>
+        <translation>Усб Устройство %1:%2</translation>
     </message>
 </context>
 <context>
