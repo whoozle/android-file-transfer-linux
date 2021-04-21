@@ -53,6 +53,59 @@
     </message>
 </context>
 <context>
+    <name>DevicesDialog</name>
+    <message>
+        <location filename="../devicesdialog.ui" line="14"/>
+        <source>Dialog</source>
+        <translation type="unfinished">Dialog</translation>
+    </message>
+    <message>
+        <location filename="../devicesdialog.cpp" line="18"/>
+        <source>Rescan Devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../devicesdialog.cpp" line="19"/>
+        <source>Kill Users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../devicesdialog.cpp" line="52"/>
+        <source>The following processes are keeping file descriptors for your device:
+</source>
+        <translation type="unfinished">Následující procesy drží popisovače souboru pro vaše zařízení:
+</translation>
+    </message>
+    <message>
+        <location filename="../devicesdialog.cpp" line="56"/>
+        <source>Device is busy</source>
+        <translation type="unfinished">Zařízení je zaneprázdněno</translation>
+    </message>
+    <message>
+        <location filename="../devicesdialog.cpp" line="57"/>
+        <source>Device is busy, maybe another process is using it.
+
+</source>
+        <translation type="unfinished">Zařízení je zaneprázdněno, možná jej používá jiný proces.
+
+</translation>
+    </message>
+    <message>
+        <location filename="../devicesdialog.cpp" line="59"/>
+        <source>Close other MTP applications and restart Android File Transfer.
+
+Press Abort to kill them or Ignore to try next device.</source>
+        <translation type="unfinished">Zavřete ostatní MTP aplikace a restartujte program.
+
+Zmáčkněte Zrušit pro jejich ukončení nebo Ignorovat pro použití dalšího zařízení.</translation>
+    </message>
+    <message>
+        <location filename="../devicesdialog.cpp" line="129"/>
+        <source>USB Device %1:%2</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>MainWindow</name>
     <message>
         <location filename="../mainwindow.ui" line="14"/>
@@ -202,8 +255,8 @@
     </message>
     <message>
         <location filename="../mainwindow.ui" line="225"/>
-        <location filename="../mainwindow.cpp" line="1034"/>
-        <location filename="../mainwindow.cpp" line="1045"/>
+        <location filename="../mainwindow.cpp" line="971"/>
+        <location filename="../mainwindow.cpp" line="982"/>
         <source>Attach Cover</source>
         <translation>Vložit Obal</translation>
     </message>
@@ -272,63 +325,57 @@ Prosím restartujte aplikaci pro nový pokus
 Vyjímka: %1</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="253"/>
         <source>The following processes are keeping file descriptors for your device:
 </source>
-        <translation>Následující procesy drží popisovače souboru pro vaše zařízení:
+        <translation type="vanished">Následující procesy drží popisovače souboru pro vaše zařízení:
 </translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="257"/>
         <source>Device is busy</source>
-        <translation>Zařízení je zaneprázdněno</translation>
+        <translation type="vanished">Zařízení je zaneprázdněno</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="258"/>
         <source>Device is busy, maybe another process is using it.
 
 </source>
-        <translation>Zařízení je zaneprázdněno, možná jej používá jiný proces.
+        <translation type="vanished">Zařízení je zaneprázdněno, možná jej používá jiný proces.
 
 </translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="260"/>
         <source>Close other MTP applications and restart Android File Transfer.
 
 Press Abort to kill them or Ignore to try next device.</source>
-        <translation>Zavřete ostatní MTP aplikace a restartujte program.
+        <translation type="vanished">Zavřete ostatní MTP aplikace a restartujte program.
 
 Zmáčkněte Zrušit pro jejich ukončení nebo Ignorovat pro použití dalšího zařízení.</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="284"/>
         <source>Device::Find failed</source>
-        <translation>Zařízení::Hledání selhalo</translation>
+        <translation type="vanished">Zařízení::Hledání selhalo</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="285"/>
         <source>MTP device could not be opened at the moment
 
 Failure: %1
 Press Reset to reset them or Ignore to try next device.</source>
-        <translation>MTP zařízení nemohlo být nyní otevřeno
+        <translation type="vanished">MTP zařízení nemohlo být nyní otevřeno
 
 Problém: %1
 Zmáčkněte Reset pro obnovu nebo Ignorovat pro použití dalšího zařízení.</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="310"/>
+        <location filename="../mainwindow.cpp" line="241"/>
         <source>No MTP device found</source>
         <translation>Nenalezeno žádné MTP zařízení</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="328"/>
+        <location filename="../mainwindow.cpp" line="259"/>
         <source>MTPZ Keys are Missing</source>
         <translation>MTPZ Klíče Nenalezeny</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="329"/>
+        <location filename="../mainwindow.cpp" line="260"/>
         <source>It seems your computer is missing an important bit for talking with MTPZ device: private keys and certificate material from Microsoft.
 This means that you can&apos;t download and upload files from/to such devices.
 
@@ -347,7 +394,7 @@ Protože je monžost překročení legálních restrikcí, nemůžeme přiložit
 </translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="341"/>
+        <location filename="../mainwindow.cpp" line="272"/>
         <source>Alternatively I (as an app) can offer you to download keys from the Internet.
 Can I download keys for you?
 
@@ -358,92 +405,92 @@ Stáhnout klíče?
 (Zmáčkněte Ano jen v případě, že je řečené u vás legální nebo je vám to jedno).</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="362"/>
+        <location filename="../mainwindow.cpp" line="293"/>
         <source>You can look for .mtpz-data file on the internet, download it and place it in your home directory.</source>
         <translation>Můžete najít .mtpz-data soubor na internetu a stáhnou jej do vaší domovské složky.</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="375"/>
-        <location filename="../mainwindow.cpp" line="394"/>
+        <location filename="../mainwindow.cpp" line="306"/>
+        <location filename="../mainwindow.cpp" line="325"/>
         <source>MTP</source>
         <translation>MTP</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="375"/>
+        <location filename="../mainwindow.cpp" line="306"/>
         <source>MTP device does not respond</source>
         <translation>MTP zařízení neodpovídá</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="394"/>
+        <location filename="../mainwindow.cpp" line="325"/>
         <source>Could not open MTP session: %1</source>
         <translation>Nemohu otevřít MTP sezení: %1</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="428"/>
+        <location filename="../mainwindow.cpp" line="359"/>
         <source>No MTP Storages</source>
         <translation>Žádné MTP Uložiště</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="429"/>
+        <location filename="../mainwindow.cpp" line="360"/>
         <source>No MTP storage found, your device might be locked.
 Please unlock and press Retry to continue or Abort to exit.</source>
         <translation>Nenalezeno žádné MTP uložiště, vaše zařízení může být zamčeno.
 Prosím odemčete jej a zmáčknětě Zkust znovu pro pokračování nebo Zrušit pro ukončení.</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="466"/>
+        <location filename="../mainwindow.cpp" line="403"/>
         <source>Loading Media Library</source>
         <translation>Načítání Knihovny Médií</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="582"/>
+        <location filename="../mainwindow.cpp" line="519"/>
         <source>Deleting file(s)</source>
         <translation>Mazání souboru(ů)</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="583"/>
+        <location filename="../mainwindow.cpp" line="520"/>
         <source>Are you sure?</source>
         <translation>Opravdu?</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="670"/>
+        <location filename="../mainwindow.cpp" line="607"/>
         <source>Error</source>
         <translation>Chyba</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="671"/>
+        <location filename="../mainwindow.cpp" line="608"/>
         <source>Failed to create new directory:
 </source>
         <translation>Vytvoření nové složky selhalo:
 </translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="739"/>
+        <location filename="../mainwindow.cpp" line="676"/>
         <source>Download Progress</source>
         <translation>Postup Stahování</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="942"/>
+        <location filename="../mainwindow.cpp" line="879"/>
         <source>Importing Progress</source>
         <translation>Postup Importu</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="969"/>
+        <location filename="../mainwindow.cpp" line="906"/>
         <source>Overwrite confirmation</source>
         <translation>Potvrzení přepsání</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="969"/>
+        <location filename="../mainwindow.cpp" line="906"/>
         <source>You are about to overwrite file </source>
         <translation>Chystáte se přepsat soubor </translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1034"/>
+        <location filename="../mainwindow.cpp" line="971"/>
         <source>Could not open selected file</source>
         <translation>Nemohu otevřít vybraný soubor</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1045"/>
+        <location filename="../mainwindow.cpp" line="982"/>
         <source>Could not attach cover: %1</source>
         <translation>Nemohu vložit obal: %1</translation>
     </message>

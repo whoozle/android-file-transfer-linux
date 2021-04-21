@@ -53,6 +53,59 @@
     </message>
 </context>
 <context>
+    <name>DevicesDialog</name>
+    <message>
+        <location filename="../devicesdialog.ui" line="14"/>
+        <source>Dialog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../devicesdialog.cpp" line="18"/>
+        <source>Rescan Devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../devicesdialog.cpp" line="19"/>
+        <source>Kill Users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../devicesdialog.cpp" line="52"/>
+        <source>The following processes are keeping file descriptors for your device:
+</source>
+        <translation type="unfinished">Следующие процессы удерживают файловые дескрипторы вашего устройства:
+</translation>
+    </message>
+    <message>
+        <location filename="../devicesdialog.cpp" line="56"/>
+        <source>Device is busy</source>
+        <translation type="unfinished">Устройство занято</translation>
+    </message>
+    <message>
+        <location filename="../devicesdialog.cpp" line="57"/>
+        <source>Device is busy, maybe another process is using it.
+
+</source>
+        <translation type="unfinished">Устройство занято, может быть какой-нибудь другой процесс его использует.
+
+</translation>
+    </message>
+    <message>
+        <location filename="../devicesdialog.cpp" line="59"/>
+        <source>Close other MTP applications and restart Android File Transfer.
+
+Press Abort to kill them or Ignore to try next device.</source>
+        <translation type="unfinished">Закройте другие MTP приложения и перезапустите Android File Transfer
+
+Нажмите &quot;Прервать&quot; чтобы убить сторонний процесс, или &quot;Игнорировать&quot; чтобы попробовать следующее устройство.</translation>
+    </message>
+    <message>
+        <location filename="../devicesdialog.cpp" line="129"/>
+        <source>USB Device %1:%2</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>MainWindow</name>
     <message>
         <location filename="../mainwindow.ui" line="14"/>
@@ -197,8 +250,8 @@
     </message>
     <message>
         <location filename="../mainwindow.ui" line="225"/>
-        <location filename="../mainwindow.cpp" line="1034"/>
-        <location filename="../mainwindow.cpp" line="1045"/>
+        <location filename="../mainwindow.cpp" line="971"/>
+        <location filename="../mainwindow.cpp" line="982"/>
         <source>Attach Cover</source>
         <translation>Установить обложку</translation>
     </message>
@@ -222,9 +275,8 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="257"/>
         <source>Device is busy</source>
-        <translation>Устройство занято</translation>
+        <translation type="vanished">Устройство занято</translation>
     </message>
     <message>
         <source>Device is busy, maybe another process is using it. Close other MTP applications and restart Android File Transfer.</source>
@@ -286,58 +338,53 @@ Exception: %1</source>
 Ошибка: %1</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="253"/>
         <source>The following processes are keeping file descriptors for your device:
 </source>
-        <translation>Следующие процессы удерживают файловые дескрипторы вашего устройства:
+        <translation type="vanished">Следующие процессы удерживают файловые дескрипторы вашего устройства:
 </translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="258"/>
         <source>Device is busy, maybe another process is using it.
 
 </source>
-        <translation>Устройство занято, может быть какой-нибудь другой процесс его использует.
+        <translation type="vanished">Устройство занято, может быть какой-нибудь другой процесс его использует.
 
 </translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="260"/>
         <source>Close other MTP applications and restart Android File Transfer.
 
 Press Abort to kill them or Ignore to try next device.</source>
-        <translation>Закройте другие MTP приложения и перезапустите Android File Transfer
+        <translation type="vanished">Закройте другие MTP приложения и перезапустите Android File Transfer
 
 Нажмите &quot;Прервать&quot; чтобы убить сторонний процесс, или &quot;Игнорировать&quot; чтобы попробовать следующее устройство.</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="284"/>
         <source>Device::Find failed</source>
-        <translation>Device::Find взорвалось</translation>
+        <translation type="vanished">Device::Find взорвалось</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="285"/>
         <source>MTP device could not be opened at the moment
 
 Failure: %1
 Press Reset to reset them or Ignore to try next device.</source>
-        <translation>MTP устройство не может быть открыто в данный момент
+        <translation type="vanished">MTP устройство не может быть открыто в данный момент
 
 Ошибка: %1
 Нажмите &quot;Сброс&quot; чтобы попытаться сбросить устройство или &quot;Игнорировать&quot; чтобы попробовать другие устройства. </translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="310"/>
+        <location filename="../mainwindow.cpp" line="241"/>
         <source>No MTP device found</source>
         <translation>Не найдено ни одного устройства MTP</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="328"/>
+        <location filename="../mainwindow.cpp" line="259"/>
         <source>MTPZ Keys are Missing</source>
         <translation>MTPZ ключи не найдены</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="329"/>
+        <location filename="../mainwindow.cpp" line="260"/>
         <source>It seems your computer is missing an important bit for talking with MTPZ device: private keys and certificate material from Microsoft.
 This means that you can&apos;t download and upload files from/to such devices.
 
@@ -356,7 +403,7 @@ Because of the legal risks we can&apos;t bundle those keys, even though in some 
 </translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="341"/>
+        <location filename="../mainwindow.cpp" line="272"/>
         <source>Alternatively I (as an app) can offer you to download keys from the Internet.
 Can I download keys for you?
 
@@ -367,92 +414,92 @@ Can I download keys for you?
 Пожалуйста нажмите &quot;Да&quot; только если всё вышеуказанное легально в вашей стране. (Или вам всё равно)</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="362"/>
+        <location filename="../mainwindow.cpp" line="293"/>
         <source>You can look for .mtpz-data file on the internet, download it and place it in your home directory.</source>
         <translation>Вы можете найти файл &quot;.mtpz-data&quot; в интернете и просто положить его в домашнюю директорию.</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="375"/>
-        <location filename="../mainwindow.cpp" line="394"/>
+        <location filename="../mainwindow.cpp" line="306"/>
+        <location filename="../mainwindow.cpp" line="325"/>
         <source>MTP</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="375"/>
+        <location filename="../mainwindow.cpp" line="306"/>
         <source>MTP device does not respond</source>
         <translation>MTP устройство не отвечает</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="394"/>
+        <location filename="../mainwindow.cpp" line="325"/>
         <source>Could not open MTP session: %1</source>
         <translation>Не получается открыть MTP сессию: %1</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="428"/>
+        <location filename="../mainwindow.cpp" line="359"/>
         <source>No MTP Storages</source>
         <translation>Нет хранилищ MTP</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="429"/>
+        <location filename="../mainwindow.cpp" line="360"/>
         <source>No MTP storage found, your device might be locked.
 Please unlock and press Retry to continue or Abort to exit.</source>
         <translation>Нет ни одного хранилища, возможно ваше устройство заблокировано
 Разблокируйте устройство и нажмите Повторить чтобы попробовать ещё раз или Прервать, чтобы выйти.</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="466"/>
+        <location filename="../mainwindow.cpp" line="403"/>
         <source>Loading Media Library</source>
         <translation>Загружаем библиотеку</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="582"/>
+        <location filename="../mainwindow.cpp" line="519"/>
         <source>Deleting file(s)</source>
         <translation>Удаление файла(ов)</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="583"/>
+        <location filename="../mainwindow.cpp" line="520"/>
         <source>Are you sure?</source>
         <translation>Вы уверены?</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="670"/>
+        <location filename="../mainwindow.cpp" line="607"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="671"/>
+        <location filename="../mainwindow.cpp" line="608"/>
         <source>Failed to create new directory:
 </source>
         <translation>Не удалось создать новый каталог:
 </translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="739"/>
+        <location filename="../mainwindow.cpp" line="676"/>
         <source>Download Progress</source>
         <translation>Загрузка</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="942"/>
+        <location filename="../mainwindow.cpp" line="879"/>
         <source>Importing Progress</source>
         <translation>Импорт</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="969"/>
+        <location filename="../mainwindow.cpp" line="906"/>
         <source>Overwrite confirmation</source>
         <translation>Подтверждение перезаписи</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="969"/>
+        <location filename="../mainwindow.cpp" line="906"/>
         <source>You are about to overwrite file </source>
         <translation>Вы собираетесь перезаписать файл </translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1034"/>
+        <location filename="../mainwindow.cpp" line="971"/>
         <source>Could not open selected file</source>
         <translation>Не получилось открыть выбранный файл</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1045"/>
+        <location filename="../mainwindow.cpp" line="982"/>
         <source>Could not attach cover: %1</source>
         <translation>Не удалось установить обложку: %1</translation>
     </message>

@@ -4,29 +4,49 @@
 <context>
     <name>CommandQueue</name>
     <message>
-        <location filename="../commandqueue.cpp" line="63"/>
         <source>Loading media libraryâ¦</source>
-        <translation>Bezig met laden van mediaverzameling…</translation>
+        <translation type="vanished">Bezig met laden van mediaverzameling…</translation>
+    </message>
+    <message>
+        <source>Querying artistsâ¦</source>
+        <translation type="vanished">Bezig met zoeken naar artiesten…</translation>
+    </message>
+    <message>
+        <source>Loading artistsâ¦</source>
+        <translation type="vanished">Bezig met laden van artiesten…</translation>
+    </message>
+    <message>
+        <source>Querying albumsâ¦</source>
+        <translation type="vanished">Bezig met zoeken naar albums…</translation>
+    </message>
+    <message>
+        <source>Loading albumsâ¦</source>
+        <translation type="vanished">Bezig met laden van albums…</translation>
+    </message>
+    <message>
+        <location filename="../commandqueue.cpp" line="63"/>
+        <source>Loading media library…</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../commandqueue.cpp" line="64"/>
-        <source>Querying artistsâ¦</source>
-        <translation>Bezig met zoeken naar artiesten…</translation>
+        <source>Querying artists…</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../commandqueue.cpp" line="65"/>
-        <source>Loading artistsâ¦</source>
-        <translation>Bezig met laden van artiesten…</translation>
+        <source>Loading artists…</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../commandqueue.cpp" line="66"/>
-        <source>Querying albumsâ¦</source>
-        <translation>Bezig met zoeken naar albums…</translation>
+        <source>Querying albums…</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../commandqueue.cpp" line="67"/>
-        <source>Loading albumsâ¦</source>
-        <translation>Bezig met laden van albums…</translation>
+        <source>Loading albums…</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../commandqueue.cpp" line="68"/>
@@ -50,6 +70,59 @@
         <location filename="../createdirectorydialog.ui" line="20"/>
         <source>Create New Directory</source>
         <translation>Nieuwe map</translation>
+    </message>
+</context>
+<context>
+    <name>DevicesDialog</name>
+    <message>
+        <location filename="../devicesdialog.ui" line="14"/>
+        <source>Dialog</source>
+        <translation type="unfinished">Venster</translation>
+    </message>
+    <message>
+        <location filename="../devicesdialog.cpp" line="18"/>
+        <source>Rescan Devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../devicesdialog.cpp" line="19"/>
+        <source>Kill Users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../devicesdialog.cpp" line="52"/>
+        <source>The following processes are keeping file descriptors for your device:
+</source>
+        <translation type="unfinished">De volgende processen bevatten bestandsomschrijvingen van je apparaat:
+</translation>
+    </message>
+    <message>
+        <location filename="../devicesdialog.cpp" line="56"/>
+        <source>Device is busy</source>
+        <translation type="unfinished">Apparaat is bezig</translation>
+    </message>
+    <message>
+        <location filename="../devicesdialog.cpp" line="57"/>
+        <source>Device is busy, maybe another process is using it.
+
+</source>
+        <translation type="unfinished">Het apparaat is bezig. Mogelijk is het in gebruik door een ander proces.
+
+</translation>
+    </message>
+    <message>
+        <location filename="../devicesdialog.cpp" line="59"/>
+        <source>Close other MTP applications and restart Android File Transfer.
+
+Press Abort to kill them or Ignore to try next device.</source>
+        <translation type="unfinished">Sluit andere mtp-programma&apos;s en herstart Android-bestandsoverdracht.
+
+Druk op &apos;Afbreken&apos; om ze af te sluiten of &apos;Negeren&apos; om een ander apparaat te proberen.</translation>
+    </message>
+    <message>
+        <location filename="../devicesdialog.cpp" line="129"/>
+        <source>USB Device %1:%2</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -202,8 +275,8 @@
     </message>
     <message>
         <location filename="../mainwindow.ui" line="225"/>
-        <location filename="../mainwindow.cpp" line="1034"/>
-        <location filename="../mainwindow.cpp" line="1045"/>
+        <location filename="../mainwindow.cpp" line="971"/>
+        <location filename="../mainwindow.cpp" line="982"/>
         <source>Attach Cover</source>
         <translation>Hoes bijsluiten</translation>
     </message>
@@ -272,63 +345,57 @@ Herstart het programma en probeer het opnieuw.
 Uitzonderingsfout: %1</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="253"/>
         <source>The following processes are keeping file descriptors for your device:
 </source>
-        <translation>De volgende processen bevatten bestandsomschrijvingen van je apparaat:
+        <translation type="vanished">De volgende processen bevatten bestandsomschrijvingen van je apparaat:
 </translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="257"/>
         <source>Device is busy</source>
-        <translation>Apparaat is bezig</translation>
+        <translation type="vanished">Apparaat is bezig</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="258"/>
         <source>Device is busy, maybe another process is using it.
 
 </source>
-        <translation>Het apparaat is bezig. Mogelijk is het in gebruik door een ander proces.
+        <translation type="vanished">Het apparaat is bezig. Mogelijk is het in gebruik door een ander proces.
 
 </translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="260"/>
         <source>Close other MTP applications and restart Android File Transfer.
 
 Press Abort to kill them or Ignore to try next device.</source>
-        <translation>Sluit andere mtp-programma&apos;s en herstart Android-bestandsoverdracht.
+        <translation type="vanished">Sluit andere mtp-programma&apos;s en herstart Android-bestandsoverdracht.
 
 Druk op &apos;Afbreken&apos; om ze af te sluiten of &apos;Negeren&apos; om een ander apparaat te proberen.</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="284"/>
         <source>Device::Find failed</source>
-        <translation>Apparaat niet aangetroffen</translation>
+        <translation type="vanished">Apparaat niet aangetroffen</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="285"/>
         <source>MTP device could not be opened at the moment
 
 Failure: %1
 Press Reset to reset them or Ignore to try next device.</source>
-        <translation>Het mtp-apparaat kan momenteel niet worden benaderd.
+        <translation type="vanished">Het mtp-apparaat kan momenteel niet worden benaderd.
 
 Foutmelding: %1
 Druk op &apos;Herstellen&apos; om te herstellen of &apos;Negeren&apos; om een ander apparaat te proberen.</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="310"/>
+        <location filename="../mainwindow.cpp" line="241"/>
         <source>No MTP device found</source>
         <translation>Geen mtp-apparaat aangetroffen</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="328"/>
+        <location filename="../mainwindow.cpp" line="259"/>
         <source>MTPZ Keys are Missing</source>
         <translation>De mtpz-sleutels ontbreken</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="329"/>
+        <location filename="../mainwindow.cpp" line="260"/>
         <source>It seems your computer is missing an important bit for talking with MTPZ device: private keys and certificate material from Microsoft.
 This means that you can&apos;t download and upload files from/to such devices.
 
@@ -347,7 +414,7 @@ Vanwege juridische conflicten kunnen deze sleutels niet meeleveren, zelfs al is 
 </translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="341"/>
+        <location filename="../mainwindow.cpp" line="272"/>
         <source>Alternatively I (as an app) can offer you to download keys from the Internet.
 Can I download keys for you?
 
@@ -358,92 +425,92 @@ Zal ik dat voor je doen?
 (klik alleen op &apos;Ja&apos; als dit legaal is in je land of als de wet je niet interesseert)</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="362"/>
+        <location filename="../mainwindow.cpp" line="293"/>
         <source>You can look for .mtpz-data file on the internet, download it and place it in your home directory.</source>
         <translation>Je kunt .mtpz-gegevens vinden op het internet en deze in je persoonlijke map plaatsen.</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="375"/>
-        <location filename="../mainwindow.cpp" line="394"/>
+        <location filename="../mainwindow.cpp" line="306"/>
+        <location filename="../mainwindow.cpp" line="325"/>
         <source>MTP</source>
         <translation>MTP</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="375"/>
+        <location filename="../mainwindow.cpp" line="306"/>
         <source>MTP device does not respond</source>
         <translation>MTP-apparaat reageert niet</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="394"/>
+        <location filename="../mainwindow.cpp" line="325"/>
         <source>Could not open MTP session: %1</source>
         <translation>De mtp-sessie kan niet worden geopend: %1</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="428"/>
+        <location filename="../mainwindow.cpp" line="359"/>
         <source>No MTP Storages</source>
         <translation>Geen mtp-apparaten</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="429"/>
+        <location filename="../mainwindow.cpp" line="360"/>
         <source>No MTP storage found, your device might be locked.
 Please unlock and press Retry to continue or Abort to exit.</source>
         <translation>Geen mtp-apparaat aangetroffen - wellicht is je apparaat vergrendeld.
 Ontgrendel je apparaat en druk op &apos;Opnieuw&apos; of &apos;Afbreken&apos;.</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="466"/>
+        <location filename="../mainwindow.cpp" line="403"/>
         <source>Loading Media Library</source>
         <translation>Bezig met laden van mediaverzameling</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="582"/>
+        <location filename="../mainwindow.cpp" line="519"/>
         <source>Deleting file(s)</source>
         <translation>Bezig met verwijderen van bestand(en)</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="583"/>
+        <location filename="../mainwindow.cpp" line="520"/>
         <source>Are you sure?</source>
         <translation>Weet je het zeker?</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="670"/>
+        <location filename="../mainwindow.cpp" line="607"/>
         <source>Error</source>
         <translation>Fout</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="671"/>
+        <location filename="../mainwindow.cpp" line="608"/>
         <source>Failed to create new directory:
 </source>
         <translation>De map kan niet worden aangemaakt:
 </translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="739"/>
+        <location filename="../mainwindow.cpp" line="676"/>
         <source>Download Progress</source>
         <translation>Downloadvoortgang</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="942"/>
+        <location filename="../mainwindow.cpp" line="879"/>
         <source>Importing Progress</source>
         <translation>Importvoortgang</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="969"/>
+        <location filename="../mainwindow.cpp" line="906"/>
         <source>Overwrite confirmation</source>
         <translation>Overschrijven bevestigen</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="969"/>
+        <location filename="../mainwindow.cpp" line="906"/>
         <source>You are about to overwrite file </source>
         <translation>Je staat op het punt om het volgende te overschrijven:</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1034"/>
+        <location filename="../mainwindow.cpp" line="971"/>
         <source>Could not open selected file</source>
         <translation>Kan het geselecteerde bestand niet openen</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1045"/>
+        <location filename="../mainwindow.cpp" line="982"/>
         <source>Could not attach cover: %1</source>
         <translation>De hoes kan niet worden bijgesloten: %1</translation>
     </message>
