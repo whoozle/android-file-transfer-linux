@@ -20,7 +20,7 @@ install:
     elif [ "${TRAVIS_OS_NAME}" = "freebsd" ]; then
       sudo pkg install -y ninja qt5-qmake qt5-buildtools qt5-widgets qt5-linguist fusefs-libs pybind11 taglib
     elif [ "${TRAVIS_OS_NAME}" = "osx" ]; then
-      brew tap homebrew/cask && brew install qt5 homebrew/cask/osxfuse pybind11 taglib openssl@1.1
+      travis_wait 30 brew tap homebrew/cask && brew install qt5 homebrew/cask/osxfuse pybind11 taglib openssl@1.1
     fi
 
 script:
