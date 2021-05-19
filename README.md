@@ -71,12 +71,12 @@ https://www.paypal.me/whoozle
 * For ubuntu and other debian-based distros use the following command:
 
   ```shell
-  sudo apt-get install build-essential cmake qt5-default ninja-build libfuse-dev libreadline-dev
+  sudo apt-get install build-essential cmake qt5-default ninja-build libfuse-dev libreadline-dev qttools5-dev
   ```
 
   For Fedora:
   ```
-  dnf install make automake gcc gcc-c++ kernel-devel cmake fuse fuse-devel qt-devel readline-devel
+  dnf install make automake gcc gcc-c++ kernel-devel cmake fuse fuse-devel qt-devel readline-devel libqt5-linguist-devel
   ```
 
 * Basically, you need `libqtX-dev` for UI, `libfuse-dev` for FUSE interface, `cmake`, `ninja` or `make` for building the project. You could use libqt5-dev as well.
