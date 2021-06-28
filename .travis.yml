@@ -10,61 +10,69 @@ matrix:
         - os: freebsd
           compiler: clang
         - os: osx
-          osx_image: xcode10.1
+          osx_image: xcode12.2
           compiler: clang
 
 install:
   - |
     if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
-      sudo apt-get -y install qt5-default qttools5-dev qttools5-dev-tools libfuse-dev libmagic-dev libtag1-dev libssl-dev
+      sudo apt-get -y install ninja-build qt5-default qttools5-dev qttools5-dev-tools libfuse-dev libmagic-dev libtag1-dev libssl-dev
     elif [ "${TRAVIS_OS_NAME}" = "freebsd" ]; then
       sudo pkg install -y ninja qt5-qmake qt5-buildtools qt5-widgets qt5-linguist fusefs-libs pybind11 taglib
     elif [ "${TRAVIS_OS_NAME}" = "osx" ]; then
       export HOMEBREW_NO_AUTO_UPDATE=1
-      brew tap homebrew/cask
-      brew install qt5 homebrew/cask/osxfuse pybind11 taglib openssl@1.1
+      brew install ninja qt5 homebrew/cask/osxfuse pybind11 taglib openssl@1.1
     fi
 
 script:
   - |
     if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
-      cmake . -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr &&
-      make -j$(nproc) &&
-      make DESTDIR=appdir -j$(nproc) install ; find appdir/ &&
-      sed -i -e 's|^Name=.*|Name=Android File Transfer|g' appdir/usr/share/applications/android-file-transfer.desktop &&
-      wget -c -q "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage" &&
-      chmod a+x linuxdeployqt-continuous-x86_64.AppImage &&
-      unset QTDIR; unset QT_PLUGIN_PATH ; unset LD_LIBRARY_PATH &&
-      export VERSION=$(git rev-parse --short HEAD) &&
-      ./linuxdeployqt-continuous-x86_64.AppImage appdir/usr/share/applications/*.desktop -bundle-non-qt-libs &&
+      cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr
+      cmake --build build
+      DESTDIR=appdir ninja -C build install
+      find ./appdir || find ./build
+      sed -i -e 's|^Name=.*|Name=Android File Transfer|g' appdir/usr/share/applications/android-file-transfer.desktop
+      wget -c -q "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
+      chmod a+x linuxdeployqt-continuous-x86_64.AppImage
+      unset QTDIR; unset QT_PLUGIN_PATH; unset LD_LIBRARY_PATH
+      export VERSION=$(git rev-parse --short HEAD)
+      ./linuxdeployqt-continuous-x86_64.AppImage appdir/usr/share/applications/*.desktop -bundle-non-qt-libs
       ./linuxdeployqt-continuous-x86_64.AppImage appdir/usr/share/applications/*.desktop -appimage
     elif [ "${TRAVIS_OS_NAME}" = "freebsd" ]; then
-      cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DUSB_BACKEND_LIBUSB=YES -DBUILD_PYTHON=OFF
+      cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DUSB_BACKEND_LIBUSB=YES -DBUILD_PYTHON=OFF
       cmake --build build
+      DESTDIR=appdir ninja -C build install
+      find build/appdir
     elif [ "${TRAVIS_OS_NAME}" = "osx" ]; then
-      mkdir build &&
-      cd build &&
-      cmake .. -DCMAKE_OSX_DEPLOYMENT_TARGET=10.12 -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/usr/local/opt/qt5 -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl@1.1 -DOPENSSL_LIBRARIES=/usr/local/opt/openssl@1.1/lib -DCMAKE_INSTALL_PREFIX=$(pwd)/installdir &&
-      make -j$(sysctl -n hw.ncpu) &&
-      make install &&
-      mv installdir/android-file-transfer.app installdir/Android\ File\ Transfer\ for\ Linux.app &&
-      git clone https://github.com/andreyvit/create-dmg.git &&
-      cd create-dmg &&
-      ./create-dmg --volicon "../../osx/android-file-transfer.icns" --icon-size 96 --icon "Android File Transfer for Linux" 110 100 --app-drop-link 380 100 AndroidFileTransferForLinux.dmg ../installdir/Android\ File\ Transfer\ for\ Linux.app
+      cmake -S . -B build -G Ninja -DCMAKE_OSX_DEPLOYMENT_TARGET=10.12 -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_PREFIX_PATH=/usr/local/opt/qt5 -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl@1.1 \
+        -DOPENSSL_LIBRARIES=/usr/local/opt/openssl@1.1/lib -DCMAKE_INSTALL_PREFIX=/
+      cmake --build build
+      DESTDIR=appdir ninja -C build install
+      find build/appdir
+      cd build
+      mv appdir/android-file-transfer.app appdir/Android\ File\ Transfer\ for\ Linux.app
+      git clone https://github.com/andreyvit/create-dmg.git
+      cd create-dmg
+      ./create-dmg --volicon "../../osx/android-file-transfer.icns" --icon-size 96 \
+        --icon "Android File Transfer for Linux" 110 100 --app-drop-link 380 100 AndroidFileTransferForLinux.dmg \
+        ../appdir/Android\ File\ Transfer\ for\ Linux.app
     fi
 
 after_success:
   - |
     if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
-      find ./appdir -executable -type f -exec ldd {} \; | grep " => /usr" | cut -d " " -f 2-3 | sort | uniq &&
-      wget https://github.com/d1vanov/ciuploadtool/releases/download/continuous-master/ciuploadtool_linux.zip &&
-      unzip ciuploadtool_linux.zip &&
-      chmod 755 ciuploadtool &&
+      cd build
+      find ./appdir -executable -type f -exec ldd {} \; | grep " => /usr" | cut -d " " -f 2-3 | sort | uniq
+      wget https://github.com/d1vanov/ciuploadtool/releases/download/continuous-master/ciuploadtool_linux.zip
+      unzip ciuploadtool_linux.zip
+      chmod 755 ciuploadtool
       ./ciuploadtool ./Android*.AppImage*
     elif [ "${TRAVIS_OS_NAME}" = "osx" ]; then
-      wget https://github.com/d1vanov/ciuploadtool/releases/download/continuous-master/ciuploadtool_mac.zip &&
-      unzip ciuploadtool_mac.zip &&
-      chmod 755 ciuploadtool &&
+      cd build
+      wget https://github.com/d1vanov/ciuploadtool/releases/download/continuous-master/ciuploadtool_mac.zip
+      unzip ciuploadtool_mac.zip
+      chmod 755 ciuploadtool
       ./ciuploadtool AndroidFileTransferForLinux.dmg
     fi
 
