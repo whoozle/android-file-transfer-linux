@@ -137,6 +137,7 @@ namespace
 			attr.st_atime = attr.st_mtime = mtp::ConvertDateTime(oi.ModificationDate);
 			attr.st_ctime = mtp::ConvertDateTime(oi.CaptureDate);
 			attr.st_size = oi.ObjectCompressedSize != mtp::MaxObjectSize? oi.ObjectCompressedSize: _session->GetObjectIntegerProperty(id, mtp::ObjectProperty::ObjectSize);
+			attr.st_nlink = 1;
 		}
 
 		struct stat GetObjectAttr(FuseId inode)
@@ -147,6 +148,7 @@ namespace
 				attr.st_ino = inode.Inode;
 				attr.st_mtime = attr.st_ctime = attr.st_atime = _connectTime;
 				attr.st_mode = FuseEntry::DirectoryMode;
+				attr.st_nlink = 1;
 				return attr;
 			}
 
@@ -156,6 +158,7 @@ namespace
 				attr.st_ino = inode.Inode;
 				attr.st_mtime = attr.st_ctime = attr.st_atime = _connectTime;
 				attr.st_mode = FuseEntry::DirectoryMode;
+				attr.st_nlink = 1;
 				return attr;
 			}
 
@@ -276,6 +279,7 @@ namespace
 							struct stat & attr = _objectAttrs[objectId];
 							attr.st_ino = ToFuse(objectId).Inode;
 							attr.st_mode = FuseEntry::GetMode(format);
+							attr.st_nlink = 1;
 						});
 
 					//size
