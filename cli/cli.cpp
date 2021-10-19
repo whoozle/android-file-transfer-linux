@@ -91,7 +91,7 @@ int main(int argc, char **argv)
 		{"input-file",		required_argument,	0,	'f' },
 		{"reset-device",	no_argument	,		0,	'R' },
 		{"device-name",		required_argument,	0,	'd' },
-		{"device-list",		required_argument,	0,	'l' },
+		{"device-list",		no_argument,		0,	'l' },
 		{0,					0,					0,	 0	}
 	};
 
