@@ -175,6 +175,7 @@ namespace mtp
 	time_t ConvertDateTime(const std::string &timespec)
 	{
 		struct tm time = {};
+		time.tm_isdst = -1;
 		char *end = strptime(timespec.c_str(), "%Y%m%dT%H%M%S", &time);
 		if (!end)
 			return 0;
