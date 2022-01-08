@@ -1,0 +1,47 @@
+name: Android File Transfer for Linux
+on: [push]
+jobs:
+  Linux:
+    runs-on: ubuntu-18.04
+    steps:
+    - name: Install dependencies...
+      run: sudo apt-get -y install qt5-default qttools5-dev qttools5-dev-tools libgtk2.0-dev libfuse-dev libmagic-dev libtag1-dev libssl-dev ninja-build cmake
+    - name: Checking out sources...
+      uses: actions/checkout@v2
+    - name: Configuring...
+      run: cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX:PATH=appdir/usr -B build -GNinja .
+    - name: Building...
+      run: ninja -j$(nproc) -C build
+    - name: Installing...
+      run: ninja -C build install
+    - name: Creating AppImage...
+      run: |
+        sed -i -e 's|^Name=.*|Name=Android File Transfer|g' build/appdir/usr/share/applications/android-file-transfer.desktop
+        wget -c -q "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
+        chmod a+x linuxdeployqt-continuous-x86_64.AppImage
+        unset QTDIR
+        unset QT_PLUGIN_PATH
+        unset LD_LIBRARY_PATH
+        export VERSION=$(git rev-parse --short HEAD)
+        ./linuxdeployqt-continuous-x86_64.AppImage build/appdir/usr/share/applications/*.desktop -bundle-non-qt-libs
+        ./linuxdeployqt-continuous-x86_64.AppImage build/appdir/usr/share/applications/*.desktop -appimage
+        find build/appdir -executable -type f -exec ldd {} \; | grep " => /usr" | cut -d " " -f 2-3 | sort | uniq
+    - name: Creating release...
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        draft: false
+        prerelease: false
+    - name: Uploading Artifacts...
+      id: upload-release-asset
+      uses: ncipollo/release-action@v1
+      with:
+        allowUpdates: true
+        body: The latest and greatest - try this first in case you're having any issues.
+        token: ${{ secrets.GITHUB_TOKEN }}
+        artifacts: ./Android*.AppImage*
+        tag: continuos
