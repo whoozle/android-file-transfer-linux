@@ -71,5 +71,5 @@ jobs:
         omitBody: true
         omitName: true
         token: ${{ secrets.GITHUB_TOKEN }}
-        artifacts: ./*.dmg
+        artifacts: create-dmg/*.dmg
         tag: continuous
