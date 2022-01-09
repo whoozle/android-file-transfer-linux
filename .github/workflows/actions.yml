@@ -9,9 +9,11 @@ jobs:
     - name: Creating Release...
       uses: ncipollo/release-action@v1
       with:
-        body: The latest and greatest - try this first in case you're having any issues.
+        name: "The latest and greatest"
+        body: This is the latest build of the current development branch. Please try any issues using this build before reporting any problems.
         token: ${{ secrets.GITHUB_TOKEN }}
         tag: continuous
+        prerelease: true
         allowUpdates: true
         removeArtifacts: true
     - name: Install Dependencies...
