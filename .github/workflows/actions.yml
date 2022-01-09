@@ -4,6 +4,14 @@ jobs:
   Linux:
     runs-on: ubuntu-18.04
     steps:
+    - name: Creating Release...
+      uses: ncipollo/release-action@v1
+      with:
+        body: The latest and greatest - try this first in case you're having any issues.
+        token: ${{ secrets.GITHUB_TOKEN }}
+        tag: continuous
+        allowUpdates: true
+        removeArtifacts: true
     - name: Install Dependencies...
       run: sudo apt-get -y install qt5-default qttools5-dev qttools5-dev-tools libgtk2.0-dev libfuse-dev libmagic-dev libtag1-dev libssl-dev ninja-build cmake
     - name: Checking out sources...
@@ -27,10 +35,11 @@ jobs:
         ./linuxdeployqt-continuous-x86_64.AppImage build/appdir/usr/share/applications/*.desktop -appimage
         find build/appdir -executable -type f -exec ldd {} \; | grep " => /usr" | cut -d " " -f 2-3 | sort | uniq
     - name: Uploading Artifacts...
-      id: upload-release-asset
       uses: ncipollo/release-action@v1
       with:
-        body: The latest and greatest - try this first in case you're having any issues.
+        allowUpdates: true
+        omitBody: true
+        omitName: true
         token: ${{ secrets.GITHUB_TOKEN }}
         artifacts: ./Android*.AppImage*
         tag: continuous
@@ -55,3 +64,12 @@ jobs:
         git clone https://github.com/andreyvit/create-dmg.git
         cd create-dmg
         ./create-dmg --volicon "../osx/android-file-transfer.icns" --icon-size 96 --icon "Android File Transfer for Linux" 110 100 --app-drop-link 380 100 AndroidFileTransferForLinux.dmg ../appdir/Android\ File\ Transfer\ for\ Linux.app
+    - name: Uploading Artifacts...
+      uses: ncipollo/release-action@v1
+      with:
+        allowUpdates: true
+        omitBody: true
+        omitName: true
+        token: ${{ secrets.GITHUB_TOKEN }}
+        artifacts: ./*.dmg
+        tag: continuous
