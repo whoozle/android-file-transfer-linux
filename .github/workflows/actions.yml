@@ -28,7 +28,7 @@ jobs:
       run: ninja -C build install
     - name: Creating AppImage...
       run: |
-        sed -i -e 's|^Name=.*|Name=Android File Transfer|g' build/appdir/usr/share/applications/android-file-transfer.desktop
+        sed -i -e 's|^Name=.*|Name=Android File Transfer For Linux|g' build/appdir/usr/share/applications/android-file-transfer.desktop
         wget -c -q "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
         chmod a+x linuxdeployqt-continuous-x86_64.AppImage
         unset QTDIR
