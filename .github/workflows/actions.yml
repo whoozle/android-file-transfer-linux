@@ -30,7 +30,6 @@ jobs:
       id: upload-release-asset
       uses: ncipollo/release-action@v1
       with:
-        allowUpdates: true
         body: The latest and greatest - try this first in case you're having any issues.
         token: ${{ secrets.GITHUB_TOKEN }}
         artifacts: ./Android*.AppImage*
@@ -55,4 +54,4 @@ jobs:
         mv appdir/android-file-transfer.app appdir/Android\ File\ Transfer\ for\ Linux.app
         git clone https://github.com/andreyvit/create-dmg.git
         cd create-dmg
-        ./create-dmg --volicon "../../osx/android-file-transfer.icns" --icon-size 96 --icon "Android File Transfer for Linux" 110 100 --app-drop-link 380 100 AndroidFileTransferForLinux.dmg ../appdir/Android\ File\ Transfer\ for\ Linux.app
+        ./create-dmg --volicon "../osx/android-file-transfer.icns" --icon-size 96 --icon "Android File Transfer for Linux" 110 100 --app-drop-link 380 100 AndroidFileTransferForLinux.dmg ../appdir/Android\ File\ Transfer\ for\ Linux.app
