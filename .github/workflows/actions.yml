@@ -8,6 +8,7 @@ jobs:
     steps:
     - name: Creating Release...
       uses: ncipollo/release-action@v1
+      if: github.ref_name == 'master'
       with:
         name: "The latest and greatest"
         body: This is the latest build of the current development branch. Please try any issues using this build before reporting any problems.
@@ -40,6 +41,7 @@ jobs:
         find build/appdir -executable -type f -exec ldd {} \; | grep " => /usr" | cut -d " " -f 2-3 | sort | uniq
     - name: Uploading Artifacts...
       uses: ncipollo/release-action@v1
+      if: github.ref_name == 'master'
       with:
         allowUpdates: true
         omitBody: true
@@ -70,6 +72,7 @@ jobs:
         ./create-dmg --volicon "../osx/android-file-transfer.icns" --icon-size 96 --icon "Android File Transfer for Linux" 110 100 --app-drop-link 380 100 AndroidFileTransferForLinux.dmg ../appdir/Android\ File\ Transfer\ for\ Linux.app
     - name: Uploading Artifacts...
       uses: ncipollo/release-action@v1
+      if: github.ref_name == 'master'
       with:
         allowUpdates: true
         omitBody: true
