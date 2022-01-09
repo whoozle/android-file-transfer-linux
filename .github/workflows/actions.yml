@@ -1,0 +1,82 @@
+name: Android File Transfer for Linux (and MacOSX!)
+
+on: [push]
+
+jobs:
+  Linux:
+    runs-on: ubuntu-18.04
+    steps:
+    - name: Creating Release...
+      uses: ncipollo/release-action@v1
+      if: github.ref_name == 'master'
+      with:
+        name: "The latest and greatest"
+        body: This is the latest build of the current development branch. Please try any issues using this build before reporting any problems.
+        token: ${{ secrets.GITHUB_TOKEN }}
+        tag: continuous
+        prerelease: true
+        allowUpdates: true
+        removeArtifacts: true
+    - name: Install Dependencies...
+      run: sudo apt-get -y install qt5-default qttools5-dev qttools5-dev-tools libgtk2.0-dev libfuse-dev libmagic-dev libtag1-dev libssl-dev ninja-build cmake
+    - name: Checking out sources...
+      uses: actions/checkout@v2
+    - name: Configuring...
+      run: cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX:PATH=appdir/usr -B build -GNinja .
+    - name: Building...
+      run: ninja -j$(nproc) -C build
+    - name: Installing...
+      run: ninja -C build install
+    - name: Creating AppImage...
+      run: |
+        sed -i -e 's|^Name=.*|Name=Android File Transfer For Linux|g' build/appdir/usr/share/applications/android-file-transfer.desktop
+        wget -c -q "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
+        chmod a+x linuxdeployqt-continuous-x86_64.AppImage
+        unset QTDIR
+        unset QT_PLUGIN_PATH
+        unset LD_LIBRARY_PATH
+        export VERSION=$(git rev-parse --short HEAD)
+        ./linuxdeployqt-continuous-x86_64.AppImage build/appdir/usr/share/applications/*.desktop -bundle-non-qt-libs
+        ./linuxdeployqt-continuous-x86_64.AppImage build/appdir/usr/share/applications/*.desktop -appimage
+        find build/appdir -executable -type f -exec ldd {} \; | grep " => /usr" | cut -d " " -f 2-3 | sort | uniq
+    - name: Uploading Artifacts...
+      uses: ncipollo/release-action@v1
+      if: github.ref_name == 'master'
+      with:
+        allowUpdates: true
+        omitBody: true
+        omitName: true
+        token: ${{ secrets.GITHUB_TOKEN }}
+        artifacts: ./Android*.AppImage*
+        tag: continuous
+  MacOSX:
+    runs-on: macos-latest
+    steps:
+    - name: Install Dependencies...
+      run: |
+        brew tap homebrew/cask
+        brew install qt5 homebrew/cask/macfuse pybind11 taglib openssl@1.1 cmake ninja libmagic
+    - name: Checking out sources...
+      uses: actions/checkout@v2
+    - name: Configuring...
+      run: cmake -DCMAKE_OSX_DEPLOYMENT_TARGET=10.12 -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/usr/local/opt/qt5 -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl@1.1 -DOPENSSL_LIBRARIES=/usr/local/opt/openssl@1.1/lib -DCMAKE_INSTALL_PREFIX=appdir -B build -G Ninja .
+    - name: Building...
+      run: ninja -j$(sysctl -n hw.ncpu) -C build
+    - name: Installing...
+      run: ninja -C build install
+    - name: Packaging...
+      run: |
+        mv appdir/android-file-transfer.app appdir/Android\ File\ Transfer\ for\ Linux.app
+        git clone https://github.com/andreyvit/create-dmg.git
+        cd create-dmg
+        ./create-dmg --volicon "../osx/android-file-transfer.icns" --icon-size 96 --icon "Android File Transfer for Linux" 110 100 --app-drop-link 380 100 AndroidFileTransferForLinux.dmg ../appdir/Android\ File\ Transfer\ for\ Linux.app
+    - name: Uploading Artifacts...
+      uses: ncipollo/release-action@v1
+      if: github.ref_name == 'master'
+      with:
+        allowUpdates: true
+        omitBody: true
+        omitName: true
+        token: ${{ secrets.GITHUB_TOKEN }}
+        artifacts: create-dmg/*.dmg
+        tag: continuous
