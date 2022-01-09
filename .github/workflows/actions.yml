@@ -34,4 +34,4 @@ jobs:
         body: The latest and greatest - try this first in case you're having any issues.
         token: ${{ secrets.GITHUB_TOKEN }}
         artifacts: ./Android*.AppImage*
-        tag: continuos
+        tag: continuous
