@@ -4,7 +4,7 @@ jobs:
   Linux:
     runs-on: ubuntu-18.04
     steps:
-    - name: Install dependencies...
+    - name: Install Dependencies...
       run: sudo apt-get -y install qt5-default qttools5-dev qttools5-dev-tools libgtk2.0-dev libfuse-dev libmagic-dev libtag1-dev libssl-dev ninja-build cmake
     - name: Checking out sources...
       uses: actions/checkout@v2
@@ -35,3 +35,24 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
         artifacts: ./Android*.AppImage*
         tag: continuous
+  MacOSX:
+    runs-on: macos-latest
+    steps:
+    - name: Install Dependencies...
+      run: |
+        brew tap homebrew/cask
+        brew install qt5 homebrew/cask/osxfuse pybind11 taglib openssl@1.1
+    - name: Checking out sources...
+      uses: actions/checkout@v2
+    - name: Configuring...
+      run: cmake -DCMAKE_OSX_DEPLOYMENT_TARGET=10.12 -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/usr/local/opt/qt5 -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl@1.1 -DOPENSSL_LIBRARIES=/usr/local/opt/openssl@1.1/lib -DCMAKE_INSTALL_PREFIX=appdir -B build -G Ninja .
+    - name: Building...
+      run: ninja -j$(nproc) -C build
+    - name: Installing...
+      run: ninja -C build install
+    - name: Packaging...
+      run: |
+        mv appdir/android-file-transfer.app appdir/Android\ File\ Transfer\ for\ Linux.app
+        git clone https://github.com/andreyvit/create-dmg.git
+        cd create-dmg
+        ./create-dmg --volicon "../../osx/android-file-transfer.icns" --icon-size 96 --icon "Android File Transfer for Linux" 110 100 --app-drop-link 380 100 AndroidFileTransferForLinux.dmg ../appdir/Android\ File\ Transfer\ for\ Linux.app
