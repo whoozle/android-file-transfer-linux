@@ -15,7 +15,7 @@
     android-file-transfer:
       command: bin/desktop-launch android-file-transfer
       desktop: share/applications/android-file-transfer.desktop
-      plugs: [x11, network, network-bind, desktop, gsettings, wayland, raw-usb]
+      plugs: [x11, network, network-bind, desktop, gsettings, wayland, raw-usb, personal-files]
       environment:
         # Use GTK3 cursor theme, icon theme and open/save file dialogs.
         QT_QPA_PLATFORMTHEME: gtk3
