@@ -4,7 +4,7 @@
 [![Version](http://img.shields.io/:version-4.3-green.svg)](https://github.com/whoozle/android-file-transfer-linux)
 [![Android File Transfer for Linux (and MacOSX!)](https://github.com/whoozle/android-file-transfer-linux/actions/workflows/actions.yml/badge.svg)](https://github.com/whoozle/android-file-transfer-linux/actions/workflows/actions.yml)
 
-Android File Transfer for Linux — reliable MTP client with minimalistic UI similar to [Android File Transfer for Mac](https://www.android.com/intl/en_us/filetransfer/).
+Android File Transfer for Linux — reliable MTP client with minimalistic UI similar to [Android File Transfer](https://www.android.com/intl/en_us/filetransfer/).
 
 It just works™.
 
@@ -18,7 +18,6 @@ If you're suffering from crashes, missing tags, album covers, usb freezes and co
 
 If your distribution does not provide `android-file-transfer-linux` package, you can still install it in your system. 
 There's quite a few packages available:
-- Snapcraft: https://snapcraft.io/android-file-transfer-linux
 - AppImage: https://github.com/whoozle/android-file-transfer-linux/releases
 - MacOSX DMG image: https://github.com/whoozle/android-file-transfer-linux/releases
 - MacOSX Homebrew: `brew cask install whoozle-android-file-transfer` or `brew cask install whoozle-android-file-transfer-nightly`
@@ -45,7 +44,13 @@ https://www.paypal.me/whoozle
 ## FAQ
 [Please take a look at FAQ if you have issues with your operating system](FAQ.md). It's not that big, but those are the questions asked very often. 
 
-## Building instructions
+## Installation
+
+### Debian/Ubuntu
+
+  ```
+  sudo apt-get install android-file-transfer
+  ```
 
 ### Gentoo
 
@@ -63,6 +68,8 @@ https://www.paypal.me/whoozle
   ```
   =sys-fs/android-file-transfer-linux-9999 **
   ```
+
+## Building from source
 
 ### Prerequisites
 
