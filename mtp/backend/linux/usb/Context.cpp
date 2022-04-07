@@ -41,7 +41,7 @@ namespace mtp { namespace usb
 			{
 				unsigned busId, conf, interface;
 				char portBuf[256];
-				if (sscanf(entry.c_str(), "%u-%256[0-9.]:%u.%u", &busId, portBuf, &conf, &interface) == 4)
+				if (sscanf(entry.c_str(), "%u-%255[0-9.]:%u.%u", &busId, portBuf, &conf, &interface) == 4)
 				{
 					std::string port = portBuf;
 					if ((port.size() == 1 && port[0] == '0'))
