@@ -17,6 +17,10 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 	find_program(OTOOL_BIN otool)
 endif()
 
+if (${CMAKE_SYSTEM_NAME} MATCHES "Haiku")
+	set(USB_BACKEND_HAIKU TRUE)
+endif()
+
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 
 include(FindPkgConfig)
@@ -165,6 +169,14 @@ elseif (USB_BACKEND_DARWIN)
 		mtp/backend/darwin/usb/Exception.cpp
 		mtp/backend/darwin/usb/Interface.cpp
 	)
+elseif (USB_BACKEND_HAIKU)
+	add_definitions(-DUSB_BACKEND_HAIKU)
+	list(APPEND SOURCES
+		mtp/backend/haiku/usb/Context.cpp
+		mtp/backend/haiku/usb/Device.cpp
+		mtp/backend/haiku/usb/DeviceDescriptor.cpp
+	)
+	list(APPEND MTP_LIBRARIES device)
 else()
 	list(APPEND SOURCES
 		mtp/backend/linux/usb/Endpoint.cpp
@@ -230,6 +242,8 @@ if (USB_BACKEND_LIBUSB)
 	target_include_directories(${LIB_NAME} PUBLIC mtp/backend/libusb)
 elseif (USB_BACKEND_DARWIN)
 	target_include_directories(${LIB_NAME} PUBLIC mtp/backend/darwin)
+elseif (USB_BACKEND_HAIKU)
+	target_include_directories(${LIB_NAME} PUBLIC mtp/backend/haiku)
 else()
 	target_include_directories(${LIB_NAME} PUBLIC mtp/backend/linux)
 endif()
