@@ -18,27 +18,33 @@
 #  Readline_LIBRARY          The readline library.
 
 find_path(Readline_ROOT_DIR
-    NAMES include/readline/readline.h
+    NAMES include/readline/readline.h includes/editline/readline.h
+          develop/headers/readline/readline.h develop/headers/editline/readline.h
 )
 
 find_path(Readline_INCLUDE_DIR
-    NAMES readline/readline.h
-    HINTS ${Readline_ROOT_DIR}/include
+    NAMES readline.h
+    HINTS ${Readline_ROOT_DIR}/include/readline ${Readline_ROOT_DIR}/develop/headers/readline
+        ${Readline_ROOT_DIR}/include/editline ${Readline_ROOT_DIR}/develop/headers/editline
 )
+
+if(EXISTS ${Readline_INCLUDE_DIR}/history.h)
+	add_definitions(-DHAVE_READLINE_HISTORY_H=1)
+endif()
 
 find_library(Readline_LIBRARY
-    NAMES readline
-    HINTS ${Readline_ROOT_DIR}/lib
+    NAMES readline edit
+    HINTS ${Readline_ROOT_DIR}/lib ${Readline_ROOT_DIR}/develop/lib
 )
 
-if(Readline_INCLUDE_DIR AND Readline_LIBRARY AND Ncurses_LIBRARY)
+if(Readline_INCLUDE_DIR AND Readline_LIBRARY)
   set(READLINE_FOUND TRUE)
-else(Readline_INCLUDE_DIR AND Readline_LIBRARY AND Ncurses_LIBRARY)
-  FIND_LIBRARY(Readline_LIBRARY NAMES readline)
+else(Readline_INCLUDE_DIR AND Readline_LIBRARY)
+  FIND_LIBRARY(Readline_LIBRARY NAMES readline edit)
   include(FindPackageHandleStandardArgs)
   FIND_PACKAGE_HANDLE_STANDARD_ARGS(Readline DEFAULT_MSG Readline_INCLUDE_DIR Readline_LIBRARY )
   MARK_AS_ADVANCED(Readline_INCLUDE_DIR Readline_LIBRARY)
-endif(Readline_INCLUDE_DIR AND Readline_LIBRARY AND Ncurses_LIBRARY)
+endif(Readline_INCLUDE_DIR AND Readline_LIBRARY)
 
 mark_as_advanced(
     Readline_ROOT_DIR

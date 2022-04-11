@@ -13,7 +13,7 @@ if (READLINE_FOUND)
 	set(CMAKE_REQUIRED_LIBRARIES ${Readline_LIBRARY})
 	set(READLINE_TEST_SRC "
 #include <stdio.h>
-#include <readline/readline.h>
+#include <readline.h>
 
 int main(int argc, char **argv) {
 	char *line = readline(\">\");
