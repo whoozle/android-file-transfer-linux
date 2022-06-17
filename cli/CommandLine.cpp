@@ -23,8 +23,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
-#include <readline/readline.h>
-#include <readline/history.h>
+#include <readline.h>
+#if HAVE_READLINE_HISTORY_H
+#include <history.h>
+#endif
 
 namespace cli
 {
