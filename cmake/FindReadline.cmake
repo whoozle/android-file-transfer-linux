@@ -19,13 +19,16 @@
 
 find_path(Readline_ROOT_DIR
     NAMES include/readline/readline.h includes/editline/readline.h
+          develop/headers/x86/readline/readline.h develop/headers/x86/editline/readline.h
           develop/headers/readline/readline.h develop/headers/editline/readline.h
 )
 
 find_path(Readline_INCLUDE_DIR
     NAMES readline.h
-    HINTS ${Readline_ROOT_DIR}/include/readline ${Readline_ROOT_DIR}/develop/headers/readline
-        ${Readline_ROOT_DIR}/include/editline ${Readline_ROOT_DIR}/develop/headers/editline
+    HINTS ${Readline_ROOT_DIR}/include/readline ${Readline_ROOT_DIR}/develop/headers/x86/readline
+			${Readline_ROOT_DIR}/develop/headers/readline
+        ${Readline_ROOT_DIR}/include/editline ${Readline_ROOT_DIR}/develop/headers/x86/editline
+			${Readline_ROOT_DIR}/develop/headers/editline
 )
 
 if(EXISTS ${Readline_INCLUDE_DIR}/history.h)
@@ -34,7 +37,8 @@ endif()
 
 find_library(Readline_LIBRARY
     NAMES readline edit
-    HINTS ${Readline_ROOT_DIR}/lib ${Readline_ROOT_DIR}/develop/lib
+    HINTS ${Readline_ROOT_DIR}/lib ${Readline_ROOT_DIR}/develop/lib/x86
+		${Readline_ROOT_DIR}/develop/lib
 )
 
 if(Readline_INCLUDE_DIR AND Readline_LIBRARY)
