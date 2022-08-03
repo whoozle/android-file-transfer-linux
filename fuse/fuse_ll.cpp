@@ -875,7 +875,7 @@ int main(int argc, char **argv)
 	for(int i = 1; i < argc; ++i)
 	{
 		if (strcmp(argv[i], "-R") == 0)
-			resetDevice = false;
+			resetDevice = true;
 		else if (strcmp(argv[i], "-C") == 0)
 			claimInterface = false;
 		else if (strcmp(argv[i], "-d") == 0 || strcmp(argv[i], "-odebug") == 0)
