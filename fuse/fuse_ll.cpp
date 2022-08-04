@@ -244,10 +244,6 @@ namespace
 			ChildrenObjects & cache = _files[inode];
 
 			using namespace mtp;
-			if (inode == FuseId::Root)
-			{
-				return cache;
-			}
 
 			msg::ObjectHandles oh;
 
