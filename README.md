@@ -69,6 +69,12 @@ https://www.paypal.me/whoozle
   =sys-fs/android-file-transfer-linux-9999 **
   ```
 
+### Arch
+
+  ```
+  sudo pacman -S android-file-transfer
+  ```
+
 ## Building from source
 
 ### Prerequisites
