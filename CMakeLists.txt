@@ -32,10 +32,11 @@ find_package ( Threads )
 option(BUILD_FUSE "Build fuse mount helper" ON)
 option(BUILD_MTPZ "Build with MTPZ support" ON)
 option(BUILD_PYTHON "Build python module" ON)
+set(BUILD_PYTHON_VERSION "" CACHE STRING "Force specific python version to build")
 option(BUILD_TAGLIB "Build with taglib support" ON)
 
 if (BUILD_PYTHON)
-	find_package (Python COMPONENTS Interpreter Development QUIET)
+	find_package (Python ${BUILD_PYTHON_VERSION} COMPONENTS Interpreter Development QUIET)
 endif()
 
 if (BUILD_SHARED_LIB)
