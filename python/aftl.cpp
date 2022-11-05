@@ -152,9 +152,15 @@ PYBIND11_MODULE(aftl, m) {
 		;
 	;
 
+	py::class_<usb::Context, usb::ContextPtr>(m, "UsbContext").
+		def(py::init<>()).
+		def("get_device_descriptors", &usb::Context::GetDevices)
+	;
+
 	py::class_<Device, DevicePtr>(m, "Device").
 		def_static("find_first", static_cast<DevicePtr (*)(const std::string &, bool claimInterface, bool)>(&Device::FindFirst),
 			py::arg("filter_device") = std::string(), py::arg("claim_interface") = true, py::arg("reset_device") = false).
+		def_static("open", &Device::Open, py::arg("context"), py::arg("device_descriptor"), py::arg("claim_interface") = true, py::arg("reset_device") = false).
 		def("open_session", &Device::OpenSession,
 			py::arg("session_id") = 1, py::arg("timeout") = static_cast<int>(Session::DefaultTimeout))
 	;
