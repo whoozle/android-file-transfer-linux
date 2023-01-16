@@ -25,6 +25,7 @@
 #include <QMessageBox>
 #include <QTranslator>
 #include <mtp/log.h>
+#include <stdlib.h>
 #if QT_VERSION >= 0x050000
 #	include <QGuiApplication>
 #endif
@@ -52,6 +53,10 @@ namespace
 
 int main(int argc, char *argv[])
 {
+	if (getenv("WAYLAND_DISPLAY")) {
+		// See issue #322
+		setenv("GDK_BACKEND", "x11", true);
+	}
 	QApplication app(argc, argv);
 	Q_INIT_RESOURCE(android_file_transfer);
 
