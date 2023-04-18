@@ -27,6 +27,7 @@
 #include <memory>
 #include <mutex>
 #include <exception>
+#include <stdexcept>
 #include <string>
 
 namespace mtp
