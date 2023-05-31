@@ -231,9 +231,8 @@ bool MainWindow::reconnectToDevice()
 	{
 		DevicesDialog dialog(_resetDevice, this);
 		int r = dialog.exec();
-		if (r == QDialog::Rejected)
-			return false;
-		_device = dialog.getDevice();
+		if (r == QDialog::Accepted)
+			_device = dialog.getDevice();
 	}
 
 	if (!_device)
