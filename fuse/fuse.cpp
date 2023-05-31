@@ -978,6 +978,7 @@ int main(int argc, char **argv)
 		mtp::print("Additional AFT options: ");
 		mtp::print("    -R                     reset device");
 		mtp::print("    -C                     do not claim USB interface");
+		mtp::print("    -D <name>              filter by manufacturer/model/serial");
 		mtp::print("    -v                     AFT verbose output");
 	}
 	fuse_opt_free_args(&fuse_args);
