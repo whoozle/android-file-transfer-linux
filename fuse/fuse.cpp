@@ -883,13 +883,23 @@ int main(int argc, char **argv)
 			args.push_back(argv[i]);
 			mtp::g_debug = true;
 		}
-		else if (i + 1 < argc && strcmp(argv[i], "-o") == 0 && strcmp(argv[i + 1], "debug") == 0)
+		else if (strcmp(argv[i], "-o") == 0 && strcmp(argv[i + 1], "debug") == 0)
 		{
+			if (i + 1 == argc)
+			{
+				mtp::error("-o requires an argument");
+				return 1;
+			}
 			mtp::g_debug = true;
 			args.push_back(argv[i]);
 		}
-		else if (i + 1 < argc && strcmp(argv[i], "-D") == 0)
+		else if (strcmp(argv[i], "-D") == 0)
 		{
+			if (i + 1 == argc)
+			{
+				mtp::error("-D requires an argument");
+				return 1;
+			}
 			deviceFilter = argv[i + 1];
 			++i;
 		}
