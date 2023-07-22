@@ -181,9 +181,11 @@ namespace mtp
 	DevicePtr Device::FindFirst(usb::ContextPtr ctx, const std::string & filter, bool claimInterface, bool resetDevice)
 	{
 		int vendor, product;
+		bool useUsbVendorProduct = true;
 		if (sscanf(filter.c_str(), "%x:%x", &vendor, &product) != 2)
 		{
 			vendor = product = -1;
+			useUsbVendorProduct = false;
 		}
 
 		for (usb::DeviceDescriptorPtr desc : ctx->GetDevices())
@@ -196,7 +198,7 @@ namespace mtp
 			}
 
 			auto device = Open(ctx, desc, claimInterface, resetDevice);
-			if (device && device->Matches(filter))
+			if (device && (useUsbVendorProduct || device->Matches(filter)))
 				return device;
 		}
 		catch(const std::exception &ex)
