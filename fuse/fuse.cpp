@@ -31,12 +31,13 @@
 #include <mtp/log.h>
 
 #include <algorithm>
+#include <functional>
 #include <map>
 #include <set>
+#include <unistd.h>
 #include <vector>
-#include <functional>
 #include <list>
-#include <stdio.h>
+#include <cstdio>
 
 #include <fuse_lowlevel.h>
 
@@ -132,6 +133,8 @@ namespace
 			cache.emplace(oi.Filename, inode);
 
 			struct stat &attr = _objectAttrs[id];
+			attr.st_uid = getuid();
+			attr.st_gid = getgid();
 			attr.st_ino = inode.Inode;
 			attr.st_mode = FuseEntry::GetMode(oi.ObjectFormat);
 			attr.st_atime = attr.st_mtime = mtp::ConvertDateTime(oi.ModificationDate);
@@ -145,6 +148,8 @@ namespace
 			if (inode == FuseId::Root)
 			{
 				struct stat attr = { };
+				attr.st_uid = getuid();
+				attr.st_gid = getgid();
 				attr.st_ino = inode.Inode;
 				attr.st_mtime = attr.st_ctime = attr.st_atime = _connectTime;
 				attr.st_mode = FuseEntry::DirectoryMode;
@@ -155,6 +160,8 @@ namespace
 			if (IsStorage(inode))
 			{
 				struct stat attr = { };
+				attr.st_uid = getuid();
+				attr.st_gid = getgid();
 				attr.st_ino = inode.Inode;
 				attr.st_mtime = attr.st_ctime = attr.st_atime = _connectTime;
 				attr.st_mode = FuseEntry::DirectoryMode;
@@ -450,7 +457,7 @@ namespace
 				if (path.empty())
 				{
 					char buf[64];
-					snprintf(buf, sizeof(buf), "sdcard%u", (unsigned)i);
+					std::snprintf(buf, sizeof(buf), "sdcard%u", (unsigned)i);
 					path = buf;
 				}
 				FuseId inode(MtpStorageShift + i);
