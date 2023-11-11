@@ -874,7 +874,6 @@ int main(int argc, char **argv)
 	std::string deviceFilter;
 	bool claimInterface = true;
 	bool resetDevice = false;
-	bool showHelp = false;
 
 	std::vector<char *> args;
 	args.push_back(argv[0]);
@@ -912,8 +911,14 @@ int main(int argc, char **argv)
 		}
 		else if (strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-h") == 0)
 		{
-			args.push_back(argv[i]);
-			showHelp = true;
+			mtp::print();
+			mtp::print("Additional AFT options: ");
+			mtp::print("    -R                     reset device");
+			mtp::print("    -C                     do not claim USB interface");
+			mtp::print("    -d / -o debug          show MTP debug output");
+			mtp::print("    -D <name>              filter by manufacturer/model/serial");
+			mtp::print("    -v                     AFT verbose output");
+			return 0;
 		} else
 			args.push_back(argv[i]);
 	}
@@ -979,14 +984,6 @@ int main(int argc, char **argv)
 		}
 	} else {
 		mtp::error("fuse_parse_cmdline failed");
-	}
-	if (showHelp) {
-		mtp::print();
-		mtp::print("Additional AFT options: ");
-		mtp::print("    -R                     reset device");
-		mtp::print("    -C                     do not claim USB interface");
-		mtp::print("    -D <name>              filter by manufacturer/model/serial");
-		mtp::print("    -v                     AFT verbose output");
 	}
 	fuse_opt_free_args(&fuse_args);
 
