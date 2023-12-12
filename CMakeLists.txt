@@ -4,7 +4,7 @@ project(android-file-transfer)
 set (CMAKE_CXX_STANDARD 11)
 
 set(VERSION_MAJOR "4")
-set(VERSION_MINOR "3")
+set(VERSION_MINOR "4")
 set(VERSION_PATCH "0")
 set(VERSION_COUNT 3)
 set(VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")

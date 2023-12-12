@@ -13,7 +13,7 @@
       "config-opts": [ "-DCMAKE_BUILD_TYPE=Release" ],
       "sources": [{
         "type": "git",
-        "tag": "v4.3",
+        "tag": "v4.4",
         "url": "https://github.com/whoozle/android-file-transfer-linux.git"
       }]
     }
