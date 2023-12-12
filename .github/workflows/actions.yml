@@ -6,7 +6,7 @@ jobs:
   Linux:
     runs-on: ubuntu-20.04
     steps:
-    - name: Creating Release...
+    - name: Creating contiguous...
       uses: ncipollo/release-action@v1
       if: github.ref_name == 'master'
       with:
@@ -17,6 +17,16 @@ jobs:
         prerelease: true
         allowUpdates: true
         removeArtifacts: true
+    - name: Creating release...
+      uses: ncipollo/release-action@v1
+      if: github.ref_type == 'tag'
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        omitBody: true
+        omitName: true
+        allowUpdates: true
+        removeArtifacts: true
+        makeLatest: true
     - name: Install Dependencies...
       run: sudo apt-get -y install qt5-default qttools5-dev qttools5-dev-tools libgtk2.0-dev libfuse-dev libmagic-dev libtag1-dev libssl-dev ninja-build cmake
     - name: Checking out sources...
@@ -38,7 +48,7 @@ jobs:
         export VERSION=$(git rev-parse --short HEAD)
         ./linuxdeployqt-continuous-x86_64.AppImage build/appdir/usr/share/applications/*.desktop -bundle-non-qt-libs -appimage
         find build/appdir -executable -type f -exec ldd {} \; | grep " => /usr" | cut -d " " -f 2-3 | sort | uniq
-    - name: Uploading Artifacts...
+    - name: Uploading contiguous artifacts...
       uses: ncipollo/release-action@v1
       if: github.ref_name == 'master'
       with:
@@ -48,6 +58,15 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
         artifacts: ./Android*.AppImage*
         tag: continuous
+    - name: Uploading release artifacts...
+      uses: ncipollo/release-action@v1
+      if: github.ref_type == 'tag'
+      with:
+        allowUpdates: true
+        omitBody: true
+        omitName: true
+        token: ${{ secrets.GITHUB_TOKEN }}
+        artifacts: ./Android*.AppImage*
   MacOSX:
     runs-on: macos-latest
     steps:
@@ -69,7 +88,7 @@ jobs:
         git clone https://github.com/andreyvit/create-dmg.git
         cd create-dmg
         ./create-dmg --volicon "../osx/android-file-transfer.icns" --icon-size 96 --icon "Android File Transfer for Linux" 110 100 --app-drop-link 380 100 AndroidFileTransferForLinux.dmg ../appdir/Android\ File\ Transfer\ for\ Linux.app
-    - name: Uploading Artifacts...
+    - name: Uploading contiguous artifacts...
       uses: ncipollo/release-action@v1
       if: github.ref_name == 'master'
       with:
@@ -79,3 +98,13 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
         artifacts: create-dmg/*.dmg
         tag: continuous
+
+    - name: Uploading contiguous artifacts...
+      uses: ncipollo/release-action@v1
+      if: github.ref_type == 'tag'
+      with:
+        allowUpdates: true
+        omitBody: true
+        omitName: true
+        token: ${{ secrets.GITHUB_TOKEN }}
+        artifacts: create-dmg/*.dmg
