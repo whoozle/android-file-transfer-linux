@@ -706,6 +706,16 @@ namespace
 			}
 
 			FuseId inode = i->second;
+			if (GetObjectAttr(inode).st_mode & S_IFDIR)
+			{
+				auto &dirChildren = GetChildren(inode);
+				if (!dirChildren.empty())
+				{
+					FUSE_CALL(fuse_reply_err(req, ENOTEMPTY));
+					return;
+				}
+			}
+
 			UnlinkImpl(inode);
 			_directoryCache.erase(parent);
 			children.erase(i);
