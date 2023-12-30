@@ -107,6 +107,12 @@ namespace
 		static bool IsStorage(FuseId id)
 		{ return id.Inode >= MtpStorageShift && id.Inode <= MtpObjectShift; }
 
+		static void SetSize(struct stat & st, size_t size)
+		{
+			st.st_size = size;
+			st.st_blocks = (size + 511) / 512;
+		}
+
 		mtp::StorageId FuseIdToStorageId(FuseId id) const
 		{
 			if (!IsStorage(id))
@@ -139,7 +145,7 @@ namespace
 			attr.st_mode = FuseEntry::GetMode(oi.ObjectFormat);
 			attr.st_atime = attr.st_mtime = mtp::ConvertDateTime(oi.ModificationDate);
 			attr.st_ctime = mtp::ConvertDateTime(oi.CaptureDate);
-			attr.st_size = oi.ObjectCompressedSize != mtp::MaxObjectSize? oi.ObjectCompressedSize: _session->GetObjectIntegerProperty(id, mtp::ObjectProperty::ObjectSize);
+			SetSize(attr, oi.ObjectCompressedSize != mtp::MaxObjectSize? oi.ObjectCompressedSize: _session->GetObjectIntegerProperty(id, mtp::ObjectProperty::ObjectSize));
 			attr.st_nlink = 1;
 		}
 
@@ -292,7 +298,7 @@ namespace
 					//size
 					GetObjectPropertyList<mtp::u64>(parent, objects, mtp::ObjectProperty::ObjectSize,
 						[this](ObjectId objectId, mtp::u64 size)
-						{ _objectAttrs[objectId].st_size = size; });
+						{ SetSize(_objectAttrs[objectId], size); });
 
 					//mtime
 					try
@@ -615,7 +621,7 @@ namespace
 			{
 				mtp::debug("truncating file to ", newSize);
 				tr->Truncate(newSize);
-				_objectAttrs[objectId].st_size = newSize;
+				SetSize(_objectAttrs[objectId], newSize);
 			}
 
 			tr->Send(off, mtp::ByteArray(buf, buf + size));
@@ -676,8 +682,8 @@ namespace
 					off_t newSize = attr->st_size;
 					ObjectEditSessionPtr tr = GetTransaction(inode);
 					tr->Truncate(newSize);
-					entry.attr.st_size = newSize;
-					_objectAttrs[FromFuse(inode)].st_size = newSize;
+					SetSize(entry.attr, newSize);
+					SetSize(_objectAttrs[FromFuse(inode)], newSize);
 				}
 				entry.ReplyAttr();
 			}
