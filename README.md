@@ -21,7 +21,7 @@ If your distribution does not provide an `android-file-transfer-linux` package, 
 There's quite a few packages available:
 - AppImage: https://github.com/whoozle/android-file-transfer-linux/releases
 - macOS DMG image: https://github.com/whoozle/android-file-transfer-linux/releases
-- macOS Homebrew: `brew cask install whoozle-android-file-transfer` or `brew cask install whoozle-android-file-transfer-nightly`
+- macOS Homebrew: `brew install --cask whoozle-android-file-transfer` or `brew install --cask whoozle-android-file-transfer-nightly`
 
 ## Support me
 If you want to help me with development, click on the link below and follow the instructions. I'm working on this project in my spare time and I try to fix everything as fast as possible, sometimes adding features in realtime (more than 100 tickets closed by now).
