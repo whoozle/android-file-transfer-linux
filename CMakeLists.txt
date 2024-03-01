@@ -3,11 +3,23 @@ project(android-file-transfer)
 
 set (CMAKE_CXX_STANDARD 11)
 
-set(VERSION_MAJOR "4")
-set(VERSION_MINOR "4")
-set(VERSION_PATCH "0")
-set(VERSION_COUNT 3)
-set(VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
+file(READ ${CMAKE_SOURCE_DIR}/README.md README_MD)
+string(REGEX MATCH "version-([0-9a-fA-F.]+)-" _VERSION ${README_MD})
+set(AFT_BASE_VERSION ${CMAKE_MATCH_1})
+
+find_package(Git)
+execute_process(COMMAND ${GIT_EXECUTABLE}  -C ${CMAKE_SOURCE_DIR} rev-parse --short HEAD
+	OUTPUT_VARIABLE AFT_REVISION
+	OUTPUT_STRIP_TRAILING_WHITESPACE
+	RESULT_VARIABLE GIT_STATUS
+	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+
+if (GIT_STATUS EQUAL 0)
+	set(AFT_VERSION "${AFT_BASE_VERSION}-${AFT_REVISION}")
+else()
+	set(AFT_VERSION "${AFT_BASE_VERSION}-snapshot")
+endif()
+message(STATUS "version: ${AFT_VERSION}, base version: ${AFT_BASE_VERSION}")
 
 message(STATUS "building for ${CMAKE_SYSTEM_NAME}")
 
@@ -133,23 +145,6 @@ set(SOURCES
 	mtp/mtpz/TrustedApp.cpp
 )
 
-find_package(Git)
-execute_process(COMMAND ${GIT_EXECUTABLE}  -C ${CMAKE_SOURCE_DIR} describe --tags --match=v\*
-	OUTPUT_VARIABLE AFT_VERSION
-	OUTPUT_STRIP_TRAILING_WHITESPACE
-	RESULT_VARIABLE GIT_STATUS
-	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
-
-if (GIT_STATUS EQUAL 0)
-	string(REGEX MATCH "v([0-9a-fA-F.]+)-" _VERSION ${AFT_VERSION})
-	set(AFT_BASE_VERSION ${CMAKE_MATCH_1})
-else()
-	file(READ ${CMAKE_SOURCE_DIR}/README.md README_MD)
-	string(REGEX MATCH "version-([0-9a-fA-F.]+)-" _VERSION ${README_MD})
-	set(AFT_BASE_VERSION ${CMAKE_MATCH_1})
-	set(AFT_VERSION "v${AFT_BASE_VERSION}-snapshot")
-endif()
-message(STATUS "version: ${AFT_VERSION}, base version: ${AFT_BASE_VERSION}")
 
 set(VERSION_SRC ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/version.cpp)
 configure_file(mtp/version.cpp.in ${VERSION_SRC})
@@ -222,7 +217,7 @@ endif()
 
 if (BUILD_SHARED_LIB)
 	add_library(${LIB_NAME} SHARED ${SOURCES})
-	set_target_properties(${LIB_NAME} PROPERTIES SOVERSION ${VERSION})
+	set_target_properties(${LIB_NAME} PROPERTIES SOVERSION ${AFT_BASE_VERSION})
 	target_link_libraries(${LIB_NAME} PRIVATE ${CMAKE_THREAD_LIBS_INIT} ${MTP_SHARED_LIBRARIES})
 
 	if (USB_BACKEND_LIBUSB)
