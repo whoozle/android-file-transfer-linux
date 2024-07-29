@@ -363,8 +363,8 @@ namespace cli
 				ss << ToString(code) << " ";
 
 			ss << "\nsupported properties: ";
-			_batterySupported = _gdi.Supports(mtp::DeviceProperty::BatteryLevel);
-			_deviceFriendlyNameSupported = _gdi.Supports(mtp::DeviceProperty::DeviceFriendlyName);
+			_batterySupported = _gdi.Supports(mtp::OperationCode::GetDevicePropValue) && _gdi.Supports(mtp::DeviceProperty::BatteryLevel);
+			_deviceFriendlyNameSupported = _gdi.Supports(mtp::OperationCode::GetDevicePropValue) && _gdi.Supports(mtp::DeviceProperty::DeviceFriendlyName);
 
 			for(DeviceProperty code : _gdi.DevicePropertiesSupported)
 				ss << ToString(code) << " ";
