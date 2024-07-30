@@ -130,6 +130,10 @@ namespace cli
 			make_function([this](const Path &path) -> void { Get(path); }));
 		AddCommand("get", "<file> <dst> downloads file to <dst>",
 			make_function([this](const Path &path, const LocalPath &dst) -> void { Get(dst, path); }));
+		AddCommand("get-id", "<id> get object by id",
+			make_function([this](mtp::u32 id) -> void { Get(mtp::ObjectId(id)); }));
+		AddCommand("get-id", "<id> <dst> get object by id to <dst>",
+                        make_function([this](mtp::u32 id, const LocalPath &dst) -> void { Get(dst, mtp::ObjectId(id)); }));
 
 		AddCommand("get-thumb", "<file> downloads thumbnail for file",
 			make_function([this](const Path &path) -> void { GetThumb(path); }));
