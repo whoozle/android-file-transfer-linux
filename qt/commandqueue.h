@@ -23,6 +23,7 @@
 #include <QObject>
 #include <QQueue>
 #include <QMap>
+#include <QDebug>
 #include <mtp/ptp/ObjectId.h>
 #include <mtp/ptp/ObjectFormat.h>
 #include <mtp/metadata/Library.h>
