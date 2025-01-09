@@ -70,7 +70,7 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
         artifacts: ./Android*.AppImage*
   MacOSX:
-    runs-on: macos-latest
+    runs-on: macos-13
     steps:
     - name: Install Dependencies...
       run: |
