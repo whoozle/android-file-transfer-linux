@@ -107,6 +107,9 @@ namespace mtp { namespace usb
 						if (fdPath.empty())
 							break;
 
+						if (fdPath[0] == '.')
+							continue;
+
 						auto fdTarget = ReadLink(fdsRoot + "/" + fdPath);
 						if (fdTarget.empty())
 							continue;
