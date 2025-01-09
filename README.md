@@ -6,6 +6,8 @@
 
 Android File Transfer for Linux — a reliable [MTP](https://en.wikipedia.org/wiki/Media_Transfer_Protocol) client with minimalistic UI similar to [Android File Transfer](https://www.android.com/intl/en_us/filetransfer/).
 
+![AFTL Screenshot](screenshot.png "Nintendo Switch MTP connection and device-generated thumbnails.")
+
 It just works™.
 
 ## Do I need it?
