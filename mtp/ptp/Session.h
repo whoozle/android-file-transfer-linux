@@ -144,7 +144,7 @@ namespace mtp
 		//windows specific
 		void EnableSecureFileOperations(u32 cmac1[4]);
 
-		static msg::DeviceInfo GetDeviceInfo(PipePacketer& packeter, int timeout = 0);
+		static msg::DeviceInfo GetDeviceInfo(PipePacketer& packeter, u32 transactionId, int timeout = 0);
 
 	private:
 		template<typename ... Args>

@@ -42,12 +42,27 @@ namespace mtp
 		throw InvalidResponseException(__func__, (RCODE)); \
 } while(false)
 
+	class Session::Transaction
+	{
+		Session *	_session;
+	public:
+		u32			Id;
+
+		Transaction(Session *session): _session(session)
+		{ session->SetCurrentTransaction(this); }
+		~Transaction()
+		{ _session->SetCurrentTransaction(0); }
+	};
+
 	Session::Session(const PipePacketer & packeter, u32 sessionId):
 		_packeter(packeter), _sessionId(sessionId), _nextTransactionId(1), _transaction(),
 		_getObjectModificationTimeBuggy(false), _separateBulkWrites(false),
 		_defaultTimeout(DefaultTimeout)
 	{
-		_deviceInfo = GetDeviceInfo(_packeter, _defaultTimeout);
+		{
+			Transaction tr(this);
+			_deviceInfo = GetDeviceInfo(_packeter, tr.Id, _defaultTimeout);
+		}
 		if (_deviceInfo.Manufacturer == "Microsoft")
 			_separateBulkWrites = true;
 
@@ -62,18 +77,6 @@ namespace mtp
 
 	Session::~Session()
 	{ try { Close(); } catch(const std::exception &ex) { } }
-
-	class Session::Transaction
-	{
-		Session *	_session;
-	public:
-		u32			Id;
-
-		Transaction(Session *session): _session(session)
-		{ session->SetCurrentTransaction(this); }
-		~Transaction()
-		{ _session->SetCurrentTransaction(0); }
-	};
 
 	void Session::SetCurrentTransaction(Transaction *transaction)
 	{
@@ -157,10 +160,10 @@ namespace mtp
 		return Get(transaction.Id, response);
 	}
 
-	msg::DeviceInfo Session::GetDeviceInfo(PipePacketer& packeter, int timeout)
+	msg::DeviceInfo Session::GetDeviceInfo(PipePacketer& packeter, u32 transactionId, int timeout)
 	{
 		ByteArray response;
-		Send(packeter, OperationRequest(OperationCode::GetDeviceInfo, 0), timeout);
+		Send(packeter, OperationRequest(OperationCode::GetDeviceInfo, transactionId), timeout);
 		auto info = Get(packeter, 0, response, timeout);
 		return ParseResponse<msg::DeviceInfo>(info);
 	}

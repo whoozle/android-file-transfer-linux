@@ -208,7 +208,7 @@ namespace mtp
 	}
 
 	msg::DeviceInfo Device::GetInfo()
-	{ return Session::GetDeviceInfo(_packeter); }
+	{ return Session::GetDeviceInfo(_packeter, /*transactionId=*/0); }
 
 	bool Device::Matches(const std::string & filter)
 	{
