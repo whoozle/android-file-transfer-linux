@@ -25,18 +25,26 @@
 
 namespace mtp { namespace usb
 {
-	BulkPipe::BulkPipe(DevicePtr device, ConfigurationPtr conf, InterfacePtr interface, EndpointPtr in, EndpointPtr out, EndpointPtr interrupt, ITokenPtr claimToken):
+	BulkPipe::BulkPipe(DevicePtr device, ConfigurationPtr conf, InterfacePtr interface, EndpointPtr in, EndpointPtr out, EndpointPtr interrupt, ITokenPtr claimToken, bool clearHalt):
 		_device(device), _conf(conf), _interface(interface), _in(in), _out(out), _interrupt(interrupt), _claimToken(claimToken)
 	{
-		try
-		{ device->ClearHalt(in); }
-		catch(const std::exception & ex)
-		{ error("clearing halt for in ep: ", ex.what()); }
+		if (clearHalt)
+		{
+			try
+			{ device->ClearHalt(_interrupt); }
+			catch(const std::exception & ex)
+			{ error("clearing halt for in ep: ", ex.what()); }
 
-		try
-		{ device->ClearHalt(out); }
-		catch(const std::exception & ex)
-		{ error("clearing halt for in ep: ", ex.what()); }
+			try
+			{ device->ClearHalt(in); }
+			catch(const std::exception & ex)
+			{ error("clearing halt for in ep: ", ex.what()); }
+
+			try
+			{ device->ClearHalt(out); }
+			catch(const std::exception & ex)
+			{ error("clearing halt for in ep: ", ex.what()); }
+		}
 	}
 
 	BulkPipe::~BulkPipe()

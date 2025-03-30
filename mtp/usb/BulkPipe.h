@@ -54,7 +54,7 @@ namespace mtp { namespace usb
 		class CurrentStreamSetter;
 
 	public:
-		BulkPipe(DevicePtr device, ConfigurationPtr conf, InterfacePtr interface, EndpointPtr in, EndpointPtr out, EndpointPtr interrupt, ITokenPtr claimToken);
+		BulkPipe(DevicePtr device, ConfigurationPtr conf, InterfacePtr interface, EndpointPtr in, EndpointPtr out, EndpointPtr interrupt, ITokenPtr claimToken, bool clearHalt = false);
 		~BulkPipe();
 
 		DevicePtr GetDevice() const;
