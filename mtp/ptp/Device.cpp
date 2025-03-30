@@ -107,7 +107,6 @@ namespace mtp
 			for(int j = 0; j < interfaces; ++j)
 			{
 				usb::InterfacePtr iface = conf->GetInterface(device, conf, j, 0);
-				usb::InterfaceTokenPtr token = claimInterface? device->ClaimInterface(iface): nullptr;
 				debug("Device usb interface: ", i, ':', j, ", index: ", iface->GetIndex(), ", endpoints: ", iface->GetEndpointsCount());
 
 #ifdef USB_BACKEND_LIBUSB
@@ -155,8 +154,10 @@ namespace mtp
 					name = stream.ReadString((len - 2) / 2);
 				}
 #endif
+				//device->SetConfiguration(i);
 				if (name.find("MTP") != name.npos)
 				{
+					usb::InterfaceTokenPtr token = claimInterface? device->ClaimInterface(iface): nullptr;
 					usb::BulkPipePtr pipe = usb::BulkPipe::Create(device, conf, iface, token);
 					return std::make_shared<Device>(pipe);
 				} else
@@ -164,6 +165,7 @@ namespace mtp
 
 				if (iface->GetClass() == 6 && iface->GetSubclass() == 1)
 				{
+					usb::InterfaceTokenPtr token = claimInterface? device->ClaimInterface(iface): nullptr;
 					usb::BulkPipePtr pipe = usb::BulkPipe::Create(device, conf, iface, token);
 					return std::make_shared<Device>(pipe);
 				}
