@@ -52,7 +52,9 @@ namespace mtp { namespace usb
 
 	InterfaceToken::InterfaceToken(int fd, unsigned interfaceNumber): _fd(fd), _interfaceNumber(interfaceNumber)
 	{
-		IOCTL(_fd, USBDEVFS_CLAIMINTERFACE, &interfaceNumber);
+		usbdevfs_disconnect_claim claim = {};
+		claim.interface = interfaceNumber;
+		IOCTL(_fd, USBDEVFS_DISCONNECT_CLAIM, &claim);
 	}
 
 	InterfaceToken::~InterfaceToken()
