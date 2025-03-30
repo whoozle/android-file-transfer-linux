@@ -90,12 +90,12 @@ namespace mtp { namespace usb
 				if (pid == myPid)
 					continue;
 
-				debug("got process dir ", pidPath);
+				// debug("got process dir ", pidPath);
 				auto fdsRoot = "/proc/" + pidPath + "/fd";
 
 				if (access(fdsRoot.c_str(), R_OK) != 0)
 				{
-					debug("skipping inaccessible path ", fdsRoot);
+					// debug("skipping inaccessible path ", fdsRoot);
 					continue;
 				}
 				try
