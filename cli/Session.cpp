@@ -948,7 +948,7 @@ namespace cli
 		mtp::print("properties supported: ");
 		for(mtp::ObjectProperty prop: ops.ObjectPropertyCodes)
 		{
-			PrintFormat(_session->GetObjectPropertyDesc(prop), _session->GetObjectProperty(id, prop));
+			PrintFormat(_session->GetObjectPropertyDesc(prop, format), _session->GetObjectProperty(id, prop));
 		}
 	}
 

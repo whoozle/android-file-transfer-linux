@@ -226,8 +226,8 @@ namespace mtp
 	msg::ObjectPropertiesSupported Session::GetObjectPropertiesSupported(ObjectFormat format)
 	{ return ParseResponse<msg::ObjectPropertiesSupported>(RunTransaction(_defaultTimeout, OperationCode::GetObjectPropsSupported, static_cast<u32>(format))); }
 
-	ByteArray Session::GetObjectPropertyDesc(ObjectProperty code)
-	{ return RunTransaction(_defaultTimeout, OperationCode::GetObjectPropDesc, static_cast<u32>(code)); }
+	ByteArray Session::GetObjectPropertyDesc(ObjectProperty code, ObjectFormat format)
+	{ return RunTransaction(_defaultTimeout, OperationCode::GetObjectPropDesc, static_cast<u32>(code), static_cast<u32>(format)); }
 
 	void Session::GetObject(ObjectId objectId, const IObjectOutputStreamPtr &outputStream)
 	{

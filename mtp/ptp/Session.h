@@ -107,7 +107,7 @@ namespace mtp
 		{ return std::make_shared<ObjectEditSession>(session, objectId); }
 
 		msg::ObjectPropertiesSupported GetObjectPropertiesSupported(ObjectFormat format);
-		ByteArray GetObjectPropertyDesc(ObjectProperty code);
+		ByteArray GetObjectPropertyDesc(ObjectProperty code, ObjectFormat format);
 
 		void SetObjectProperty(ObjectId objectId, ObjectProperty property, const ByteArray &value);
 		void SetObjectProperty(ObjectId objectId, ObjectProperty property, u64 value);
