@@ -58,7 +58,7 @@ else()
 endif()
 
 if (BUILD_FUSE)
-	pkg_check_modules ( FUSE fuse )
+	pkg_check_modules ( FUSE fuse3 )
 endif()
 
 if (BUILD_TAGLIB)
@@ -70,7 +70,7 @@ endif()
 
 if (FUSE_FOUND)
 	message(STATUS "fuse found, building mount helper")
-	add_definitions(${FUSE_CFLAGS} -DFUSE_USE_VERSION=26)
+	add_definitions(${FUSE_CFLAGS} -DFUSE_USE_VERSION=35 -DFUSE_DARWIN_ENABLE_EXTENSIONS=0)
 endif()
 
 if (PYTHON_FOUND)

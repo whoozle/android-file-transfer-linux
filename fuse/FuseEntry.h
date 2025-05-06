@@ -22,6 +22,9 @@
 
 #include <mtp/ptp/ObjectFormat.h>
 
+#include <fuse/Exception.h>
+#include <fuse/FuseId.h>
+
 #include <fuse_lowlevel.h>
 
 namespace mtp { namespace fuse

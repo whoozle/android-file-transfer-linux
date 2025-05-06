@@ -478,7 +478,6 @@ namespace
 		void Init(void *, fuse_conn_info *conn)
 		{
 			mtp::scoped_mutex_lock l(_mutex);
-			conn->want |= conn->capable & FUSE_CAP_BIG_WRITES;
 		}
 
 		void Lookup (fuse_req_t req, FuseId parent, const char *name)
@@ -732,7 +731,7 @@ namespace
 		void RemoveDir (fuse_req_t req, FuseId parent, const char *name)
 		{ Unlink(req, parent, name); }
 
-		void Rename(fuse_req_t req, FuseId parent, const char *name, FuseId newparent, const char *newName)
+		void Rename(fuse_req_t req, FuseId parent, const char *name, FuseId newparent, const char *newName, unsigned int flags)
 		{
 			if (parent != newparent) {
 				//no renames across directory boundary, sorry
@@ -824,18 +823,14 @@ namespace
 	void Init (void *userdata, struct fuse_conn_info *conn)
 	{
 		mtp::debug("Init: fuse proto version: ", conn->proto_major, ".", conn->proto_minor,
-			", capability: 0x", mtp::hex(conn->capable, 8),
-			", async read: ", conn->async_read,
-			//", congestion_threshold: ", conn->congestion_threshold,
-			//", max bg: ", conn->max_background,
+			", capability: 0x", mtp::hex(conn->capable_ext, 8),
 			", max readahead: ", conn->max_readahead, ", max write: ", conn->max_write
 		);
 
 		//If synchronous reads are chosen, Fuse will wait for reads to complete before issuing any other requests.
 		//mtp is completely synchronous. you cannot have two transaction in parallel, so you have to wait any operation to finish before starting another one
 
-		conn->async_read = 0;
-		conn->want &= ~FUSE_CAP_ASYNC_READ;
+		fuse_unset_feature_flag(conn, FUSE_CAP_ASYNC_READ);
 		try { g_wrapper->Init(userdata, conn); } catch (const std::exception &ex) { mtp::error("init failed:", ex.what()); }
 	}
 
@@ -866,8 +861,8 @@ namespace
 	void Open(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi)
 	{ mtp::debug("   Open ", ino); WRAP_EX(g_wrapper->Open(req, FuseId(ino), fi)); }
 
-	void Rename(fuse_req_t req, fuse_ino_t parent, const char *name, fuse_ino_t newparent, const char *newname)
-	{ mtp::debug("   Rename ", parent, " ", name, " -> ", newparent, " ", newname); WRAP_EX(g_wrapper->Rename(req, FuseId(parent), name, FuseId(newparent), newname)); }
+	void Rename(fuse_req_t req, fuse_ino_t parent, const char *name, fuse_ino_t newparent, const char *newname, unsigned int flags)
+	{ mtp::debug("   Rename ", parent, " ", name, " -> ", newparent, " ", newname); WRAP_EX(g_wrapper->Rename(req, FuseId(parent), name, FuseId(newparent), newname, flags)); }
 
 	void Release(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi)
 	{ mtp::debug("   Release ", ino); WRAP_EX(g_wrapper->Release(req, FuseId(ino), fi)); }
@@ -966,41 +961,50 @@ int main(int argc, char **argv)
 	ops.statfs		= &StatFS;
 
 	struct fuse_args fuse_args = FUSE_ARGS_INIT(static_cast<int>(args.size() - 1), args.data());
-	struct fuse_chan *ch;
-	char *mountpoint;
+	struct fuse_cmdline_opts opts = {};
 	int err = -1;
-	int multithreaded = 0, foreground = 0;
 
-	if (fuse_parse_cmdline(&fuse_args, &mountpoint, &multithreaded, &foreground) != -1)
+	if (fuse_parse_cmdline(&fuse_args, &opts) == 0)
 	{
-		if (!mountpoint)
+		if (opts.show_version)
 		{
-			auto mp = g_wrapper->GetMountpoint();
-			mountpoint = strdup(mp.c_str());
-			mkdir(mountpoint, 0700);
+			fuse_lowlevel_version();
+			exit(0);
+		}
+		if (opts.show_help)
+		{
+			fuse_cmdline_help();
+			fuse_lowlevel_help();
+			exit(0);
 		}
 
-	    if (mountpoint != NULL && (ch = fuse_mount(mountpoint, &fuse_args)) != NULL)
+	    if (opts.mountpoint != NULL)
 		{
-			struct fuse_session *se = fuse_lowlevel_new(&fuse_args, &ops, sizeof(ops), NULL);
+			struct fuse_session *se = fuse_session_new(&fuse_args, &ops, sizeof(ops), NULL);
 			if (se != NULL)
 			{
-				if (fuse_set_signal_handlers(se) != -1)
+				if (fuse_set_signal_handlers(se) == 0)
 				{
-					fuse_session_add_chan(se, ch);
-					if (fuse_daemonize(foreground) == -1)
-						perror("fuse_daemonize");
-					err = (multithreaded? fuse_session_loop_mt: fuse_session_loop)(se);
+					if (fuse_session_mount(se, opts.mountpoint) == 0)
+					{
+						if (fuse_daemonize(opts.foreground) == -1)
+							perror("fuse_daemonize");
+						if (opts.singlethread)
+							err = fuse_session_loop(se);
+						else
+							err = fuse_session_loop_mt(se, nullptr);
+
+						fuse_session_unmount(se);
+					}
 					fuse_remove_signal_handlers(se);
-					fuse_session_remove_chan(ch);
 				}
 				fuse_session_destroy(se);
 			}
-			fuse_unmount(mountpoint, ch);
 		}
 	} else {
 		mtp::error("fuse_parse_cmdline failed");
 	}
+	free(opts.mountpoint);
 	fuse_opt_free_args(&fuse_args);
 
 	return err ? 1 : 0;
