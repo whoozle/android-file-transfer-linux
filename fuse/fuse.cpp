@@ -823,14 +823,14 @@ namespace
 	void Init (void *userdata, struct fuse_conn_info *conn)
 	{
 		mtp::debug("Init: fuse proto version: ", conn->proto_major, ".", conn->proto_minor,
-			", capability: 0x", mtp::hex(conn->capable_ext, 8),
+			", capability: 0x", mtp::hex(conn->capable, 8),
 			", max readahead: ", conn->max_readahead, ", max write: ", conn->max_write
 		);
 
 		//If synchronous reads are chosen, Fuse will wait for reads to complete before issuing any other requests.
 		//mtp is completely synchronous. you cannot have two transaction in parallel, so you have to wait any operation to finish before starting another one
 
-		fuse_unset_feature_flag(conn, FUSE_CAP_ASYNC_READ);
+		conn->want &= ~FUSE_CAP_ASYNC_READ;
 		try { g_wrapper->Init(userdata, conn); } catch (const std::exception &ex) { mtp::error("init failed:", ex.what()); }
 	}
 

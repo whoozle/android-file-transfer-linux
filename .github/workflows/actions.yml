@@ -4,7 +4,7 @@ on: [push]
 
 jobs:
   Linux:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - name: Creating contiguous...
       uses: ncipollo/release-action@v1
@@ -30,7 +30,7 @@ jobs:
     - name: Install Dependencies...
       run: |
         sudo apt-get update
-        sudo apt-get -y install qt5-default qttools5-dev qttools5-dev-tools libgtk2.0-dev libfuse-dev libmagic-dev libtag1-dev libssl-dev ninja-build cmake
+        sudo apt-get -y install qtbase5-dev qt5-qmake qttools5-dev qttools5-dev-tools libgtk2.0-dev libfuse3-dev libfuse2 libmagic-dev libtag1-dev libssl-dev ninja-build cmake
     - name: Checking out sources...
       uses: actions/checkout@v4
     - name: Configuring...
