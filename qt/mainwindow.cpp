@@ -558,12 +558,7 @@ void MainWindow::showContextMenu ( const QPoint & pos )
 
 			visited.insert(format);
 			auto supportedProperties = _session->GetObjectPropertiesSupported(format);
-			auto & properties = supportedProperties.ObjectPropertyCodes;
-			auto it = std::find(properties.begin(), properties.end(), mtp::ObjectProperty::RepresentativeSampleData);
-			if (it != properties.end()) {
-				showRSMenu = true;
-				break;
-			}
+			showRSMenu = supportedProperties.Supports(mtp::ObjectProperty::RepresentativeSampleData);
 		} catch (const std::exception & ex) {
 			qWarning() << "checking representative sample failed";
 		}
