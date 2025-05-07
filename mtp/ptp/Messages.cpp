@@ -61,4 +61,8 @@ namespace mtp { namespace msg
 		return ss.str();
 	}
 
+	bool ObjectPropertiesSupported::Supports(ObjectProperty prop) const
+	{ return std::find(ObjectPropertyCodes.begin(), ObjectPropertyCodes.end(), prop) != ObjectPropertyCodes.end(); }
+
+
 }}

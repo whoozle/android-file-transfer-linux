@@ -52,7 +52,9 @@ namespace mtp
 		debug("device supports ObjectFormat::Artist: ", _artistSupported? "yes": "no");
 		{
 			auto propsSupported = _session->GetObjectPropertiesSupported(ObjectFormat::AbstractAudioAlbum);
-			_albumDateAuthoredSupported = std::find(propsSupported.ObjectPropertyCodes.begin(), propsSupported.ObjectPropertyCodes.end(), ObjectProperty::DateAuthored) != propsSupported.ObjectPropertyCodes.end();
+			_albumDateAuthoredSupported = propsSupported.Supports(ObjectProperty::DateAuthored);
+			_albumCoverSupported = propsSupported.Supports(ObjectProperty::RepresentativeSampleData);
+			mtp::debug("abstract album supports date authored: ", _albumDateAuthoredSupported, ", cover: ", _albumCoverSupported);
 		}
 
 		_storage = storages.StorageIDs[0]; //picking up first storage.

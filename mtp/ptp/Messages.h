@@ -219,6 +219,8 @@ namespace mtp { namespace msg
 	{
 		std::vector<ObjectProperty>		ObjectPropertyCodes;
 
+		bool Supports(ObjectProperty prop) const;
+
 		void Read(InputStream &stream)
 		{
 			stream >> ObjectPropertyCodes;
