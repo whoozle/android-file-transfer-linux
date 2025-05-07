@@ -987,14 +987,12 @@ void MainWindow::removeCover()
 	QItemSelectionModel *selection =_ui->listView->selectionModel();
 	QModelIndexList rows = selection->selectedRows();
 
-	mtp::ByteArray value;
-
 	for(QModelIndex row : rows)
 	{
 		row = mapIndex(row);
 		auto id = _objectModel->objectIdAt(row.row());
 		try
-		{ _session->SetObjectPropertyAsArray(id, mtp::ObjectProperty::RepresentativeSampleData, value); }
+		{ _session->SetObjectPropertyAsArray(id, mtp::ObjectProperty::RepresentativeSampleData, {}); }
 		catch(const std::exception & ex)
 		{ qWarning() << "failed to remove cover:" << ex.what(); }
 	}
