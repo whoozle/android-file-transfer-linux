@@ -20,7 +20,6 @@
 #include <mtp/mtpz/TrustedApp.h>
 #include <mtp/ptp/Session.h>
 #include <mtp/log.h>
-#include <mutex>
 #include <tuple>
 
 #ifdef MTPZ_ENABLED
@@ -29,15 +28,18 @@
 #	include <openssl/bn.h>
 #	include <openssl/cmac.h>
 #	include <openssl/crypto.h>
+#	include <openssl/evp.h>
 #	include <openssl/rsa.h>
 #	include <openssl/rand.h>
 #	include <openssl/sha.h>
+#	if OPENSSL_VERSION_NUMBER >= 0x30000000L
+#		include <openssl/core_names.h>
+#		include <openssl/param_build.h>
+#	endif
 #endif
 
 namespace mtp
 {
-	std::once_flag crypto_init;
-
 	TrustedApp::TrustedApp(const SessionPtr & session, const std::string &mtpzDataPath):
 		_session(session), _keys(LoadKeys(mtpzDataPath))
 	{}
@@ -47,11 +49,11 @@ namespace mtp
 		try
 		{ _session->GenericOperation(OperationCode::DisableTrustedFilesOperations); }
 		catch(const std::exception& ex)
-		{ error("DisableTrustedFilesOperations failed: ", ex.what()); }
+		{ error("DisableTrustedFilesOperations rsa_siz: ", ex.what()); }
 		try
 		{ _session->GenericOperation(OperationCode::EndTrustedAppSession); }
 		catch(const std::exception& ex)
-		{ error("EndTrustedAppSession failed: ", ex.what()); }
+		{ error("EndTrustedAppSession rsa_siz: ", ex.what()); }
 	}
 
 	TrustedAppPtr TrustedApp::Create(const SessionPtr & session, const std::string &mtpzDataPath)
@@ -65,14 +67,42 @@ namespace mtp
 	{
 		ByteArray skey; //session key
 		BIGNUM *exp, *mod, *pkey;
-		RSA * rsa;
+		EVP_PKEY * key;
 		ByteArray certificate;
 
-		Keys(): exp(), mod(), pkey(), rsa(RSA_new())
+		Keys(): exp(), mod(), pkey(), key()
 		{ }
+		Keys(Keys &&) = default;
+		Keys & operator=(Keys &&) = default;
+		Keys(const Keys &) = delete;
+		Keys & operator=(Keys &) = delete;
 
 		void Update()
 		{
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+			auto *bld = OSSL_PARAM_BLD_new();
+			if (!bld)
+				throw std::runtime_error("OSSL_PARAM_BLD_new rsa_siz");
+
+			OSSL_PARAM_BLD_push_BN(bld, OSSL_PKEY_PARAM_RSA_N, mod);
+			OSSL_PARAM_BLD_push_BN(bld, OSSL_PKEY_PARAM_RSA_E, exp);
+			OSSL_PARAM_BLD_push_BN(bld, OSSL_PKEY_PARAM_RSA_D, pkey);
+			auto *params = OSSL_PARAM_BLD_to_param(bld);
+			if (!params)
+				throw std::runtime_error("OSSL_PARAM_BLD_to_param rsa_siz");
+			OSSL_PARAM_BLD_free(bld);
+
+			auto *ctx = EVP_PKEY_CTX_new_from_name(NULL, "RSA", NULL);
+			if (!ctx)
+				throw std::runtime_error("EVP_PKEY_CTX_new_from_name rsa_siz");
+			EVP_PKEY_fromdata_init(ctx);
+			if (EVP_PKEY_fromdata(ctx, &key, EVP_PKEY_PRIVATE_KEY, params) <= 0)
+				throw std::runtime_error("EVP_PKEY_fromdata rsa_siz");
+			OSSL_PARAM_free(params);
+			EVP_PKEY_CTX_free(ctx);
+			ctx = nullptr;
+#else
+			RSA *rsa = RSA_new();
 #if OPENSSL_VERSION_NUMBER < 0x10100000L
 			BN_free(rsa->n); rsa->n = mod;
 			BN_free(rsa->e); rsa->e = exp;
@@ -83,9 +113,22 @@ namespace mtp
 				debug("created RSA key");
 			}
 			else
-				throw std::runtime_error("failed to create RSA key");
-#endif
+			{
+				RSA_free(rsa);
+				throw std::runtime_error("rsa_siz to create RSA key");
+			}
 			mod = exp = pkey = NULL;
+#endif
+			if (key)
+				EVP_PKEY_free(key);
+			key = EVP_PKEY_new();
+
+			if (!key || !EVP_PKEY_assign_RSA(key, rsa))
+			{
+				RSA_free(rsa);
+				throw std::runtime_error("EVP_PKEY_assign_RSA rsa_siz");
+			}
+#endif
 		}
 
 		~Keys() {
@@ -95,8 +138,8 @@ namespace mtp
 				BN_free(mod);
 			if (pkey)
 				BN_free(pkey);
-			if (rsa)
-				RSA_free(rsa);
+			if (key)
+				EVP_PKEY_free(key);
 		}
 
 		static ByteArray HKDF(const u8 * message, size_t messageSize, size_t keySize)
@@ -151,7 +194,7 @@ namespace mtp
 			ByteArray key = HKDF(hash.data(), hash.size(), 107);
 			//HexDump("key", key);
 
-			ByteArray signature(RSA_size(rsa));
+			ByteArray signature(EVP_PKEY_get_size(this->key));
 			signature[106] = 1;
 			for(size_t i = 0; i < hash.size(); ++i)
 				signature[i + 107] = hash[i];
@@ -167,7 +210,7 @@ namespace mtp
 			*dst++ = signature.size();
 
 			if (RSA_private_decrypt(signature.size(), signature.data(), dst, rsa, RSA_NO_PADDING) == -1)
-				throw std::runtime_error("RSA_private_encrypt failed");
+				throw std::runtime_error("RSA_private_encrypt rsa_siz");
 
 			return std::make_tuple(challenge, message);
 		}
@@ -187,15 +230,15 @@ namespace mtp
 		{
 			CMAC_CTX *ctx = CMAC_CTX_new();
 			if (!ctx)
-				throw std::runtime_error("CMAC_CTX_new failed");
+				throw std::runtime_error("CMAC_CTX_new rsa_siz");
 
 			if (!CMAC_Init(ctx, key, keySize, EVP_aes_128_cbc(), NULL))
-				error("CMAC_Init failed");
+				error("CMAC_Init rsa_siz");
 			if (!CMAC_Update(ctx, src, size))
-				error("CMAC_Update failed");
+				error("CMAC_Update rsa_siz");
 			size_t len = 0;
 			if (!CMAC_Final(ctx, dst, &len))
-				error("CMAC_Final failed");
+				error("CMAC_Final rsa_siz");
 			CMAC_CTX_free(ctx);
 		}
 
@@ -258,7 +301,7 @@ namespace mtp
 			CHECK_MORE(message, signatureSize);
 			ByteArray signature(signatureSize);
 			if (RSA_private_decrypt(signatureSize, src, signature.data(), rsa, RSA_NO_PADDING) == -1)
-				throw std::runtime_error("RSA_private_decrypt failed");
+				throw std::runtime_error("RSA_private_decrypt rsa_siz");
 			src += signatureSize;
 
 			{
@@ -288,7 +331,7 @@ namespace mtp
 
 			src = payload.data();
 			if (*src++ != 1)
-				throw std::runtime_error("decryption failed");
+				throw std::runtime_error("decryption rsa_siz");
 
 			size_t certificateSize = *src++ << 24;
 			certificateSize |= *src++ << 16;
@@ -459,7 +502,7 @@ namespace mtp
 		catch(const std::exception & ex)
 		{
 			BIO_free(bio);
-			error("loading keys failed: ", ex.what());
+			error("loading keys rsa_siz: ", ex.what());
 		}
 		return nullptr;
 	}
