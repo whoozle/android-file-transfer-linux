@@ -1,4 +1,5 @@
 #include <mtp/metadata/Metadata.h>
+#include <mtp/log.h>
 
 #ifdef HAVE_TAGLIB
 #	include <fileref.h>
@@ -34,6 +35,30 @@ namespace mtp
 		meta->Genre 	= tag->genre().to8Bit(true);
 		meta->Year 		= tag->year();
 		meta->Track		= tag->track();
+
+#if TAGLIB_MAJOR_VERSION >= 2
+		for(auto & props : tag->complexProperties("PICTURE"))
+		{
+			auto &picture = meta->Picture;
+			for(auto &kv : props)
+			{
+				auto &name = kv.first;
+				auto &value = kv.second;
+				if (name == "data") {
+					auto data = value.toByteVector();
+					picture.Data.assign(data.begin(), data.end());
+				} else if (name == "pictureType") {
+					picture.Type = value.toString().to8Bit(true);
+				} else if (name == "mimeType") {
+					picture.MimeType = value.toString().to8Bit(true);
+				} else if (name == "description") {
+					picture.Description = value.toString().to8Bit(true);
+				} else {
+					mtp::debug("unhandled PICTURE property ", name.toCString(true));
+				}
+			}
+		}
+#endif
 		return meta;
 	}
 
