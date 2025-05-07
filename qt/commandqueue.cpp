@@ -208,6 +208,9 @@ void CommandQueue::importFile(const QString &filename)
 		_albums.insert(std::make_pair(dir, album));
 	}
 
+	if (!metadata->Picture.Data.empty())
+		_library->AddCover(album, metadata->Picture.Data);
+
 	if (_library->HasTrack(album, metadata->Title, metadata->Track)) {
 		qDebug() << "skipping" << filename << ", already uploaded";
 		return;
