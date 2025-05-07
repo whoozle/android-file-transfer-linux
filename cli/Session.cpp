@@ -1124,7 +1124,7 @@ namespace cli
 		if (!meta)
 			throw std::runtime_error("no metadata");
 
-		print("metadata: ", meta->Artist, " / ", meta->Album, " (", meta->Year, ") / ", meta->Title);
+		print("metadata: ", meta->Artist, " / ", meta->Album, " (", meta->Year, ") / ", meta->Title, " picture description: ", meta->Picture.Description);
 
 		auto artist = _library->GetArtist(meta->Artist);
 		if (!artist)
@@ -1147,6 +1147,9 @@ namespace cli
 		debug("track format: " + ToString(format));
 		auto songId = _library->CreateTrack(artist, album, format, meta->Title, meta->Genre, meta->Track, filename, stream->GetSize());
 		_session->SendObject(stream);
+
+		if (!meta->Picture.Data.empty())
+			_library->AddCover(album, meta->Picture.Data);
 
 		_library->AddTrack(album, songId);
 	}

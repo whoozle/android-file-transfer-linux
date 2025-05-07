@@ -3,6 +3,7 @@
 
 #include <mtp/ptp/ObjectId.h>
 #include <mtp/ptp/ObjectFormat.h>
+#include <mtp/ByteArray.h>
 #include <mtp/types.h>
 #include <functional>
 #include <memory>
@@ -68,6 +69,7 @@ namespace mtp
 		ObjectId _musicFolder;
 		bool _artistSupported;
 		bool _albumDateAuthoredSupported;
+		bool _albumCoverSupported;
 
 		using ArtistMap = std::unordered_map<std::string, ArtistPtr>;
 		ArtistMap _artists;
@@ -102,6 +104,7 @@ namespace mtp
 		bool HasTrack(const AlbumPtr & album, const std::string &name, int trackIndex);
 		NewTrackInfo CreateTrack(const ArtistPtr & artist, const AlbumPtr & album, ObjectFormat type, std::string name, const std::string & genre, int trackIndex, const std::string &filename, size_t size);
 		void AddTrack(AlbumPtr album, const NewTrackInfo &ti);
+		void AddCover(AlbumPtr album, const mtp::ByteArray &data);
 	};
 	DECLARE_PTR(Library);
 }

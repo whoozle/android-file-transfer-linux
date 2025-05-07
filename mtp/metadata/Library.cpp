@@ -407,6 +407,14 @@ namespace mtp
 		tracks.insert(std::make_pair(ti.Name, ti.Index));
 	}
 
+	void Library::AddCover(AlbumPtr album, const mtp::ByteArray &data)
+	{
+		if (!album || !_albumCoverSupported)
+			return;
+
+		mtp::debug("sending ", data.size(), " bytes of album cover...");
+		_session->SetObjectPropertyAsArray(album->Id, mtp::ObjectProperty::RepresentativeSampleData, data);
+	}
 
 	bool Library::Supported(const mtp::SessionPtr & session)
 	{
