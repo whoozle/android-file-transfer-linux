@@ -31,17 +31,25 @@ ENUM_VALUE(UploadUrl, 0x501d)
 ENUM_VALUE(Artist, 0x501e)
 ENUM_VALUE(CopyrightInfo, 0x501f)
 
+ENUM_VALUE(SecureTime, 0xd101)
+ENUM_VALUE(DeviceCertificate, 0xd102)
+ENUM_VALUE(RevocationInfo, 0xd103)
+ENUM_VALUE(PlaysForSureID, 0xd131)
+
 ENUM_VALUE(DeviceEUI64, 0xd210)
+
+ENUM_VALUE(FunctionalID, 0xd301)
+ENUM_VALUE(ModelID, 0xd302)
+ENUM_VALUE(UseDeviceStage, 0xd303)
 
 ENUM_VALUE(SynchronizationPartner, 0xd401)
 ENUM_VALUE(DeviceFriendlyName, 0xd402)
 ENUM_VALUE(Volume, 0xd403)
 ENUM_VALUE(SupportedFormatsOrdered, 0xd404)
 ENUM_VALUE(DeviceIcon, 0xd405)
+ENUM_VALUE(SessionInitiatorVersionInfo, 0xd406)
+ENUM_VALUE(PerceivedDeviceType, 0xd407)
 ENUM_VALUE(PlaybackRate, 0xd410)
 ENUM_VALUE(PlaybackObject, 0xd411)
 ENUM_VALUE(PlaybackContainerIndex, 0xd412)
 ENUM_VALUE(PlaybackPosition, 0xd413)
-
-ENUM_VALUE(SessionInitiatorVersionInfo, 0xd406)
-ENUM_VALUE(PerceivedDeviceType, 0xd407)

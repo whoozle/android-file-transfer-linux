@@ -56,6 +56,17 @@ ENUM_VALUE(EnableTrustedFilesOperations, 0x9214)
 ENUM_VALUE(DisableTrustedFilesOperations, 0x9215)
 ENUM_VALUE(EndTrustedAppSession, 0x9216)
 
+ENUM_VALUE(GetServiceIDs, 0x9301)
+ENUM_VALUE(GetServiceInfo, 0x9302)
+ENUM_VALUE(GetServiceCapabilities, 0x9303)
+ENUM_VALUE(GetServicePropDesc, 0x9304)
+ENUM_VALUE(GetServicePropList, 0x9305)
+ENUM_VALUE(SetServicePropList, 0x9306)
+ENUM_VALUE(UpdateObjectPropList, 0x9307)
+ENUM_VALUE(DeleteObjectPropList, 0x9308)
+ENUM_VALUE(DeleteServicePropList, 0x9309)
+ENUM_VALUE(GetFormatCapabilities, 0x930a)
+
 ENUM_VALUE(SendTinyCLRData, 0x9401)
 ENUM_VALUE(GetTinyCLRData, 0x9402)
 
