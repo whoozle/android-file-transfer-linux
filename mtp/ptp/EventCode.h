@@ -1,3 +1,22 @@
+/*
+    This file is part of Android File Transfer For Linux.
+    Copyright (C) 2015-2025  Vladimir Menshakov
+
+    This library is free software; you can redistribute it and/or modify it
+    under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation; either version 2.1 of the License,
+    or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+    Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with this library; if not, write to the Free Software Foundation,
+    Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+*/
+
 #ifndef AFTL_MTP_PTP_EVENTCODE_H
 #define AFTL_MTP_PTP_EVENTCODE_H
 
@@ -7,26 +26,13 @@ namespace mtp
 {
 	enum struct EventCode : u16
 	{
-		TransactionCancelled	= 0x4001,
-		ObjectAdded				= 0x4002,
-		ObjectRemoved			= 0x4003,
-		StoreAdded				= 0x4004,
-		StoreRemoved			= 0x4005,
-		DevicePropChanged		= 0x4006,
-		ObjectInfoChanged		= 0x4007,
-		DeviceInfoChanged		= 0x4008,
-		RequestObjectTransfer	= 0x4009,
-		StoreFull				= 0x400a,
-		DeviceReset				= 0x400b,
-		StorageInfoChanged		= 0x400c,
-		CaptureComplete			= 0x400d,
-		UnreportedStatus		= 0x400e,
-
-		ObjectPropChanged		= 0xc801,
-		ObjectPropDescChanged	= 0xc802,
-		ObjectReferenceChanged	= 0xc803
+#define ENUM_VALUE(NAME, VALUE) ENUM_VALUE_DECL(NAME, VALUE)
+#		include <mtp/ptp/EventCode.values.h>
+#undef ENUM_VALUE
 	};
 	DECLARE_ENUM(EventCode, u16);
+
+	std::string ToString(EventCode code);
 }
 
 #endif
