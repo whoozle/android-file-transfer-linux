@@ -36,8 +36,7 @@ ENUM_VALUE(NetworkAssociation, 0xb102)
 ENUM_VALUE(M4a, 0xb215)
 ENUM_VALUE(Artist, 0xb218)
 
-ENUM_VALUE(UndefinedFirmware, 0xb800)
-ENUM_VALUE(UndefinedFirmwareAndroid, 0xb802)
+ENUM_VALUE(UndefinedFirmware, 0xb802)
 ENUM_VALUE(WindowsImageFormat, 0xb881)
 
 ENUM_VALUE(UndefinedAudio, 0xb900)
