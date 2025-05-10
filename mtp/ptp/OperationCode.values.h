@@ -49,6 +49,7 @@ ENUM_VALUE(SetCurrentTimePosition, 0x9173)
 
 ENUM_VALUE(WMPMetadataRoundTrip, 0x9201)
 ENUM_VALUE(WmpGetAcquiredContent, 0x9202)
+ENUM_VALUE(RebootDevice, 0x9204)
 
 ENUM_VALUE(SendWMDRMPDAppRequest, 0x9212)
 ENUM_VALUE(GetWMDRMPDAppResponse, 0x9213)

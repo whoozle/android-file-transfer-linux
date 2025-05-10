@@ -143,6 +143,7 @@ namespace mtp
 
 		//windows specific
 		void EnableSecureFileOperations(u32 cmac1[4]);
+		void RebootDevice();
 
 		static msg::DeviceInfo GetDeviceInfo(PipePacketer& packeter, u32 transactionId, int timeout = 0);
 

@@ -189,6 +189,10 @@ namespace cli
 				make_function([this](const LocalPath &path) -> void { ZuneImport(path); }));
 		}
 
+		if (_session->GetDeviceInfo().Supports(mtp::OperationCode::RebootDevice)) {
+			AddCommand("device-reboot", "reboots device (Microsoft specific?)", make_function([this]() -> void { RebootDevice(); }));
+		}
+
 		AddCommand("test-property-list", "test GetObjectPropList on given object",
 			make_function([this](const Path &path) -> void { TestObjectPropertyList(path); }));
 
@@ -1102,6 +1106,9 @@ namespace cli
 			debug(id.Id, "\t", _session->GetObjectStringProperty(id, ObjectProperty::ObjectFilename));
 		}
 	}
+
+	void Session::RebootDevice()
+	{ _session->RebootDevice(); }
 
 	void Session::ZuneInit()
 	{

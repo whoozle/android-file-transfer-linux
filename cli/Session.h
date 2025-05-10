@@ -174,6 +174,7 @@ namespace cli
 
 		void ZuneInit();
 		void ZuneImport(const LocalPath & path);
+		void RebootDevice();
 
 		template <typename ...Args>
 		void AddCommand(const std::string &name, const std::string &help, std::function<void(Args...)> && callback)
