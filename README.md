@@ -168,6 +168,55 @@ mkdir ~/my-device
 Remember, if you want album art to be displayed, it must be named 'albumart.xxx' and placed *first* in the destination folder. Then copy other files.
 Also, note that FUSE could be 7-8 times slower than UI/CLI file transfer.
 
+### ZUNE firmware flashing/recovery
+
+1. Find Zune-Firmware-x86.msi on the internet
+2. Unpack it `7z x Zune-Firmware-x86.msi` in some directory, you should get the following files there:
+
+```
+DracoBaselineCab  FirmwareUpdateXml  KeelBaselineCab  PavoBaselineCab  ScorpiusBaselineCab
+```
+3. Find the name of your update in FirmwareUpdateXml. If you're not sure, compare USB ids to `HardwareID=` lines in XML.
+4. Unpack update for your device into some folder using cabextract: `cabextract XXXXBaselineCab`.
+
+Here's content of all cabs:
+```
+├── Draco
+│   ├── EBoot.bin
+│   ├── Games.cab
+│   ├── nk.bin
+│   └── recovery.bin
+├── Keel
+│   ├── EBoot.bin
+│   ├── Games.cab
+│   ├── nk.bin
+│   └── recovery.bin
+├── Pavo
+│   ├── EXT.bin
+│   ├── NK.bin
+│   ├── Recovery.bin
+│   └── ZBoot.bin
+└── Scorpius
+    ├── EBoot.bin
+    ├── Games.cab
+    ├── nk.bin
+    ├── recovery.bin
+    └── xldr.bin
+```
+
+5. Flash firmware files using cli tool. Generally you don't need to flash anything called `*boot*` or `*recovery*`.
+Original software starts with nk.bin, then EXT or Games.
+Here's an example of how I flash model 1395:
+```
+aft-mtp-cli -v -d 045e:063e # finds Zune HD 16Gb (model 1395)
+
+flash zune/Pavo/NK.bin
+flash zune/Pavo/EXT.bin
+device-reboot
+```
+6. Wait until your Zune restarts, it can take a minute or two.
+7. Voila, you don't need to fiddle with Zune software on windows anymore.
+
 ### Qt user interface
 
 1. Start application, choose destination folder and click any button on toolbar.
