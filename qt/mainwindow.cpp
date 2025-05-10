@@ -616,7 +616,7 @@ void MainWindow::uploadFiles(const QStringList &files, mtp::ObjectFormat format)
 	if (files.isEmpty())
 		return;
 
-	qDebug() << "uploadFiles " << files << ", format: " << mtp::ToString(format);
+	qDebug() << "uploadFiles " << files << ", format: " << fromUtf8(mtp::ToString(format));
 	_uploadAnswer = 0;
 	_proxyModel->setSourceModel(NULL);
 	ProgressDialog progressDialog(this);

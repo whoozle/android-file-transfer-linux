@@ -107,7 +107,7 @@ void CommandQueue::uploadFile(const QString &filename, mtp::ObjectFormat format)
 	QFileInfo fi(filename);
 	QString parentPath = fi.dir().path();
 
-	qDebug() << "uploading file " << filename << ", parent: " << parentPath << ", format: " << mtp::ToString(format);
+	qDebug() << "uploading file " << filename << ", parent: " << parentPath << ", format: " << fromUtf8(mtp::ToString(format));
 
 	if (_directories.empty())
 	{
