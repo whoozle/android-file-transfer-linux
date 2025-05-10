@@ -38,6 +38,7 @@ ENUM_VALUE(PlaysForSureID, 0xd131)
 
 ENUM_VALUE(DeviceEUI64, 0xd210)
 ENUM_VALUE(FirmwareVersion, 0xd233)
+ENUM_VALUE(SerialNumber, 0xd235)
 
 ENUM_VALUE(FunctionalID, 0xd301)
 ENUM_VALUE(ModelID, 0xd302)
