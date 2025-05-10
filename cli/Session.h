@@ -114,7 +114,7 @@ namespace cli
 		{ Get(dst, srcId, true); }
 		void Cat(const Path &path);
 		void Rename(const Path & path, const std::string & newName);
-		void Put(mtp::ObjectId parentId, const LocalPath &src, const std::string &targetFilename = std::string());
+		void Put(mtp::ObjectId parentId, const LocalPath &src, const std::string &targetFilename = std::string(), mtp::ObjectFormat format = mtp::ObjectFormat::Any);
 		void Put(const LocalPath &src, const Path &dst);
 		mtp::ObjectId MakeDirectory(mtp::ObjectId parentId, const std::string & name);
 		void ListObjects(const std::string & format);
@@ -136,6 +136,9 @@ namespace cli
 
 		void Put(const LocalPath &src)
 		{ Put(_cd, src); }
+
+		void Flash(const LocalPath &src)
+		{ Put(_cd, src, {}, mtp::ObjectFormat::UndefinedFirmware); }
 
 		void Get(const Path &src)
 		{ Get(Resolve(src)); }

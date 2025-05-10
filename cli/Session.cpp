@@ -125,6 +125,8 @@ namespace cli
 			make_function([this](const LocalPath &path, const Path &dst) -> void { Put(path, dst); }));
 		AddCommand("put", "<file> uploads file",
 			make_function([this](const LocalPath &path) -> void { Put(path); }));
+		AddCommand("flash", "<file> sends file but set file format to UndefinedFirmware(0xb802).",
+			make_function([this](const LocalPath &path) -> void { Flash(path); }));
 
 		AddCommand("get", "<file> downloads file",
 			make_function([this](const Path &path) -> void { Get(path); }));
@@ -775,7 +777,7 @@ namespace cli
 		}
 	}
 
-	void Session::Put(mtp::ObjectId parentId, const LocalPath &src, const std::string &targetFilename)
+	void Session::Put(mtp::ObjectId parentId, const LocalPath &src, const std::string &targetFilename, mtp::ObjectFormat format)
 	{
 		using namespace mtp;
 		struct stat st = Stat(src);
@@ -831,9 +833,12 @@ namespace cli
 			auto stream = std::make_shared<ObjectInputStream>(src);
 			stream->SetTotal(stream->GetSize());
 
+			if (format == mtp::ObjectFormat::Any)
+				format = ObjectFormatFromFilename(src);
+
 			msg::ObjectInfo oi;
 			oi.Filename = filename;
-			oi.ObjectFormat = ObjectFormatFromFilename(src);
+			oi.ObjectFormat = format;
 			oi.ObjectCompressedSize = stream->GetSize();
 
 			if (_showEvents)
