@@ -66,7 +66,8 @@ struct MakeDirectory : public FileCommand
 
 struct UploadFile : public FileCommand
 {
-	UploadFile(const QString &filename) : FileCommand(filename) { }
+	mtp::ObjectFormat Format;
+	UploadFile(const QString &filename, mtp::ObjectFormat format) : FileCommand(filename), Format(format) { }
 	void execute(CommandQueue &queue);
 };
 
@@ -120,7 +121,7 @@ public:
 
 	void loadLibrary();
 	void createDirectory(const QString &path);
-	void uploadFile(const QString &file);
+	void uploadFile(const QString &file, mtp::ObjectFormat format);
 	void downloadFile(const QString &filename, mtp::ObjectId objectId);
 	void importFile(const QString &file);
 

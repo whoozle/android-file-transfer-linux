@@ -71,6 +71,9 @@
     <addaction name="separator"/>
     <addaction name="actionCreateDirectory"/>
     <addaction name="separator"/>
+    <addaction name="actionUploadFirmware"/>
+    <addaction name="actionRebootDevice"/>
+    <addaction name="separator"/>
     <addaction name="actionPaste"/>
     <addaction name="separator"/>
     <addaction name="actionExit"/>
@@ -119,7 +122,7 @@
   </action>
   <action name="actionCreateDirectory">
    <property name="text">
-    <string>&amp;CreateDirectory</string>
+    <string>&amp;CreateDirectory...</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+N</string>
@@ -231,6 +234,16 @@
    </property>
    <property name="toolTip">
     <string>Import individual music files</string>
+   </property>
+  </action>
+  <action name="actionUploadFirmware">
+   <property name="text">
+    <string>Upload Firmware...</string>
+   </property>
+  </action>
+  <action name="actionRebootDevice">
+   <property name="text">
+    <string>Reboot Device</string>
    </property>
   </action>
  </widget>

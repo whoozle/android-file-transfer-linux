@@ -24,6 +24,7 @@
 #include <QThread>
 #include <QDateTime>
 #include <mtp/types.h>
+#include <mtp/ptp/ObjectFormat.h>
 #include <memory>
 
 class MtpObjectsModel;
@@ -62,7 +63,7 @@ public:
 	void tryCreateLibrary();
 	mtp::LibraryPtr library() const;
 
-	void upload(QStringList files);
+	void upload(QStringList files, mtp::ObjectFormat format);
 	void importMusic(const QString & path);
 	void download(const QString &path, const QVector<mtp::ObjectId> & objectIds);
 

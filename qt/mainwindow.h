@@ -25,6 +25,7 @@
 #include <QVector>
 #include <QByteArray>
 #include <mtp/ptp/ObjectId.h>
+#include <mtp/ptp/ObjectFormat.h>
 #include <mtp/types.h>
 
 namespace Ui {
@@ -95,7 +96,7 @@ private slots:
 	void renameFile();
 	void deleteFiles();
 	void downloadFiles(const QVector<mtp::ObjectId> &objects);
-	void uploadFiles(const QStringList &files);
+	void uploadFiles(const QStringList &files, mtp::ObjectFormat format = mtp::ObjectFormat::Any);
 	void onFilesDropped(const QStringList &files);
 	void onStorageChanged(int idx);
 	void validateClipboard();
@@ -104,6 +105,8 @@ private slots:
 	void showThumbnails(bool enable);
 	void attachCover();
 	void removeCover();
+	void uploadFirmware();
+	void rebootDevice();
 
 public slots:
 	void downloadFiles(const QString & path, const QVector<mtp::ObjectId> &objects);

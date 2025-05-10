@@ -107,6 +107,8 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(_ui->actionShowThumbnails, SIGNAL(triggered(bool)), SLOT(showThumbnails(bool)));
 	connect(_ui->actionRemoveCover, SIGNAL(triggered(bool)), SLOT(removeCover()));
 	connect(_ui->actionAttachCover, SIGNAL(triggered(bool)), SLOT(attachCover()));
+	connect(_ui->actionUploadFirmware, SIGNAL(triggered()), SLOT(uploadFirmware()));
+	connect(_ui->actionRebootDevice, SIGNAL(triggered()), SLOT(rebootDevice()));
 
 	connect(_objectModel, SIGNAL(onFilesDropped(QStringList)), SLOT(onFilesDropped(QStringList)));
 	connect(_objectModel, SIGNAL(existingFileOverwrite(QString)), SLOT(confirmOverwrite(QString)), Qt::BlockingQueuedConnection);
@@ -469,6 +471,9 @@ void MainWindow::updateActionsState()
 	_ui->actionGoDown->setEnabled(rows.size() == 1);
 	_ui->actionBack->setEnabled(!_history.empty());
 
+	_ui->actionUploadFirmware->setEnabled(_session? _session->GetDeviceInfo().Supports(mtp::ObjectFormat::UndefinedFirmware): false);
+	_ui->actionRebootDevice->setEnabled(_session? _session->GetDeviceInfo().Supports(mtp::OperationCode::RebootDevice): false);
+
 	QStringList statusList;
 	for(const auto & h : _history)
 		statusList.push_back(h.first);
@@ -606,12 +611,12 @@ void MainWindow::createDirectory()
 	saveGeometry("create-directory-dialog", d);
 }
 
-void MainWindow::uploadFiles(const QStringList &files)
+void MainWindow::uploadFiles(const QStringList &files, mtp::ObjectFormat format)
 {
 	if (files.isEmpty())
 		return;
 
-	qDebug() << "uploadFiles " << files;
+	qDebug() << "uploadFiles " << files << ", format: " << mtp::ToString(format);
 	_uploadAnswer = 0;
 	_proxyModel->setSourceModel(NULL);
 	ProgressDialog progressDialog(this);
@@ -623,7 +628,7 @@ void MainWindow::uploadFiles(const QStringList &files)
 	connect(_uploader, SIGNAL(uploadStarted(QString)), &progressDialog, SLOT(setFilename(QString)));
 	connect(_uploader, SIGNAL(finished()), &progressDialog, SLOT(accept()));
 	connect(&progressDialog, SIGNAL(abort()), _uploader, SLOT(abort()));
-	_uploader->upload(files);
+	_uploader->upload(files, format);
 
 	progressDialog.exec();
 
@@ -992,3 +997,30 @@ void MainWindow::removeCover()
 		{ qWarning() << "failed to remove cover:" << ex.what(); }
 	}
 }
+
+void MainWindow::uploadFirmware()
+{
+	QFileDialog d(this);
+
+	QSettings settings;
+	{
+		QVariant ld = settings.value("the-latest-firmware-directory");
+		if (ld.isValid())
+			d.setDirectory(ld.toString());
+	}
+
+	d.setAcceptMode(QFileDialog::AcceptOpen);
+	d.setFileMode(QFileDialog::ExistingFiles);
+	d.setOption(QFileDialog::ShowDirsOnly, false);
+	d.setOption(QFileDialog::ReadOnly, true);
+	restoreGeometry("upload-firmware", d);
+	if (!d.exec())
+		return;
+
+	saveGeometry("upload-firmware", d);
+	settings.setValue("the-latest-firmware-directory", d.directory().absolutePath());
+	uploadFiles(d.selectedFiles(), mtp::ObjectFormat::UndefinedFirmware);
+}
+
+void MainWindow::rebootDevice()
+{ _session->RebootDevice(); }

@@ -86,7 +86,7 @@ void FileUploader::onFinished()
 	emit finished();
 }
 
-void FileUploader::upload(QStringList files)
+void FileUploader::upload(QStringList files, mtp::ObjectFormat format)
 {
 	_model->moveToThread(&_workerThread);
 	_total = 0;
@@ -113,7 +113,7 @@ void FileUploader::upload(QStringList files)
 
 				if (fi.isFile())
 				{
-					commands.push_back(new UploadFile(next));
+					commands.push_back(new UploadFile(next, format));
 					_total += fi.size();
 				}
 				else if (fi.isDir())
@@ -125,7 +125,7 @@ void FileUploader::upload(QStringList files)
 		}
 		else if (currentFileInfo.isFile())
 		{
-			commands.push_back(new UploadFile(currentFile));
+			commands.push_back(new UploadFile(currentFile, format));
 			_total += currentFileInfo.size();
 		}
 	}

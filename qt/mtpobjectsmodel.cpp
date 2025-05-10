@@ -256,10 +256,12 @@ mtp::ObjectId MtpObjectsModel::createDirectory(mtp::ObjectId parentObjectId, con
 	return noi.ObjectId;
 }
 
-bool MtpObjectsModel::uploadFile(mtp::ObjectId parentObjectId, const QString &filePath, QString filename)
+bool MtpObjectsModel::uploadFile(mtp::ObjectId parentObjectId, const QString &filePath, QString filename, mtp::ObjectFormat format)
 {
 	QFileInfo fileInfo(filePath);
-	mtp::ObjectFormat objectFormat = mtp::ObjectFormatFromFilename(toUtf8(filePath));
+	mtp::ObjectFormat objectFormat = format == mtp::ObjectFormat::Any?
+		mtp::ObjectFormatFromFilename(toUtf8(filePath)):
+		format;
 
 	if (filename.isEmpty())
 		filename = fileInfo.fileName();

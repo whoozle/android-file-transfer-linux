@@ -35,7 +35,7 @@ void FinishQueue::execute(CommandQueue &queue)
 { queue.finish(DirectoryId); }
 
 void UploadFile::execute(CommandQueue &queue)
-{ queue.uploadFile(Filename); }
+{ queue.uploadFile(Filename, Format); }
 
 void MakeDirectory::execute(CommandQueue &queue)
 { queue.createDirectory(Filename); }
@@ -99,7 +99,7 @@ void CommandQueue::downloadFile(const QString &filename, mtp::ObjectId objectId)
 	addProgress(fi.size());
 }
 
-void CommandQueue::uploadFile(const QString &filename)
+void CommandQueue::uploadFile(const QString &filename, mtp::ObjectFormat format)
 {
 	if (_aborted)
 		return;
@@ -107,7 +107,7 @@ void CommandQueue::uploadFile(const QString &filename)
 	QFileInfo fi(filename);
 	QString parentPath = fi.dir().path();
 
-	qDebug() << "uploading file " << filename << ", parent: " << parentPath;
+	qDebug() << "uploading file " << filename << ", parent: " << parentPath << ", format: " << mtp::ToString(format);
 
 	if (_directories.empty())
 	{
@@ -127,7 +127,7 @@ void CommandQueue::uploadFile(const QString &filename)
 		if (_model->parentObjectId() != parent.value()) //needed for overwrite protection
 			_model->setParent(parent.value());
 
-		_model->uploadFile(parent.value(), filename);
+		_model->uploadFile(parent.value(), filename, {}, format);
 	} catch(const std::exception &ex)
 	{ qDebug() << "uploading file " << filename << " failed: " << fromUtf8(ex.what()); }
 

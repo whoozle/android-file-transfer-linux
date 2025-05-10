@@ -101,9 +101,9 @@ public:
 	mtp::ObjectId createDirectory(const QString &name, mtp::AssociationType type = mtp::AssociationType::GenericFolder)
 	{ return createDirectory(_parentObjectId, name, type); }
 
-	bool uploadFile(mtp::ObjectId parentObjectId, const QString &filePath, QString filename = QString());
-	bool uploadFile(const QString &filePath, QString filename = QString())
-	{ return uploadFile(_parentObjectId, filePath, filename); }
+	bool uploadFile(mtp::ObjectId parentObjectId, const QString &filePath, QString filename = QString(), mtp::ObjectFormat format = mtp::ObjectFormat::Any);
+	bool uploadFile(const QString &filePath, QString filename = QString(), mtp::ObjectFormat format = mtp::ObjectFormat::Any)
+	{ return uploadFile(_parentObjectId, filePath, filename, format); }
 	bool sendFile(const QString &filePath);
 	bool downloadFile(const QString &filePath, mtp::ObjectId objectId);
 	void rename(int idx, const QString &fileName);
