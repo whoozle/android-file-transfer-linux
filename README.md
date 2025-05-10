@@ -176,7 +176,8 @@ Also, note that FUSE could be 7-8 times slower than UI/CLI file transfer.
 ```
 DracoBaselineCab  FirmwareUpdateXml  KeelBaselineCab  PavoBaselineCab  ScorpiusBaselineCab
 ```
-3. Find the name of your update in FirmwareUpdateXml. If you're not sure, compare USB ids to `HardwareID=` lines in XML.
+3. Find the name of your update in FirmwareUpdateXml. If you're not sure, open [Zune Specifications](https://en.wikipedia.org/wiki/Zune#Specifications) wikipedia page, find your model in "Official Model Numbers" row, and match with "Codename".
+For instance Zune 4 model 1124 has codename "Scorpius".
 4. Unpack update for your device into some folder using cabextract: `cabextract XXXXBaselineCab`.
 
 Here's content of all cabs:
