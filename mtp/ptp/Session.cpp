@@ -296,10 +296,25 @@ namespace mtp
 		Send(OperationRequest(OperationCode::SendObjectInfo, transaction.Id, storageId.Id, parentObject.Id));
 		{
 			DataRequest req(OperationCode::SendObjectInfo, transaction.Id);
-			OutputStream stream(req.Data);
-			objectInfo.Write(stream);
-			Container container(req);
-			_packeter.Write(container.Data, _defaultTimeout);
+			if (_separateBulkWrites)
+			{
+				ByteArray data;
+				OutputStream os(data);
+				objectInfo.Write(os);
+				auto is = std::make_shared<ByteArrayObjectInputStream>(data);
+
+				Container container(req, is);
+				_packeter.Write(container.Data, _defaultTimeout);
+
+				_packeter.Write(is, _defaultTimeout);
+			}
+			else
+			{
+				OutputStream stream(req.Data);
+				objectInfo.Write(stream);
+				Container container(req);
+				_packeter.Write(container.Data, _defaultTimeout);
+			}
 		}
 		ByteArray data, response;
 		ResponseType responseCode;
@@ -319,7 +334,7 @@ namespace mtp
 			Container container(req, inputStream);
 			if (_separateBulkWrites)
 			{
-				_packeter.Write(std::make_shared<ByteArrayObjectInputStream>(container.Data), timeout);
+				_packeter.Write(container.Data, timeout);
 				_packeter.Write(inputStream, timeout);
 			} else
 				_packeter.Write(std::make_shared<JoinedObjectInputStream>(std::make_shared<ByteArrayObjectInputStream>(container.Data), inputStream), timeout);
