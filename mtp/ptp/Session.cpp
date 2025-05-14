@@ -105,7 +105,8 @@ namespace mtp
 	void Session::Close()
 	{
 		scoped_mutex_lock l(_mutex);
-		Send(OperationRequest(OperationCode::CloseSession, 0, _sessionId));
+		Transaction transaction(this);
+		Send(OperationRequest(OperationCode::CloseSession, transaction.Id));
 		ByteArray data, response;
 		ResponseType responseCode;
 		_packeter.Read(0, data, responseCode, response, _defaultTimeout);
