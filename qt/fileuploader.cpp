@@ -119,7 +119,6 @@ void FileUploader::upload(QStringList files, mtp::ObjectFormat format)
 				else if (fi.isDir())
 				{
 					commands.push_back(new MakeDirectory(next));
-					files.push_back(next);
 				}
 			}
 		}
