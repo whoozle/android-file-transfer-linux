@@ -5,7 +5,7 @@
 hierarchical prompt usage example
 """
 from __future__ import print_function, unicode_literals
-from PyInquirer import style_from_dict, Token, prompt, Separator
+from InquirerPy import prompt, separator
 
 import aftl
 
@@ -52,7 +52,7 @@ def get_object_action(session):
 		'message': 'Object Action (press h for help)',
 		'choices': [
 			{ 'key': 'b', 'name': 'Back', 'value': 'back' },
-			Separator(),
+			separator.Separator(),
 			{ 'key': 'd', 'name': 'Download', 'value': 'download' },
 		]
 	}
