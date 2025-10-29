@@ -24,6 +24,9 @@
 #include <QLocale>
 #include <QMessageBox>
 #include <QTranslator>
+#include <QFile>
+#include <QDir>
+#include <QTextStream>
 #include <mtp/log.h>
 #if QT_VERSION >= 0x050000
 #	include <QGuiApplication>
@@ -54,6 +57,30 @@ int main(int argc, char *argv[])
 {
 	QApplication app(argc, argv);
 	Q_INIT_RESOURCE(android_file_transfer);
+	
+#ifdef Q_OS_MACOS
+	// On macOS, when launched from Finder, environment variables are often not set
+	// This causes QLocale::system() to default to en_US even if system language is Chinese
+	if (qgetenv("LANG").isEmpty() && qgetenv("LC_ALL").isEmpty()) {
+		// Check if user has a locale preference file, otherwise default to detecting from available translations
+		QFile prefsFile(QDir::home().filePath(".android-file-transfer-locale-prefs"));
+		if (prefsFile.exists() && prefsFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+			QTextStream in(&prefsFile);
+			QString preferredLocale = in.readLine().trimmed();
+			if (!preferredLocale.isEmpty()) {
+				qputenv("LANG", preferredLocale.toUtf8());
+				qputenv("LC_ALL", preferredLocale.toUtf8());
+			}
+			prefsFile.close();
+		} else {
+			// Auto-detect Chinese locale if available - this is the most common case for Chinese users
+			if (QFile::exists(":/android-file-transfer-linux_zh_CN")) {
+				qputenv("LANG", "zh_CN.UTF-8");
+				qputenv("LC_ALL", "zh_CN.UTF-8");
+			}
+		}
+	}
+#endif
 
 	QCoreApplication::setApplicationName("aft-linux-qt");
 	QCoreApplication::setOrganizationDomain("whoozle.github.io");
@@ -64,14 +91,60 @@ int main(int argc, char *argv[])
 #endif
 
 	QTranslator qtTranslator;
+	QString localeName = QLocale::system().name();
+	
+#ifdef Q_OS_MACOS
+	// On macOS, check for user preference file first
+	QFile prefsFile(QDir::home().filePath(".android-file-transfer-locale-prefs"));
+	if (prefsFile.exists() && prefsFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+		QTextStream in(&prefsFile);
+		QString preferredLocale = in.readLine().trimmed();
+		if (!preferredLocale.isEmpty()) {
+			// Extract just the locale part (e.g., "zh_CN.UTF-8" -> "zh_CN")
+			localeName = preferredLocale.split(".").first();
+		}
+		prefsFile.close();
+	} else if (qgetenv("LANG").isEmpty() && qgetenv("LC_ALL").isEmpty()) {
+		// When launched from Finder with no preference file, auto-detect Chinese
+		if (QFile::exists(":/android-file-transfer-linux_zh_CN")) {
+			localeName = "zh_CN";
+		}
+	}
+#endif
 
-	qtTranslator.load("qt_" + QLocale::system().name(),
+	qtTranslator.load("qt_" + localeName,
 					QLibraryInfo::location(QLibraryInfo::TranslationsPath));
 	app.installTranslator(&qtTranslator);
 
 	QTranslator aTranslator;
-	aTranslator.load(":/android-file-transfer-linux_" + QLocale::system().name());
-	app.installTranslator(&aTranslator);
+	
+	// Try to load translation with multiple fallback strategies
+	bool translationLoaded = false;
+	QStringList localeAttempts;
+	
+	// Add all possible locale formats to try
+	localeAttempts << localeName;  // Original: "zh_CN"
+	localeAttempts << localeName.replace("_", "-");  // Hyphen: "zh-CN" 
+	localeAttempts << localeName.split("-").first().split("_").first();  // Language only: "zh"
+	
+	// Also try some common variations for Chinese
+	if (localeName.startsWith("zh")) {
+		localeAttempts << "zh-CN";  // Simplified Chinese
+		localeAttempts << "zh-TW";  // Traditional Chinese  
+		localeAttempts << "zh_CN";  // Underscore variant
+	}
+	
+	for (const QString& attempt : localeAttempts) {
+		QString resourcePath = ":/android-file-transfer-linux_" + attempt;
+		if (aTranslator.load(resourcePath)) {
+			translationLoaded = true;
+			break;
+		}
+	}
+	
+	if (translationLoaded) {
+		app.installTranslator(&aTranslator);
+	}
 
 	MainWindow w;
 
