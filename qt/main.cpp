@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
 	// On macOS, when launched from Finder, environment variables are often not set
 	// This causes QLocale::system() to default to en_US even if system language is Chinese
 	if (qgetenv("LANG").isEmpty() && qgetenv("LC_ALL").isEmpty()) {
-		// Check if user has a locale preference file, otherwise default to detecting from available translations
+		// Check if user has a locale preference file first
 		QFile prefsFile(QDir::home().filePath(".android-file-transfer-locale-prefs"));
 		if (prefsFile.exists() && prefsFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
 			QTextStream in(&prefsFile);
@@ -72,13 +72,9 @@ int main(int argc, char *argv[])
 				qputenv("LC_ALL", preferredLocale.toUtf8());
 			}
 			prefsFile.close();
-		} else {
-			// Auto-detect Chinese locale if available - this is the most common case for Chinese users
-			if (QFile::exists(":/android-file-transfer-linux_zh_CN")) {
-				qputenv("LANG", "zh_CN.UTF-8");
-				qputenv("LC_ALL", "zh_CN.UTF-8");
-			}
 		}
+		// If no preference file, let Qt detect system locale naturally
+		// Don't force any specific language - let the fallback mechanism handle it
 	}
 #endif
 
@@ -104,12 +100,9 @@ int main(int argc, char *argv[])
 			localeName = preferredLocale.split(".").first();
 		}
 		prefsFile.close();
-	} else if (qgetenv("LANG").isEmpty() && qgetenv("LC_ALL").isEmpty()) {
-		// When launched from Finder with no preference file, auto-detect Chinese
-		if (QFile::exists(":/android-file-transfer-linux_zh_CN")) {
-			localeName = "zh_CN";
-		}
 	}
+	// Note: When launched from Finder with no preference file, we let Qt detect system locale naturally
+	// The fallback mechanism in translation loading will handle unknown languages
 #endif
 
 	qtTranslator.load("qt_" + localeName,
