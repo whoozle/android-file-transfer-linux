@@ -1,0 +1,17 @@
+[project]
+name = "android-file-transfer-linux"
+version = "4.6"
+
+[build-system]
+requires = ["scikit-build-core", "pybind11"]
+build-backend = "scikit_build_core.build"
+
+[tool.scikit-build]
+build.targets = ["aftl"]
+install.components = ["aftl"]
+# Rely only on CMake install.
+wheel.packages = []
+
+[tool.scikit-build.cmake.define]
+BUILD_FUSE = false
+BUILD_QT_UI = false
