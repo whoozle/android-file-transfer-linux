@@ -27,6 +27,8 @@
 #include <QFile>
 #include <QDir>
 #include <QTextStream>
+#include <QProcess>
+#include <QRegularExpression>
 #include <mtp/log.h>
 #if QT_VERSION >= 0x050000
 #	include <QGuiApplication>
@@ -58,25 +60,7 @@ int main(int argc, char *argv[])
 	QApplication app(argc, argv);
 	Q_INIT_RESOURCE(android_file_transfer);
 	
-#ifdef Q_OS_MACOS
-	// On macOS, when launched from Finder, environment variables are often not set
-	// This causes QLocale::system() to default to en_US even if system language is Chinese
-	if (qgetenv("LANG").isEmpty() && qgetenv("LC_ALL").isEmpty()) {
-		// Check if user has a locale preference file first
-		QFile prefsFile(QDir::home().filePath(".android-file-transfer-locale-prefs"));
-		if (prefsFile.exists() && prefsFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-			QTextStream in(&prefsFile);
-			QString preferredLocale = in.readLine().trimmed();
-			if (!preferredLocale.isEmpty()) {
-				qputenv("LANG", preferredLocale.toUtf8());
-				qputenv("LC_ALL", preferredLocale.toUtf8());
-			}
-			prefsFile.close();
-		}
-		// If no preference file, let Qt detect system locale naturally
-		// Don't force any specific language - let the fallback mechanism handle it
-	}
-#endif
+
 
 	QCoreApplication::setApplicationName("aft-linux-qt");
 	QCoreApplication::setOrganizationDomain("whoozle.github.io");
@@ -90,20 +74,46 @@ int main(int argc, char *argv[])
 	QString localeName = QLocale::system().name();
 	
 #ifdef Q_OS_MACOS
-	// On macOS, check for user preference file first
-	QFile prefsFile(QDir::home().filePath(".android-file-transfer-locale-prefs"));
-	if (prefsFile.exists() && prefsFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-		QTextStream in(&prefsFile);
-		QString preferredLocale = in.readLine().trimmed();
-		if (!preferredLocale.isEmpty()) {
-			// Extract just the locale part (e.g., "zh_CN.UTF-8" -> "zh_CN")
-			localeName = preferredLocale.split(".").first();
+	// On macOS, when launched from Finder, environment variables are often not set
+	// This causes QLocale::system() to default to en_US even if system language is Chinese
+	// Try to detect the actual system language using multiple methods
+	if (qgetenv("LANG").isEmpty() && qgetenv("LC_ALL").isEmpty()) {
+		// Method 1: Try to get system language using macOS-specific commands
+		QProcess process;
+		process.start("defaults", QStringList() << "read" << "NSGlobalDomain" << "AppleLocale");
+		process.waitForFinished(1000);
+		QString output = process.readAllStandardOutput().trimmed();
+		if (!output.isEmpty() && output != "\"en_US\"") {
+			// Remove quotes and convert to Qt locale format
+			output = output.remove("\"");
+			localeName = output;
+		} else {
+			// Method 2: Try to get language from system preferences
+			process.start("defaults", QStringList() << "read" << "NSGlobalDomain" << "AppleLanguages");
+			process.waitForFinished(1000);
+			output = process.readAllStandardOutput().trimmed();
+			if (!output.isEmpty()) {
+				// Parse array format like ( "zh-Hans-CN", "en" )
+				QRegularExpression re("\"([^\"]+)\"");
+				QRegularExpressionMatch match = re.match(output);
+				if (match.hasMatch()) {
+					QString lang = match.captured(1);
+					// Convert macOS format to Qt format
+					if (lang.startsWith("zh-Hans")) {
+						localeName = "zh_CN";
+					} else if (lang.startsWith("zh-Hant")) {
+						localeName = "zh_TW";
+					} else {
+						// Extract first two characters for language code
+						localeName = lang.left(2);
+					}
+				}
+			}
 		}
-		prefsFile.close();
 	}
-	// Note: When launched from Finder with no preference file, we let Qt detect system locale naturally
-	// The fallback mechanism in translation loading will handle unknown languages
 #endif
+	
+
 
 	qtTranslator.load("qt_" + localeName,
 					QLibraryInfo::location(QLibraryInfo::TranslationsPath));
