@@ -35,14 +35,15 @@ private:
 	QFile		_file;
 	qint64		_size;
 	int			_progress;
+	bool		_valid;
 
 public:
 	QtObjectInputStream(const QString &file) : _file(file), _size(_file.size()), _progress(-1) {
-		_file.open(QFile::ReadOnly);
+		_valid = _file.open(QFile::ReadOnly);
 	}
 
 	bool Valid() const
-	{ return _file.isOpen(); }
+	{ return _valid; }
 
 	virtual mtp::u64 GetSize() const
 	{ return _size; }
@@ -74,13 +75,14 @@ signals:
 private:
 	QFile		_file;
 	qint64		_size;
+	bool		_valid;
 
 public:
 	QtObjectOutputStream(const QString &file): _file(file)
-	{ _file.open(QFile::WriteOnly | QFile::Truncate); }
+	{ _valid = _file.open(QFile::WriteOnly | QFile::Truncate); }
 
 	bool Valid() const
-	{ return _file.isOpen(); }
+	{ return _valid; }
 
 	virtual size_t Write(const mtp::u8 *data, size_t size)
 	{
