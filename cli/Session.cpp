@@ -76,7 +76,8 @@ namespace cli
 		_showEvents(false),
 		_showPrompt(showPrompt),
 		_terminalWidth(80),
-		_batterySupported(false)
+		_batterySupported(false),
+		_deviceFriendlyNameSupported(false)
 	{
 		using namespace mtp;
 		using namespace std::placeholders;
@@ -333,14 +334,24 @@ namespace cli
 			std::stringstream ss;
 			ss << _gdi.Manufacturer << " " << _gdi.Model;
 			if (_deviceFriendlyNameSupported) {
-				auto name = _session->GetDeviceStringProperty(mtp::DeviceProperty::DeviceFriendlyName);
-				if (!name.empty())
-					ss << " / " << name;
+				try {
+					auto name = _session->GetDeviceStringProperty(mtp::DeviceProperty::DeviceFriendlyName);
+					if (!name.empty())
+						ss << " / " << name;
+				} catch (const std::exception &ex) {
+					mtp::debug("failed to get device friendly name: ", ex.what());
+					_deviceFriendlyNameSupported = false;
+				}
 			}
 			if (_batterySupported)
 			{
-				auto level = _session->GetDeviceIntegerProperty(mtp::DeviceProperty::BatteryLevel);
-				ss <<  " [" << level << "%]";
+				try {
+					auto level = _session->GetDeviceIntegerProperty(mtp::DeviceProperty::BatteryLevel);
+					ss <<  " [" << level << "%]";
+				} catch (const std::exception &ex) {
+					mtp::debug("failed to get battery level: ", ex.what());
+					_batterySupported = false;
+				}
 			}
 			if (!_csName.empty())
 				ss << ":" << _csName;
