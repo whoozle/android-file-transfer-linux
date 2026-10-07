@@ -167,6 +167,7 @@ elseif (USB_BACKEND_DARWIN)
 	find_library(CORE_LIBRARY CoreFoundation)
 	find_library(IOKIT_LIBRARY IOKit)
 	list(APPEND MTP_LIBRARIES ${IOKIT_LIBRARY} ${CORE_LIBRARY})
+	list(APPEND MTP_SHARED_LIBRARIES ${IOKIT_LIBRARY} ${CORE_LIBRARY})
 	list(APPEND SOURCES
 		mtp/backend/darwin/usb/Context.cpp
 		mtp/backend/darwin/usb/Device.cpp
