@@ -102,6 +102,10 @@ endif()
 
 option(BUILD_QT_UI "Build reference Qt application" ON)
 option(BUILD_SHARED_LIB "Build shared library" OFF)
+if (BUILD_SHARED_LIB AND ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" AND NOT CMAKE_INSTALL_RPATH)
+	# CMake drops the build tree rpath on install; let installed executables find libmtp-ng.dylib in ../lib
+	set(CMAKE_INSTALL_RPATH "@loader_path/../lib${LIB_SUFFIX}")
+endif()
 
 option(USB_BACKEND_LIBUSB "Use libusb-1.0" OFF)
 if (USB_BACKEND_LIBUSB)
