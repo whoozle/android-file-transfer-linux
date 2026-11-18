@@ -603,7 +603,17 @@ namespace
 					data = _session->GetPartialObject(objectId, begin, rsize);
 			}
 			mtp::debug("read ", data.size(), " bytes of data");
-			FUSE_CALL(fuse_reply_buf(req, static_cast<char *>(static_cast<void *>(data.data())), data.size()));
+			if (data.empty())
+			{
+				FUSE_CALL(fuse_reply_buf(req, nullptr, 0));
+				return;
+			}
+			struct fuse_bufvec bufv = {};
+			bufv.count = 1;
+			bufv.buf[0].size = data.size();
+			bufv.buf[0].mem = data.data();
+			bufv.buf[0].fd = -1;
+			FUSE_CALL(fuse_reply_data(req, &bufv, FUSE_BUF_NO_SPLICE));
 		}
 
 		void Write(fuse_req_t req, FuseId inode, const char *buf, size_t size, off_t off, struct fuse_file_info *fi)
