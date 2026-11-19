@@ -24,12 +24,16 @@
 #include <usb/usb.h>
 #include <mtp/usb/DeviceNotFoundException.h>
 #include <mtp/usb/DeviceBusyException.h>
+#include <mtp/usb/TimeoutException.h>
 
 #define USB_CALL(...) \
 	do { int _r_ = (__VA_ARGS__); \
 		switch(_r_) { \
 			case kIOReturnSuccess  : break; \
-			case kIOReturnNoDevice : throw mtp::usb::DeviceNotFoundException(); \
+			case kIOReturnNoDevice : \
+			case kIOReturnNotResponding : throw mtp::usb::DeviceNotFoundException(); \
+			case kIOReturnTimeout : \
+			case kIOUSBTransactionTimeout : throw mtp::usb::TimeoutException("USB transfer timed out"); \
 			case kIOReturnExclusiveAccess: throw mtp::usb::DeviceBusyException(); \
 			default: throw mtp::usb::Exception(#__VA_ARGS__, _r_) ; \
 		} \

@@ -46,35 +46,54 @@ namespace mtp { namespace usb
 
 	void Device::ClearHalt(const EndpointPtr & ep)
 	{
-		IOUSBInterfaceInterface	** interface = ep->GetInterfaceHandle();
+		IOUSBInterfaceType	** interface = ep->GetInterfaceHandle();
 		USB_CALL((*interface)->ClearPipeStall(interface, ep->GetRefIndex()));
 	}
 
 	void Device::WriteBulk(const EndpointPtr & ep, const IObjectInputStreamPtr &inputStream, int timeout)
 	{
-		IOUSBInterfaceInterface	** interface = ep->GetInterfaceHandle();
+		IOUSBInterfaceType	** interface = ep->GetInterfaceHandle();
 
-		size_t transferSize = ep->GetMaxPacketSize();
+		static constexpr size_t MaxBulkTransferSize = 256 * 1024;
+		size_t maxPacket = ep->GetMaxPacketSize();
+		if (maxPacket == 0)
+			maxPacket = 512;
+		size_t transferSize = std::max(maxPacket, (MaxBulkTransferSize / maxPacket) * maxPacket);
 		ByteArray buffer(transferSize);
 		size_t r;
+		UInt32 noDataTimeout = timeout > 0 ? timeout : 0;
+		UInt32 completionTimeout = timeout > 0 ? std::max(timeout, 30000) : 0;
+
 		do
 		{
 			r = inputStream->Read(buffer.data(), buffer.size());
-			USB_CALL((*interface)->WritePipe(interface, ep->GetRefIndex(), buffer.data(), r));
+			USB_CALL((*interface)->WritePipeTO(interface, ep->GetRefIndex(), buffer.data(), static_cast<UInt32>(r), noDataTimeout, completionTimeout));
 		}
 		while(r == transferSize);
+
+		if (r > 0 && (r % maxPacket == 0))
+		{
+			USB_CALL((*interface)->WritePipeTO(interface, ep->GetRefIndex(), buffer.data(), 0, noDataTimeout, completionTimeout));
+		}
 	}
 
 	void Device::ReadBulk(const EndpointPtr & ep, const IObjectOutputStreamPtr &outputStream, int timeout)
 	{
-		IOUSBInterfaceInterface	** interface = ep->GetInterfaceHandle();
-		size_t transferSize = ep->GetMaxPacketSize();
+		IOUSBInterfaceType	** interface = ep->GetInterfaceHandle();
+		static constexpr size_t MaxBulkTransferSize = 256 * 1024;
+		size_t maxPacket = ep->GetMaxPacketSize();
+		if (maxPacket == 0)
+			maxPacket = 512;
+		size_t transferSize = std::max(maxPacket, (MaxBulkTransferSize / maxPacket) * maxPacket);
 		ByteArray buffer(transferSize);
 		size_t r;
+		UInt32 noDataTimeout = timeout > 0 ? timeout : 0;
+		UInt32 completionTimeout = timeout > 0 ? std::max(timeout, 30000) : 0;
+
 		do
 		{
-			UInt32 readBytes = buffer.size();
-			USB_CALL((*interface)->ReadPipe(interface, ep->GetRefIndex(), buffer.data(), &readBytes));
+			UInt32 readBytes = static_cast<UInt32>(buffer.size());
+			USB_CALL((*interface)->ReadPipeTO(interface, ep->GetRefIndex(), buffer.data(), &readBytes, noDataTimeout, completionTimeout));
 			r = outputStream->Write(buffer.data(), readBytes);
 		}
 		while(r == transferSize);
@@ -82,14 +101,19 @@ namespace mtp { namespace usb
 
 	void Device::ReadControl(IOUSBDeviceType **dev, u8 type, u8 req, u16 value, u16 index, ByteArray &data, int timeout)
 	{
-		IOUSBDevRequest request = {};
+		UInt32 noDataTimeout = timeout > 0 ? timeout : 0;
+		UInt32 completionTimeout = timeout > 0 ? std::max(timeout, 30000) : 0;
+
+		IOUSBDevRequestTO request = {};
 		request.bmRequestType = type;
 		request.bRequest = req;
 		request.wValue = value;
 		request.wIndex = index;
 		request.pData = data.data();
-		request.wLength = data.size();
-		USB_CALL((*dev)->DeviceRequest(dev, &request));
+		request.wLength = static_cast<UInt16>(data.size());
+		request.noDataTimeout = noDataTimeout;
+		request.completionTimeout = completionTimeout;
+		USB_CALL((*dev)->DeviceRequestTO(dev, &request));
 		data.resize(request.wLenDone);
 	}
 
@@ -97,7 +121,21 @@ namespace mtp { namespace usb
 	{ ReadControl(_dev, type, req, value, index, data, timeout); }
 
 	void Device::WriteControl(u8 type, u8 req, u16 value, u16 index, const ByteArray &data, int timeout)
-	{ error("WriteControl stub"); }
+	{
+		UInt32 noDataTimeout = timeout > 0 ? timeout : 0;
+		UInt32 completionTimeout = timeout > 0 ? std::max(timeout, 30000) : 0;
+
+		IOUSBDevRequestTO request = {};
+		request.bmRequestType = type;
+		request.bRequest = req;
+		request.wValue = value;
+		request.wIndex = index;
+		request.pData = const_cast<u8 *>(data.data());
+		request.wLength = static_cast<UInt16>(data.size());
+		request.noDataTimeout = noDataTimeout;
+		request.completionTimeout = completionTimeout;
+		USB_CALL((*_dev)->DeviceRequestTO(_dev, &request));
+	}
 
 	InterfaceTokenPtr Device::ClaimInterface(const InterfacePtr &interface)
 	{ return interface->Claim(); }

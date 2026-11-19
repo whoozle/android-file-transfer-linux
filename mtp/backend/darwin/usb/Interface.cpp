@@ -24,7 +24,7 @@
 namespace mtp { namespace usb
 {
 
-	Endpoint::Endpoint(IOUSBInterfaceInterface **interface, int idx): _interface(interface), _refIndex(idx)
+	Endpoint::Endpoint(IOUSBInterfaceType **interface, int idx): _interface(interface), _refIndex(idx)
 	{
 		UInt8		direction;
 		UInt8		number;
@@ -59,7 +59,7 @@ namespace mtp { namespace usb
 		_maxPacketSize = maxPacketSize;
 	}
 
-	Interface::Interface(DevicePtr device, ConfigurationPtr config, IOUSBInterfaceInterface **interface): _device(device), _config(config), _interface(interface) { }
+	Interface::Interface(DevicePtr device, ConfigurationPtr config, IOUSBInterfaceType **interface): _device(device), _config(config), _interface(interface) { }
 
 	Interface::~Interface()
 	{ }
@@ -92,7 +92,7 @@ namespace mtp { namespace usb
 		return intfNumEndpoints;
 	}
 
-	InterfaceToken::InterfaceToken(IOUSBInterfaceInterface **interface): _interface(interface)
+	InterfaceToken::InterfaceToken(IOUSBInterfaceType **interface): _interface(interface)
 	{
 		USB_CALL((*_interface)->USBInterfaceOpen(_interface));
 	}

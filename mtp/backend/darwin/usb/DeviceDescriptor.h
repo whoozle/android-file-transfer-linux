@@ -35,7 +35,7 @@ namespace mtp { namespace usb
 		//IOUSBDeviceType			**_dev;
 		IOUSBConfigurationDescriptorPtr	_conf;
 
-		std::vector<IOUSBInterfaceInterface **> _interfaces;
+		std::vector<IOUSBInterfaceType **> _interfaces;
 
 	public:
 		Configuration(IOUSBDeviceType ** dev, IOUSBConfigurationDescriptorPtr conf);
