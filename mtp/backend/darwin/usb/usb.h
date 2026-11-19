@@ -31,4 +31,18 @@ typedef IOUSBDeviceInterface500 IOUSBDeviceType;
 typedef IOUSBDeviceInterface IOUSBDeviceType;
 #define DeviceInterfaceID kIOUSBDeviceInterface
 #endif
+
+#if defined (kIOUSBInterfaceInterfaceID500)
+typedef IOUSBInterfaceInterface500 IOUSBInterfaceType;
+#define InterfaceInterfaceID kIOUSBInterfaceInterfaceID500
+#elif defined (kIOUSBInterfaceInterfaceID190)
+typedef IOUSBInterfaceInterface190 IOUSBInterfaceType;
+#define InterfaceInterfaceID kIOUSBInterfaceInterfaceID190
+#elif defined (kIOUSBInterfaceInterfaceID182)
+typedef IOUSBInterfaceInterface182 IOUSBInterfaceType;
+#define InterfaceInterfaceID kIOUSBInterfaceInterfaceID182
+#else
+typedef IOUSBInterfaceInterface IOUSBInterfaceType;
+#define InterfaceInterfaceID kIOUSBInterfaceInterfaceID
+#endif
 }}

@@ -28,7 +28,7 @@ namespace mtp { namespace usb
 	class Endpoint
 	{
 	private:
-		IOUSBInterfaceInterface	**	_interface;
+		IOUSBInterfaceType	**		_interface;
 		int							_refIndex;
 		int							_address;
 		int							_maxPacketSize;
@@ -36,9 +36,9 @@ namespace mtp { namespace usb
 		EndpointType				_type;
 
 	public:
-		Endpoint(IOUSBInterfaceInterface **interface, int idx);
+		Endpoint(IOUSBInterfaceType **interface, int idx);
 
-		IOUSBInterfaceInterface	** GetInterfaceHandle()
+		IOUSBInterfaceType	** GetInterfaceHandle()
 		{ return _interface; }
 
 		int GetRefIndex()
@@ -65,10 +65,10 @@ namespace mtp { namespace usb
 
 	class InterfaceToken : public IToken
 	{
-		IOUSBInterfaceInterface **_interface;
+		IOUSBInterfaceType **_interface;
 
 	public:
-		InterfaceToken(IOUSBInterfaceInterface **interface);
+		InterfaceToken(IOUSBInterfaceType **interface);
 		~InterfaceToken();
 	};
 	DECLARE_PTR(InterfaceToken);
@@ -77,13 +77,13 @@ namespace mtp { namespace usb
 	{
 		DevicePtr							_device;
 		ConfigurationPtr					_config;
-		IOUSBInterfaceInterface **			_interface;
+		IOUSBInterfaceType **				_interface;
 
 	public:
-		Interface(DevicePtr device, ConfigurationPtr config, IOUSBInterfaceInterface **interface);
+		Interface(DevicePtr device, ConfigurationPtr config, IOUSBInterfaceType **interface);
 		~Interface();
 
-		IOUSBInterfaceInterface ** GetInterfaceHandle()
+		IOUSBInterfaceType ** GetInterfaceHandle()
 		{ return _interface; }
 
 		u8 GetClass() const;

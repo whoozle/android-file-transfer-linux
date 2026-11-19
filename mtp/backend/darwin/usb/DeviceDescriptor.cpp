@@ -50,9 +50,9 @@ namespace mtp { namespace usb
 
 			IOObjectRelease(interface);
 
-			IOUSBInterfaceInterface **usbInterface = NULL;
+			IOUSBInterfaceType **usbInterface = NULL;
 			USB_CALL((*plugInInterface)->QueryInterface(plugInInterface,
-				CFUUIDGetUUIDBytes(kIOUSBInterfaceInterfaceID),
+				CFUUIDGetUUIDBytes(InterfaceInterfaceID),
 				(LPVOID *) &usbInterface));
 
 			(*plugInInterface)->Release(plugInInterface);
