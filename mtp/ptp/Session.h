@@ -97,7 +97,10 @@ namespace mtp
 		msg::NewObjectInfo SendObjectInfo(const msg::ObjectInfo &objectInfo, StorageId storageId = AnyStorage, ObjectId parentObject = Device);
 		void SendObject(const IObjectInputStreamPtr &inputStream, int timeout = LongTimeout);
 		void DeleteObject(ObjectId objectId, int timeout = LongTimeout);
+		void MoveObject(ObjectId objectId, StorageId storageId, ObjectId newParentId, int timeout = LongTimeout);
 
+		bool MoveObjectSupported() const
+		{ return _deviceInfo.Supports(OperationCode::MoveObject); }
 		bool EditObjectSupported() const
 		{ return _editObjectSupported; }
 		bool GetObjectPropertyListSupported() const

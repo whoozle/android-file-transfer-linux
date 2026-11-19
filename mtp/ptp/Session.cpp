@@ -531,6 +531,9 @@ namespace mtp
 	void Session::DeleteObject(ObjectId objectId, int timeout)
 	{ RunTransaction(timeout, OperationCode::DeleteObject, objectId.Id, 0); }
 
+	void Session::MoveObject(ObjectId objectId, StorageId storageId, ObjectId newParentId, int timeout)
+	{ RunTransaction(timeout, OperationCode::MoveObject, objectId.Id, storageId.Id, newParentId.Id); }
+
 	msg::DevicePropertyDesc Session::GetDevicePropertyDesc(DeviceProperty property)
 	{ return ParseResponse<msg::DevicePropertyDesc>(RunTransaction(_defaultTimeout, OperationCode::GetDevicePropDesc, static_cast<u32>(property))); }
 
@@ -557,7 +560,12 @@ namespace mtp
 	{ session->BeginEditObject(objectId); }
 
 	Session::ObjectEditSession::~ObjectEditSession()
-	{ _session->EndEditObject(_objectId); }
+	{
+		try
+		{ _session->EndEditObject(_objectId); }
+		catch(const std::exception &ex)
+		{ error("EndEditObject failed: ", ex.what()); }
+	}
 
 	void Session::ObjectEditSession::Truncate(u64 size)
 	{ _session->TruncateObject(_objectId, size); }
