@@ -54,16 +54,28 @@ namespace
 		mtp::DevicePtr	_device;
 		mtp::SessionPtr	_session;
 		bool			_editObjectSupported;
+		bool			_moveObjectSupported;
 		bool			_getObjectPropertyListSupported;
 		bool			_getPartialObjectSupported;
 		time_t			_connectTime;
 		size_t			_partialObjectCacheSize;
 
 		static constexpr size_t DefaultPartialObjectCacheSize = 3; //just 3 object entries.
+#ifdef RENAME_NOREPLACE
+		static constexpr unsigned int RenameNoReplace = RENAME_NOREPLACE;
+#else
+		static constexpr unsigned int RenameNoReplace = (1u << 0);
+#endif
+#ifdef RENAME_EXCHANGE
+		static constexpr unsigned int RenameExchange = RENAME_EXCHANGE;
+#else
+		static constexpr unsigned int RenameExchange = (1u << 1);
+#endif
 
 		using ChildrenObjects = std::map<std::string, FuseId>;
 		using Files = std::map<FuseId, ChildrenObjects>;
 		Files			_files;
+		std::map<fuse_ino_t, fuse_ino_t> _parentMap;
 
 		typedef std::map<mtp::ObjectId, struct stat> ObjectAttrs;
 		ObjectAttrs		_objectAttrs;
@@ -71,6 +83,18 @@ namespace
 		typedef mtp::Session::ObjectEditSessionPtr ObjectEditSessionPtr;
 		typedef std::map<FuseId, ObjectEditSessionPtr> OpenedFiles;
 		OpenedFiles		_openedFiles;
+
+		struct WriteBufferEntry
+		{
+			mtp::u64             StartOffset = 0;
+			mtp::ByteArray       Data;
+		};
+		std::map<FuseId, WriteBufferEntry> _writeBuffers;
+
+		fuse_ino_t      _readAheadInode = 0;
+		off_t           _readAheadOffset = 0;
+		mtp::ByteArray  _readAheadData;
+		static constexpr size_t ReadAheadSize = 256 * 1024;
 
 		typedef std::map<FuseId, CharArray> DirectoryCache;
 		DirectoryCache	_directoryCache;
@@ -81,6 +105,15 @@ namespace
 		std::vector<mtp::StorageId>					_storageIdList;
 		std::map<mtp::StorageId, std::string>		_storageToName;
 		std::map<std::string, mtp::StorageId>		_storageFromName;
+
+		struct CachedStorageSpace
+		{
+			mtp::u64	FreeSpace;
+			mtp::u64	MaxCapacity;
+			time_t		Timestamp;
+		};
+		std::map<mtp::u32, CachedStorageSpace>		_storageSpaceCache;
+		static constexpr time_t						StorageSpaceCacheTTL = 5;
 
 		struct ObjectCacheEntry
 		{
@@ -131,12 +164,13 @@ namespace
 			return FuseId(MtpStorageShift + std::distance(_storageIdList.begin(), i));
 		}
 
-		void GetObjectInfo(ChildrenObjects &cache, mtp::ObjectId id)
+		void GetObjectInfo(ChildrenObjects &cache, mtp::ObjectId id, FuseId parentInode)
 		{
 			auto oi = _session->GetObjectInfo(id);
 
 			FuseId inode = ToFuse(id);
 			cache.emplace(oi.Filename, inode);
+			_parentMap[inode.Inode] = parentInode.Inode;
 
 			struct stat &attr = _objectAttrs[id];
 			attr.st_uid = getuid();
@@ -233,17 +267,19 @@ namespace
 		{
 			if (inode == FuseId::Root)
 			{
-				PopulateStorages();
 				ChildrenObjects & cache = _files[inode];
-				cache.clear();
-				for(size_t i = 0; i < _storageIdList.size(); ++i)
+				if (cache.empty())
 				{
-					mtp::StorageId storageId = _storageIdList[i];
-					auto name = _storageToName.find(storageId);
-					if (name != _storageToName.end())
-						cache.emplace(name->second, FuseId(MtpStorageShift + i));
-					else
-						mtp::error("no storage name for ", storageId);
+					PopulateStorages();
+					for(size_t i = 0; i < _storageIdList.size(); ++i)
+					{
+						mtp::StorageId storageId = _storageIdList[i];
+						auto name = _storageToName.find(storageId);
+						if (name != _storageToName.end())
+							cache.emplace(name->second, FuseId(MtpStorageShift + i));
+						else
+							mtp::error("no storage name for ", storageId);
+					}
 				}
 				return cache;
 			}
@@ -282,8 +318,12 @@ namespace
 
 					//populate filenames
 					GetObjectPropertyList<std::string>(parent, objects, mtp::ObjectProperty::ObjectFilename,
-						[&cache](ObjectId objectId, const std::string &name)
-						{ cache.emplace(name, ToFuse(objectId)); });
+						[this, &cache, inode](ObjectId objectId, const std::string &name)
+						{
+							FuseId childInode = ToFuse(objectId);
+							cache.emplace(name, childInode);
+							_parentMap[childInode.Inode] = inode.Inode;
+						});
 
 					//format
 					GetObjectPropertyList<mtp::ObjectFormat>(parent, objects, mtp::ObjectProperty::ObjectFormat,
@@ -328,7 +368,7 @@ namespace
 			{
 				try
 				{
-					GetObjectInfo(cache, id);
+					GetObjectInfo(cache, id, inode);
 				} catch(const std::exception &ex)
 				{ }
 			}
@@ -365,8 +405,10 @@ namespace
 			{ //update cache:
 				auto i = _files.find(parentInode);
 				if (i != _files.end())
-					GetObjectInfo(i->second, noi.ObjectId); //insert object info into cache
+					GetObjectInfo(i->second, noi.ObjectId, parentInode); //insert object info into cache
 				_directoryCache.erase(parentInode);
+				_parentMap[ToFuse(noi.ObjectId).Inode] = parentInode.Inode;
+				_storageSpaceCache.clear();
 			}
 			return ToFuse(noi.ObjectId);
 		}
@@ -397,19 +439,51 @@ namespace
 			if (IsStorage(inode))
 				return FuseId::Root;
 
+			auto it = _parentMap.find(inode.Inode);
+			if (it != _parentMap.end())
+				return FuseId(it->second);
+
 			mtp::ObjectId id = FromFuse(inode);
 			mtp::ObjectId parent = _session->GetObjectParent(id);
+			fuse_ino_t parentIno;
 			if (parent == mtp::Session::Device || parent == mtp::Session::Root) //parent == root -> storage
 			{
-				return FuseIdFromStorageId(_session->GetObjectStorage(id));
+				parentIno = FuseIdFromStorageId(_session->GetObjectStorage(id)).Inode;
 			}
 			else
-				return ToFuse(parent);
+				parentIno = ToFuse(parent).Inode;
+
+			_parentMap[inode.Inode] = parentIno;
+			return FuseId(parentIno);
+		}
+
+		FuseId GetStorageInode(FuseId inode)
+		{
+			FuseId cur = inode;
+			for (int depth = 0; depth < 128 && cur != FuseId::Root; ++depth)
+			{
+				if (IsStorage(cur))
+					return cur;
+				auto it = _parentMap.find(cur.Inode);
+				if (it == _parentMap.end())
+					break;
+				cur = FuseId(it->second);
+			}
+			if (cur != FuseId::Root && !IsStorage(cur))
+				return FuseIdFromStorageId(_session->GetObjectStorage(FromFuse(inode)));
+			return cur;
 		}
 
 		bool FillEntry(FuseEntry &entry, FuseId id)
 		{
 			try { entry.attr = GetObjectAttr(id); } catch(const std::exception &ex) { return false; }
+			auto wb = _writeBuffers.find(id);
+			if (wb != _writeBuffers.end() && !wb->second.Data.empty())
+			{
+				off_t pendingEnd = static_cast<off_t>(wb->second.StartOffset + wb->second.Data.size());
+				if (pendingEnd > entry.attr.st_size)
+					SetSize(entry.attr, pendingEnd);
+			}
 			entry.SetId(id);
 			return true;
 		}
@@ -424,9 +498,16 @@ namespace
 			mtp::scoped_mutex_lock l(_mutex);
 
 			_openedFiles.clear();
+			_writeBuffers.clear();
 			_files.clear();
+			_parentMap.clear();
 			_objectAttrs.clear();
 			_directoryCache.clear();
+			_objectCache.clear();
+			_storageSpaceCache.clear();
+			_readAheadInode = 0;
+			_readAheadOffset = 0;
+			_readAheadData.clear();
 			_session.reset();
 			_device.reset();
 			_device = mtp::Device::FindFirst(_deviceFilter, _claimInterface, _resetDevice);
@@ -434,13 +515,21 @@ namespace
 				throw std::runtime_error("no MTP device found");
 
 			_session = _device->OpenSession(1);
+			const auto &di = _session->GetDeviceInfo();
+			_moveObjectSupported = _session->MoveObjectSupported();
 			_editObjectSupported = _session->EditObjectSupported();
+			_getObjectPropertyListSupported = _session->GetObjectPropertyListSupported();
+			_getPartialObjectSupported = di.Supports(mtp::OperationCode::GetPartialObject);
+			mtp::print("connected: ", di.Manufacturer, " ", di.Model,
+				" (MoveObject=", _moveObjectSupported ? "yes" : "no",
+				", EditObject=", _editObjectSupported ? "yes" : "no",
+				", GetPartialObject=", _getPartialObjectSupported ? "yes" : "no",
+				", GetPartialObject64=", di.Supports(mtp::OperationCode::GetPartialObject64) ? "yes" : "no",
+				", GetObjectPropertyList=", _getObjectPropertyListSupported ? "yes" : "no", ")");
 			if (!_editObjectSupported)
 				mtp::error("your device does not have android EditObject extension, you will not be able to write into individual files");
-			_getObjectPropertyListSupported = _session->GetObjectPropertyListSupported();
 			if (!_getObjectPropertyListSupported)
 				mtp::error("your device does not have GetObjectPropertyList extension, expect slow enumeration of big directories");
-			_getPartialObjectSupported = _session->GetDeviceInfo().Supports(mtp::OperationCode::GetPartialObject);
 			if (!_getPartialObjectSupported)
 				mtp::error("your device does not have GetPartialObject extension (beware, this will download the latest N objects you accessed and keep them in a small in-memory cache)");
 
@@ -470,6 +559,7 @@ namespace
 				_storageIdList.push_back(id);
 				_storageFromName[path] = id;
 				_storageToName[id] = path;
+				_storageSpaceCache[id.Id] = { si.FreeSpaceInBytes, si.MaxCapacity, time(NULL) };
 			}
 		}
 		std::string GetMountpoint()
@@ -512,11 +602,19 @@ namespace
 			if (it == _directoryCache.end())
 			{
 				const ChildrenObjects & cache = GetChildren(ino);
+				if (ino == FuseId::Root && cache.empty())
+				{
+					CharArray data;
+					dir.Add(data, ".", GetObjectAttr(ino));
+					dir.Add(data, "..", GetObjectAttr(GetParentObject(ino)));
+					dir.Reply(req, data, off, size);
+					return;
+				}
 
 				it = _directoryCache.insert(std::make_pair(ino, CharArray())).first;
 				CharArray &data = it->second;
 
-				dir.Add(data, ".", GetObjectAttr(FuseId::Root));
+				dir.Add(data, ".", GetObjectAttr(ino));
 				dir.Add(data, "..", GetObjectAttr(GetParentObject(ino)));
 				for(auto entry : cache)
 				{
@@ -535,6 +633,33 @@ namespace
 				entry.ReplyAttr();
 			else
 				entry.ReplyError(ENOENT);
+		}
+
+		void FlushWriteBuffer(FuseId inode)
+		{
+			auto it = _writeBuffers.find(inode);
+			if (it == _writeBuffers.end() || it->second.Data.empty())
+				return;
+
+			mtp::u64 startOffset = it->second.StartOffset;
+			mtp::ByteArray payload = std::move(it->second.Data);
+			it->second.Data.clear();
+
+			mtp::ObjectId objectId = FromFuse(inode);
+			GetObjectAttr(inode);
+			struct stat &attr = _objectAttrs[objectId];
+			ObjectEditSessionPtr tr = GetTransaction(inode);
+
+			off_t endOffset = static_cast<off_t>(startOffset + payload.size());
+			if (endOffset > attr.st_size)
+			{
+				tr->Truncate(endOffset);
+				SetSize(attr, endOffset);
+			}
+
+			tr->Send(startOffset, payload);
+			attr.st_mtime = time(NULL);
+			_storageSpaceCache.clear();
 		}
 
 		mtp::Session::ObjectEditSessionPtr GetTransaction(FuseId inode)
@@ -599,8 +724,30 @@ namespace
 						_objectCache.pop_back();
 						--size;
 					}
-				} else
-					data = _session->GetPartialObject(objectId, begin, rsize);
+				} else {
+					if (ino.Inode == _readAheadInode && begin >= _readAheadOffset && (begin + rsize) <= static_cast<off_t>(_readAheadOffset + _readAheadData.size()))
+					{
+						mtp::debug("read-ahead cache hit for inode ", ino.Inode, " at ", begin);
+						auto src = _readAheadData.data() + (begin - _readAheadOffset);
+						data.assign(src, src + rsize);
+					}
+					else
+					{
+						if (static_cast<size_t>(rsize) < ReadAheadSize)
+						{
+							off_t fetchSize = std::min<off_t>(attr.st_size - begin, ReadAheadSize);
+							_readAheadData = _session->GetPartialObject(objectId, begin, fetchSize);
+							_readAheadInode = ino.Inode;
+							_readAheadOffset = begin;
+							size_t available = std::min<size_t>(rsize, _readAheadData.size());
+							data.assign(_readAheadData.data(), _readAheadData.data() + available);
+						}
+						else
+						{
+							data = _session->GetPartialObject(objectId, begin, rsize);
+						}
+					}
+				}
 			}
 			mtp::debug("read ", data.size(), " bytes of data");
 			if (data.empty())
@@ -620,20 +767,40 @@ namespace
 		{
 			mtp::scoped_mutex_lock l(_mutex);
 
-			struct stat attr = GetObjectAttr(inode);
-			mtp::ObjectId objectId = FromFuse(inode);
-
-			ObjectEditSessionPtr tr = GetTransaction(inode);
-
-			off_t newSize = off + size;
-			if (newSize > attr.st_size)
+			if (_readAheadInode == inode.Inode)
 			{
-				mtp::debug("truncating file to ", newSize);
-				tr->Truncate(newSize);
-				SetSize(_objectAttrs[objectId], newSize);
+				_readAheadData.clear();
+				_readAheadInode = 0;
+			}
+			mtp::ObjectId objectId = FromFuse(inode);
+			_objectCache.remove_if([objectId](const ObjectCacheEntry &e) { return e.Id == objectId; });
+
+			GetTransaction(inode);
+			WriteBufferEntry &entry = _writeBuffers[inode];
+
+			static constexpr size_t MaxWriteBufferSize = 512 * 1024; // 512 KiB
+
+			if (!entry.Data.empty() && (off != static_cast<off_t>(entry.StartOffset + entry.Data.size()) || entry.Data.size() + size > MaxWriteBufferSize))
+			{
+				FlushWriteBuffer(inode);
 			}
 
-			tr->Send(off, mtp::ByteArray(buf, buf + size));
+			if (entry.Data.empty())
+			{
+				entry.StartOffset = off;
+			}
+
+			if (size >= MaxWriteBufferSize)
+			{
+				entry.StartOffset = off;
+				entry.Data.assign(buf, buf + size);
+				FlushWriteBuffer(inode);
+			}
+			else
+			{
+				entry.Data.insert(entry.Data.end(), buf, buf + size);
+			}
+
 			FUSE_CALL(fuse_reply_write(req, size));
 		}
 
@@ -649,28 +816,55 @@ namespace
 		void Open(fuse_req_t req, FuseId ino, struct fuse_file_info *fi)
 		{
 			mtp::scoped_mutex_lock l(_mutex);
-			mtp::ObjectFormat format;
-
 			try
 			{
-				format = static_cast<mtp::ObjectFormat>(_session->GetObjectIntegerProperty(FromFuse(ino), mtp::ObjectProperty::ObjectFormat));
+				struct stat attr = GetObjectAttr(ino);
+				if (attr.st_mode & S_IFDIR)
+				{
+					FUSE_CALL(fuse_reply_err(req, EISDIR));
+					return;
+				}
 			}
 			catch(const std::exception &ex)
-			{ FUSE_CALL(fuse_reply_err(req, ENOENT)); return; }
-
-			if (format == mtp::ObjectFormat::Association)
 			{
-				FUSE_CALL(fuse_reply_err(req, EISDIR));
+				FUSE_CALL(fuse_reply_err(req, ENOENT));
 				return;
 			}
+
 			FUSE_CALL(fuse_reply_open(req, fi));
 		}
 
 		void ReleaseTransaction(FuseId ino)
 		{
+			FlushWriteBuffer(ino);
+			_writeBuffers.erase(ino);
 			auto i = _openedFiles.find(ino);
 			if (i != _openedFiles.end())
 				_openedFiles.erase(i);
+		}
+
+		void Flush(fuse_req_t req, FuseId ino, struct fuse_file_info *fi)
+		{
+			mtp::scoped_mutex_lock l(_mutex);
+			int err = 0;
+			try
+			{
+				ReleaseTransaction(ino);
+			}
+			catch (const mtp::usb::DeviceNotFoundException &)
+			{
+				_writeBuffers.erase(ino);
+				_openedFiles.erase(ino);
+				throw;
+			}
+			catch (const std::exception &ex)
+			{
+				mtp::error("Flush failed for inode ", ino.Inode, ": ", ex.what());
+				_writeBuffers.erase(ino);
+				_openedFiles.erase(ino);
+				err = EIO;
+			}
+			FUSE_CALL(fuse_reply_err(req, err));
 		}
 
 		void Release(fuse_req_t req, FuseId ino, struct fuse_file_info *fi)
@@ -688,11 +882,20 @@ namespace
 			{
 				if (to_set & FUSE_SET_ATTR_SIZE)
 				{
+					FlushWriteBuffer(inode);
+					if (_readAheadInode == inode.Inode)
+					{
+						_readAheadData.clear();
+						_readAheadInode = 0;
+					}
+					mtp::ObjectId id = FromFuse(inode);
+					_objectCache.remove_if([id](const ObjectCacheEntry &e) { return e.Id == id; });
 					off_t newSize = attr->st_size;
 					ObjectEditSessionPtr tr = GetTransaction(inode);
 					tr->Truncate(newSize);
 					SetSize(entry.attr, newSize);
-					SetSize(_objectAttrs[FromFuse(inode)], newSize);
+					SetSize(_objectAttrs[id], newSize);
+					_storageSpaceCache.clear();
 				}
 				entry.ReplyAttr();
 			}
@@ -704,9 +907,20 @@ namespace
 		{
 			mtp::debug("   unlinking inode ", inode.Inode);
 			mtp::ObjectId id = FromFuse(inode);
-			_session->DeleteObject(id);
+			_writeBuffers.erase(inode);
 			_openedFiles.erase(inode);
+			_session->DeleteObject(id);
 			_objectAttrs.erase(id);
+			_parentMap.erase(inode.Inode);
+			_files.erase(inode);
+			_directoryCache.erase(inode);
+			if (_readAheadInode == inode.Inode)
+			{
+				_readAheadData.clear();
+				_readAheadInode = 0;
+			}
+			_objectCache.remove_if([id](const ObjectCacheEntry &e) { return e.Id == id; });
+			_storageSpaceCache.clear();
 		}
 
 		void Unlink(fuse_req_t req, FuseId parent, const char *name)
@@ -743,41 +957,216 @@ namespace
 
 		void Rename(fuse_req_t req, FuseId parent, const char *name, FuseId newparent, const char *newName, unsigned int flags)
 		{
-			if (parent != newparent) {
-				//no renames across directory boundary, sorry
-				//return cross-device link, so user space should re-create file and copy it
-				FUSE_CALL(fuse_reply_err(req, EXDEV));
+			mtp::debug("   Rename flags: 0x", mtp::hex(flags, 8));
+			if (flags & RenameExchange)
+			{
+				FUSE_CALL(fuse_reply_err(req, EINVAL));
 				return;
 			}
 
 			mtp::scoped_mutex_lock l(_mutex);
-			ChildrenObjects &children = GetChildren(parent);
-			auto i = children.find(name);
-			if (i == children.end())
+			ChildrenObjects &srcChildren = GetChildren(parent);
+			auto i = srcChildren.find(name);
+			if (i == srcChildren.end())
 			{
 				FUSE_CALL(fuse_reply_err(req, ENOENT));
 				return;
 			}
 
-			FuseId inode = i->second;
-			mtp::debug("   renaming inode ", inode.Inode, " to ", newName);
-
-			auto old = children.find(newName);
-			if (old != children.end())
+			if (parent == newparent && std::string(name) == std::string(newName))
 			{
-				mtp::debug("   unlinking target inode ", old->second.Inode);
-				UnlinkImpl(old->second);
-				children.erase(old);
+				FUSE_CALL(fuse_reply_err(req, 0));
+				return;
 			}
 
+			FuseId inode = i->second;
 			mtp::ObjectId id = FromFuse(inode);
-			_session->SetObjectProperty(id, mtp::ObjectProperty::ObjectFilename, std::string(newName));
 
-			children.erase(i);
-			children.emplace(newName, inode);
-			_directoryCache.erase(parent);
+			mtp::StorageId destStorageId;
+			mtp::ObjectId destParentId;
+			if (parent != newparent)
+			{
+				if (newparent == FuseId::Root || IsStorage(inode))
+				{
+					FUSE_CALL(fuse_reply_err(req, EPERM));
+					return;
+				}
+
+				if (!_moveObjectSupported)
+				{
+					mtp::debug("MoveObject not supported by device, returning EXDEV");
+					FUSE_CALL(fuse_reply_err(req, EXDEV));
+					return;
+				}
+
+				if (IsStorage(newparent))
+				{
+					destStorageId = FuseIdToStorageId(newparent);
+					destParentId = mtp::Session::Device;
+				}
+				else
+				{
+					destParentId = FromFuse(newparent);
+					FuseId storageIno = GetStorageInode(newparent);
+					destStorageId = IsStorage(storageIno) ? FuseIdToStorageId(storageIno) : _session->GetObjectStorage(destParentId);
+				}
+
+				FuseId srcStorageIno = GetStorageInode(parent);
+				if (IsStorage(srcStorageIno) && FuseIdToStorageId(srcStorageIno) != destStorageId)
+				{
+					mtp::debug("Cross-storage MoveObject requested, falling back to EXDEV");
+					FUSE_CALL(fuse_reply_err(req, EXDEV));
+					return;
+				}
+			}
+
+			ReleaseTransaction(inode);
+			if (_readAheadInode == inode.Inode)
+			{
+				_readAheadData.clear();
+				_readAheadInode = 0;
+			}
+			_objectCache.remove_if([id](const ObjectCacheEntry &e) { return e.Id == id; });
+
+			ChildrenObjects &destChildren = (parent == newparent) ? srcChildren : GetChildren(newparent);
+			if (parent != newparent && std::string(name) != std::string(newName)
+				&& destChildren.find(name) != destChildren.end()
+				&& srcChildren.find(newName) != srcChildren.end())
+			{
+				mtp::debug("Cross-directory MoveObject name collision in both src and dest, falling back to EXDEV");
+				FUSE_CALL(fuse_reply_err(req, EXDEV));
+				return;
+			}
+
+			auto old = destChildren.find(newName);
+			if (old != destChildren.end())
+			{
+				if (flags & RenameNoReplace)
+				{
+					FUSE_CALL(fuse_reply_err(req, EEXIST));
+					return;
+				}
+
+				if (old->second == inode)
+				{
+					FUSE_CALL(fuse_reply_err(req, 0));
+					return;
+				}
+
+				try
+				{
+					struct stat srcAttr = GetObjectAttr(inode);
+					struct stat destAttr = GetObjectAttr(old->second);
+					bool srcIsDir = (srcAttr.st_mode & S_IFDIR) != 0;
+					bool destIsDir = (destAttr.st_mode & S_IFDIR) != 0;
+					if (srcIsDir && !destIsDir)
+					{
+						FUSE_CALL(fuse_reply_err(req, ENOTDIR));
+						return;
+					}
+					if (!srcIsDir && destIsDir)
+					{
+						FUSE_CALL(fuse_reply_err(req, EISDIR));
+						return;
+					}
+					if (destIsDir && !GetChildren(old->second).empty())
+					{
+						FUSE_CALL(fuse_reply_err(req, ENOTEMPTY));
+						return;
+					}
+				}
+				catch (const std::exception &)
+				{ }
+
+				mtp::debug("   unlinking target inode ", old->second.Inode);
+				UnlinkImpl(old->second);
+				destChildren.erase(old);
+				_directoryCache.erase(newparent);
+			}
+
+			bool renamedFirst = false;
+			if (parent != newparent && std::string(name) != std::string(newName) && destChildren.find(name) != destChildren.end() && srcChildren.find(newName) == srcChildren.end())
+			{
+				try
+				{
+					_session->SetObjectProperty(id, mtp::ObjectProperty::ObjectFilename, std::string(newName));
+					srcChildren.erase(name);
+					srcChildren.emplace(newName, inode);
+					_directoryCache.erase(parent);
+					renamedFirst = true;
+				}
+				catch (const std::exception &)
+				{ }
+			}
+
+			if (parent != newparent)
+			{
+				try
+				{
+					mtp::debug("   moving inode ", inode.Inode, " (object ", id.Id, ") to parent ", destParentId.Id, " in storage ", destStorageId.Id);
+					_session->MoveObject(id, destStorageId, destParentId);
+				}
+				catch (const std::exception &ex)
+				{
+					if (renamedFirst)
+					{
+						try
+						{
+							_session->SetObjectProperty(id, mtp::ObjectProperty::ObjectFilename, std::string(name));
+							srcChildren.erase(newName);
+							srcChildren.emplace(name, inode);
+						}
+						catch (const std::exception &)
+						{ }
+					}
+					mtp::error("MoveObject failed: ", ex.what(), ", falling back to EXDEV");
+					FUSE_CALL(fuse_reply_err(req, EXDEV));
+					return;
+				}
+
+				const char *currentName = renamedFirst ? newName : name;
+				srcChildren.erase(currentName);
+				destChildren.emplace(currentName, inode);
+				_parentMap[inode.Inode] = newparent.Inode;
+				_directoryCache.erase(parent);
+				_directoryCache.erase(newparent);
+			}
+
+			if (!renamedFirst && std::string(name) != std::string(newName))
+			{
+				mtp::debug("   renaming inode ", inode.Inode, " to ", newName);
+				try
+				{
+					_session->SetObjectProperty(id, mtp::ObjectProperty::ObjectFilename, std::string(newName));
+				}
+				catch (const std::exception &ex)
+				{
+					mtp::error("SetObjectProperty(ObjectFilename) failed: ", ex.what());
+					FUSE_CALL(fuse_reply_err(req, EIO));
+					return;
+				}
+				destChildren.erase(name);
+				destChildren.emplace(newName, inode);
+				_directoryCache.erase(newparent);
+			}
 
 			FUSE_CALL(fuse_reply_err(req, 0));
+		}
+
+		void GetCachedStorageSpace(mtp::StorageId storageId, mtp::u64 &freeSpace, mtp::u64 &capacity)
+		{
+			time_t now = time(NULL);
+			auto it = _storageSpaceCache.find(storageId.Id);
+			if (it != _storageSpaceCache.end() && (now - it->second.Timestamp) < StorageSpaceCacheTTL)
+			{
+				freeSpace = it->second.FreeSpace;
+				capacity = it->second.MaxCapacity;
+				return;
+			}
+			mtp::msg::StorageInfo si = _session->GetStorageInfo(storageId);
+			freeSpace = si.FreeSpaceInBytes;
+			capacity = si.MaxCapacity;
+			_storageSpaceCache[storageId.Id] = { freeSpace, capacity, now };
 		}
 
 		void StatFS(fuse_req_t req, FuseId ino)
@@ -791,22 +1180,20 @@ namespace
 			{
 				for(auto storageId : _storageIdList)
 				{
-					mtp::msg::StorageInfo si = _session->GetStorageInfo(storageId);
-					freeSpace += si.FreeSpaceInBytes;
-					capacity += si.MaxCapacity;
+					mtp::u64 sFree = 0, sCap = 0;
+					GetCachedStorageSpace(storageId, sFree, sCap);
+					freeSpace += sFree;
+					capacity += sCap;
 				}
 			}
 			else
 			{
-				mtp::StorageId storageId;
-				if (IsStorage(ino))
-					storageId = FuseIdToStorageId(ino);
-				else
-					storageId = _session->GetObjectStorage(FromFuse(ino));
+				FuseId storageIno = IsStorage(ino) ? ino : GetStorageInode(ino);
+				mtp::StorageId storageId = IsStorage(storageIno)
+					? FuseIdToStorageId(storageIno)
+					: _session->GetObjectStorage(FromFuse(ino));
 
-				mtp::msg::StorageInfo si = _session->GetStorageInfo(storageId);
-				freeSpace = si.FreeSpaceInBytes;
-				capacity = si.MaxCapacity;
+				GetCachedStorageSpace(storageId, freeSpace, capacity);
 			}
 
 			stat.f_frsize = stat.f_bsize = 1024 * 1024;
@@ -823,8 +1210,14 @@ namespace
 		try { return __VA_ARGS__ ; } \
 		catch (const mtp::usb::DeviceNotFoundException &) \
 		{ \
-			g_wrapper->Connect(); \
-			__VA_ARGS__ ; \
+			try { \
+				g_wrapper->Connect(); \
+				return __VA_ARGS__ ; \
+			} catch (const std::exception &ex) { \
+				mtp::error("reconnect failed: ", ex.what()); \
+				fuse_reply_err(req, ENODEV); \
+				return; \
+			} \
 		} \
 		catch (const std::exception &ex) \
 		{ mtp::error(#__VA_ARGS__ " failed: ", ex.what()); fuse_reply_err(req, EIO); } \
@@ -876,6 +1269,9 @@ namespace
 
 	void Release(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi)
 	{ mtp::debug("   Release ", ino); WRAP_EX(g_wrapper->Release(req, FuseId(ino), fi)); }
+
+	void Flush(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi)
+	{ mtp::debug("   Flush ", ino); WRAP_EX(g_wrapper->Flush(req, FuseId(ino), fi)); }
 
 	void MakeDir(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t mode)
 	{ mtp::debug("   MakeDir ", parent, " ", name, " 0x", mtp::hex(mode, 8)); WRAP_EX(g_wrapper->MakeDir(req, FuseId(parent), name, mode)); }
@@ -966,6 +1362,7 @@ int main(int argc, char **argv)
 	ops.mkdir		= &MakeDir;
 	ops.rename		= &Rename;
 	ops.release		= &Release;
+	ops.flush		= &Flush;
 	ops.rmdir		= &RemoveDir;
 	ops.unlink		= &Unlink;
 	ops.statfs		= &StatFS;
