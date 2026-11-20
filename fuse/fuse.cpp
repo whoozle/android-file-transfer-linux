@@ -41,13 +41,6 @@
 
 #include <fuse_lowlevel.h>
 
-#ifndef RENAME_NOREPLACE
-#define RENAME_NOREPLACE (1 << 0)
-#endif
-#ifndef RENAME_EXCHANGE
-#define RENAME_EXCHANGE (1 << 1)
-#endif
-
 namespace
 {
 	using namespace mtp::fuse;
@@ -68,6 +61,16 @@ namespace
 		size_t			_partialObjectCacheSize;
 
 		static constexpr size_t DefaultPartialObjectCacheSize = 3; //just 3 object entries.
+#ifdef RENAME_NOREPLACE
+		static constexpr unsigned int RenameNoReplace = RENAME_NOREPLACE;
+#else
+		static constexpr unsigned int RenameNoReplace = (1u << 0);
+#endif
+#ifdef RENAME_EXCHANGE
+		static constexpr unsigned int RenameExchange = RENAME_EXCHANGE;
+#else
+		static constexpr unsigned int RenameExchange = (1u << 1);
+#endif
 
 		using ChildrenObjects = std::map<std::string, FuseId>;
 		using Files = std::map<FuseId, ChildrenObjects>;
@@ -955,7 +958,7 @@ namespace
 		void Rename(fuse_req_t req, FuseId parent, const char *name, FuseId newparent, const char *newName, unsigned int flags)
 		{
 			mtp::debug("   Rename flags: 0x", mtp::hex(flags, 8));
-			if (flags & RENAME_EXCHANGE)
+			if (flags & RenameExchange)
 			{
 				FUSE_CALL(fuse_reply_err(req, EINVAL));
 				return;
@@ -1038,7 +1041,7 @@ namespace
 			auto old = destChildren.find(newName);
 			if (old != destChildren.end())
 			{
-				if (flags & RENAME_NOREPLACE)
+				if (flags & RenameNoReplace)
 				{
 					FUSE_CALL(fuse_reply_err(req, EEXIST));
 					return;
