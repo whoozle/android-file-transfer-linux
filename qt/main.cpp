@@ -24,6 +24,11 @@
 #include <QLocale>
 #include <QMessageBox>
 #include <QTranslator>
+#include <QFile>
+#include <QDir>
+#include <QTextStream>
+#include <QProcess>
+#include <QRegularExpression>
 #include <mtp/log.h>
 #if QT_VERSION >= 0x050000
 #	include <QGuiApplication>
@@ -54,6 +59,8 @@ int main(int argc, char *argv[])
 {
 	QApplication app(argc, argv);
 	Q_INIT_RESOURCE(android_file_transfer);
+	
+
 
 	QCoreApplication::setApplicationName("aft-linux-qt");
 	QCoreApplication::setOrganizationDomain("whoozle.github.io");
@@ -64,14 +71,83 @@ int main(int argc, char *argv[])
 #endif
 
 	QTranslator qtTranslator;
+	QString localeName = QLocale::system().name();
+	
+#ifdef Q_OS_MACOS
+	// On macOS, when launched from Finder, environment variables are often not set
+	// This causes QLocale::system() to default to en_US even if system language is Chinese
+	// Try to detect the actual system language using multiple methods
+	if (qgetenv("LANG").isEmpty() && qgetenv("LC_ALL").isEmpty()) {
+		// Method 1: Try to get system language using macOS-specific commands
+		QProcess process;
+		process.start("defaults", QStringList() << "read" << "NSGlobalDomain" << "AppleLocale");
+		process.waitForFinished(1000);
+		QString output = process.readAllStandardOutput().trimmed();
+		if (!output.isEmpty() && output != "\"en_US\"") {
+			// Remove quotes and convert to Qt locale format
+			output = output.remove("\"");
+			localeName = output;
+		} else {
+			// Method 2: Try to get language from system preferences
+			process.start("defaults", QStringList() << "read" << "NSGlobalDomain" << "AppleLanguages");
+			process.waitForFinished(1000);
+			output = process.readAllStandardOutput().trimmed();
+			if (!output.isEmpty()) {
+				// Parse array format like ( "zh-Hans-CN", "en" )
+				QRegularExpression re("\"([^\"]+)\"");
+				QRegularExpressionMatch match = re.match(output);
+				if (match.hasMatch()) {
+					QString lang = match.captured(1);
+					// Convert macOS format to Qt format
+					if (lang.startsWith("zh-Hans")) {
+						localeName = "zh_CN";
+					} else if (lang.startsWith("zh-Hant")) {
+						localeName = "zh_TW";
+					} else {
+						// Extract first two characters for language code
+						localeName = lang.left(2);
+					}
+				}
+			}
+		}
+	}
+#endif
+	
 
-	qtTranslator.load("qt_" + QLocale::system().name(),
+
+	qtTranslator.load("qt_" + localeName,
 					QLibraryInfo::location(QLibraryInfo::TranslationsPath));
 	app.installTranslator(&qtTranslator);
 
 	QTranslator aTranslator;
-	aTranslator.load(":/android-file-transfer-linux_" + QLocale::system().name());
-	app.installTranslator(&aTranslator);
+	
+	// Try to load translation with multiple fallback strategies
+	bool translationLoaded = false;
+	QStringList localeAttempts;
+	
+	// Add all possible locale formats to try
+	localeAttempts << localeName;  // Original: "zh_CN"
+	localeAttempts << localeName.replace("_", "-");  // Hyphen: "zh-CN" 
+	localeAttempts << localeName.split("-").first().split("_").first();  // Language only: "zh"
+	
+	// Also try some common variations for Chinese
+	if (localeName.startsWith("zh")) {
+		localeAttempts << "zh-CN";  // Simplified Chinese
+		localeAttempts << "zh-TW";  // Traditional Chinese  
+		localeAttempts << "zh_CN";  // Underscore variant
+	}
+	
+	for (const QString& attempt : localeAttempts) {
+		QString resourcePath = ":/android-file-transfer-linux_" + attempt;
+		if (aTranslator.load(resourcePath)) {
+			translationLoaded = true;
+			break;
+		}
+	}
+	
+	if (translationLoaded) {
+		app.installTranslator(&aTranslator);
+	}
 
 	MainWindow w;
 
